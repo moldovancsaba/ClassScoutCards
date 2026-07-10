@@ -1,5 +1,6 @@
 import { NextPage, GetServerSideProps } from "next";
 import Link from "next/link";
+import { MongoClient } from "mongodb";
 
 interface CardData {
   id: string;
@@ -7,12 +8,19 @@ interface CardData {
   category: string;
   borough: string;
   neighborhood: string;
-  description: string;
-  activities: string[];
-  ageRange: string;
-  source: string;
-  createdAt: string;
-  updatedAt: string;
+  shortDescription?: string;
+  longDescription?: string;
+  description?: string;
+  activityTypes?: string[];
+  ageRanges?: string[];
+  ageRange?: string;
+  activities?: string[];
+  source?: string;
+  feedMetadata?: { source?: string };
+  createdAt?: { $date?: string } | string | Date;
+  updatedAt?: { $date?: string } | string | Date;
+  discoveredAt?: string;
+  _id?: string;
 }
 
 interface CardDetailProps {
@@ -120,18 +128,29 @@ const CardDetail: NextPage<CardDetailProps> = ({ card, error }) => {
 export const getServerSideProps: GetServerSideProps<CardDetailProps> = async (context) => {
   const { id } = context.params!;
   
-  try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-    const res = await fetch(`${baseUrl}/api/cards/${id}`);
-    
-    if (!res.ok) {
-      if (res.status === 404) {
-        return { props: { card: null } };
+  if (!process.env.MONGODB_URI) {
+    return {
+      props: {
+        card: null,
+        error: "MongoDB not configured"
       }
-      throw new Error(`Failed to fetch card: ${res.statusText}`);
+    };
+  }
+  
+  try {
+    const client = new MongoClient(process.env.MONGODB_URI);
+    await client.connect();
+    const db = client.db(process.env.MONGODB_DB_NAME || "classscout");
+    const collection = db.collection("providers");
+    
+    const card = await collection.findOne({ id });
+    
+    await client.close();
+    
+    if (!card) {
+      return { props: { card: null } };
     }
     
-    const card = await res.json();
     return { props: { card } };
   } catch (error) {
     return {
