@@ -1,89 +1,143 @@
-import type { GenerateCardInput, Provider, GenerationResult } from "@/lib/types/provider";
+import {
+  Provider,
+  GenerateCardInput,
+  GenerationResult,
+  Category,
+  Borough,
+  AgeRange,
+} from "@/lib/types/provider";
 import { randomUUID } from "crypto";
 
-// Quality gate thresholds (aligned with ClassScout's defaults)
-const MIN_QUALITY_SCORE = 70;
-const FALLBACK_MIN_SCORE = 50;
+// ---- Quality scoring weights ----
+const SCORE_FIELDS = {
+  name: 5,
+  source: 5,
+  category: 8,
+  borough: 8,
+  neighborhood: 4,
+  address: 12,
+  activityTypes: 8,
+  ageRanges: 6,
+  description: 16,
+  price: 8,
+  website: 5,
+  phone: 5,
+  email: 10,
+} as const;
+const MAX_SCORE = Object.values(SCORE_FIELDS).reduce((a, b) => a + b, 0); // 100
 
-/**
- * Generates a ClassScout Provider card from raw input
- * Applies quality gates, validation, and enrichment
- */
-export function generateCard(input: GenerateCardInput): GenerationResult {
-  const missingFields: string[] = [];
+function scoreProvider(p: GenerateCardInput): { score: number; missing: string[]; warnings: string[] } {
+  let score = 0;
+  const missing: string[] = [];
   const warnings: string[] = [];
-  let qualityScore = 100;
 
-  // Validate required fields
-  if (!input.name) {
-    return { success: false, error: "Provider name is required", missingFields: ["name"], warnings };
-  }
-  if (!input.source) {
-    return { success: false, error: "Source is required", missingFields: ["source"], warnings };
-  }
+  const has = (v: unknown) => !!v && (typeof v === "string" ? v.trim() : Array.isArray(v) ? v.length > 0 : true);
 
-  // Infer category if missing
-  let category = input.category;
-  if (!category) {
-    // Try to infer from name/description
-    const text = `${input.name} ${input.description || ""}`.toLowerCase();
-    if (text.includes("class") || text.includes("lesson")) category = "Classes";
-    else if (text.includes("camp")) category = "Camps";
-    else if (text.includes("birthday") || text.includes("party")) category = "Birthday Parties";
-    else category = "Drop-In Activities";
-    warnings.push(`Category inferred as ${category}`);
+  if (!has(p.name)) missing.push("name"); else score += SCORE_FIELDS.name;
+  if (!has(p.source)) missing.push("source"); else score += SCORE_FIELDS.source;
+  if (!has(p.category)) missing.push("category"); else score += SCORE_FIELDS.category;
+  if (!has(p.borough)) missing.push("borough"); else score += SCORE_FIELDS.borough;
+  if (!has(p.neighborhood)) { missing.push("neighborhood"); } else { score += SCORE_FIELDS.neighborhood; }
+  if (!has(p.address)) {
+    missing.push("address");
+    warnings.push("Address is strongly recommended for provider cards");
+  } else {
+    score += SCORE_FIELDS.address;
   }
 
-  // Default location
-  const borough = input.borough || "Manhattan";
-  const neighborhood = input.neighborhood || borough;
-  const address = input.address || borough;
+  if (!has(p.activityTypes)) { missing.push("activityTypes"); } else { score += SCORE_FIELDS.activityTypes; }
+  if (!has(p.ageRanges)) { missing.push("ageRanges"); warnings.push("Age ranges missing — helps parents filter"); } else { score += SCORE_FIELDS.ageRanges; }
 
-  // Quality scoring
-  if (!input.address) qualityScore -= 10;
-  if (!input.neighborhood) qualityScore -= 5;
-  if (!input.description) qualityScore -= 15;
-  if (!input.website && !input.phone) qualityScore -= 20;
-  if (!input.email) qualityScore -= 5;
-  if (!input.price) qualityScore -= 10;
+  const desc = p.description;
+  if (!has(desc)) { missing.push("description"); }
+  else {
+    const len = desc!.length;
+    if (len < 50) { score += SCORE_FIELDS.description * 0.5; warnings.push("Description too short (<50 chars)"); }
+    else if (len < 100) { score += SCORE_FIELDS.description * 0.8; warnings.push("Description could be longer"); }
+    else { score += SCORE_FIELDS.description; }
+  }
 
-  // Missing fields tracking
-  if (!input.address) missingFields.push("address");
-  if (!input.description) missingFields.push("description");
-  if (!input.website) missingFields.push("website");
-  if (!input.phone) missingFields.push("phone");
-  if (!input.email) missingFields.push("email");
-  if (!input.price) missingFields.push("price");
+  if (!has(p.price)) missing.push("price") || warnings.push("Price info improves parent decision-making");
+  else score += SCORE_FIELDS.price;
 
-  // Quality gate
-  if (qualityScore < FALLBACK_MIN_SCORE) {
+  if (!has(p.website)) missing.push("website"); else score += SCORE_FIELDS.website;
+  if (!has(p.phone)) missing.push("phone"); else score += SCORE_FIELDS.phone;
+  if (!has(p.email)) { missing.push("email"); }
+  else score += SCORE_FIELDS.email;
+
+  return { score: Math.round(score), missing, warnings };
+}
+
+function normaliseBorough(raw?: string): Borough | undefined {
+  if (!raw) return undefined;
+  const canonical: Record<string, Borough> = {
+    manhattan: "Manhattan",
+    brooklyn: "Brooklyn",
+    queens: "Queens",
+    bronx: "Bronx",
+    "staten island": "Staten Island",
+  };
+  return canonical[raw.toLowerCase().trim()] ?? undefined;
+}
+
+function normaliseAgeRange(raw?: string): AgeRange | undefined {
+  if (!raw) return undefined;
+  const canonical: Record<string, AgeRange> = {
+    "0-2": "0–2",
+    "0–2": "0–2",
+    "3-5": "3–5",
+    "3–5": "3–5",
+    "6-8": "6–8",
+    "6–8": "6–8",
+    "9-12": "9–12",
+    "9–12": "9–12",
+    teens: "Teens",
+  };
+  return canonical[raw.toLowerCase().trim()];
+}
+
+function parsePriceToNumber(price?: string): number | undefined {
+  if (!price) return undefined;
+  const match = price.match(/\$?([\d,]+(?:\.\d+)?)/);
+  return match ? parseFloat(match[1].replace(/,/g, "")) : undefined;
+}
+
+export function generateCard(input: GenerateCardInput): GenerationResult {
+  const { score, missing, warnings } = scoreProvider(input);
+
+  // Reject if score too low
+  if (score < 30) {
     return {
       success: false,
-      error: `Quality score ${qualityScore} below minimum ${FALLBACK_MIN_SCORE}`,
-      missingFields,
+      error: `Quality score too low (${score}/100). Required fields: ${missing.join(", ")}`,
+      missingFields: missing,
       warnings,
     };
   }
+  if (score < 50) {
+    warnings.push(`Low quality score (${score}/100) — consider filling: ${missing.slice(0, 5).join(", ")}`);
+  }
 
-  // Build provider card
+  const borough = normaliseBorough(input.borough) ?? (input.borough as Borough) ?? undefined;
+
   const card: Provider = {
     id: randomUUID(),
-    name: input.name,
-    category,
-    borough,
-    neighborhood,
-    address,
-    activityTypes: input.activityTypes || ["General"],
-    ageRanges: input.ageRanges || [],
+    name: input.name.trim(),
+    category: (input.category ?? "Classes") as Category,
+    borough: borough ?? ("Manhattan" as Borough),
+    neighborhood: input.neighborhood ?? "",
+    address: input.address ?? "",
+    activityTypes: input.activityTypes ?? ["General"],
+    ageRanges: input.ageRanges ? input.ageRanges.filter((a) => normaliseAgeRange(a)) : [],
     dayTimeTags: [],
-    pricePerClass: parsePrice(input.price) || 0,
-    priceText: input.price,
-    shortDescription: truncate(input.description || "", 150),
-    longDescription: input.description || "",
-    email: input.email || "",
-    website: input.website || "",
-    phone: input.phone || "",
-    image: "", // Will be enriched later
+    pricePerClass: parsePriceToNumber(input.price) ?? 0,
+    priceText: input.price ?? undefined,
+    shortDescription: input.description ? input.description.slice(0, 160) : "",
+    longDescription: input.description ?? "",
+    email: input.email ?? "",
+    website: input.website ?? "",
+    phone: input.phone ?? "",
+    image: "",
     rating: 0,
     reviewCount: 0,
     badges: [],
@@ -93,30 +147,10 @@ export function generateCard(input: GenerateCardInput): GenerationResult {
       source: input.source,
       originalUrl: input.sourceUrl,
       extractedAt: new Date().toISOString(),
-      confidence: qualityScore / 100,
-      missingFields,
+      confidence: Math.min(score / 100, 1),
+      missingFields: missing,
     },
   };
 
-  if (missingFields.length > 0) {
-    warnings.push(`Card has ${missingFields.length} missing fields: ${missingFields.join(", ")}`);
-  }
-
-  return {
-    success: true,
-    card,
-    missingFields,
-    warnings,
-  };
-}
-
-function parsePrice(priceText?: string): number {
-  if (!priceText) return 0;
-  const match = priceText.match(/\$(\d+)/);
-  return match ? parseInt(match[1]) : 0;
-}
-
-function truncate(text: string, maxLength: number): string {
-  if (text.length <= maxLength) return text;
-  return text.substring(0, maxLength - 3) + "...";
+  return { success: true, card, missingFields: missing, warnings };
 }

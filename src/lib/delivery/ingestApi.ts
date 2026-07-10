@@ -1,125 +1,116 @@
-import type { Provider } from "@/lib/types/provider";
+import { Provider } from "@/lib/types/provider";
 
-export interface IngestConfig {
+interface IngestApiConfig {
   baseUrl: string;
   apiKey: string;
 }
 
-export interface IngestResult {
+interface IngestResponse {
   success: boolean;
-  ingestApi: boolean;
   cardsSent: number;
-  response?: unknown;
-  error?: string;
+  errors: string[];
+  endpoint?: string;
+  method?: string;
 }
 
 /**
- * Delivers generated cards to ClassScout via the ingest API
- * POST /api/ingest with Bearer token auth
+ * Deliver cards to the main ClassScout ingest endpoint.
+ * This is the primary delivery path — cards are validated and ingested
+ * into the ClassScout MongoDB Atlas cluster after passing quality gates.
  */
 export async function deliverViaIngestApi(
   cards: Provider[],
-  config: IngestConfig
-): Promise<IngestResult> {
-  if (!config.baseUrl || !config.apiKey) {
+  config: IngestApiConfig
+): Promise<IngestResponse> {
+  if (!config.apiKey) {
     return {
       success: false,
-      ingestApi: false,
       cardsSent: 0,
-      error: "Missing CLASSSCOUT_BASE_URL or CLASSSCOUT_INGEST_KEY",
+      errors: ["CLASSSCOUT_INGEST_KEY not configured"],
     };
   }
 
-  try {
-    const url = `${config.baseUrl}/api/ingest`;
-    const payload = {
-      operations: [
-        {
-          collection: "providers",
-          action: "upsertMany",
-          data: cards,
-        },
-      ],
-    };
+  const endpoint = `${config.baseUrl.replace(/\/$/, "")}/api/ingest/providers`;
+  const errors: string[] = [];
 
-    const response = await fetch(url, {
+  try {
+    const response = await fetch(endpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${config.apiKey}`,
+        "X-Source": "classscout-cards-api",
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        providers: cards,
+        source: "cards-api",
+        ingestedAt: new Date().toISOString(),
+      }),
     });
 
-    const text = await response.text();
-    let json: unknown;
-    try {
-      json = JSON.parse(text);
-    } catch {
-      json = text;
-    }
-
     if (!response.ok) {
+      const errorText = await response.text();
       return {
         success: false,
-        ingestApi: false,
-        cardsSent: cards.length,
-        response: json,
-        error: `HTTP ${response.status}: ${text}`,
+        cardsSent: 0,
+        errors: [
+          `Ingest API error: ${response.status} ${response.statusText}`,
+          errorText,
+        ],
       };
     }
 
+    const result = await response.json();
+
     return {
       success: true,
-      ingestApi: true,
-      cardsSent: cards.length,
-      response: json,
+      cardsSent: result.accepted?.length ?? cards.length,
+      errors: result.errors ?? [],
+      endpoint,
     };
   } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown network error";
+    errors.push(`Failed to reach ingest API: ${message}`);
     return {
       success: false,
-      ingestApi: false,
-      cardsSent: cards.length,
-      error: `Ingest failed: ${error}`,
+      cardsSent: 0,
+      errors,
     };
   }
 }
 
 /**
- * Checks health/status of the ingest API connection
+ * Health check for the ingest endpoint. Called by /api/status.
+ * Returns a lightweight response without sending actual data.
  */
-export async function checkIngestHealth(config: IngestConfig): Promise<{
+export async function checkIngestHealth(config: IngestApiConfig): Promise<{
   healthy: boolean;
-  capabilities?: unknown;
   error?: string;
+  endpoint?: string;
 }> {
-  if (!config.baseUrl || !config.apiKey) {
-    return { healthy: false, error: "Missing CLASSSCOUT_BASE_URL or CLASSSCOUT_INGEST_KEY" };
+  if (!config.apiKey) {
+    return { healthy: false, error: "CLASSSCOUT_INGEST_KEY not configured" };
   }
 
+  const endpoint = `${config.baseUrl.replace(/\/$/, "")}/api/health`;
+
   try {
-    const url = `${config.baseUrl}/api/ingest`;
-    const response = await fetch(url, {
+    const response = await fetch(endpoint, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${config.apiKey}`,
+        "X-Source": "classscout-cards-api",
       },
+      signal: AbortSignal.timeout(5000),
     });
 
-    if (!response.ok) {
-      return { healthy: false, error: `HTTP ${response.status}` };
-    }
-
-    const text = await response.text();
-    let capabilities: unknown;
-    try {
-      capabilities = JSON.parse(text);
-    } catch {
-      capabilities = text;
-    }
-
-    return { healthy: true, capabilities };
+    return {
+      healthy: response.ok,
+      error: response.ok ? undefined : `HTTP ${response.status}`,
+      endpoint,
+    };
   } catch (error) {
-    return { healthy: false, error: `Health check failed: ${error}` };
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return { healthy: false, error: message, endpoint };
   }
 }

@@ -1,2 +1,2 @@
 export { deliverViaIngestApi, checkIngestHealth } from "./ingestApi";
-export { deliverViaMongo, checkMongoHealth } from "./mongoDirect";
+export { checkMongoHealth, saveCardToMongo, saveCardsToMongo, getRecentCards } from "./mongoDirect";
