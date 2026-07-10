@@ -1,6 +1,5 @@
 import { NextPage, GetServerSideProps } from "next";
 import Link from "next/link";
-import { MongoClient } from "mongodb";
 
 interface CardData {
   id: string;
@@ -128,31 +127,17 @@ const CardDetail: NextPage<CardDetailProps> = ({ card, error }) => {
 export const getServerSideProps: GetServerSideProps<CardDetailProps> = async (context) => {
   const { id } = context.params!;
   
-  if (!process.env.MONGODB_URI) {
-    return {
-      props: {
-        card: null,
-        error: "MongoDB not configured"
-      }
-    };
-  }
-  
   try {
-    const client = new MongoClient(process.env.MONGODB_URI);
-    await client.connect();
-    const db = client.db(process.env.MONGODB_DB_NAME || "classscout");
-    const collection = db.collection("providers");
-    
-    const card = await collection.findOne({ id });
-    
-    await client.close();
+    const { getCardById } = await import("@/lib/delivery/mongoDirect");
+    const card = await getCardById(id);
     
     if (!card) {
       return { props: { card: null } };
     }
     
-    return { props: { card } };
+    return { props: { card: JSON.parse(JSON.stringify(card)) } };
   } catch (error) {
+    console.error("Error in getServerSideProps:", error);
     return {
       props: {
         card: null,
