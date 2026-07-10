@@ -1,0 +1,1 @@
+export { generateCard } from "./cardGenerator";
