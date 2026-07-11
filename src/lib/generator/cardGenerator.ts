@@ -57,8 +57,12 @@ function scoreProvider(p: GenerateCardInput): { score: number; missing: string[]
     else { score += SCORE_FIELDS.description; }
   }
 
-  if (!has(p.price)) missing.push("price") || warnings.push("Price info improves parent decision-making");
-  else score += SCORE_FIELDS.price;
+  if (!has(p.price)) {
+    missing.push("price");
+    warnings.push("Price info improves parent decision-making");
+  } else {
+    score += SCORE_FIELDS.price;
+  }
 
   if (!has(p.website)) missing.push("website"); else score += SCORE_FIELDS.website;
   if (!has(p.phone)) missing.push("phone"); else score += SCORE_FIELDS.phone;
