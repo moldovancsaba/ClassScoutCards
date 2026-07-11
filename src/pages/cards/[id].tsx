@@ -12,8 +12,18 @@ interface CardData {
   description?: string;
   activityTypes?: string[];
   ageRanges?: string[];
-  ageRange?: string;
+  ageRange?: string | string[];
   activities?: string[];
+  address?: string;
+  priceText?: string;
+  rating?: number;
+  reviewCount?: number;
+  website?: string;
+  phone?: string;
+  email?: string;
+  image?: string;
+  badges?: string[];
+  sourceUrl?: string;
   source?: string;
   feedMetadata?: { source?: string };
   createdAt?: { $date?: string } | string | Date;
@@ -89,13 +99,13 @@ const CardDetail: NextPage<CardDetailProps> = ({ card, error }) => {
 
         <section style={{ marginBottom: "2rem" }}>
           <h2 style={{ fontSize: "1.2rem", marginBottom: "0.75rem", color: "#495057" }}>Description</h2>
-          <p style={{ lineHeight: "1.6", color: "#343a40" }}>{card.description}</p>
+          <p style={{ lineHeight: "1.6", color: "#343a40" }}>{card.description || card.longDescription || card.shortDescription}</p>
         </section>
 
         <section style={{ marginBottom: "2rem" }}>
           <h2 style={{ fontSize: "1.2rem", marginBottom: "0.75rem", color: "#495057" }}>Activities</h2>
           <ul style={{ paddingLeft: "1.5rem", color: "#343a40" }}>
-            {card.activities.map((activity, i) => (
+            {(card.activities || card.activityTypes || []).map((activity, i) => (
               <li key={i} style={{ marginBottom: "0.5rem" }}>{activity}</li>
             ))}
           </ul>
@@ -104,13 +114,40 @@ const CardDetail: NextPage<CardDetailProps> = ({ card, error }) => {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem", marginBottom: "2rem" }}>
           <div style={{ padding: "1rem", background: "#f8f9fa", borderRadius: "6px" }}>
             <div style={{ fontSize: "0.85rem", color: "#868e96", marginBottom: "0.25rem" }}>Age Range</div>
-            <div style={{ fontSize: "1.1rem", fontWeight: 600, color: "#495057" }}>{card.ageRange}</div>
+            <div style={{ fontSize: "1.1rem", fontWeight: 600, color: "#495057" }}>
+              {Array.isArray(card.ageRange) ? card.ageRange.join(", ") : (card.ageRange || (card.ageRanges || []).join(", "))}
+            </div>
           </div>
           <div style={{ padding: "1rem", background: "#f8f9fa", borderRadius: "6px" }}>
             <div style={{ fontSize: "0.85rem", color: "#868e96", marginBottom: "0.25rem" }}>Source</div>
-            <div style={{ fontSize: "1.1rem", fontWeight: 600, color: "#495057" }}>{card.source}</div>
+            <div style={{ fontSize: "1.1rem", fontWeight: 600, color: "#495057" }}>{card.source || card.feedMetadata?.source || "-"}</div>
           </div>
         </div>
+
+        {(card.address || card.priceText || card.rating !== undefined) && (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem", marginBottom: "2rem" }}>
+            {card.address && (
+              <div style={{ padding: "1rem", background: "#f8f9fa", borderRadius: "6px" }}>
+                <div style={{ fontSize: "0.85rem", color: "#868e96", marginBottom: "0.25rem" }}>Address</div>
+                <div style={{ fontSize: "1.1rem", fontWeight: 600, color: "#495057" }}>{card.address}</div>
+              </div>
+            )}
+            {card.priceText && (
+              <div style={{ padding: "1rem", background: "#f8f9fa", borderRadius: "6px" }}>
+                <div style={{ fontSize: "0.85rem", color: "#868e96", marginBottom: "0.25rem" }}>Price</div>
+                <div style={{ fontSize: "1.1rem", fontWeight: 600, color: "#495057" }}>{card.priceText}</div>
+              </div>
+            )}
+            {card.rating !== undefined && (
+              <div style={{ padding: "1rem", background: "#f8f9fa", borderRadius: "6px" }}>
+                <div style={{ fontSize: "0.85rem", color: "#868e96", marginBottom: "0.25rem" }}>Rating</div>
+                <div style={{ fontSize: "1.1rem", fontWeight: 600, color: "#495057" }}>
+                  {card.rating}{card.reviewCount !== undefined ? ` (${card.reviewCount})` : ""}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         <footer style={{ paddingTop: "1.5rem", borderTop: "1px solid #dee2e6", fontSize: "0.9rem", color: "#868e96" }}>
           <div>Created: {new Date(card.createdAt).toLocaleString()}</div>
@@ -126,16 +163,24 @@ const CardDetail: NextPage<CardDetailProps> = ({ card, error }) => {
 
 export const getServerSideProps: GetServerSideProps<CardDetailProps> = async (context) => {
   const { id } = context.params!;
-  
+
   try {
     const { getCardById } = await import("@/lib/delivery/mongoDirect");
     const card = await getCardById(id);
-    
+
     if (!card) {
       return { props: { card: null } };
     }
-    
-    return { props: { card: JSON.parse(JSON.stringify(card)) } };
+
+    const normalized = {
+      ...card,
+      description: card.longDescription || card.shortDescription || card.description,
+      activities: card.activityTypes,
+      ageRange: card.ageRanges,
+      source: card.sourceUrl || card.feedMetadata?.source,
+    } as Record<string, unknown>;
+
+    return { props: { card: JSON.parse(JSON.stringify(normalized)) } };
   } catch (error) {
     console.error("Error in getServerSideProps:", error);
     return {
