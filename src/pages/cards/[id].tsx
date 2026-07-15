@@ -40,9 +40,9 @@ interface CardDetailProps {
 const CardDetail: NextPage<CardDetailProps> = ({ card, error }) => {
   if (error) {
     return (
-      <div style={{ fontFamily: "system-ui, sans-serif", maxWidth: 800, margin: "0 auto", padding: "2rem" }}>
-        <Link href="/" style={{ color: "#1971c2", textDecoration: "none" }}>← Back to Home</Link>
-        <h1 style={{ color: "#c92a2a", marginTop: "1rem" }}>Error</h1>
+      <div style={{ fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif", maxWidth: 1200, margin: "0 auto", padding: "2rem 1.5rem" }}>
+        <Link href="/" style={{ color: "#2563eb", textDecoration: "none" }}>← Back</Link>
+        <h1 style={{ color: "#c81e1e", marginTop: "1rem" }}>Error</h1>
         <p>{error}</p>
       </div>
     );
@@ -50,137 +50,119 @@ const CardDetail: NextPage<CardDetailProps> = ({ card, error }) => {
 
   if (!card) {
     return (
-      <div style={{ fontFamily: "system-ui, sans-serif", maxWidth: 800, margin: "0 auto", padding: "2rem" }}>
-        <Link href="/" style={{ color: "#1971c2", textDecoration: "none" }}>← Back to Home</Link>
-        <h1 style={{ color: "#868e96", marginTop: "1rem" }}>Card Not Found</h1>
+      <div style={{ fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif", maxWidth: 1200, margin: "0 auto", padding: "2rem 1.5rem" }}>
+        <Link href="/" style={{ color: "#2563eb", textDecoration: "none" }}>← Back</Link>
+        <h1 style={{ color: "#6b7280", marginTop: "1rem" }}>Card Not Found</h1>
       </div>
     );
   }
 
+  const ageDisplay = Array.isArray(card.ageRange)
+    ? card.ageRange.join(", ")
+    : Array.isArray(card.ageRanges)
+      ? card.ageRanges.join(", ")
+      : (card.ageRange || "-");
+
   return (
-    <div style={{ fontFamily: "system-ui, sans-serif", maxWidth: 800, margin: "0 auto", padding: "2rem" }}>
-      <Link href="/" style={{ color: "#1971c2", textDecoration: "none" }}>← Back to Home</Link>
-      
-      <article style={{ marginTop: "1.5rem" }}>
-        <header style={{ marginBottom: "2rem" }}>
-          <h1 style={{ fontSize: "1.8rem", marginBottom: "0.5rem", color: "#212529" }}>
-            {card.name}
-          </h1>
-          <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap", marginBottom: "1rem" }}>
-            <span style={{
-              background: "#1971c2",
-              color: "white",
-              padding: "0.25rem 0.75rem",
-              borderRadius: "4px",
-              fontSize: "0.9rem"
-            }}>
-              {card.category}
-            </span>
-            <span style={{
-              background: "#2f9e44",
-              color: "white",
-              padding: "0.25rem 0.75rem",
-              borderRadius: "4px",
-              fontSize: "0.9rem"
-            }}>
-              {card.borough}
-            </span>
-            <span style={{
-              background: "#868e96",
-              color: "white",
-              padding: "0.25rem 0.75rem",
-              borderRadius: "4px",
-              fontSize: "0.9rem"
-            }}>
-              {card.neighborhood}
-            </span>
-          </div>
-        </header>
+    <div style={{ fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif", minHeight: "100vh", background: "#f6f7fb", color: "#1f1f2e" }}>
+      <div style={{ background: "#ffffff", borderBottom: "1px solid #e5e7eb" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "1.25rem 1.5rem" }}>
+          <Link href="/" style={{ color: "#2563eb", textDecoration: "none", fontSize: "0.9rem", fontWeight: 500 }}>← Back to Partner Programs</Link>
+        </div>
+      </div>
 
-        <section style={{ marginBottom: "2rem" }}>
-          <h2 style={{ fontSize: "1.2rem", marginBottom: "0.75rem", color: "#495057" }}>Description</h2>
-          <p style={{ lineHeight: "1.6", color: "#343a40" }}>{card.description || card.longDescription || card.shortDescription}</p>
-        </section>
-
-        <section style={{ marginBottom: "2rem" }}>
-          <h2 style={{ fontSize: "1.2rem", marginBottom: "0.75rem", color: "#495057" }}>Activities</h2>
-          <ul style={{ paddingLeft: "1.5rem", color: "#343a40" }}>
-            {(card.activities || card.activityTypes || []).map((activity, i) => (
-              <li key={i} style={{ marginBottom: "0.5rem" }}>{activity}</li>
-            ))}
-          </ul>
-        </section>
-
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem", marginBottom: "2rem" }}>
-          <div style={{ padding: "1rem", background: "#f8f9fa", borderRadius: "6px" }}>
-            <div style={{ fontSize: "0.85rem", color: "#868e96", marginBottom: "0.25rem" }}>Age Range</div>
-            <div style={{ fontSize: "1.1rem", fontWeight: 600, color: "#495057" }}>
-              {Array.isArray(card.ageRange) ? card.ageRange.join(", ") : (card.ageRange || (card.ageRanges || []).join(", "))}
+      <main style={{ maxWidth: 1200, margin: "0 auto", padding: "1.75rem 1.5rem" }}>
+        <div style={{ background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: 10, padding: "1.5rem" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "1rem", flexWrap: "wrap" }}>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div style={{ fontSize: "0.8rem", fontWeight: 700, color: "#2563eb", marginBottom: "0.25rem", textTransform: "uppercase", letterSpacing: "0.06em" }}>{card.category}</div>
+              <h1 style={{ margin: 0, fontSize: "1.6rem", fontWeight: 600, lineHeight: 1.2 }}>{card.name}</h1>
+              <div style={{ marginTop: "0.5rem", color: "#6b7280", fontSize: "0.95rem" }}>{card.borough} • {card.neighborhood}</div>
+            </div>
+            <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+              <span style={{ fontSize: "0.78rem", fontWeight: 600, padding: "0.35rem 0.7rem", borderRadius: 999, background: "#eff6ff", color: "#1e40af", border: "1px solid #bfdbfe" }}>{card.borough}</span>
+              <span style={{ fontSize: "0.78rem", fontWeight: 600, padding: "0.35rem 0.7rem", borderRadius: 999, background: "#f5f3ff", color: "#5b21b6", border: "1px solid #ddd6fe" }}>{card.category}</span>
             </div>
           </div>
-          <div style={{ padding: "1rem", background: "#f8f9fa", borderRadius: "6px" }}>
-            <div style={{ fontSize: "0.85rem", color: "#868e96", marginBottom: "0.25rem" }}>Source</div>
-            <div style={{ fontSize: "1.1rem", fontWeight: 600, color: "#495057" }}>{card.source || card.feedMetadata?.source || "-"}</div>
+
+          <div style={{ marginTop: "1.25rem", color: "#374151", lineHeight: 1.6 }}>
+            <p>{card.description || card.longDescription || card.shortDescription}</p>
           </div>
+
+          <div style={{ marginTop: "1.5rem", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1rem" }}>
+            {card.activities && card.activities.length > 0 && (
+              <div style={{ background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: 8, padding: "1rem" }}>
+                <div style={{ fontSize: "0.8rem", color: "#6b7280", marginBottom: "0.35rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>Activities</div>
+                <ul style={{ margin: 0, paddingLeft: "1.25rem", color: "#374151" }}>
+                  {card.activities.map((activity, i) => <li key={i} style={{ marginBottom: "0.2rem" }}>{activity}</li>)}
+                </ul>
+              </div>
+            )}
+            <div style={{ background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: 8, padding: "1rem" }}>
+              <div style={{ fontSize: "0.8rem", color: "#6b7280", marginBottom: "0.35rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>Age Range</div>
+              <div style={{ fontWeight: 600, color: "#111827" }}>{ageDisplay}</div>
+            </div>
+            <div style={{ background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: 8, padding: "1rem" }}>
+              <div style={{ fontSize: "0.8rem", color: "#6b7280", marginBottom: "0.35rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>Source</div>
+              <div style={{ fontWeight: 600, color: "#111827" }}>{card.source || card.feedMetadata?.source || "-"}</div>
+            </div>
+          </div>
+
+          {(card.address || card.priceText || card.rating !== undefined) && (
+            <div style={{ marginTop: "1rem", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1rem" }}>
+              {card.address && (
+                <div style={{ background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: 8, padding: "1rem" }}>
+                  <div style={{ fontSize: "0.8rem", color: "#6b7280", marginBottom: "0.35rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>Address</div>
+                  <div style={{ fontWeight: 600, color: "#111827" }}>{card.address}</div>
+                </div>
+              )}
+              {card.priceText && (
+                <div style={{ background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: 8, padding: "1rem" }}>
+                  <div style={{ fontSize: "0.8rem", color: "#6b7280", marginBottom: "0.35rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>Price</div>
+                  <div style={{ fontWeight: 600, color: "#111827" }}>{card.priceText}</div>
+                </div>
+              )}
+              {card.rating !== undefined && (
+                <div style={{ background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: 8, padding: "1rem" }}>
+                  <div style={{ fontSize: "0.8rem", color: "#6b7280", marginBottom: "0.35rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>Rating</div>
+                  <div style={{ fontWeight: 600, color: "#111827" }}>{card.rating}{card.reviewCount !== undefined ? ` (${card.reviewCount})` : ""}</div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
-        {(card.address || card.priceText || card.rating !== undefined) && (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem", marginBottom: "2rem" }}>
-            {card.address && (
-              <div style={{ padding: "1rem", background: "#f8f9fa", borderRadius: "6px" }}>
-                <div style={{ fontSize: "0.85rem", color: "#868e96", marginBottom: "0.25rem" }}>Address</div>
-                <div style={{ fontSize: "1.1rem", fontWeight: 600, color: "#495057" }}>{card.address}</div>
-              </div>
-            )}
-            {card.priceText && (
-              <div style={{ padding: "1rem", background: "#f8f9fa", borderRadius: "6px" }}>
-                <div style={{ fontSize: "0.85rem", color: "#868e96", marginBottom: "0.25rem" }}>Price</div>
-                <div style={{ fontSize: "1.1rem", fontWeight: 600, color: "#495057" }}>{card.priceText}</div>
-              </div>
-            )}
-            {card.rating !== undefined && (
-              <div style={{ padding: "1rem", background: "#f8f9fa", borderRadius: "6px" }}>
-                <div style={{ fontSize: "0.85rem", color: "#868e96", marginBottom: "0.25rem" }}>Rating</div>
-                <div style={{ fontSize: "1.1rem", fontWeight: 600, color: "#495057" }}>
-                  {card.rating}{card.reviewCount !== undefined ? ` (${card.reviewCount})` : ""}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        <footer style={{ paddingTop: "1.5rem", borderTop: "1px solid #dee2e6", fontSize: "0.9rem", color: "#868e96" }}>
-          <div>Created: {new Date(card.createdAt).toLocaleString()}</div>
-          <div>Updated: {new Date(card.updatedAt).toLocaleString()}</div>
-          <div style={{ marginTop: "0.5rem", fontSize: "0.8rem", fontFamily: "monospace" }}>
-            ID: {card.id}
-          </div>
+        <footer style={{ marginTop: "1.5rem", color: "#9ca3af", fontSize: "0.8rem", lineHeight: 1.5 }}>
+          <div>Created: {card.createdAt ? new Date(card.createdAt as string | Date).toLocaleString() : '-'}</div>
+          <div>Updated: {card.updatedAt ? new Date(card.updatedAt as string | Date).toLocaleString() : '-'}</div>
+          <div style={{ marginTop: "0.35rem", fontFamily: "monospace" }}>ID: {card.id}</div>
         </footer>
-      </article>
+      </main>
     </div>
   );
 };
 
 export const getServerSideProps: GetServerSideProps<CardDetailProps> = async (context) => {
   const { id } = context.params!;
+  const cardId = Array.isArray(id) ? id[0] : (id as string);
 
   try {
     const { getCardById } = await import("@/lib/delivery/mongoDirect");
-    const card = await getCardById(id);
+    const card = await getCardById(cardId);
 
     if (!card) {
       return { props: { card: null } };
     }
 
-    const normalized = {
+    const normalized: any = {
       ...card,
-      description: card.longDescription || card.shortDescription || card.description,
+      description: card.longDescription || card.shortDescription || (card as any).description,
       activities: card.activityTypes,
       ageRange: card.ageRanges,
       source: card.sourceUrl || card.feedMetadata?.source,
     } as Record<string, unknown>;
 
-    return { props: { card: JSON.parse(JSON.stringify(normalized)) } };
+    return { props: { card: JSON.parse(JSON.stringify(normalized)) as CardData } };
   } catch (error) {
     console.error("Error in getServerSideProps:", error);
     return {
