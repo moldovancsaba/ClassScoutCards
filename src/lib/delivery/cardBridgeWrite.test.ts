@@ -113,4 +113,64 @@ describe("validateWriteRequest", () => {
     });
     expect(result.ok).toBe(true);
   });
+
+  describe("touch mode (reviewed, nothing to change)", () => {
+    const validTouchBody = {
+      collection: "contentCards",
+      id: "cc-abc123",
+      touch: true,
+      reason: "Reviewed against fresh source text; card is already accurate, no field needs to change",
+      source: "oldest-card-loop-test",
+    };
+
+    it("accepts a touch request with NO updates field at all", () => {
+      expect(validateWriteRequest(validTouchBody).ok).toBe(true);
+    });
+
+    it("accepts a touch request with an explicitly empty updates object", () => {
+      expect(validateWriteRequest({ ...validTouchBody, updates: {} }).ok).toBe(true);
+    });
+
+    it("without touch=true, an empty/absent updates object is still rejected", () => {
+      const { touch, ...withoutTouch } = validTouchBody;
+      expect(validateWriteRequest(withoutTouch).ok).toBe(false);
+      expect(validateWriteRequest({ ...withoutTouch, updates: {} }).ok).toBe(false);
+    });
+
+    it("touch=true still allows a REAL updates field alongside the touch (not mutually exclusive)", () => {
+      const result = validateWriteRequest({ ...validTouchBody, updates: { categoryHint: "Dance" } });
+      expect(result.ok).toBe(true);
+      expect(result.ok && result.value.touch).toBe(true);
+    });
+
+    it("touch defaults to false when absent", () => {
+      const result = validateWriteRequest(validProviderBody);
+      expect(result.ok && result.value.touch).toBe(false);
+    });
+  });
+
+  describe("contentCards state transitions", () => {
+    const stateBody = {
+      collection: "contentCards",
+      id: "cc-abc123",
+      reason: "Research confirmed source is dead; blocking terminally",
+      source: "state-machine-test",
+    };
+
+    it("accepts a real, non-PUBLISHED state", () => {
+      expect(validateWriteRequest({ ...stateBody, updates: { state: "REVIEW_READY" } }).ok).toBe(true);
+      expect(validateWriteRequest({ ...stateBody, updates: { state: "BLOCKED_TERMINAL" } }).ok).toBe(true);
+    });
+
+    it('rejects state="PUBLISHED" explicitly, with a message pointing at the main app\'s gate', () => {
+      const result = validateWriteRequest({ ...stateBody, updates: { state: "PUBLISHED" } });
+      expect(result.ok).toBe(false);
+      expect(!result.ok && result.error).toMatch(/PUBLISHED/);
+      expect(!result.ok && result.error).toMatch(/main app/);
+    });
+
+    it("rejects a made-up state value", () => {
+      expect(validateWriteRequest({ ...stateBody, updates: { state: "ARCHIVED" } }).ok).toBe(false);
+    });
+  });
 });

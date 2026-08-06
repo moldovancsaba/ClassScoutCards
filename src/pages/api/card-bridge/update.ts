@@ -4,16 +4,23 @@ import { applyCardBridgeWrite, validateWriteRequest } from "@/lib/delivery/cardB
 
 /**
  * Write path: POST /api/card-bridge/update
- * Body: { collection, id, updates, reason, source, dryRun? }  (dryRun defaults to true)
+ * Body: { collection, id, updates?, reason, source, dryRun?, touch? }  (dryRun defaults to true)
  *
  * SAFE BY DEFAULT: without an explicit `"dryRun": false` in the body, this NEVER writes — it returns
  * exactly what it would change (before/after) so the caller can review before applying. Every
  * non-dry-run write is also recorded in the `cardBridgeAuditLog` collection with the pre-image, so any
- * change made through this endpoint can be reviewed or manually reverted later.
+ * change made through this endpoint can be reviewed or manually reverted later. Every applied write
+ * (touch or not) stamps lastReviewedAt/lastReviewedBy alongside updatedAt.
+ *
+ * `touch: true` allows `updates` to be omitted/empty — a pure "reviewed this card, decided no field
+ * needs to change" write. This is required by the card-improvement loop's own rules: a card must be
+ * marked reviewed (updatedAt advances, so the oldest-first queue rotates) even when step 4 of that
+ * process (enrich/fix) concludes nothing needs fixing — see docs/card-improvement-process.md.
  *
  * See cardBridgeWrite.ts / cardBridgeRegistry.ts for exactly what can be written and why: per-collection
- * field allow-lists, a real Category enum check, an https-URL sanity check on image fields, and the
- * ported copy-quality gate on description fields — this is deliberately not a generic field-setter.
+ * field allow-lists, a real Category enum check and a state-machine check (state can never be set to
+ * "PUBLISHED" through this bridge), an https-URL sanity check on image fields, and the ported
+ * copy-quality gate on description fields — this is deliberately not a generic field-setter.
  */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
