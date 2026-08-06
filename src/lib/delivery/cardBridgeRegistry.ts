@@ -16,6 +16,7 @@ export type BridgeCollectionKey =
   | "meetupGroups"
   | "serviceLeads"
   | "servicePlaceFacts"
+  | "serviceReviewPackets"
   | "serviceTasks";
 
 export { ALLOWED_STATES, type ContentCardState };
@@ -119,11 +120,18 @@ export const BRIDGE_REGISTRY: Record<BridgeCollectionKey, BridgeCollectionConfig
       incompleteFields: 1,
       discoveryTier: 1,
       qualityStatus: 1,
+      visibility: 1,
       lastReviewedAt: 1,
       lastReviewedBy: 1,
       updatedAt: 1,
       publishedAt: 1,
     },
+    // qualityStatus/visibility are the DEFENSIVE direction only — this bridge can quarantine/hide an
+    // already-published record found to be bad on re-review, but (unlike serviceLeads' public-status
+    // safeguard, which gates the RISKY direction) there is no un-quarantine path here: reversing a
+    // quarantine is a bigger call than one automated check should make alone. See cardBridgeWrite.ts
+    // for the exact allowed values (visibility can only be set to "hidden", qualityStatus only to
+    // "quarantined" — the ONLY two real values either field takes per the main app's Provider type).
     writableFields: [
       "category",
       "categoryConfidence",
@@ -134,6 +142,8 @@ export const BRIDGE_REGISTRY: Record<BridgeCollectionKey, BridgeCollectionConfig
       "ageRanges",
       "incompleteFields",
       "discoveryTier",
+      "qualityStatus",
+      "visibility",
       ...REVIEW_PROVENANCE_FIELDS,
     ],
     copyFields: ["shortDescription", "longDescription"],
@@ -159,13 +169,16 @@ export const BRIDGE_REGISTRY: Record<BridgeCollectionKey, BridgeCollectionConfig
     writableFields: ["groupType", "description", "coverImageUrl", "ageRange", "cadence", ...REVIEW_PROVENANCE_FIELDS],
     copyFields: ["description"],
   },
-  // The three below back the family-services pipeline (src/lib/familyServices/{types,core}.ts in the
-  // main app: lead -> place fact -> review packet, driven by the classscoutLiteFamilyServiceTasks
-  // queue). READ-ONLY for now — this state machine has real business-logic invariants
-  // (visibility/status transitions, confidence scoring) this bridge doesn't yet replicate, so writing
-  // into it blind would risk corrupting review state. Added to investigate the family-service
-  // content-card hand-off gap; extend with real writes only once that logic is understood well enough
-  // to reproduce safely (see the recommendation this generated).
+  // The four below back the family-services pipeline: lead -> place fact -> review packet, driven by
+  // the classscoutLiteFamilyServiceTasks queue in the main app (see src/lib/familyServices/{types,core}.ts
+  // there, PORTED — not imported — into src/lib/familyServices/ in THIS repo). serviceLeads is writable:
+  // every write is passed through the ported normalizeFamilyServiceLead so visibility/blockers are
+  // ALWAYS re-derived from status, never trusted from the caller (see cardBridgeWrite.ts), and every
+  // applied lead write cascades into an upserted servicePlaceFacts row and, when eligible, a
+  // serviceReviewPackets row — mirroring upsertFamilyServicePlaceFacts/upsertFamilyServiceReviewPackets
+  // exactly. servicePlaceFacts/serviceReviewPackets stay NOT directly writable via the API (writableFields
+  // []) because they are PURELY DERIVED from a lead in the real architecture — writing them independently
+  // would let them drift out of sync with their lead, which the main app's design never allows.
   serviceLeads: {
     mongoCollection: "classscoutServiceLeads",
     idField: "leadId",
@@ -188,13 +201,33 @@ export const BRIDGE_REGISTRY: Record<BridgeCollectionKey, BridgeCollectionConfig
       amenities: 1,
       tags: 1,
       existingClassScoutCategoryCandidate: 1,
+      existingCategoryReason: 1,
       confidenceScore: 1,
       blockers: 1,
       duplicateKey: 1,
+      lastReviewedAt: 1,
+      lastReviewedBy: 1,
       updatedAt: 1,
       createdAt: 1,
     },
-    writableFields: [],
+    // Deliberately NOT here: "visibility" (always derived from status) and "blockers" (always
+    // re-derived from validateFamilyServiceLead) — see cardBridgeWrite.ts's serviceLeads special case.
+    writableFields: [
+      "status",
+      "name",
+      "serviceKind",
+      "priceTier",
+      "neighborhood",
+      "borough",
+      "address",
+      "latitude",
+      "longitude",
+      "amenities",
+      "tags",
+      "existingClassScoutCategoryCandidate",
+      "existingCategoryReason",
+      ...REVIEW_PROVENANCE_FIELDS,
+    ],
     copyFields: [],
   },
   servicePlaceFacts: {
@@ -216,6 +249,25 @@ export const BRIDGE_REGISTRY: Record<BridgeCollectionKey, BridgeCollectionConfig
       tags: 1,
       confidenceScore: 1,
       blockers: 1,
+      updatedAt: 1,
+    },
+    writableFields: [],
+    copyFields: [],
+  },
+  serviceReviewPackets: {
+    mongoCollection: "classscoutServiceReviewPackets",
+    idField: "packetId",
+    readProjection: {
+      _id: 0,
+      packetId: 1,
+      leadId: 1,
+      status: 1,
+      allowedActions: 1,
+      candidateCategories: 1,
+      confidenceScore: 1,
+      blockers: 1,
+      reasons: 1,
+      createdAt: 1,
       updatedAt: 1,
     },
     writableFields: [],
