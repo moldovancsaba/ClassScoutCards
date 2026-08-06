@@ -15,12 +15,23 @@ from "never looked at."
 This is not a one-time cleanup. It runs forever, card after card, as the pool grows and as the rules
 below get corrected from real mistakes.
 
+**The pool is not just pre-publish content cards.** An already-`PUBLISHED` provider or `meetupGroup`
+is not exempt from this loop — it can still be wrong (a stale image, drifted copy, a category that no
+longer matches reality) and nothing else re-checks it once it's live. "It's published" is not a reason
+to skip a record; it changes what outcomes are available (Decision Matrix C, not A/B), not whether the
+record gets reviewed at all (owner directive, 2026-08-06: "You have to check published cards as well,
+add it to the rules it is not optional each and every cards!! We have to check all cards time to time").
+
 ## The loop
 
-1. **Pull** the single oldest-updated card from the pool (`GET /api/card-bridge/rows`, no filter,
-   `limit=1`, or `?state=X` when working a specific queue). Selection is always `updatedAt asc,
-   <idField> asc` — the same canonical ordering every lane in the main app uses. Never hand-pick a
-   card out of order.
+1. **Pull** the single globally oldest-updated record across the whole reviewable pool — not just
+   `contentCards`. Fetch the oldest row from `contentCards`, `providers`, AND `meetupGroups`
+   independently (`GET /api/card-bridge/rows?collection=<each>&limit=1`, `?state=X`/`?filter=...` when
+   working a specific queue within one of them) and take whichever of the three has the smallest
+   `updatedAt`. Selection within each collection is always `updatedAt asc, <idField> asc` — the same
+   canonical ordering every lane in the main app uses. **Never exhaust one collection before checking
+   the other two** — a content card can look "oldest" only because nobody compared it against an
+   even-older published provider sitting untouched since launch. Never hand-pick a record out of order.
 2. **Learn** the card's current stored state: every field the bridge's read projection exposes,
    including `enrichmentSummary` (what the pipeline already extracted) and, for family-service cards,
    the linked `serviceLeads`/`servicePlaceFacts`/`serviceTasks` records (see "Cross-collection lookups"
@@ -116,7 +127,7 @@ authoritative record.
 | Copy contains a defect (`validateCopyQuality`: URL leak, scraped chrome, placeholder, un-decoded entity, too short) | Fix: rewrite from the source's real content — never patch symptomatically (e.g. never just strip the bad substring and leave a fragment) |
 | Source is dead / unreachable / doesn't support the card's facts at all | Do not fabricate a fix. Move to Decision Matrix B (block) |
 | A field is genuinely absent from *every* available source (not just this one) | Leave the gap recorded (`incompleteFields` / `blockerCodes`), do not invent a value |
-| The card's real record lives partly in another collection (e.g. a `FamilyServiceLead`) and THAT record has the actual defect | Report it — see "Explicit boundaries," this bridge does not yet write `serviceLeads`/`servicePlaceFacts` |
+| The card's real record lives partly in another collection (e.g. a `FamilyServiceLead`) and THAT record has the actual defect | Fix it there directly (`serviceLeads` writes are supported, v2) — see "Explicit boundaries" for the derived-field rules (`visibility`/`blockers`) and the cascade to `servicePlaceFacts`/`serviceReviewPackets` |
 
 ## Decision Matrix B — block / draft / publish / leave (step 5, `contentCards.state`)
 
@@ -127,6 +138,20 @@ authoritative record.
 | Block (repairable) | `BLOCKED_REPAIRABLE` + `blockerCodes` | A specific, nameable gap exists that a future pass (or a different process) could plausibly fix |
 | Block (terminal) | `BLOCKED_TERMINAL` + `terminalReason` | Source is confirmed dead, the entity doesn't exist, or it's clearly out of scope (e.g. not actually a family/kids activity) |
 | Publish | **never** — reject at the API layer | Real publication is the main app's job. Setting `REVIEW_READY` is the correct hand-off; do not try to shortcut it |
+
+## Decision Matrix C — leave / fix / quarantine (step 5, ALREADY-PUBLISHED `providers` / `meetupGroups`)
+
+A published record has already cleared the main app's publish gate once — this loop is a *re-review*,
+not a first review, and the available outcomes are narrower than Matrix A/B on purpose: there is no
+"draft" state to move it to (it's already live) and no un-quarantine path back through this bridge.
+
+| Finding from research | Action |
+| --- | --- |
+| Stored facts still match the source; no defect in any of the 4 properties | Leave as-is; touch only |
+| A stored field is wrong or stale, and the fresh source clearly gives the correct value | Fix: write the corrected, allow-listed field(s) directly (`category`, `shortDescription`/`longDescription`, `image`, `recurringPrograms`, `ageRanges`, etc.) — the record stays published and visible, this is a correction, not a re-publish |
+| Copy contains a defect (`validateCopyQuality`) | Fix: rewrite from the source's real content, same rule as Matrix A |
+| The organization/program is confirmed gone, fraudulent, or was never a legitimate match for the category it's published under, and a live audience is being actively misled | Quarantine: `qualityStatus: "quarantined"` + `visibility: "hidden"` — this is **one-directional**; there is no un-quarantine write through this bridge (see "Explicit boundaries"). Only use it when leaving the record live is the actual harm, not for an ordinary content gap that a `fix` already resolves |
+| Evidence is inconclusive (source is thin, ambiguous, or unreachable but the record isn't obviously wrong either) | Leave as-is, record the gap (`incompleteFields`), touch — do not quarantine on a hunch; quarantine is for confirmed problems, not uncertainty |
 
 ## Cross-collection lookups (before deciding anything)
 
@@ -143,13 +168,33 @@ misleading audit trail:
   *content* problem — don't force a per-card fix for what is actually a systemic gap. Write a
   recommendation (see the project's recommendation convention) instead of papering over it card by card.
 
-## Explicit boundaries (v1 — revisit as capability grows)
+## Explicit boundaries (v2 — updated 2026-08-06)
 
-- **No real publication.** `state` can never be set to `PUBLISHED` through this bridge.
-- **`serviceLeads` / `servicePlaceFacts` are read-only.** Their status/visibility transitions have real
-  business-logic invariants (`src/lib/familyServices/core.ts` in the main app) this bridge doesn't yet
-  reproduce. Do not attempt to advance a lead's status through raw field writes — report it as a
-  recommendation until this bridge has real support for that state machine.
+- **No real provider/meetup publication.** Content-card `state` can never be set to `PUBLISHED`
+  through this bridge — that path still requires the main app's full gate.
+- **`serviceLeads` writes ARE now supported** (v2) — content fields (`address`, `serviceKind`,
+  `priceTier`, `neighborhood`, `borough`, `latitude`, `longitude`, `amenities`, `tags`,
+  `existingClassScoutCategoryCandidate`, `existingCategoryReason`) and `status`. `visibility` and
+  `blockers` can NEVER be set directly — every write re-derives them via the ported
+  `normalizeFamilyServiceLead` (`src/lib/familyServices/core.ts` in THIS repo, ported from the main
+  app's own logic, not reinvented), so a write can't produce an inconsistent status/visibility pair or
+  a stale blockers list. Every applied lead write also cascades into an upserted `servicePlaceFacts`
+  row and, when the lead's status is review-eligible, a `serviceReviewPackets` row — mirroring
+  `upsertFamilyServicePlaceFacts`/`upsertFamilyServiceReviewPackets` exactly.
+  **This means setting `status` to `approved_support_only` or `approved_for_publication` genuinely
+  makes the lead publicly visible** (`visibility` flips to `public_support`, which is what
+  `publicFamilyServiceFilter`/`publicFamilyServiceFactFilter` read) — the family-service equivalent of
+  publishing. Treat that status change with the same care as a real publish decision. A hard safeguard
+  blocks it anyway when the lead still carries an unresolved blocker (checked in dry-run too, so it
+  surfaces before commit, not after).
+- **`servicePlaceFacts` / `serviceReviewPackets` stay NOT directly writable.** They are purely derived
+  from a lead in the real architecture; writing them independently would let them drift out of sync.
+  Always go through a `serviceLeads` write — the cascade keeps them consistent.
+- **`providers.qualityStatus`/`.visibility` are one-directional** (v3) — this bridge can move an
+  already-published provider to `qualityStatus: "quarantined"` / `visibility: "hidden"` when re-review
+  confirms a real problem (Decision Matrix C), but there is no write path back to un-quarantine or
+  re-show it through this bridge. Reversing a quarantine is a bigger call than one automated re-review
+  pass should make alone — it goes through whatever process (main app, human) originally published it.
 - **No automated "research" step yet.** Step 3 today is performed by whoever/whatever is driving the
   loop (a person, an agent) fetching the source and reasoning about it — there is no wired-in LLM call
   inside the bridge itself. Automating step 3 unattended (e.g. via Vercel Cron) needs a hosted LLM
@@ -176,3 +221,20 @@ committing.
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
   `touch` + content-card `state` write support to the bridge specifically to support this loop.
+- v2 (2026-08-06): added the Verification Checklist (step 2/4) after the first end-to-end test missed a
+  real defect — a garbage "candidate image" fact sitting unchecked in `enrichmentSummary`. Extended
+  read projections with the fields the checklist needs (`normalizedTitle`, `fingerprint`,
+  `latestRunId`, `sourceAuthorityGrade`, `serviceLeads.latitude/longitude`). Widened `serviceLeads` from
+  read-only to fully writable (content fields + `status`), with the ported
+  `normalizeFamilyServiceLead`/`validateFamilyServiceLead`/`buildFamilyServicePlaceFact`/
+  `buildFamilyServiceReviewPacket` logic driving every write so `visibility`/`blockers` are always
+  re-derived and never caller-supplied, and every write cascades into `servicePlaceFacts` +
+  (when eligible) `serviceReviewPackets` — this is what makes the loop actually capable of completing
+  a family-service card end to end, not just annotating the content card around it.
+- v3 (2026-08-06): closed the implicit "published means exempt from review" gap (owner directive:
+  published cards are not optional, all cards get checked over time). Step 1 now pulls the globally
+  oldest-updated record across `contentCards`, `providers`, AND `meetupGroups` — never exhausts one
+  collection before checking the other two. Added Decision Matrix C for already-published
+  `providers`/`meetupGroups` (leave / fix / quarantine — no draft state, no un-quarantine). Widened
+  `providers.qualityStatus`/`.visibility` to writable, one direction only (`"quarantined"`/`"hidden"`),
+  enforced in `cardBridgeWrite.ts` and documented as a boundary above.

@@ -9,6 +9,8 @@ import {
   type BridgeCollectionKey,
 } from "@/lib/delivery/cardBridgeRegistry";
 import { validateCopyQuality } from "@/lib/validation/copyQuality";
+import { buildFamilyServicePlaceFact, buildFamilyServiceReviewPacket, isPublicStatus, normalizeFamilyServiceLead, reviewPacketEligible } from "@/lib/familyServices/core";
+import { FAMILY_SERVICE_LEAD_STATUSES, type FamilyServiceLead } from "@/lib/familyServices/types";
 
 export interface NormalizedWriteRequest {
   collection: BridgeCollectionKey;
@@ -89,6 +91,19 @@ export function validateWriteRequest(body: unknown): WriteValidationResult {
     }
   }
 
+  if (collection === "providers" && "qualityStatus" in updates && updates.qualityStatus !== "quarantined") {
+    return { ok: false, status: 400, error: 'qualityStatus can only be set to "quarantined" (the only real value the main app defines) — omit the field entirely rather than trying to clear it through this bridge' };
+  }
+  if (collection === "providers" && "visibility" in updates && updates.visibility !== "hidden") {
+    return { ok: false, status: 400, error: 'visibility can only be set to "hidden" (the only real value the main app defines) — omit the field entirely rather than trying to clear it through this bridge' };
+  }
+
+  if (collection === "serviceLeads" && "status" in updates) {
+    if (!(FAMILY_SERVICE_LEAD_STATUSES as readonly string[]).includes(updates.status as string)) {
+      return { ok: false, status: 400, error: `status must be one of: ${FAMILY_SERVICE_LEAD_STATUSES.join(", ")}` };
+    }
+  }
+
   if (collection === "contentCards" && "state" in updates) {
     if (updates.state === "PUBLISHED") {
       return {
@@ -132,6 +147,14 @@ export interface WriteOutcome {
   before?: Record<string, unknown>;
   applied?: Record<string, unknown>;
   auditId?: string;
+  /** Set (found=true, nothing written, even in apply mode) when a serviceLeads write tried to move
+   *  the lead to a public status (approved_support_only / approved_for_publication) while it still
+   *  carries an unresolved blocker. Checked in dry-run too, so this surfaces before commit. */
+  blockedReason?: string;
+  /** Present only for serviceLeads writes — the place fact (and, when eligible, review packet) that
+   *  were upserted as a consequence of this lead write, mirroring the main app's own
+   *  upsertFamilyServicePlaceFacts/upsertFamilyServiceReviewPackets cascade. Absent in dry-run. */
+  cascaded?: { placeFactId: string; reviewPacketId?: string };
 }
 
 /** Applies (or dry-runs) an already-validated write. Assumes `validateWriteRequest` already passed. */
@@ -148,7 +171,31 @@ export async function applyCardBridgeWrite(request: NormalizedWriteRequest): Pro
   const before: Record<string, unknown> = {};
   for (const key of Object.keys(request.updates)) before[key] = current[key] ?? null;
 
+  // serviceLeads: visibility and blockers are NEVER taken from the caller — always re-derived from
+  // the ported normalizeFamilyServiceLead, exactly like the main app does. Checked in BOTH dry-run and
+  // apply, because the public-status-with-blockers safeguard needs to surface before commit, not after.
+  let normalizedLead: FamilyServiceLead | undefined;
+  if (request.collection === "serviceLeads") {
+    const merged = { ...(current as unknown as FamilyServiceLead), ...request.updates } as FamilyServiceLead;
+    normalizedLead = normalizeFamilyServiceLead(merged, "<now>");
+    if (isPublicStatus(normalizedLead.status) && normalizedLead.blockers && normalizedLead.blockers.length > 0) {
+      return {
+        found: true,
+        dryRun: request.dryRun,
+        touch: request.touch,
+        collection: request.collection,
+        id: request.id,
+        before,
+        blockedReason: `Cannot set status="${normalizedLead.status}" (a public status) while blockers exist: ${normalizedLead.blockers.join(", ")}. Resolve the blockers first (they are re-derived, not settable directly).`,
+      };
+    }
+  }
+
   if (request.dryRun) {
+    const previewExtra =
+      request.collection === "serviceLeads" && normalizedLead
+        ? { visibility: normalizedLead.visibility, blockers: normalizedLead.blockers, tags: normalizedLead.tags }
+        : {};
     return {
       found: true,
       dryRun: true,
@@ -158,7 +205,9 @@ export async function applyCardBridgeWrite(request: NormalizedWriteRequest): Pro
       before,
       // Even in dry-run, show what a touch would actually stamp — so the caller can verify the
       // no-op-content path before committing to it, same as any other write.
-      applied: request.touch ? { ...request.updates, updatedAt: "<now>", lastReviewedAt: "<now>", lastReviewedBy: request.source } : request.updates,
+      applied: request.touch
+        ? { ...request.updates, ...previewExtra, updatedAt: "<now>", lastReviewedAt: "<now>", lastReviewedBy: request.source }
+        : { ...request.updates, ...previewExtra },
     };
   }
 
@@ -181,6 +230,12 @@ export async function applyCardBridgeWrite(request: NormalizedWriteRequest): Pro
     finalUpdates.categoryReclassifiedAt = nowIso;
   }
 
+  if (request.collection === "serviceLeads" && normalizedLead) {
+    finalUpdates.visibility = normalizedLead.visibility;
+    finalUpdates.blockers = normalizedLead.blockers;
+    finalUpdates.tags = normalizedLead.tags;
+  }
+
   const auditId = randomUUID();
   await db.collection("cardBridgeAuditLog").insertOne({
     auditId,
@@ -196,5 +251,31 @@ export async function applyCardBridgeWrite(request: NormalizedWriteRequest): Pro
 
   await collection.updateOne({ [config.idField]: request.id }, { $set: finalUpdates });
 
-  return { found: true, dryRun: false, touch: request.touch, collection: request.collection, id: request.id, before, applied: finalUpdates, auditId };
+  let cascaded: WriteOutcome["cascaded"];
+  if (request.collection === "serviceLeads") {
+    // Cascade exactly like upsertFamilyServicePlaceFacts/upsertFamilyServiceReviewPackets in the main
+    // app: the place fact is always regenerated from the lead's new persisted state; a review packet
+    // is upserted only when the lead's (new) status is review-eligible.
+    const fullLead = { ...(current as unknown as FamilyServiceLead), ...finalUpdates } as FamilyServiceLead;
+    const fact = buildFamilyServicePlaceFact(fullLead, nowIso);
+    await db.collection("classscoutServicePlaceFacts").updateOne({ factId: fact.factId }, { $set: fact }, { upsert: true });
+    cascaded = { placeFactId: fact.factId };
+    if (reviewPacketEligible(fullLead.status)) {
+      const packet = buildFamilyServiceReviewPacket(fullLead, nowIso);
+      await db.collection("classscoutServiceReviewPackets").updateOne({ packetId: packet.packetId }, { $set: packet }, { upsert: true });
+      cascaded.reviewPacketId = packet.packetId;
+    }
+  }
+
+  return {
+    found: true,
+    dryRun: false,
+    touch: request.touch,
+    collection: request.collection,
+    id: request.id,
+    before,
+    applied: finalUpdates,
+    auditId,
+    cascaded,
+  };
 }
