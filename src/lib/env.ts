@@ -6,6 +6,11 @@ export interface EnvConfig {
   MONGODB_URI: string;
   MONGODB_DB_NAME: string;
   MONGODB_CARDS_COLLECTION: string;
+  /** Separate from MONGODB_CARDS_COLLECTION (the "providers" collection this app's generator writes
+   *  to) — this is the main classscout app's content-card pool the read-only bridge reads FROM. */
+  MONGODB_CONTENT_CARDS_COLLECTION: string;
+  /** Bearer-key secret for /api/card-bridge/*, dedicated and separate from CLASSSCOUT_INGEST_KEY. */
+  CARD_BRIDGE_API_KEY: string;
   NODE_ENV: string;
   PORT: number;
 }
@@ -16,6 +21,8 @@ const defaults = {
   MONGODB_URI: "",
   MONGODB_DB_NAME: "classscout",
   MONGODB_CARDS_COLLECTION: "providers",
+  MONGODB_CONTENT_CARDS_COLLECTION: "classscoutContentCards",
+  CARD_BRIDGE_API_KEY: "",
   NODE_ENV: process.env.NODE_ENV ?? "development",
   PORT: 3001,
 };
@@ -30,6 +37,11 @@ export const env: EnvConfig = {
   MONGODB_URI: get("MONGODB_URI"),
   MONGODB_DB_NAME: get("MONGODB_DB_NAME", defaults.MONGODB_DB_NAME),
   MONGODB_CARDS_COLLECTION: get("MONGODB_CARDS_COLLECTION", defaults.MONGODB_CARDS_COLLECTION),
+  MONGODB_CONTENT_CARDS_COLLECTION: get(
+    "MONGODB_CONTENT_CARDS_COLLECTION",
+    defaults.MONGODB_CONTENT_CARDS_COLLECTION,
+  ),
+  CARD_BRIDGE_API_KEY: get("CARD_BRIDGE_API_KEY"),
   NODE_ENV: defaults.NODE_ENV,
   PORT: parseInt(get("PORT", String(defaults.PORT)), 10) || defaults.PORT,
 };
