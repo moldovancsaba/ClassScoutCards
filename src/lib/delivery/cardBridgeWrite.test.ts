@@ -173,4 +173,32 @@ describe("validateWriteRequest", () => {
       expect(validateWriteRequest({ ...stateBody, updates: { state: "ARCHIVED" } }).ok).toBe(false);
     });
   });
+
+  describe("serviceLeads writes", () => {
+    const leadBody = {
+      collection: "serviceLeads",
+      id: "lead-1",
+      reason: "Re-fetched source, confirmed the real address",
+      source: "family-service-test",
+    };
+
+    it("accepts a real status value", () => {
+      expect(validateWriteRequest({ ...leadBody, updates: { status: "ready_for_existing_category_review" } }).ok).toBe(true);
+    });
+
+    it("rejects a made-up status value", () => {
+      const result = validateWriteRequest({ ...leadBody, updates: { status: "totally_made_up" } });
+      expect(result.ok).toBe(false);
+      expect(!result.ok && result.error).toMatch(/status must be one of/);
+    });
+
+    it("accepts a plain content field write (address) with no status change", () => {
+      expect(validateWriteRequest({ ...leadBody, updates: { address: "345 Greenwich St, New York, NY 10013" } }).ok).toBe(true);
+    });
+
+    it("rejects an attempt to set visibility or blockers directly — always derived, never caller-supplied", () => {
+      expect(validateWriteRequest({ ...leadBody, updates: { visibility: "public_support" } }).ok).toBe(false);
+      expect(validateWriteRequest({ ...leadBody, updates: { blockers: [] } }).ok).toBe(false);
+    });
+  });
 });

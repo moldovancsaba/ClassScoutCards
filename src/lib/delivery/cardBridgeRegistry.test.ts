@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { isBridgeCollectionKey, rejectedFields, BRIDGE_REGISTRY } from "./cardBridgeRegistry";
 
-const WRITABLE_COLLECTIONS = ["contentCards", "providers", "meetupGroups"] as const;
-const READ_ONLY_COLLECTIONS = ["serviceLeads", "servicePlaceFacts", "serviceTasks"] as const;
+const WRITABLE_COLLECTIONS = ["contentCards", "providers", "meetupGroups", "serviceLeads"] as const;
+const READ_ONLY_COLLECTIONS = ["servicePlaceFacts", "serviceReviewPackets", "serviceTasks"] as const;
 
 describe("isBridgeCollectionKey", () => {
   it("accepts every registered collection, writable or read-only", () => {
