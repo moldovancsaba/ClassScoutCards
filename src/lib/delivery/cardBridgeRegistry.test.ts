@@ -1,11 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { isBridgeCollectionKey, rejectedFields, BRIDGE_REGISTRY } from "./cardBridgeRegistry";
 
+const WRITABLE_COLLECTIONS = ["contentCards", "providers", "meetupGroups"] as const;
+const READ_ONLY_COLLECTIONS = ["serviceLeads", "servicePlaceFacts", "serviceTasks"] as const;
+
 describe("isBridgeCollectionKey", () => {
-  it("accepts the three registered collections", () => {
-    expect(isBridgeCollectionKey("contentCards")).toBe(true);
-    expect(isBridgeCollectionKey("providers")).toBe(true);
-    expect(isBridgeCollectionKey("meetupGroups")).toBe(true);
+  it("accepts every registered collection, writable or read-only", () => {
+    for (const key of [...WRITABLE_COLLECTIONS, ...READ_ONLY_COLLECTIONS]) {
+      expect(isBridgeCollectionKey(key)).toBe(true);
+    }
   });
 
   it("rejects anything not explicitly registered", () => {
@@ -26,13 +29,21 @@ describe("rejectedFields", () => {
     expect(rejectedFields("providers", { website: "https://evil.example" })).toEqual(["website"]);
   });
 
-  it("every registered collection's writableFields is non-empty and copyFields is a subset of it", () => {
-    for (const key of Object.keys(BRIDGE_REGISTRY) as Array<keyof typeof BRIDGE_REGISTRY>) {
+  it("every WRITABLE collection's writableFields is non-empty and copyFields is a subset of it", () => {
+    for (const key of WRITABLE_COLLECTIONS) {
       const config = BRIDGE_REGISTRY[key];
       expect(config.writableFields.length).toBeGreaterThan(0);
       for (const copyField of config.copyFields) {
         expect(config.writableFields).toContain(copyField);
       }
+    }
+  });
+
+  it("every READ-ONLY collection has an empty writableFields — any update attempt is rejected", () => {
+    for (const key of READ_ONLY_COLLECTIONS) {
+      const config = BRIDGE_REGISTRY[key];
+      expect(config.writableFields).toEqual([]);
+      expect(rejectedFields(key, { anyField: "x" })).toEqual(["anyField"]);
     }
   });
 });

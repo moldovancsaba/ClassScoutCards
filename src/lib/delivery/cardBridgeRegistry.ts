@@ -8,7 +8,13 @@
  * by hand since this is a separate repo/deployment.
  */
 
-export type BridgeCollectionKey = "contentCards" | "providers" | "meetupGroups";
+export type BridgeCollectionKey =
+  | "contentCards"
+  | "providers"
+  | "meetupGroups"
+  | "serviceLeads"
+  | "servicePlaceFacts"
+  | "serviceTasks";
 
 export interface BridgeCollectionConfig {
   /** Real Mongo collection name in the shared classscoutcluster database. */
@@ -68,6 +74,8 @@ export const BRIDGE_REGISTRY: Record<BridgeCollectionKey, BridgeCollectionConfig
       name: 1,
       category: 1,
       categoryConfidence: 1,
+      activityTypes: 1,
+      programType: 1,
       borough: 1,
       neighborhood: 1,
       shortDescription: 1,
@@ -112,6 +120,85 @@ export const BRIDGE_REGISTRY: Record<BridgeCollectionKey, BridgeCollectionConfig
     },
     writableFields: ["groupType", "description", "coverImageUrl", "ageRange", "cadence"],
     copyFields: ["description"],
+  },
+  // The three below back the family-services pipeline (src/lib/familyServices/{types,core}.ts in the
+  // main app: lead -> place fact -> review packet, driven by the classscoutLiteFamilyServiceTasks
+  // queue). READ-ONLY for now — this state machine has real business-logic invariants
+  // (visibility/status transitions, confidence scoring) this bridge doesn't yet replicate, so writing
+  // into it blind would risk corrupting review state. Added to investigate the family-service
+  // content-card hand-off gap; extend with real writes only once that logic is understood well enough
+  // to reproduce safely (see the recommendation this generated).
+  serviceLeads: {
+    mongoCollection: "classscoutServiceLeads",
+    idField: "leadId",
+    readProjection: {
+      _id: 0,
+      leadId: 1,
+      sourceSystem: 1,
+      sourceUrl: 1,
+      sourceSlug: 1,
+      visibility: 1,
+      status: 1,
+      name: 1,
+      serviceKind: 1,
+      priceTier: 1,
+      neighborhood: 1,
+      borough: 1,
+      address: 1,
+      amenities: 1,
+      tags: 1,
+      existingClassScoutCategoryCandidate: 1,
+      confidenceScore: 1,
+      blockers: 1,
+      duplicateKey: 1,
+      updatedAt: 1,
+      createdAt: 1,
+    },
+    writableFields: [],
+    copyFields: [],
+  },
+  servicePlaceFacts: {
+    mongoCollection: "classscoutServicePlaceFacts",
+    idField: "factId",
+    readProjection: {
+      _id: 0,
+      factId: 1,
+      leadId: 1,
+      visibility: 1,
+      reviewStatus: 1,
+      name: 1,
+      serviceKind: 1,
+      neighborhood: 1,
+      borough: 1,
+      address: 1,
+      geo: 1,
+      amenities: 1,
+      tags: 1,
+      confidenceScore: 1,
+      blockers: 1,
+      updatedAt: 1,
+    },
+    writableFields: [],
+    copyFields: [],
+  },
+  serviceTasks: {
+    mongoCollection: "classscoutLiteFamilyServiceTasks",
+    idField: "taskId",
+    readProjection: {
+      _id: 0,
+      taskId: 1,
+      taskType: 1,
+      subjectId: 1,
+      status: 1,
+      retryCount: 1,
+      nextRunAt: 1,
+      errorCode: 1,
+      errorMessage: 1,
+      createdAt: 1,
+      updatedAt: 1,
+    },
+    writableFields: [],
+    copyFields: [],
   },
 };
 
