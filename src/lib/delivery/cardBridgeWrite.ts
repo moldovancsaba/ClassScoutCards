@@ -91,6 +91,13 @@ export function validateWriteRequest(body: unknown): WriteValidationResult {
     }
   }
 
+  if (collection === "providers" && "qualityStatus" in updates && updates.qualityStatus !== "quarantined") {
+    return { ok: false, status: 400, error: 'qualityStatus can only be set to "quarantined" (the only real value the main app defines) — omit the field entirely rather than trying to clear it through this bridge' };
+  }
+  if (collection === "providers" && "visibility" in updates && updates.visibility !== "hidden") {
+    return { ok: false, status: 400, error: 'visibility can only be set to "hidden" (the only real value the main app defines) — omit the field entirely rather than trying to clear it through this bridge' };
+  }
+
   if (collection === "serviceLeads" && "status" in updates) {
     if (!(FAMILY_SERVICE_LEAD_STATUSES as readonly string[]).includes(updates.status as string)) {
       return { ok: false, status: 400, error: `status must be one of: ${FAMILY_SERVICE_LEAD_STATUSES.join(", ")}` };
