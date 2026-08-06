@@ -49,6 +49,64 @@ below get corrected from real mistakes.
    `source` — this is the only audit trail; there is no way to write through this bridge without one.
 8. **Go to 1.**
 
+## Verification checklist (step 2/4 — run this explicitly, every time)
+
+A real miss during the first end-to-end test (2026-08-06): a card was reviewed and called "no defect
+found" without checking it against a complete, explicit list of what's actually required — a garbage
+"candidate image" (a UI icon, not a photo) sat in plain sight in `enrichmentSummary.extractedFacts` and
+was missed simply because nobody looked at that specific field with a checklist in hand. **"Learn the
+content" (step 2) is not complete until every item below has been checked against real data, not
+skimmed.**
+
+The four target properties (category, age/schedule/location, image, copy) do NOT apply uniformly —
+`entityKindHint` determines which checklist branch applies. A restaurant lead has no age range or
+class schedule; applying the provider checklist to it is itself a mistake.
+
+### A. Always (every content card, any entityKindHint) — rule doc "Content Card Identity"
+- [ ] `contentCardId`, `normalizedTitle`, `sourceUrl`, `sourceHost` all present and non-empty
+- [ ] `sourceAuthorityGrade` is not silently "unknown" without a stated reason
+- [ ] `fingerprint` is present (dedupe depends on it — a card missing this can't be deduped against)
+- [ ] `latestRunId` is present (provenance — which run produced this card)
+- [ ] `enrichmentSummary` exists and its `extractedFacts` are individually sane — **read every fact
+      value, don't just check the array is non-empty.** A "candidate image" that's a nav icon, a
+      "category" that's a cuisine, a phone number that's obviously malformed — these pass an
+      emptiness check and still be wrong.
+- [ ] `visitorVisibility` / `operationalVisibility` match the card's real state (e.g. a card that's
+      actually parked shouldn't read `"active"`)
+
+### B. entityKindHint = "provider" or "meetupGroup" (heading toward publish)
+- [ ] Category/activity classification matches the real program type (not a keyword echo)
+- [ ] Age range and schedule are source-backed, not invented, not silently defaulted
+- [ ] A real image exists (not a category banner masquerading as one, not a UI asset) once published
+- [ ] Public copy passes `validateCopyQuality` (URL-free, chrome-free, no placeholder, no raw entities,
+      >= 20 real chars) once it reaches a `shortDescription`/`longDescription` field
+- [ ] Address is a real, number-bearing street address (main app rule: "no address → no publish")
+
+### C. entityKindHint = "familyService" (its OWN track — never the provider checklist)
+Cross-reference the linked `serviceLeads` row (match by `sourceUrl`) — the content card is not the
+authoritative record.
+- [ ] `serviceLeads`: `leadId`, `sourceSystem`, `sourceUrl`, `name`, `duplicateKey` all present
+      (`validateFamilyServiceLead`'s own required set)
+- [ ] `latitude`/`longitude`, if present, are in valid range (±90 / ±180); if ABSENT, note it — no
+      geo means this lead can never appear in `buildNearActivityLinksForProviders`'s near-activity
+      matching, a real (if soft) gap, not a hard blocker
+- [ ] `serviceKind` is a plausible venue-type/service description — flag (don't silently "fix") if
+      it's actually just the cuisine (see the serviceKind-vocabulary recommendation already filed)
+- [ ] `amenities` marked `true` are each traceable to the source's own text/tags, not assumed
+- [ ] There is NO age/schedule/image requirement for a family-service lead — the schema (`src/lib/
+      familyServices/types.ts`) has no such fields. Do not apply the provider checklist here.
+- [ ] `status` progression: is this lead's `status` still `"hidden_ready"` (or another pre-review
+      status) long after `updatedAt`? If so, that's a *pipeline* finding (see "Cross-collection
+      lookups"), not something to fix on this one lead.
+
+### D. Quantity, not just quality
+"Enough data to be useful" is itself a requirement, separate from "the data present is correct":
+- [ ] Are there fields the record SHOULD have (per A/B/C above) that are simply absent, vs. fields
+      that are present but wrong? Both count as findings — don't stop checking once you've found one.
+- [ ] For a family-service lead specifically: is address present at all? It isn't a hard blocker in
+      `validateFamilyServiceLead`, but it's real, useful, evidence-backed data if the source has it and
+      it was never carried over — worth noting even when it isn't blocking anything.
+
 ## Decision Matrix A — enrich / fix / leave (step 4)
 
 | Finding from research | Action |
