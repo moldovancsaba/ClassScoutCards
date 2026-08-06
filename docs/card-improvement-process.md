@@ -116,7 +116,7 @@ authoritative record.
 | Copy contains a defect (`validateCopyQuality`: URL leak, scraped chrome, placeholder, un-decoded entity, too short) | Fix: rewrite from the source's real content — never patch symptomatically (e.g. never just strip the bad substring and leave a fragment) |
 | Source is dead / unreachable / doesn't support the card's facts at all | Do not fabricate a fix. Move to Decision Matrix B (block) |
 | A field is genuinely absent from *every* available source (not just this one) | Leave the gap recorded (`incompleteFields` / `blockerCodes`), do not invent a value |
-| The card's real record lives partly in another collection (e.g. a `FamilyServiceLead`) and THAT record has the actual defect | Report it — see "Explicit boundaries," this bridge does not yet write `serviceLeads`/`servicePlaceFacts` |
+| The card's real record lives partly in another collection (e.g. a `FamilyServiceLead`) and THAT record has the actual defect | Fix it there directly (`serviceLeads` writes are supported, v2) — see "Explicit boundaries" for the derived-field rules (`visibility`/`blockers`) and the cascade to `servicePlaceFacts`/`serviceReviewPackets` |
 
 ## Decision Matrix B — block / draft / publish / leave (step 5, `contentCards.state`)
 
@@ -143,13 +143,28 @@ misleading audit trail:
   *content* problem — don't force a per-card fix for what is actually a systemic gap. Write a
   recommendation (see the project's recommendation convention) instead of papering over it card by card.
 
-## Explicit boundaries (v1 — revisit as capability grows)
+## Explicit boundaries (v2 — updated 2026-08-06)
 
-- **No real publication.** `state` can never be set to `PUBLISHED` through this bridge.
-- **`serviceLeads` / `servicePlaceFacts` are read-only.** Their status/visibility transitions have real
-  business-logic invariants (`src/lib/familyServices/core.ts` in the main app) this bridge doesn't yet
-  reproduce. Do not attempt to advance a lead's status through raw field writes — report it as a
-  recommendation until this bridge has real support for that state machine.
+- **No real provider/meetup publication.** Content-card `state` can never be set to `PUBLISHED`
+  through this bridge — that path still requires the main app's full gate.
+- **`serviceLeads` writes ARE now supported** (v2) — content fields (`address`, `serviceKind`,
+  `priceTier`, `neighborhood`, `borough`, `latitude`, `longitude`, `amenities`, `tags`,
+  `existingClassScoutCategoryCandidate`, `existingCategoryReason`) and `status`. `visibility` and
+  `blockers` can NEVER be set directly — every write re-derives them via the ported
+  `normalizeFamilyServiceLead` (`src/lib/familyServices/core.ts` in THIS repo, ported from the main
+  app's own logic, not reinvented), so a write can't produce an inconsistent status/visibility pair or
+  a stale blockers list. Every applied lead write also cascades into an upserted `servicePlaceFacts`
+  row and, when the lead's status is review-eligible, a `serviceReviewPackets` row — mirroring
+  `upsertFamilyServicePlaceFacts`/`upsertFamilyServiceReviewPackets` exactly.
+  **This means setting `status` to `approved_support_only` or `approved_for_publication` genuinely
+  makes the lead publicly visible** (`visibility` flips to `public_support`, which is what
+  `publicFamilyServiceFilter`/`publicFamilyServiceFactFilter` read) — the family-service equivalent of
+  publishing. Treat that status change with the same care as a real publish decision. A hard safeguard
+  blocks it anyway when the lead still carries an unresolved blocker (checked in dry-run too, so it
+  surfaces before commit, not after).
+- **`servicePlaceFacts` / `serviceReviewPackets` stay NOT directly writable.** They are purely derived
+  from a lead in the real architecture; writing them independently would let them drift out of sync.
+  Always go through a `serviceLeads` write — the cascade keeps them consistent.
 - **No automated "research" step yet.** Step 3 today is performed by whoever/whatever is driving the
   loop (a person, an agent) fetching the source and reasoning about it — there is no wired-in LLM call
   inside the bridge itself. Automating step 3 unattended (e.g. via Vercel Cron) needs a hosted LLM
@@ -176,3 +191,13 @@ committing.
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
   `touch` + content-card `state` write support to the bridge specifically to support this loop.
+- v2 (2026-08-06): added the Verification Checklist (step 2/4) after the first end-to-end test missed a
+  real defect — a garbage "candidate image" fact sitting unchecked in `enrichmentSummary`. Extended
+  read projections with the fields the checklist needs (`normalizedTitle`, `fingerprint`,
+  `latestRunId`, `sourceAuthorityGrade`, `serviceLeads.latitude/longitude`). Widened `serviceLeads` from
+  read-only to fully writable (content fields + `status`), with the ported
+  `normalizeFamilyServiceLead`/`validateFamilyServiceLead`/`buildFamilyServicePlaceFact`/
+  `buildFamilyServiceReviewPacket` logic driving every write so `visibility`/`blockers` are always
+  re-derived and never caller-supplied, and every write cascades into `servicePlaceFacts` +
+  (when eligible) `serviceReviewPackets` — this is what makes the loop actually capable of completing
+  a family-service card end to end, not just annotating the content card around it.
