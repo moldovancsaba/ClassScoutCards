@@ -2,6 +2,7 @@ import { randomUUID } from "crypto";
 import { getBridgeDb } from "@/lib/delivery/cardBridgeClient";
 import {
   BRIDGE_REGISTRY,
+  BRIDGE_SETTABLE_STATES,
   CATEGORY_VALUES,
   isBridgeCollectionKey,
   rejectedFields,
@@ -12,10 +13,17 @@ import { validateCopyQuality } from "@/lib/validation/copyQuality";
 export interface NormalizedWriteRequest {
   collection: BridgeCollectionKey;
   id: string;
+  /** May be empty ONLY when touch=true — a pure "reviewed, nothing to change" write. */
   updates: Record<string, unknown>;
   reason: string;
   source: string;
   dryRun: boolean;
+  /** When true, this write is allowed to carry zero content fields: it still stamps updatedAt +
+   *  lastReviewedAt/lastReviewedBy on apply, recording that the card WAS reviewed even though no field
+   *  needed to change. This is how "pull oldest -> research -> decide no action needed -> still record
+   *  the review and rotate the queue" is expressed — never skip step 6/7 just because step 4 found
+   *  nothing to fix. */
+  touch: boolean;
 }
 
 export type WriteValidationResult =
@@ -49,12 +57,14 @@ export function validateWriteRequest(body: unknown): WriteValidationResult {
     return { ok: false, status: 400, error: "id must be a non-empty string" };
   }
 
-  if (typeof b.updates !== "object" || b.updates === null || Array.isArray(b.updates)) {
+  const touch = b.touch === true;
+
+  if (b.updates !== undefined && (typeof b.updates !== "object" || b.updates === null || Array.isArray(b.updates))) {
     return { ok: false, status: 400, error: "updates must be a JSON object" };
   }
-  const updates = b.updates as Record<string, unknown>;
-  if (Object.keys(updates).length === 0) {
-    return { ok: false, status: 400, error: "updates must contain at least one field" };
+  const updates = (b.updates as Record<string, unknown> | undefined) ?? {};
+  if (Object.keys(updates).length === 0 && !touch) {
+    return { ok: false, status: 400, error: "updates must contain at least one field, unless touch=true (a pure reviewed-no-change write)" };
   }
 
   const rejected = rejectedFields(collection, updates);
@@ -79,6 +89,19 @@ export function validateWriteRequest(body: unknown): WriteValidationResult {
     }
   }
 
+  if (collection === "contentCards" && "state" in updates) {
+    if (updates.state === "PUBLISHED") {
+      return {
+        ok: false,
+        status: 400,
+        error: 'state cannot be set to "PUBLISHED" through this bridge — publishing requires the main app\'s full gate (dedupe, schema validation, image pipeline, safe-publish flags), which this bridge does not replicate. Set state to "REVIEW_READY" instead and publish through the main app.',
+      };
+    }
+    if (!(BRIDGE_SETTABLE_STATES as readonly string[]).includes(updates.state as string)) {
+      return { ok: false, status: 400, error: `state must be one of: ${BRIDGE_SETTABLE_STATES.join(", ")}` };
+    }
+  }
+
   for (const field of BRIDGE_REGISTRY[collection].copyFields) {
     const value = updates[field];
     if (typeof value === "string") {
@@ -97,12 +120,13 @@ export function validateWriteRequest(body: unknown): WriteValidationResult {
   // dryRun defaults to true — a write only actually applies when the caller explicitly passes false.
   const dryRun = b.dryRun !== false;
 
-  return { ok: true, value: { collection, id: b.id, updates, reason: b.reason, source: b.source, dryRun } };
+  return { ok: true, value: { collection, id: b.id, updates, reason: b.reason, source: b.source, dryRun, touch } };
 }
 
 export interface WriteOutcome {
   found: boolean;
   dryRun: boolean;
+  touch: boolean;
   collection: BridgeCollectionKey;
   id: string;
   before?: Record<string, unknown>;
@@ -118,18 +142,37 @@ export async function applyCardBridgeWrite(request: NormalizedWriteRequest): Pro
 
   const current = await collection.findOne({ [config.idField]: request.id });
   if (!current) {
-    return { found: false, dryRun: request.dryRun, collection: request.collection, id: request.id };
+    return { found: false, dryRun: request.dryRun, touch: request.touch, collection: request.collection, id: request.id };
   }
 
   const before: Record<string, unknown> = {};
   for (const key of Object.keys(request.updates)) before[key] = current[key] ?? null;
 
   if (request.dryRun) {
-    return { found: true, dryRun: true, collection: request.collection, id: request.id, before, applied: request.updates };
+    return {
+      found: true,
+      dryRun: true,
+      touch: request.touch,
+      collection: request.collection,
+      id: request.id,
+      before,
+      // Even in dry-run, show what a touch would actually stamp — so the caller can verify the
+      // no-op-content path before committing to it, same as any other write.
+      applied: request.touch ? { ...request.updates, updatedAt: "<now>", lastReviewedAt: "<now>", lastReviewedBy: request.source } : request.updates,
+    };
   }
 
   const nowIso = new Date().toISOString();
-  const finalUpdates: Record<string, unknown> = { ...request.updates, updatedAt: nowIso };
+  // lastReviewedAt/lastReviewedBy are stamped on EVERY applied write, touch or not — this is the
+  // record that the improvement loop looked at this card, distinct from updatedAt (which anything
+  // could have touched). `source` doubles as "who/what reviewed it" (e.g. "copy-quality-lane",
+  // "manual-oldest-card-loop-2026-08-06").
+  const finalUpdates: Record<string, unknown> = {
+    ...request.updates,
+    updatedAt: nowIso,
+    lastReviewedAt: nowIso,
+    lastReviewedBy: request.source,
+  };
 
   // Mirror the main app's categoryReclassifiedFrom/At provenance convention (business-rules.md rule
   // re: board 44 F3) so a category change made through this bridge is reversible the same way.
@@ -143,6 +186,7 @@ export async function applyCardBridgeWrite(request: NormalizedWriteRequest): Pro
     auditId,
     collection: request.collection,
     id: request.id,
+    touch: request.touch,
     before,
     after: finalUpdates,
     reason: request.reason,
@@ -152,5 +196,5 @@ export async function applyCardBridgeWrite(request: NormalizedWriteRequest): Pro
 
   await collection.updateOne({ [config.idField]: request.id }, { $set: finalUpdates });
 
-  return { found: true, dryRun: false, collection: request.collection, id: request.id, before, applied: finalUpdates, auditId };
+  return { found: true, dryRun: false, touch: request.touch, collection: request.collection, id: request.id, before, applied: finalUpdates, auditId };
 }

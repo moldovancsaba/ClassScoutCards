@@ -8,6 +8,8 @@
  * by hand since this is a separate repo/deployment.
  */
 
+import { ALLOWED_STATES, type ContentCardState } from "@/lib/delivery/contentCardsBridge";
+
 export type BridgeCollectionKey =
   | "contentCards"
   | "providers"
@@ -15,6 +17,21 @@ export type BridgeCollectionKey =
   | "serviceLeads"
   | "servicePlaceFacts"
   | "serviceTasks";
+
+export { ALLOWED_STATES, type ContentCardState };
+
+/**
+ * A content-card state this bridge is allowed to SET via a write. Deliberately excludes "PUBLISHED" —
+ * publishing a card requires the main app's full gate (dedupe, schema validation, image pipeline,
+ * safe-publish flags), none of which this bridge replicates. A write attempting state="PUBLISHED" is
+ * rejected explicitly in cardBridgeWrite.ts with a message saying so, rather than silently no-op'd.
+ */
+export const BRIDGE_SETTABLE_STATES = ALLOWED_STATES.filter((s) => s !== "PUBLISHED");
+
+/** Every writable collection gets these two review-provenance fields, stamped automatically by
+ *  cardBridgeWrite.ts on every applied (non-dry-run) write, INCLUDING a pure touch (no content change)
+ *  — this is what lets "reviewed, decided no change needed" be distinguished from "never reviewed". */
+const REVIEW_PROVENANCE_FIELDS = ["lastReviewedAt", "lastReviewedBy"] as const;
 
 export interface BridgeCollectionConfig {
   /** Real Mongo collection name in the shared classscoutcluster database. */
@@ -59,10 +76,22 @@ export const BRIDGE_REGISTRY: Record<BridgeCollectionKey, BridgeCollectionConfig
       blockerCodes: 1,
       nextEligibleRunAt: 1,
       terminalReason: 1,
+      lastReviewedAt: 1,
+      lastReviewedBy: 1,
       updatedAt: 1,
       createdAt: 1,
     },
-    writableFields: ["categoryHint", "boroughGuess", "neighborhoodGuess", "blockerCodes", "enrichmentStatus", "incompleteFields"],
+    writableFields: [
+      "state",
+      "categoryHint",
+      "boroughGuess",
+      "neighborhoodGuess",
+      "blockerCodes",
+      "terminalReason",
+      "enrichmentStatus",
+      "incompleteFields",
+      ...REVIEW_PROVENANCE_FIELDS,
+    ],
     copyFields: [],
   },
   providers: {
@@ -86,6 +115,8 @@ export const BRIDGE_REGISTRY: Record<BridgeCollectionKey, BridgeCollectionConfig
       incompleteFields: 1,
       discoveryTier: 1,
       qualityStatus: 1,
+      lastReviewedAt: 1,
+      lastReviewedBy: 1,
       updatedAt: 1,
       publishedAt: 1,
     },
@@ -99,6 +130,7 @@ export const BRIDGE_REGISTRY: Record<BridgeCollectionKey, BridgeCollectionConfig
       "ageRanges",
       "incompleteFields",
       "discoveryTier",
+      ...REVIEW_PROVENANCE_FIELDS,
     ],
     copyFields: ["shortDescription", "longDescription"],
   },
@@ -116,9 +148,11 @@ export const BRIDGE_REGISTRY: Record<BridgeCollectionKey, BridgeCollectionConfig
       coverImageUrl: 1,
       ageRange: 1,
       cadence: 1,
+      lastReviewedAt: 1,
+      lastReviewedBy: 1,
       updatedAt: 1,
     },
-    writableFields: ["groupType", "description", "coverImageUrl", "ageRange", "cadence"],
+    writableFields: ["groupType", "description", "coverImageUrl", "ageRange", "cadence", ...REVIEW_PROVENANCE_FIELDS],
     copyFields: ["description"],
   },
   // The three below back the family-services pipeline (src/lib/familyServices/{types,core}.ts in the
