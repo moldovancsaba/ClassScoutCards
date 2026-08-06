@@ -120,11 +120,18 @@ export const BRIDGE_REGISTRY: Record<BridgeCollectionKey, BridgeCollectionConfig
       incompleteFields: 1,
       discoveryTier: 1,
       qualityStatus: 1,
+      visibility: 1,
       lastReviewedAt: 1,
       lastReviewedBy: 1,
       updatedAt: 1,
       publishedAt: 1,
     },
+    // qualityStatus/visibility are the DEFENSIVE direction only — this bridge can quarantine/hide an
+    // already-published record found to be bad on re-review, but (unlike serviceLeads' public-status
+    // safeguard, which gates the RISKY direction) there is no un-quarantine path here: reversing a
+    // quarantine is a bigger call than one automated check should make alone. See cardBridgeWrite.ts
+    // for the exact allowed values (visibility can only be set to "hidden", qualityStatus only to
+    // "quarantined" — the ONLY two real values either field takes per the main app's Provider type).
     writableFields: [
       "category",
       "categoryConfidence",
@@ -135,6 +142,8 @@ export const BRIDGE_REGISTRY: Record<BridgeCollectionKey, BridgeCollectionConfig
       "ageRanges",
       "incompleteFields",
       "discoveryTier",
+      "qualityStatus",
+      "visibility",
       ...REVIEW_PROVENANCE_FIELDS,
     ],
     copyFields: ["shortDescription", "longDescription"],

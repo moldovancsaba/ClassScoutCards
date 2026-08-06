@@ -6,21 +6,34 @@ in the changelog at the bottom rather than silently rewriting history.
 
 ## Purpose
 
-An ongoing, never-ending loop that revisits ClassScout content cards — always the oldest-updated card
-in the pool first — learns what the card actually is, researches the real organization/program behind
-it, and either improves it or explicitly confirms it needs no improvement. Every pass through the loop
-is recorded, even when nothing changed, so the queue rotates and "reviewed" is always distinguishable
-from "never looked at."
+An ongoing, never-ending loop that revisits ClassScout cards — always the oldest-updated card in the
+pool first — learns what the card actually is, researches the real organization/program behind it, and
+either improves it or explicitly confirms it needs no improvement. Every pass through the loop is
+recorded, even when nothing changed, so the queue rotates and "reviewed" is always distinguishable from
+"never looked at."
+
+**"The pool" is not just pre-publish content cards. It is EVERY card, in EVERY state, including
+already-`PUBLISHED` providers and meetupGroups (owner directive, 2026-08-06).** Being published is not
+an exemption from review — it is a reason to keep re-checking. A card that reached `PUBLISHED` months
+ago and was never looked at again is exactly as stale as one still sitting in `DISCOVERED`; the main
+app's own maintainer lanes (`maintainerReverify.ts`, `maintainerReclassify.ts`) already re-verify
+published providers for this exact reason, and this loop must do the same. Checking published records
+is not optional and must not be skipped card-by-card at the operator's discretion — it is a standing
+requirement of every pass through the loop.
 
 This is not a one-time cleanup. It runs forever, card after card, as the pool grows and as the rules
 below get corrected from real mistakes.
 
 ## The loop
 
-1. **Pull** the single oldest-updated card from the pool (`GET /api/card-bridge/rows`, no filter,
-   `limit=1`, or `?state=X` when working a specific queue). Selection is always `updatedAt asc,
-   <idField> asc` — the same canonical ordering every lane in the main app uses. Never hand-pick a
-   card out of order.
+1. **Pull the GLOBALLY oldest-updated record**, across ALL THREE card-bearing collections — not just
+   `contentCards`. Fetch the single oldest row from `contentCards`, `providers`, and `meetupGroups`
+   independently (`GET /api/card-bridge/rows?collection=X&limit=1` for each, no other filter), then
+   compare their three `updatedAt` values and take the smallest. Do not process a whole collection to
+   exhaustion before checking the others — the three queues interleave by age, and skipping straight to
+   "whichever collection I was already in" is exactly the kind of implicit exemption this rule exists to
+   close. Selection within each collection is always `updatedAt asc, <idField> asc` — the same canonical
+   ordering every lane in the main app uses. Never hand-pick a card out of order.
 2. **Learn** the card's current stored state: every field the bridge's read projection exposes,
    including `enrichmentSummary` (what the pipeline already extracted) and, for family-service cards,
    the linked `serviceLeads`/`servicePlaceFacts`/`serviceTasks` records (see "Cross-collection lookups"
@@ -118,7 +131,7 @@ authoritative record.
 | A field is genuinely absent from *every* available source (not just this one) | Leave the gap recorded (`incompleteFields` / `blockerCodes`), do not invent a value |
 | The card's real record lives partly in another collection (e.g. a `FamilyServiceLead`) and THAT record has the actual defect | Fix it there directly (`serviceLeads` writes are supported, v2) — see "Explicit boundaries" for the derived-field rules (`visibility`/`blockers`) and the cascade to `servicePlaceFacts`/`serviceReviewPackets` |
 
-## Decision Matrix B — block / draft / publish / leave (step 5, `contentCards.state`)
+## Decision Matrix B — block / draft / publish / leave (step 5, `contentCards.state`, PRE-publish cards only)
 
 | Outcome | `state` to set | When |
 | --- | --- | --- |
@@ -127,6 +140,24 @@ authoritative record.
 | Block (repairable) | `BLOCKED_REPAIRABLE` + `blockerCodes` | A specific, nameable gap exists that a future pass (or a different process) could plausibly fix |
 | Block (terminal) | `BLOCKED_TERMINAL` + `terminalReason` | Source is confirmed dead, the entity doesn't exist, or it's clearly out of scope (e.g. not actually a family/kids activity) |
 | Publish | **never** — reject at the API layer | Real publication is the main app's job. Setting `REVIEW_READY` is the correct hand-off; do not try to shortcut it |
+
+## Decision Matrix C — an already-`PUBLISHED` provider/meetupGroup (step 5, live records)
+
+A card reaching this matrix is already public. There is no "state" field to advance — the record IS
+the live thing families see right now. The direction of every possible action here is DEFENSIVE:
+fixing a real defect, or removing something that shouldn't be visible. There is no action in this
+matrix that increases exposure — that direction (approving/publishing something new) belongs to the
+main app's own gate, not this loop.
+
+| Outcome | Action | When |
+| --- | --- | --- |
+| Leave | Touch only | Re-research confirms the live record is still accurate and complete |
+| Fix | Write the corrected field(s) (Decision Matrix A applies the same way — same allow-list, same copy-quality gate) | A specific, source-backed correction is available (stale info, a since-fixed schedule, a rotted image link, etc.) |
+| Quarantine | `qualityStatus: "quarantined"` + `visibility: "hidden"` | Research finds the record is now genuinely wrong at the root — business closed, source confirms it never should have published, safety/policy concern — and a field-level fix wouldn't be honest |
+| Un-quarantine | **not supported by this bridge** | Reversing a quarantine is a bigger call than one automated re-check should make alone — hand off to a human/the main app if a quarantined record needs reinstating |
+
+Quarantining a live record is real and immediate — it stops being shown to families the moment the
+write applies. Always dry-run first, and write a `reason` a human could audit later and agree with.
 
 ## Cross-collection lookups (before deciding anything)
 
@@ -176,10 +207,17 @@ misleading audit trail:
 There is no autopilot yet — each iteration is driven explicitly:
 
 ```
-GET  /api/card-bridge/rows?collection=contentCards&limit=1          # step 1
+# step 1 — three calls, take whichever row has the smallest updatedAt:
+GET /api/card-bridge/rows?collection=contentCards&limit=1
+GET /api/card-bridge/rows?collection=providers&limit=1
+GET /api/card-bridge/rows?collection=meetupGroups&limit=1
+
 # steps 2-5 performed by whoever/whatever is driving this iteration
+# (Decision Matrix A/B for a pre-publish contentCards row, Matrix A/C for an already-PUBLISHED
+# providers/meetupGroups row)
+
 POST /api/card-bridge/update                                        # steps 6-7
-  { "collection": "contentCards", "id": "...", "touch": true,
+  { "collection": "<whichever collection the winning row came from>", "id": "...", "touch": true,
     "updates": { ... only if something actually changed ... },
     "reason": "...", "source": "...", "dryRun": false }
 ```
@@ -201,3 +239,10 @@ committing.
   re-derived and never caller-supplied, and every write cascades into `servicePlaceFacts` +
   (when eligible) `serviceReviewPackets` — this is what makes the loop actually capable of completing
   a family-service card end to end, not just annotating the content card around it.
+- v3 (2026-08-06, owner directive): closed an implicit exemption — being `PUBLISHED` was acting as a
+  reason to skip review, and it must not be. Step 1 now pulls the globally oldest-updated record across
+  `contentCards`, `providers`, AND `meetupGroups`, not just `contentCards`. Added Decision Matrix C for
+  an already-published record (leave / fix / quarantine — never an action that increases exposure) and
+  widened `providers` writes to support it: `qualityStatus` (only settable to `"quarantined"`) and
+  `visibility` (only settable to `"hidden"`) — deliberately one-directional; un-quarantining is not
+  supported through this bridge.

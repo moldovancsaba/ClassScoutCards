@@ -92,6 +92,19 @@ describe("validateWriteRequest", () => {
     expect(result.ok).toBe(true);
   });
 
+  describe("quarantine/hide an already-published provider", () => {
+    it("accepts qualityStatus=quarantined and visibility=hidden", () => {
+      expect(validateWriteRequest({ ...validProviderBody, updates: { qualityStatus: "quarantined" } }).ok).toBe(true);
+      expect(validateWriteRequest({ ...validProviderBody, updates: { visibility: "hidden" } }).ok).toBe(true);
+    });
+
+    it("rejects any other qualityStatus/visibility value — these fields only ever move ONE direction through this bridge", () => {
+      expect(validateWriteRequest({ ...validProviderBody, updates: { qualityStatus: "approved" } }).ok).toBe(false);
+      expect(validateWriteRequest({ ...validProviderBody, updates: { visibility: "visible" } }).ok).toBe(false);
+      expect(validateWriteRequest({ ...validProviderBody, updates: { qualityStatus: null } }).ok).toBe(false);
+    });
+  });
+
   it("meetupGroups: rejects a description that fails the quality gate the same way providers does", () => {
     const result = validateWriteRequest({
       collection: "meetupGroups",
