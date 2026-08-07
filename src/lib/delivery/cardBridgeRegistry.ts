@@ -150,6 +150,7 @@ export const BRIDGE_REGISTRY: Record<BridgeCollectionKey, BridgeCollectionConfig
     writableFields: [
       "category",
       "categoryConfidence",
+      "programType",
       "address",
       "borough",
       "neighborhood",
