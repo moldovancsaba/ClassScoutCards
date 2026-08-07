@@ -771,6 +771,65 @@ misleading audit trail:
   *content* problem — don't force a per-card fix for what is actually a systemic gap. Write a
   recommendation (see the project's recommendation convention) instead of papering over it card by card.
 
+## Splitting a card that represents more than one real thing (added 2026-08-07)
+
+Three recurring patterns from the 100-card mass run turned out to be the same underlying problem: a
+single record whose fields can't honestly describe what it actually represents, because it actually
+represents more than one real thing. Editing fields on the one existing document can't fix this — it
+needs to become N documents. `POST /api/card-bridge/split` (see README.md for the full request shape)
+does that: given a `parentId` and a list of N child payloads, it generates N new documents using the
+**same ID-generation schemes the main app itself uses** and blocks/quarantines the parent to point at
+them.
+
+**When it applies, and what each child needs:**
+
+1. **One real org, several real physical locations** (e.g. Penguin City Swim — Midtown East, John Jay
+   College, Riverdale — forced into one `boroughGuess`). Each child needs its own real, independently
+   confirmed address/borough/neighborhood and, ideally, its own location-specific page on the org's site
+   as `sourceUrl`/`website` — exactly the kind of per-location page some orgs already have (see the
+   "Steve & Kate's Camp Upper West Side" / generic "Steve & Kate's Camp" pattern already in this queue).
+   If no per-location page exists, the org's main site is an acceptable shared `sourceUrl` for more than
+   one child ONLY if you've independently confirmed each location is real — never invent an address to
+   make a location "count."
+2. **An aggregator/directory page that actually lists N real, distinct businesses**, extracted as if it
+   were one entity. Each child needs its own real source — usually that business's own direct site if
+   findable (search for it, the way every aggregator-contamination fix this session did), or a specific,
+   real listing/section of the aggregator page if that's genuinely the only source and it's specific
+   enough to that one business (not the same generic roundup URL repeated for every child — see the
+   "no two children may share a source" rule below).
+3. **Two real orgs' facts mashed into one record under one name** (a fabricated-identity case, e.g. Big
+   Apple Swim School / Big Apple Academy). Splitting is the right fix ONLY once you've independently
+   found each real org's OWN separate source — if you can't find a second real source, this isn't a
+   splittable card, it's an unfixable one; leave it `QUARANTINED` with the conflation documented (as
+   every fabricated-identity case in this run's Changelog already was) rather than fabricating a second
+   source just to make a split possible.
+
+**Hard rules, not suggestions:**
+- Every child needs its own distinguishing `sourceUrl` (`contentCards`) or `website` (`providers`) — no
+  two children in the same split may share one. This is enforced by the endpoint itself (a 400, not a
+  warning) and is what actually distinguishes a real split from just relisting the same bad source twice.
+- Always dry-run first, same as every other write this bridge does — `dryRun` defaults to `true` and the
+  response previews every generated child ID before anything is written.
+- `contentCards` children land in `state: "DISCOVERED"` — they go through the SAME real
+  extract/score/publish-gate pipeline any other freshly-discovered card does; this bridge never
+  publishes them directly, same as everywhere else in this doc.
+- `providers` children are ALWAYS created `visibility: "hidden"`, regardless of what you pass — a raw
+  insert into `providers` has no publish gate at the database layer at all (confirmed: no uniqueness
+  constraint on `providers.id` exists), so this is the one thing standing between a split and something
+  silently going live unreviewed. Un-hiding a split-off provider is a main-app action, not something
+  this bridge can do.
+- The parent gets `state: "BLOCKED_TERMINAL"` (`contentCards`) or `qualityStatus: "quarantined"` +
+  `visibility: "hidden"` (`providers`) with the children's IDs recorded — never a new state value
+  invented on either collection, and never left `PUBLISHED`/`active` pointing nowhere useful.
+
+**What this does NOT do**: there is still no automated detection of "this card should be split" — that
+judgment (does this source actually describe N real things, and can each one be independently sourced)
+is made by whoever is running the review loop, the same way every other decision in this doc is. The
+main `classscout` repo has no automated multi-entity extraction either (confirmed by reading its own
+code — a `locationGroup.ts` comment explicitly calls this "a follow-up," not yet built there); recommend
+that as the real long-term fix for pattern #1 above (extraction creating N location-specific cards up
+front instead of one generic one) since it has the source-page context this bridge never will.
+
 ## Explicit boundaries (v2 — updated 2026-08-06)
 
 - **No real provider/meetup publication.** Content-card `state` can never be set to `PUBLISHED`
@@ -1263,3 +1322,17 @@ the real problem plainly, with `policy_or_safety_review` in `blockerCodes`.
   real defect the bridge previously had no way to correct), and a real bug fixed in the read endpoint
   (`&id` was silently ignored, always falling back to "return the oldest row"). All fixes were dry-run
   verified before every apply, and no write ever touched `classscout` — only `classscoutcards`.
+- v34 (2026-08-07): the `/stats` page and its API now group `boroughGuess`/`neighborhoodGuess` using the
+  **same canonical location logic the main app itself uses** (ported into `src/lib/delivery/
+  locations.ts` — `findCanonicalBorough`/`findCanonicalNeighborhood` from `src/data/locations.ts`, plus
+  an LA area/neighborhood equivalent this repo adds since none existed to port), instead of raw-string
+  grouping — a messy value like `"Manhattan/Brooklyn"` now buckets into an explicit `"(unresolved)"`
+  group rather than polluting a real borough's count, and this surfaced a real, useful finding on its
+  own: roughly a quarter of `contentCards` bucketed under a resolved `Manhattan` still have a
+  `neighborhoodGuess` that doesn't canonicalize to any real NYC neighborhood. Every count now also shows
+  a published/not-published split, and a card-level "Sport Cards" summary was added (one card counts
+  once even with multiple sport tags — see `sportActivity.ts` for the best-effort classifier, since the
+  main app has no sport taxonomy to port). Also added `POST /api/card-bridge/split` (see its own section
+  above) — the first capability in this repo that inserts new documents rather than only updating
+  existing ones, built to handle the multi-location, aggregator-multi-business, and
+  independently-re-sourced-conflated-identity splitting scenarios all found during the 100-card run.

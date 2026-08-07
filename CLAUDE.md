@@ -39,27 +39,36 @@ Three things live in this one repo:
    main app's `providers` collection. Not part of the card-bridge; don't conflate the two.
 3. **The stats page** (`src/pages/stats.tsx`, `src/lib/delivery/cardBridgeStats.ts`,
    `src/pages/api/card-bridge/stats.ts`) — a read-only reporting view: total counts for `contentCards`
-   and `providers`, each broken down by borough, neighborhood, and activity. Deliberately public (no
-   bridge-key auth) since it only ever returns aggregate counts, never individual record content — the
-   page queries MongoDB directly server-side in `getServerSideProps` rather than round-tripping through
-   its own API. Live at `https://compare.messmass.com/stats`.
+   and `providers`, with a published/not-published split on every number, grouped by borough/area and
+   neighborhood using the **same canonical location logic the main app itself uses**
+   (`src/lib/delivery/locations.ts` — see its own header comment for exactly what's ported vs. added),
+   plus an activity breakdown and a card-level "Sport Cards" summary. Deliberately public (no bridge-key
+   auth) since it only ever returns aggregate counts, never individual record content — the page queries
+   MongoDB directly server-side in `getServerSideProps` rather than round-tripping through its own API.
+   Live at `https://compare.messmass.com/stats`.
+4. **The split capability** (`src/lib/delivery/cardBridgeSplit.ts`, `src/pages/api/card-bridge/split.ts`)
+   — for a card that actually represents more than one real thing (several real locations, an aggregator
+   page listing several real businesses, or two orgs mashed into one record once each has been
+   independently re-sourced), creates N new documents and blocks/quarantines the parent. The only
+   capability in this repo that INSERTS new documents rather than updating existing ones — read its own
+   header comment in full before touching it; the safety rails there (forced `visibility: "hidden"` on
+   every split-off provider, a required distinct source per child, real ID-generation schemes ported
+   from the main app) are load-bearing, not decoration.
 
 ## Current status (2026-08-07)
 
-A 100-card mass-enrichment pass (`docs/card-improvement-process.md`, now at v33) has been completed —
+A 100-card mass-enrichment pass (`docs/card-improvement-process.md`, now at v33+) has been completed —
 a new agent picking this up is not starting from zero. Read that doc's Changelog before assuming a
 pattern is undiscovered; it very likely already has a name, a fix pattern, and a confirmed-instance
-count. Two open items handed off from that pass, not yet resolved:
+count. One open item handed off from that pass, not yet resolved:
 - **Live off-topic contamination with zero blockers**: at least two cards were found `PUBLISHED`/
   `active` with completely off-topic sourceHosts (a foreign university LMS, a general-audience
   reference article) and no blocker at all — never caught by quarantine. Only two were found by chance
   while working an oldest-first queue; there are very likely more. Worth a targeted sweep, not just
   reactive fixes as they're stumbled on.
-- **Card-splitting** (an enrichment source that actually describes N real entities, or a real business
-  with several physical locations, currently force-fit into one record): no design has been committed
-  to yet — see whatever's most recent in conversation/PR history for where that discussion landed
-  before building anything here. Don't assume "one card → one entity" always held historically; some
-  of what looks like a data-quality bug in a single record may actually be an unsplit multi-entity card.
+
+Card-splitting (the other open item as of the last update to this file) is now designed and built — see
+item 4 above and `docs/card-improvement-process.md`'s splitting section for when to use it.
 
 ## The one fact that will cost you hours if you get it wrong
 
@@ -82,6 +91,8 @@ from the main `moldovancsaba/classscout` repo (a separate deployment; there is n
 | `src/lib/familyServices/types.ts`, `core.ts` | `src/lib/familyServices/types.ts`, `core.ts` |
 | `contentCardsBridge.ts`'s `ALLOWED_STATES` | `src/lib/contentIntelligence/contentCards.ts`'s `ContentCardState` |
 | Registry field names (`cardBridgeRegistry.ts`) | `src/types/provider.ts`, `src/types/meetup.ts`, `src/lib/contentIntelligence/contentCards.ts` |
+| `src/lib/delivery/locations.ts` (boroughs/neighborhoods + canonicalization) | `src/data/locations.ts`, `src/data/laLocations.ts`, `src/data/placeLabelNormalize.ts` — its own header comment says exactly which parts (LA's `findCanonicalArea`) are this repo's own addition, not a port |
+| `cardBridgeSplit.ts`'s ID-generation (`computeContentCardIdentity`, `slugifyProviderName`) | `contentCards.ts`'s `buildContentCardIdentityFromParts`, `classscoutAdapter.ts`'s `slugify` + its `id: prov-${slugify(title)}` call site |
 
 **If you're about to write new validation/derivation logic for a field this bridge touches, check
 whether the main app already has the real rule first** (its own docs — `docs/business-rules.md`,

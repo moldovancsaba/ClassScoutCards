@@ -119,6 +119,52 @@ The only write path. **Dry-run by default** — nothing is written unless the bo
 - Every applied (non-dry-run) write is recorded in `cardBridgeAuditLog` with the before-image, `reason`,
   and `source` — the only audit trail; there's no way to write through this API without one.
 
+### `POST /api/card-bridge/split`
+
+For a card that actually represents more than one real thing — several real physical locations, an
+aggregator page listing several real businesses, or two real orgs mashed into one record where each has
+since been independently sourced — creates N new documents and blocks/quarantines the parent, instead of
+trying to force N realities into one record. `dryRun` defaults to `true`, same convention as `/update`.
+
+```json
+{
+  "collection": "contentCards | providers",
+  "parentId": "cc-... | prov-...",
+  "children": [
+    { "title": "...", "sourceUrl": "https://...", "categoryHint": "...", "boroughGuess": "...", "neighborhoodGuess": "..." },
+    { "...": "at least 2 entries" }
+  ],
+  "reason": "required, >= 5 chars",
+  "source": "required",
+  "dryRun": false
+}
+```
+
+(`providers` children use `name`/`website`/`category`/`borough`/`neighborhood`/`address`/
+`activityTypes`/`shortDescription`/`longDescription` instead of the `contentCards` field names above.)
+
+- Every child **must** carry its own genuinely distinguishing source (`sourceUrl` for `contentCards`,
+  `website` for `providers`) — no two children may share one. This is what makes a split meaningfully
+  different from just relisting the same bad source twice, and it's what rules a conflated-identity
+  record in or out: splitting only works once a real, separate source has actually been found for each
+  identity.
+- IDs are generated with the **same schemes the main app itself uses** (`cc-<sha1 fingerprint>` for
+  `contentCards`, `prov-<slugified name>` for `providers`) — see `cardBridgeSplit.ts` for exactly which
+  main-repo functions these port. Collisions are checked and disambiguated before insert.
+- `contentCards` children are created with `state: "DISCOVERED"` — the main app's own cron pipeline
+  picks these up and pushes them through its real extract/score/publish-gate cycle, same as any other
+  freshly-discovered card.
+- `providers` children are always created with `visibility: "hidden"` — **forced, not
+  caller-controlled** — because a raw insert into `providers` bypasses the main app's publish
+  gate/dedup entirely (confirmed: there is no uniqueness constraint on `providers.id` in the database at
+  all). A split-off provider can never go live through this bridge; a human must explicitly un-hide it
+  through the main app itself.
+- The parent is updated only after every child is generated and validated — `state: "BLOCKED_TERMINAL"`
+  with a `terminalReason` naming the children (`contentCards`), or `qualityStatus: "quarantined"` +
+  `visibility: "hidden"` (`providers`) — no new state value invented on either collection.
+- See `docs/card-improvement-process.md`'s splitting section for when to use this vs. a normal
+  field-level fix, and `cardBridgeSplit.ts`'s own header comment for the full reasoning.
+
 ### `GET /api/card-bridge/oldest-cards` (legacy)
 
 The first version of the read path, `contentCards`-only, kept for backward compatibility. Prefer
@@ -134,9 +180,22 @@ comes up again.
 ### `GET /api/card-bridge/stats`
 
 Read-only aggregate counts (requires the bridge key like every other `/api/card-bridge/*` route): total
-document count for `contentCards` and `providers`, each broken down by borough, neighborhood, and
-activity (`categoryHint` on `contentCards`; `activityTypes`, unwound, on `providers`). No individual
-record content — just counts. The same data, without needing the bridge key, is at `/stats` (see below).
+document count for `contentCards` and `providers`, each with:
+- a **published vs. not-published** split (`state === "PUBLISHED"` on `contentCards`; `publishedAt` set
+  on `providers`) on every number below, not just the top-level total;
+- borough/area counts, using the **same canonical location logic the main app itself uses**
+  (`findCanonicalBorough`/`findCanonicalNeighborhood`, ported from `src/data/locations.ts` — see
+  `src/lib/delivery/locations.ts`) — a messy raw value like `"Manhattan/Brooklyn"` lands in an explicit
+  `"(unresolved)"` bucket instead of polluting a real borough's count;
+- neighborhood counts **nested under their real parent borough/area**, not a flat list;
+- activity counts (`categoryHint` on `contentCards`; `activityTypes`, unwound, on `providers` — one
+  provider with 2 activity tags contributes to both buckets here);
+- a card-level **"Sport Cards"** summary (published/all) — one card counts once even if it carries
+  multiple sport-related tags, using a best-effort classifier (`sportActivity.ts`) since the main app has
+  no "is this activity a sport" taxonomy to port.
+
+No individual record content — just counts. The same data, without needing the bridge key, is at
+`/stats` (see below).
 
 ## Stats page
 
