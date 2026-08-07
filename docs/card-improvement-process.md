@@ -1910,6 +1910,25 @@ No new pattern this batch — all findings are instances of already-documented c
 `low_source_trust` clearing, host-site delivery, search-engine-link-as-source, neighborhood-precision
 enrichment).
 
+### Batch 18/10 (cards 171-180)
+
+| Card | Finding | Action |
+|---|---|---|
+| Bedstuy Community Partnership | Already `PUBLISHED`, correct | Touch only |
+| Playgroup Nyc | Already `PUBLISHED`, correct | Touch only |
+| City Kids Williamsburg | Real, confirmed address (240 Meeker Ave) matches card; stale `low_source_trust` | Blocker cleared |
+| Brooklyn Bouldering Project Youth Programs | Real (formerly Brooklyn Boulders); confirmed Gowanus location; stale `low_source_trust` | Blocker cleared, `neighborhoodGuess` enriched from plain "Brooklyn" to Gowanus |
+| Educational Alliance Youth Programs | Real, well-established (1889) settlement house nonprofit, confirmed HQ matches card; stale `low_source_trust` | Blocker cleared |
+| Treasure Trunk Theatre | Real host-site theatre program across multiple confirmed Brooklyn venues, matching its own honest "Brooklyn-wide" label; stale `low_source_trust` | Blocker cleared |
+| Kumon UWS | Real, confirmed location (700 Columbus Ave) matches card; low-trust source was a search-engine link | → `BLOCKED_REPAIRABLE` |
+| Basis Independent Manhattan Camps | Real, confirmed Lower School campus (795 Columbus Ave) runs real summer camps; low-trust source was a search-engine link | → `BLOCKED_REPAIRABLE` |
+| Creative Art Works Brooklyn | Already `PUBLISHED`, correct | Touch only |
+| Marlene Meyerson JCC Manhattan | Already `PUBLISHED`, correct | Touch only |
+
+No new pattern this batch — all findings are instances of already-documented categories (stale
+`low_source_trust` clearing, host-site delivery, search-engine-link-as-source, neighborhood-precision
+enrichment).
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -2363,3 +2382,6 @@ enrichment).
   `low_source_trust` blockers cleared, 3 new `BLOCKED_REPAIRABLE` fixes with neighborhood enrichment), 5
   already-correct cards touched. No new pattern — all findings are instances of already-documented
   categories. See "Batch 17/10..." above.
+- v62 (2026-08-07): batch 18/10 (cards 171-180) complete. 6 real entities corrected (4 stale
+  `low_source_trust` blockers cleared, 2 new `BLOCKED_REPAIRABLE` fixes for search-engine-link-sourced
+  cards), 4 already-correct cards touched. No new pattern. See "Batch 18/10..." above.
