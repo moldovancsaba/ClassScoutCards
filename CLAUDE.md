@@ -185,6 +185,19 @@ independently in one session** (2026-08-07): Fort Lee NJ/Water Mill NY (Tennis I
 product decision (a new city-tenant value? an explicit "greater metro" category?) rather than continued
 individual flagging. Not decided here — flagged as a recommendation.
 
+**The owner-requested 100-card sovereign autonomous test is now complete** (2026-08-07, 10 batches of
+10 cards each, `docs/card-improvement-process.md`'s "100-card sovereign autonomous test" section has the
+full per-batch tables plus a retrospective). Headline result: roughly 80% of the 100 were real NYC
+businesses wrongly held behind stale/bot-blocked/network-layer source checks (fixed to
+`BLOCKED_REPAIRABLE`), confirming the earlier off-topic-contamination finding above was NOT reproduced at
+scale in this sample — it remains a real, separate risk worth its own targeted sweep, but is not what
+dominates the queue. New patterns discovered during the test and already folded into the "Hard-won
+lessons" section below: sourceUrl domain hijacking (Urban Dunes), splits surfacing on already-`PUBLISHED`
+records, duplicate content cards for the identical location (confirmed 3x: Tiger Schulmann's, Mathnasium,
+Gymstars), a named real org not guaranteeing THIS card is real (Liberated Movement, Little Notes), the
+TLS-certificate-issuer-check methodology fix, and a real brand's card still failing on a
+confirmed-nonexistent specific location (PLAYDAY NYC Tribeca, Tiger Schulmann's Park Slope — 2x).
+
 ## The one fact that will cost you hours if you get it wrong
 
 **`MONGODB_DB_NAME` must be `classscoutcluster`, not `classscout`.** The cluster name and the real
