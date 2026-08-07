@@ -1737,6 +1737,35 @@ and 4 genuinely new defect patterns were discovered and codified into durable pr
 (CLAUDE.md) rather than silently handled and forgotten — evidence the process scales past a handful of
 cards without needing tighter supervision.
 
+## Cards 101-200: continuing the sovereign autonomous review, non-stop (owner directive, 2026-08-07)
+
+The owner explicitly requested continuing the same 10-cards-per-batch, dry-run/apply/verify/document/
+commit/push cycle for the next 100 cards (101-200), non-stop, in the same spirit as the first 100-card
+test. Same reporting convention as the first 100 (compact table + a "new patterns" callout only when
+genuinely new); the retrospective above covers cards 1-100 only, a second one will follow at card 200.
+
+### Batch 11/10 (cards 101-110)
+
+| Card | Finding | Action |
+|---|---|---|
+| Newmomsgroup Sugar Hill (Askpetrushka) | Already `PUBLISHED`, correct; confirmed via own distinguishing page | Touch only |
+| Om City Yoga | Real, confirmed 1551 2nd Ave matches Upper East Side | → `BLOCKED_REPAIRABLE` |
+| Ballet Academy East | Real, well-known since 1979, confirmed 1651 Third Ave matches card | → `BLOCKED_REPAIRABLE` |
+| Asphalt Green Battery Park City | Real campus of an already-confirmed org (batch 6), confirmed via own location page | → `BLOCKED_REPAIRABLE` |
+| New York City Center Education | Real major NYC venue; sourceUrl was google.com (search page) | → `BLOCKED_REPAIRABLE` |
+| Mandarin Seeds Manhattan | Real predecessor program; domain now redirects to its real successor (Ya Ya Preschool), confirmed Tribeca address | → `BLOCKED_REPAIRABLE`, neighborhoodGuess Manhattan→Tribeca |
+| Manhattan Youth Ballet | Real, confirmed 2 real UWS addresses match card | → `BLOCKED_REPAIRABLE` |
+| French Institute Alliance Française Kids | Real, well-known cultural institution; source 403 (bot-block) | → `BLOCKED_REPAIRABLE` |
+| Joffrey Ballet School Children's Program | Real, confirmed 434 Ave of the Americas — card said vague "Manhattan" | → `BLOCKED_REPAIRABLE`, neighborhoodGuess corrected to Chelsea |
+| Manhattan Youth Downtown Community Center | **4th confirmed duplicate-content-card instance** — same org/sourceUrl as a card already touched in batch 3; BOTH already `PUBLISHED`/correct | Left as-is (touch only) — no downgrade of a correct live record just to resolve a duplicate |
+
+**New pattern found this batch**: a duplicate-content-card pair where BOTH sides are already
+`PUBLISHED`/correct (unlike every prior duplicate instance — Tiger Schulmann's, Mathnasium, Gymstars x2 —
+where one side needed fixing and the other became `BLOCKED_TERMINAL`). When neither side is wrong, the
+right move is to leave both alone: this bridge's quarantine/terminal actions are one-directional
+safeguards for demoting a bad record, not a dedup tool, and demoting an already-correct, already-live
+card would make things worse, not better, just to resolve the duplication cosmetically.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -2147,3 +2176,9 @@ cards without needing tighter supervision.
   `primaryActivityClassifier.ts`/`categoryBanner.ts` already do the "which ONE activity leads" half
   correctly almost everywhere — the one place that doesn't is `MyAccountView.tsx`'s `SavedProviderCard`,
   which reads `activityTypes[0]` directly, a one-line fix documented above for whoever owns that repo.
+- v55 (2026-08-07): started the owner-requested continuation past the first 100-card test — cards
+  101-200, same batch-of-10 cycle, non-stop. Batch 11/10 (cards 101-110) complete: 8 real entities
+  corrected, 2 already-correct cards touched. New pattern: a duplicate-content-card pair can have BOTH
+  sides already `PUBLISHED`/correct (Manhattan Youth Downtown Community Center vs. its batch-3 sibling) —
+  unlike every prior duplicate instance, neither side needs fixing here, so both are left as-is rather
+  than demoting a correct live record just to resolve the duplication. See "Cards 101-200..." above.
