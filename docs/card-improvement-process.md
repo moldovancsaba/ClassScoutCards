@@ -2236,6 +2236,40 @@ visitor-facing, so no family sees it.
    stripped by every consumer forever. Returning `undefined` and letting the field be absent removes the
    whole class of bug.
 
+### Batch 26/10 (cards 251-260)
+
+| Card | Finding | Action |
+|---|---|---|
+| Masttro : Family Office Software… | **3rd live off-topic hit** — B2B wealth-management software; "Family Office" is a finance term, not a family activity | → `QUARANTINED` |
+| Vivvi | **14th duplicate** (of the batch-23 Vivvi Dumbo card) | → `BLOCKED_TERMINAL` |
+| Planet Han Chinese | **15th duplicate** (of the batch-23 Planet Han UWS card) | → `BLOCKED_TERMINAL` |
+| Gjøa Youth Soccer Brooklyn | **16th duplicate** (of the batch-17 card) | → `BLOCKED_TERMINAL` |
+| Downtown United Soccer Club | **17th duplicate** (of the batch-19 card) | → `BLOCKED_TERMINAL` |
+| New York City's Ymca | Organization-level umbrella card, superseded by the real per-branch cards | → `BLOCKED_TERMINAL` |
+| Park Slope Armory YMCA Youth Programs | Real branch, confirmed 361 15th St matches card | Blocker cleared |
+| MatchPoint NYC | Real athletic club, confirmed 2781 Shell Rd; **2nd real location (9000 Bay Pkwy) recorded as a split candidate** | Blocker cleared |
+| Riverside Park Conservancy | Real park nonprofit with genuine youth programming | Blocker cleared |
+| North Brooklyn YMCA Youth Programs | Real branch serving Greenpoint/Williamsburg | Blocker cleared |
+
+**Third live off-topic hit, and it completes a pattern: token collision on the TOPICAL axis.** Masttro is
+software for *family offices* — private firms managing ultra-high-net-worth portfolios. The word "Family"
+collided with this platform's family-activity vocabulary, exactly as "Upper" in `upper.school` collided
+with "Upper West Side" in batch 22. Those two are the same failure wearing different clothes: **a term of
+art from an unrelated domain that happens to share a word with this platform's vocabulary.** One landed on
+the location axis, one on the topical axis. Worth naming as a class, because the detection cue is the same
+in both: the card's own title contains the giveaway, and no amount of field-by-field checking finds it —
+only asking "what is this entity, actually?"
+
+**Duplicate count is now 17 and clearly systemic.** Five of this batch's ten cards were duplicates of cards
+already corrected in batches 17, 19 and 23 — i.e. the queue is re-serving the same businesses under
+slightly different titles. That is no longer a scattering of coincidences; it is a property of how these
+discovery runs enumerated candidates. Recorded as a recommendation below.
+
+**Recommendation (main app, read-only from here)**: content-card discovery appears to create multiple cards
+for one business when it encounters the same domain under different titles/paths (bare name, name + program,
+name + neighborhood). A dedupe key on `sourceHost` + normalized street address — rather than on title —
+would collapse these at creation instead of leaving them to be found one at a time downstream.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -2765,3 +2799,12 @@ visitor-facing, so no family sees it.
   Jitsu" -> Art, "Water" -> Art; now Martial Arts and Swimming). All 89 records cleaned via a bounded loop;
   0 remain. 8 new unit tests (153 total passing). Recommendation recorded for the main app. See the
   "Owner-reported defect..." section above.
+- v71 (2026-08-07): batch 26/10 (cards 251-260) complete. 4 real entities corrected (stale
+  `low_source_trust` blockers cleared; MatchPoint NYC recorded as a 2-location split candidate), 5 marked
+  terminal as the 14th-17th duplicate-content-card instances plus one organization-level umbrella card, and
+  1 quarantined as the **third** live zero-blocker off-topic contamination of this continuation (Masttro,
+  B2B family-office wealth-management software). Named the shared class behind Masttro and the batch-22
+  `upper.school` case: a term of art from an unrelated domain colliding with this platform's vocabulary --
+  "Family Office" on the topical axis, "Upper" on the location axis. Duplicates now at 17 confirmed and
+  clearly systemic (5 in this batch alone), with a dedupe-key recommendation recorded for the main app.
+  See "Batch 26/10..." above.
