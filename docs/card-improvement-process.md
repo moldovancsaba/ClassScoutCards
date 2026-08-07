@@ -1462,6 +1462,28 @@ Basketball Academy) — the correct move is `BLOCKED_TERMINAL` (superseded) on t
 the live record directly, not trying to force the content card through further pipeline states it no
 longer needs.
 
+### Batch 3/10 (cards 21-29 — 9 processed; 10th candidate deferred to batch 4)
+
+| Card | Finding | Action |
+|---|---|---|
+| McCarren Tennis Association Kids | Genuine entity-name ambiguity: title says "Association" (a real nonprofit advocacy group, not a class provider) but content describes kids classes matching "McCarren Tennis Center" (a real commercial facility, 50 Bedford Ave, Brooklyn) — two distinct real entities, unclear which this card is | → `BLOCKED_REPAIRABLE`, ambiguity flagged in `terminalReason` rather than guessed |
+| Fairytale Island | Real indoor playground/cafe, 7110 3rd Ave, Bay Ridge, Brooklyn — source domain persistent 502 (network-layer, not bot-block) | → `BLOCKED_REPAIRABLE` |
+| International Karate Center | Likely match to a real school ("International Martial Arts Center (IMAC)", 98 Third Ave, Kips Bay) but exact name match not 100% confirmed; source persistent 502 | → `BLOCKED_REPAIRABLE`, neighborhoodGuess Midtown→Kips Bay, name-match uncertainty flagged |
+| Downtown Community Center / Manhattan Youth | Real, already correct | Touch only |
+| Kaufman Music Center / Lucy Moses School | Real, already correct | Touch only |
+| Applause New York | Real, 30-year NYC performing arts program ages 3-18; stale blocker (source now 200) | → `BLOCKED_REPAIRABLE` |
+| Pixel Academy Brooklyn | Real coding/game-design program for kids 7-16, 163 Pacific St, Cobble Hill — source 403 (bot-blocked), confirmed via Sawyer/Yelp | → `BLOCKED_REPAIRABLE`, neighborhoodGuess Brooklyn→Cobble Hill |
+| Dazzling Discoveries | Real hands-on STEM program, hybrid in-person/virtual; stale blocker (source now 200) | → `BLOCKED_REPAIRABLE`, physical-only hybrid rule applied (led with in-person) |
+| Karma Kids Yoga | Real children's yoga studio, confirmed current address 16 Madison Square West, NoMad — card claimed vague "Manhattan-wide" | → `BLOCKED_REPAIRABLE`, neighborhoodGuess corrected to NoMad |
+
+**New patterns found this batch**: none genuinely new — this batch reinforced two already-documented
+patterns (persistent network-layer 502s as a distinct, non-bot-blocking failure mode; stale
+source-unreachable blockers on fully-reachable real sites) and surfaced a second instance of
+genuine entity-name ambiguity between two similarly-named real organizations (first was McCarren here;
+the general rule — flag, don't guess — was already established). The 10th candidate for this batch,
+Chelsea Piers Birthday Parties (`cc-b51c2bc013474472336a113e`), was identified but not yet researched;
+deferred to the start of batch 4 rather than delaying the whole batch to research it.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -1803,3 +1825,9 @@ longer needs.
   have a wrong neighborhood matching NONE of its actual locations (clear it, don't guess); a content card
   can be quarantined while a live provider for the same entity already exists elsewhere (use
   `BLOCKED_TERMINAL`/superseded on the card, fix the live record directly). See "Batch 2/10..." above.
+- v46 (2026-08-07): batch 3/10 of the 100-card test complete (9 of 10 cards; 10th deferred to batch 4). 7
+  real entities corrected (persistent-502 network failures, stale source-unreachable blockers, a
+  bot-blocked-but-independently-confirmed real business), 2 already-correct cards touched. No new pattern
+  — reinforced existing ones (persistent 502 as a distinct failure mode; stale blockers on now-reachable
+  sites; genuine entity-name ambiguity between two similarly-named real orgs, flagged not guessed). See
+  "Batch 3/10..." above.
