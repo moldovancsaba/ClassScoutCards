@@ -34,6 +34,15 @@ below get corrected from real mistakes.
    "whichever collection I was already in" is exactly the kind of implicit exemption this rule exists to
    close. Selection within each collection is always `updatedAt asc, <idField> asc` — the same canonical
    ordering every lane in the main app uses. Never hand-pick a card out of order.
+   **The cross-collection comparison uses the exact same rule, never a coin flip**: a record with no
+   `updatedAt` at all (never touched — common on legacy seed data) sorts as older than any record that
+   has one. When two or more candidates across different collections tie on `updatedAt` (including
+   multiple candidates all lacking it entirely), break the tie by `idField` ascending, string-sorted —
+   the identical mechanism already used for the within-collection tie-break, just applied globally.
+   **Selection must be 100% deterministic and reproducible from the same data — never randomized, even
+   when "ambiguous."** A tie is not an invitation to pick arbitrarily; it just means the tie-break rule
+   above decides it instead of `updatedAt` alone (owner directive, 2026-08-07, after a random pick was
+   used here in error).
 2. **Learn** the card's current stored state: every field the bridge's read projection exposes,
    including `enrichmentSummary` (what the pipeline already extracted) and, for family-service cards,
    the linked `serviceLeads`/`servicePlaceFacts`/`serviceTasks` records (see "Cross-collection lookups"
@@ -293,3 +302,8 @@ committing.
   than silently moving on. Also exposed `providers.address`/`website`/`phone`/`email`/`sourceUrls` and
   `meetupGroups.website`/`instagram` as read-only research fields — both collections previously exposed
   no way to find a record's own real source, which is what let this specific defect go undetected.
+- v5 (2026-08-07, owner directive): fixed a real error in step 1 — a tie between candidates (most often
+  "multiple records with no `updatedAt` at all") was being broken with a random pick instead of a
+  deterministic rule. Selection must always be reproducible from the same data. The tie-break is now
+  explicit: `idField` ascending, the same mechanism already used within one collection, extended across
+  all three.
