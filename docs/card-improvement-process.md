@@ -852,6 +852,42 @@ code — a `locationGroup.ts` comment explicitly calls this "a follow-up," not y
 that as the real long-term fix for pattern #1 above (extraction creating N location-specific cards up
 front instead of one generic one) since it has the source-page context this bridge never will.
 
+### First real-world use, under the proactive one-card-per-location policy (2026-08-07)
+
+`cc-9bbab6a42d8cfc4c2741ba77` ("Tennis Innovators NYC") was the first split actually applied, prompted by
+the v38 policy (owner directive: any confirmed multi-location org should be split proactively, not only
+when a review happens to notice). Its own site listed distinct dedicated pages, each with its own real
+street address, for at least 5 physical locations: 94th St. Court (705 Columbus Ave, Manhattan/UWS),
+John Jay College/59th St. Court (899 10th Ave btw 58th-59th St, Manhattan), UES 78th St. Jr. Academy
+(78th St. btw Park & Lex, Manhattan), Fort Lee Racquet Club (Fort Lee, NJ), and Water Mill (35 Nowedonah
+Ave, Water Mill, NY/Hamptons) — plus a "New York Tennis Club" partner location in the Bronx mentioned
+only within the Fort Lee page's own text, with no dedicated page of its own.
+
+**Split into 3 children**, the confirmed Manhattan locations each with their own genuinely distinct
+source and real address. **Deliberately excluded, not fabricated**:
+- Fort Lee (NJ) and Water Mill (Hamptons, NY) — real, physical, and each has its own dedicated source
+  page, but neither has a canonical value in this platform's 5-borough `Borough` type
+  (`src/lib/delivery/locations.ts`). Whether/how out-of-the-5-boroughs-but-serves-NYC-families
+  locations should be represented (a new city-tenant value, the way `providers.city` already supports
+  `"la"`? left out entirely? something else?) is a product-scope decision, not a data-fix — flagged here
+  as a recommendation rather than decided unilaterally.
+- New York Tennis Club (Bronx) — real and genuinely IN the 5-borough taxonomy, but its only textual
+  mention is inside the Fort Lee page, which would make it share a source with the actual Fort Lee
+  location — violating the split tool's own no-shared-source rule (see the hard rules above) and the
+  broader "never fabricate a source" principle. Needs its own independently found source (the club's own
+  site, if one exists) before it can be split out honestly.
+
+**The existing live `providers` record** (`prov-tennis-innovators-nyc`) was itself an aggregator-style
+mashup of the site's general "camps" page — an unverified `neighborhood: "Midtown"` (the only supporting
+text was a stray, unconfirmed "MIDTOWN: The Courts Coming April 2023" mention mixed with unrelated nav
+text), a spurious "Music" `activityTypes` tag on a tennis program (the same pattern documented earlier in
+this doc), and description text describing camp offerings, not any one specific court. Quarantined
+separately (Decision Matrix C) rather than folded into the split, since providers-collection splits force
+`visibility: "hidden"` on every child regardless — replacing one already-live-but-wrong record with
+several newly-hidden ones would have been a net loss of live coverage for zero gain; the correct fix
+lives on the `contentCards` side, where the pipeline will re-process the 3 new `DISCOVERED` children
+through its own real extract/score/publish-gate cycle.
+
 ## Explicit boundaries (v2 — updated 2026-08-06)
 
 - **No real provider/meetup publication.** Content-card `state` can never be set to `PUBLISHED`
@@ -1500,3 +1536,11 @@ picked as "the real" Happy Kidz Yoga without fabricating that choice) — both r
   physical business that also offers an online option keeps its card with the online language
   stripped); (2) an organization confirmed to operate more than one distinct physical location must
   become one card per location via `split`, proactively, not only when a review happens to notice.
+- v39 (2026-08-07): first real-world application of the v38 split policy — `cc-9bbab6a42d8cfc4c2741ba77`
+  ("Tennis Innovators NYC") split into 3 confirmed Manhattan location cards (94th St. Court, John Jay
+  College/59th St., UES 78th St.), each with its own dedicated source page and real street address. Two
+  more real locations (Fort Lee NJ, Water Mill/Hamptons) were deliberately excluded rather than
+  fabricated into the split — see the new "First real-world use..." section above for why (out of the
+  platform's 5-borough taxonomy; a Bronx partner location lacking its own distinct source). The existing
+  live `providers` record was itself an aggregator-mashup of the site's general camps page and was
+  quarantined separately rather than folded into the split.

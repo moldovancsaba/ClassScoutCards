@@ -142,8 +142,14 @@ count. One open item handed off from that pass, not yet resolved:
   "quarantine when the check fails," not "quarantine anything old." Worth a targeted sweep of the oldest
   records specifically, not just reactive fixes as they're stumbled on.
 
-Card-splitting (the other open item as of the last update to this file) is now designed and built — see
-item 4 above and `docs/card-improvement-process.md`'s splitting section for when to use it.
+Card-splitting (the other open item as of the last update to this file) is now designed, built, AND used
+in production for the first time (2026-08-07, `cc-9bbab6a42d8cfc4c2741ba77` "Tennis Innovators NYC" split
+into 3 real Manhattan location cards) — see item 4 above and `docs/card-improvement-process.md`'s
+splitting section (esp. "First real-world use...") for both when to use it and a real open scope
+question it surfaced: this platform's `Borough` type only covers the 5 NYC boroughs, with no defined way
+to represent a real physical location that's genuinely out of that taxonomy but still serves NYC
+families (e.g. Fort Lee, NJ, a 15-minute drive from the Upper West Side). Not decided here — flagged as
+a recommendation.
 
 ## The one fact that will cost you hours if you get it wrong
 
