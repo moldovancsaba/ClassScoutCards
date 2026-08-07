@@ -2381,6 +2381,27 @@ Unlike the collision cases, there is no doubt about the entity — only the sour
 call is `BLOCKED_REPAIRABLE` with the real facts recorded for re-sourcing, **not** quarantining a genuine
 community institution. The distinction that matters: *is the ENTITY in doubt, or only the SOURCE?*
 
+### Batch 30/10 (cards 292-301) — 300-card mark passed
+
+| Card | Finding | Action |
+|---|---|---|
+| Eye Level Learning Manhattan | Real international supplemental-education franchise with genuine Manhattan centres | Blocker cleared |
+| The Play Lab Williamsburg | Real children's play/class space, matches card's neighborhood | Blocker cleared |
+| Laser Bounce Brooklyn | Real family entertainment centre serving Borough Park | Blocker cleared |
+| Gotham Tennis Academy Manhattan | Real Manhattan junior tennis program | Blocker cleared |
+| 92NY Basketball | Real major UES institution (1395 Lexington Ave) with long-standing youth sports | Blocker cleared |
+| American Youth Dance Theater | Already `PUBLISHED`, correct | Touch only |
+| Baby Fingers | Already `PUBLISHED`, correct | Touch only |
+| Chess at Three Manhattan | Already `PUBLISHED`, correct | Touch only |
+| Physique Swimming Upper East Side | Correct — and verified a genuinely **distinct** real site, not a duplicate of its BPC/Brooklyn siblings | Touch only |
+| Big City Volleyball Brooklyn | Already `PUBLISHED`, correct | Touch only |
+
+A clean batch with no new defect patterns — 5 stale `low_source_trust` blockers cleared on real,
+well-established institutions and 5 already-correct cards confirmed. Worth noting as a control: Physique
+Swimming has four cards across BPC (×2), Brooklyn and UES, and only the BPC pair were duplicates — the
+UES and Brooklyn cards are genuinely separate real locations. Card count alone never settles duplication;
+the address does.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -2949,3 +2970,10 @@ community institution. The distinction that matters: *is the ENTITY in doubt, or
   separated as a distinct "real entity, absurd source" case fixed by re-sourcing rather than quarantine;
   an 8th real-brand-fake-location (no Brooklyn Paint Place -- real ones are UWS and Astoria); and a 19th
   duplicate. 3 real entities corrected, 2 touched. See "Batch 29/10..." above.
+- v75 (2026-08-07): batch 30/10 (cards 292-301) complete -- **the 300-card mark of the owner-requested
+  cards 201-500 continuation is passed** (301 cards reviewed in this third pass; ~501 across all three).
+  5 real entities corrected (stale `low_source_trust` cleared on Eye Level Learning, The Play Lab, Laser
+  Bounce, Gotham Tennis Academy, 92NY) and 5 already-correct cards touched. No new defect patterns. Useful
+  control observed: Physique Swimming has 4 cards, but only the Battery Park City pair were duplicates --
+  the UES and Brooklyn cards are genuinely distinct real locations, reinforcing that card count never
+  settles duplication, the street address does. See "Batch 30/10..." above.
