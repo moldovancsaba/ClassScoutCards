@@ -140,6 +140,23 @@ export const BRIDGE_REGISTRY: Record<BridgeCollectionKey, BridgeCollectionConfig
       // from NYC boroughs (e.g. LA's "Central LA"/"Harbor" instead of "Manhattan"/"Brooklyn") — without
       // seeing this field, a non-NYC borough value looks like a data-quality bug when it may not be one.
       city: 1,
+      // Structured address + geo (2026-08-07, owner directive: a corrected address must be "properly
+      // accessible for maps" — zip/geo/neighbourhood/borough/city all confirmed, not just a nicer street
+      // line). Real Provider fields (src/types/provider.ts in the main app): geo carries lat/lng/
+      // precision/source/geocodedAt; addressComponents is the structured postal breakdown; addressNormalized
+      // is the canonical single-line form; addressConfidence records how sure we are of the pin placement.
+      // This bridge is not a geocoder — see cardBridgeWrite.ts for the honesty rule on what source/
+      // precision values this bridge is allowed to claim.
+      geo: 1,
+      addressComponents: 1,
+      addressNormalized: 1,
+      addressConfidence: 1,
+      // primaryActivityType (2026-08-07, owner directive): which of this listing's OWN activityTypes is
+      // the real headline activity — the main app's own category-banner picker and Activities display
+      // already consume this to lead with the right activity instead of raw array order. This is the
+      // real mechanism for "indicate the main category," not a truncated activityTypes array.
+      primaryActivityType: 1,
+      primaryActivityTypeConfidence: 1,
     },
     // qualityStatus/visibility are the DEFENSIVE direction only — this bridge can quarantine/hide an
     // already-published record found to be bad on re-review, but (unlike serviceLeads' public-status
@@ -156,6 +173,12 @@ export const BRIDGE_REGISTRY: Record<BridgeCollectionKey, BridgeCollectionConfig
       "neighborhood",
       "phone",
       "activityTypes",
+      "primaryActivityType",
+      "primaryActivityTypeConfidence",
+      "geo",
+      "addressComponents",
+      "addressNormalized",
+      "addressConfidence",
       "shortDescription",
       "longDescription",
       "image",

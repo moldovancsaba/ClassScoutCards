@@ -98,6 +98,30 @@ export function validateWriteRequest(body: unknown): WriteValidationResult {
     return { ok: false, status: 400, error: 'visibility can only be set to "hidden" (the only real value the main app defines) — omit the field entirely rather than trying to clear it through this bridge' };
   }
 
+  // (2026-08-07, owner directive) Cards must show at most 3 headline activities, never a raw keyword
+  // dump — cap activityTypes at the source's own top 3 here so the core system is never confused by a
+  // longer list. Anything cut belongs in the write's `reason` text (kept, just not shown), not in this field.
+  if (collection === "providers" && Array.isArray(updates.activityTypes) && (updates.activityTypes as unknown[]).length > 3) {
+    return {
+      ok: false,
+      status: 400,
+      error: `activityTypes can hold at most 3 entries through this bridge (got ${(updates.activityTypes as unknown[]).length}) — trim to the source's own top 3 and record anything cut in "reason"; use primaryActivityType to call out the headline activity instead of listing more.`,
+    };
+  }
+
+  // This bridge has no real geocoder — it can only ever honestly claim "approximate" placement, never
+  // pretend to be google/nominatim/places/civic-quality geocoding it never actually performed.
+  if (collection === "providers" && "geo" in updates) {
+    const geo = updates.geo as Record<string, unknown> | undefined;
+    if (typeof geo !== "object" || geo === null || geo.source !== "approximate") {
+      return {
+        ok: false,
+        status: 400,
+        error: 'geo.source must be "approximate" when writing geo through this bridge — this bridge has no real geocoder, so any other source value would misrepresent how the pin was placed.',
+      };
+    }
+  }
+
   if (collection === "serviceLeads" && "status" in updates) {
     if (!(FAMILY_SERVICE_LEAD_STATUSES as readonly string[]).includes(updates.status as string)) {
       return { ok: false, status: 400, error: `status must be one of: ${FAMILY_SERVICE_LEAD_STATUSES.join(", ")}` };
@@ -187,6 +211,27 @@ export async function applyCardBridgeWrite(request: NormalizedWriteRequest): Pro
         id: request.id,
         before,
         blockedReason: `Cannot set status="${normalizedLead.status}" (a public status) while blockers exist: ${normalizedLead.blockers.join(", ")}. Resolve the blockers first (they are re-derived, not settable directly).`,
+      };
+    }
+  }
+
+  // Never-downgrade safeguard: this bridge can only add approximate geocoding where none exists, never
+  // overwrite a real geocoder's better-quality pin. Checked in BOTH dry-run and apply — same convention
+  // as the serviceLeads blocker check above — so this surfaces before commit, not after.
+  if (request.collection === "providers" && "geo" in request.updates) {
+    const currentPrecision = (current.geo as { precision?: string } | undefined)?.precision;
+    const incomingPrecision = (request.updates.geo as { precision?: string } | undefined)?.precision;
+    const currentIsBetter = currentPrecision === "exact" || currentPrecision === "interpolated";
+    const incomingIsBetter = incomingPrecision === "exact" || incomingPrecision === "interpolated";
+    if (currentIsBetter && !incomingIsBetter) {
+      return {
+        found: true,
+        dryRun: request.dryRun,
+        touch: request.touch,
+        collection: request.collection,
+        id: request.id,
+        before,
+        blockedReason: `Cannot overwrite existing geo (precision="${currentPrecision}") with a lower-confidence pin (precision="${incomingPrecision ?? "missing"}") through this bridge — this bridge may only add approximate geocoding where none exists, never downgrade a real geocoder's output.`,
       };
     }
   }
