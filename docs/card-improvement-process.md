@@ -1588,6 +1588,32 @@ outcome is to leave it `QUARANTINED` rather than assume real just because a same
 turned up in search — findings are documented in `terminalReason` so a future pass doesn't have to
 re-research from scratch, but the card itself is not moved forward on an unconfirmed guess.
 
+### Batch 8/10 (cards 68-77)
+
+| Card | Finding | Action |
+|---|---|---|
+| Science Museum of Long Island | Real museum, Manhasset NY — out-of-5-borough-taxonomy gap (6th confirmed instance this session) | → `BLOCKED_REPAIRABLE` |
+| Asphalt Green Youth Flag Football | Real program at an already-confirmed real org (batch 6) | → `BLOCKED_REPAIRABLE` |
+| The Language Workshop for Children NYC | Real, 767 Lexington Ave Suite 505, founded 1973; TLS issue traced to research environment, not the site | → `BLOCKED_REPAIRABLE` |
+| Two By Two Childcare Academy Camps | Already `PUBLISHED`, correct; confirmed 418 Keap St matches Williamsburg | Touch only |
+| Ballet Tech School / Kids Dance | Already `PUBLISHED`, correct; well-known Eliot Feld free public ballet school | Touch only |
+| NYChessKids Manhattan | Real, confirmed 191 W 7th Ave Ste 2N, runs classes at real NYC schools | → `BLOCKED_REPAIRABLE` |
+| Brooklyn Ballet Youth Classes | Real, well-known Downtown Brooklyn dance company | → `BLOCKED_REPAIRABLE` |
+| Asia Society Family Programs | Real, extremely well-known cultural institution; source 403 (bot-block) | → `BLOCKED_REPAIRABLE` |
+| City Ice Pavilion Youth Hockey | Real, confirmed 47-32 32nd Pl — squarely Queens/LIC, not the vague "Brooklyn/Queens border" claimed | → `BLOCKED_REPAIRABLE`, borough/neighborhood corrected |
+| Dance with Miss Rachel UWS | Real, distinguishing location-specific sourceUrl confirms UWS exactly | → `BLOCKED_REPAIRABLE` |
+
+**New finding this batch (not a new pattern, a correction to how a prior finding was framed)**: two sources
+in this batch (`languageworkshopforchildren.com`, `cityicepavilion.com`) failed with what looked like TLS
+certificate errors, but checking the certificate directly showed the issuer was this research
+environment's own egress-proxy CA, not the origin site's real certificate — i.e. the failure was an
+artifact of fetching through this sandbox's intercepting proxy, not a genuine site-side misconfiguration
+like the earlier confirmed `CN=*.web-hosting.com` case (batch "10-card batch" section). Both businesses
+were still independently confirmed real via search; the terminalReason wording was adjusted to say the
+TLS issue is environment-side rather than claim a site defect that isn't actually confirmed. Worth
+checking the certificate chain, not just the curl error message, before categorizing a TLS failure as
+"real hosting misconfiguration" going forward.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -1962,3 +1988,10 @@ re-research from scratch, but the card itself is not moved forward on an unconfi
   but its studio closed, it now rents space elsewhere, and nothing ties it to "kids" classes or to
   "Prospect" (the card's own neighborhood claim); left `QUARANTINED` rather than assumed real, findings
   documented for a future re-research pass. See "Batch 7/10..." above.
+- v51 (2026-08-07): batch 8/10 of the 100-card test complete (cards 68-77). 8 real entities corrected, 2
+  already-correct cards touched, including a 6th confirmed instance of the out-of-5-borough-taxonomy gap
+  (Science Museum of Long Island) and a wrong-borough correction (City Ice Pavilion: "Brooklyn/Queens
+  border" → confirmed squarely Queens/Long Island City). Methodology correction, not a new content
+  pattern: 2 TLS failures this batch traced to this research environment's own egress-proxy certificate,
+  not the origin site — check the certificate issuer before calling a TLS failure a genuine site-side
+  defect. See "Batch 8/10..." above.

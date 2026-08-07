@@ -348,6 +348,15 @@ in a comment when you add one, the way the existing ports do.
   current facts don't support the specific claims on the card, the reality check still fails — leave it
   `QUARANTINED` and document what was found, don't move it forward just because a same-named organization
   exists somewhere.
+- **A curl TLS error is not automatically a genuine site-side certificate misconfiguration — check the
+  certificate issuer before concluding that.** Real case (100-card test, batch 8, 2026-08-07): two sites
+  (`languageworkshopforchildren.com`, `cityicepavilion.com`) failed with what looked like the same class
+  of error as the earlier confirmed `CN=*.web-hosting.com` genuine-hosting-misconfiguration case — but
+  running `openssl s_client` directly showed the certificate issuer was THIS research environment's own
+  egress-proxy CA, not the origin site's real certificate. Both businesses were confirmed real via
+  independent search regardless, but the terminalReason should say the TLS issue is environment-side, not
+  claim a site defect that was never actually confirmed. Check `openssl s_client ... | openssl x509 -noout
+  -issuer` before writing "genuine current TLS misconfiguration" into a card's reasoning.
 
 ## Before you write anything real
 
