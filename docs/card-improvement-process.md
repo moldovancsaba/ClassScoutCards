@@ -1861,6 +1861,36 @@ CLAUDE.md (Tribeca Language: real fixed studio + broader/online service area →
 fixed location rather than a vague combined-borough label) and of the genuine-no-match principle (HCHC
 Leadership Academy: a same-named real org exists, but in a different state entirely).
 
+### Batch 16/10 (cards 151-160)
+
+| Card | Finding | Action |
+|---|---|---|
+| RoboFun | **6th confirmed duplicate-content-card instance** — same sourceUrl as the already-fixed canonical "RoboFun Upper West Side" (batch 10) | → `BLOCKED_TERMINAL` (duplicate/superseded) |
+| Brooklyn Conservatory of Music | Already `PUBLISHED`, correct | Touch only |
+| Huntington Learning Center Upper West Side | Real, bot-blocked source; confirmed address (237 West 72nd St) matches card exactly | → `BLOCKED_REPAIRABLE` |
+| LEGO Store Rockefeller Center - Kids Workshops | Real physical retail location with confirmed recurring in-store kids workshop programming | → `BLOCKED_REPAIRABLE` |
+| Look Who's Talking NYC | Real, established program; confirmed dedicated address (301 E 73rd St, Upper East Side), other locations are real partner/host-site venues | → `BLOCKED_REPAIRABLE`, `boroughGuess`/`neighborhoodGuess` corrected from vague "NYC / Manhattan" |
+| Trevor Day School Summer Programs | Real, well-known Manhattan private school; sourceUrl was a Google search link (explaining `low_source_trust`), but real summer programs independently confirmed | → `BLOCKED_REPAIRABLE` |
+| "New" (The Canopy NYC) | **NEW pattern**: garbage single-word title ("New", truncated from "New Parent Workshops...") on an already-`PUBLISHED` live record, plus a wrong neighborhood ("East New York" instead of the real Williamsburg) | Title corrected to "The Canopy NYC - New Parent Workshop", `neighborhoodGuess` corrected to Williamsburg; kept as canonical |
+| "And" (The Canopy NYC) | Same garbage-title defect ("And"), and a duplicate content card for the identical business/location as the card above | → `BLOCKED_TERMINAL` (duplicate) |
+| Engineering For Kids Manhattan | Already `PUBLISHED`, real national STEM franchise (host-site delivery); stale `low_source_trust` blocker | Blocker cleared |
+| Movement Gowanus Youth Programs | Already `PUBLISHED`, real climbing gym confirmed at 242 Butler St; stale `low_source_trust` blocker | Blocker cleared |
+
+**New pattern this batch: a garbage single-word title extraction bug can reach an already-`PUBLISHED`
+live record, not just an unpublished one.** Two sibling content cards for the same real business (The
+Canopy, a Williamsburg baby/toddler play studio) were titled "New" and "And" — meaningless one-word
+fragments truncated from their real source page titles ("New Parent Workshops Williamsburg..." and "Baby
+and Mom Meetups Williamsburg..."). Both were `PUBLISHED` with zero blockers, meaning a family browsing the
+live site would have seen a business card titled literally "New" or "And" with no indication of what it
+even is. This is distinct from the already-documented "generic extraction artifact" pattern (e.g. a card
+titled just "Camps" — still a real, meaningful word) — here the extracted fragment isn't even a coherent
+category, just a stray word from a longer title. Combined with a wrong-neighborhood label on the same
+record and a duplicate-card situation between the two siblings, this is the worst-quality live-record
+defect combination found this session. `title` is writable on `contentCards` (already used once before for
+the "Camps" case) — both were corrected: one renamed and kept canonical, the other marked `BLOCKED_TERMINAL`
+as a duplicate. Worth treating a single-word or clearly-fragmentary title as its own trigger for a closer
+look, independent of whether blockerCodes flag anything.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -2302,3 +2332,11 @@ Leadership Academy: a same-named real org exists, but in a different state entir
   homeschool co-op). 3rd confirmed domain-change instance (Homage Skateboard Academy), and a clean
   hybrid-business-rule application (Tribeca Language: real fixed studio + broader service area, anchored
   to the real location instead of a vague combined-borough label). See "Batch 15/10..." above.
+- v60 (2026-08-07): batch 16/10 (cards 151-160) complete. 6 real entities corrected (2 stale
+  `low_source_trust` blockers cleared on already-`PUBLISHED` cards, a 6th confirmed duplicate-content-card
+  instance for RoboFun), 1 already-correct card touched. New pattern: a garbage single-word title
+  ("New"/"And", truncated source-title fragments) can reach an already-`PUBLISHED` live record, combined
+  here with a wrong neighborhood and a duplicate-card pair for the same business (The Canopy, Williamsburg)
+  — worse in degree than the already-documented generic-extraction-artifact pattern since the fragment
+  isn't even a coherent word. Added a matching CLAUDE.md "Hard-won lessons" bullet. See "Batch 16/10..."
+  above.

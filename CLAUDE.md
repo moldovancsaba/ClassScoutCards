@@ -406,6 +406,21 @@ in a comment when you add one, the way the existing ports do.
   moved to `BLOCKED_REPAIRABLE` (there is nothing to repair — the business doesn't exist to re-verify
   against), with the closure finding recorded in `terminalReason` so a future pass doesn't re-research it
   from scratch. Recommending a real, still-open replacement is out of scope for this bridge.
+- **A garbage single-word title extraction bug can reach an already-`PUBLISHED` live record, not just an
+  unpublished one — and it's a worse defect than the previously-documented generic-extraction-artifact
+  case.** Real case (cards 101-200 continuation, batch 16, 2026-08-07): two sibling content cards for the
+  same real business (The Canopy / Canopy Playspace, a Williamsburg baby/toddler play studio) were titled
+  "New" and "And" — meaningless one-word fragments truncated from their real source page titles ("New
+  Parent Workshops Williamsburg..." and "Baby and Mom Meetups Williamsburg..."). Both were `PUBLISHED`
+  with zero blockers, so a family browsing the live site would have seen a card literally titled "New" or
+  "And" with nothing describing what it is. This is distinct from the earlier "Camps" case (already
+  documented above, in `cardBridgeRegistry.ts`'s comment on `title`) — that fragment was at least a real,
+  meaningful category word; "New"/"And" aren't coherent at all. The same record also carried a wrong
+  neighborhood (the real Williamsburg location was labeled "East New York," an unrelated, distant Brooklyn
+  neighborhood) and a duplicate-content-card situation between the two siblings — three defects stacked on
+  one live record. Fixed by renaming the canonical card to a real, descriptive title and correcting its
+  neighborhood, then marking the duplicate sibling `BLOCKED_TERMINAL`. Worth treating any single-word or
+  obviously-fragmentary title as its own trigger for closer review, independent of `blockerCodes`.
 
 ## Before you write anything real
 
