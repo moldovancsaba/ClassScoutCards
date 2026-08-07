@@ -1891,6 +1891,25 @@ the "Camps" case) — both were corrected: one renamed and kept canonical, the o
 as a duplicate. Worth treating a single-word or clearly-fragmentary title as its own trigger for a closer
 look, independent of whether blockerCodes flag anything.
 
+### Batch 17/10 (cards 161-170)
+
+| Card | Finding | Action |
+|---|---|---|
+| West Side Taekwondo | Already `PUBLISHED`, real (est. 1992); stale `low_source_trust` | Blocker cleared |
+| Music Together NYC UWS | Already `PUBLISHED`, real licensee (host-site delivery); stale `low_source_trust` | Blocker cleared |
+| NYC Elite Gymnastics Upper East Side | Already `PUBLISHED`, correct | Touch only |
+| NYC Elite Gymnastics Tribeca | Already `PUBLISHED`, correct — genuinely distinct location from its UES sibling (same brand, different neighborhood) | Touch only |
+| Music Together Citywide NYC | Already `PUBLISHED`, correct, honest citywide host-site label | Touch only |
+| Manhattan Youth Beach Volleyball at Pier 25 | Already `PUBLISHED`, correct | Touch only |
+| The Little Gym Upper Westside | Real franchise location, confirmed address (2121 Broadway) matches card | → `BLOCKED_REPAIRABLE` |
+| Gjøa Youth Soccer | Real, Brooklyn's oldest youth soccer nonprofit (since 1911); confirmed home field/office (Dyker Beach Park / 850 62nd St) | → `BLOCKED_REPAIRABLE`, `neighborhoodGuess` refined to Dyker Heights / Bay Ridge |
+| iD Tech NYU | Real national STEM camp franchise at a real host university venue (NYU Washington Square/10th St); low-trust source was a search-engine link | → `BLOCKED_REPAIRABLE`, `neighborhoodGuess` enriched to Greenwich Village / Washington Square |
+| Bedford Stuyvesant Early Childhood Development Center | Already `PUBLISHED`, correct | Touch only |
+
+No new pattern this batch — all findings are instances of already-documented categories (stale
+`low_source_trust` clearing, host-site delivery, search-engine-link-as-source, neighborhood-precision
+enrichment).
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -2340,3 +2359,7 @@ look, independent of whether blockerCodes flag anything.
   — worse in degree than the already-documented generic-extraction-artifact pattern since the fragment
   isn't even a coherent word. Added a matching CLAUDE.md "Hard-won lessons" bullet. See "Batch 16/10..."
   above.
+- v61 (2026-08-07): batch 17/10 (cards 161-170) complete. 4 real entities corrected (2 stale
+  `low_source_trust` blockers cleared, 2 new `BLOCKED_REPAIRABLE` fixes with neighborhood enrichment), 6
+  already-correct cards touched. No new pattern — all findings are instances of already-documented
+  categories. See "Batch 17/10..." above.
