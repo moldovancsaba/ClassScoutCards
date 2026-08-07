@@ -2443,6 +2443,25 @@ Whichever sibling the queue serves first looks canonical, because nothing on the
 another exists. A same-address check at review time — or the dedupe-at-creation fix recommended in batches
 26-27 — is what removes the guesswork; judgement applied card-by-card cannot.
 
+### Batch 33/10 (cards 322-331)
+
+6 stale `low_source_trust` blockers cleared on confirmed real entities — Children's Aid Athletics
+(nonprofit founded 1853), Writopia Lab Brooklyn, Puppetsburg, McBurney YMCA (125 W 14th St), 78 Youth
+Sports, OLS Little League / SPARKLE — and 2 already-correct cards touched (The Craft Studio Brooklyn
+Pop-Ups, NORY UWS).
+
+**The order-dependence hazard named in batch 32 reproduced immediately, twice.** Both Hudson River
+Community Sailing and UrbanGlass had their *siblings* cleared as canonical in batch 32, and the queue then
+served the twin in the very next batch — the 21st and 22nd duplicates. That is about as direct a
+confirmation as the hypothesis could get: the queue orders by `updatedAt`, so touching one sibling pushes
+it to the back and leaves its twin near the front, which means **reviewing a card reliably surfaces its
+duplicate one batch later.** Useful operationally (the pairing is predictable, not random) but it also
+means the duplicate count grows roughly in step with review volume rather than converging.
+
+The pop-up case is worth one note for the physical-only rule: The Craft Studio's Brooklyn pop-ups run at
+real host venues *and* the business has its own fixed studios, so it is the hybrid case (kept), not the
+prohibited no-fixed-venue model (Blue Balloon).
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -3035,3 +3054,11 @@ another exists. A same-address check at review time — or the dedupe-at-creatio
   reasons recording the supersession explicitly. Names the underlying hazard: reviewing one card at a time
   makes duplicate detection order-dependent, since nothing on a card reveals that a sibling exists --
   only a same-address check or dedupe-at-creation removes the guesswork. See "Batch 32/10..." above.
+- v78 (2026-08-07): batch 33/10 (cards 322-331) complete. 6 stale `low_source_trust` blockers cleared
+  (Children's Aid Athletics, Writopia Lab, Puppetsburg, McBurney YMCA, 78 Youth Sports, OLS Little League),
+  2 already-correct cards touched, and the 21st and 22nd duplicates marked terminal. Both duplicates were
+  siblings of cards cleared as canonical in the immediately preceding batch -- direct confirmation of the
+  order-dependence hazard named in batch 32: because the queue orders by `updatedAt`, touching one sibling
+  pushes it back and leaves its twin near the front, so reviewing a card reliably surfaces its duplicate
+  one batch later. Predictable, but it means the duplicate count grows in step with review volume rather
+  than converging -- reinforcing that dedupe belongs at creation. See "Batch 33/10..." above.
