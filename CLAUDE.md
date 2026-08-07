@@ -92,20 +92,24 @@ A 100-card mass-enrichment pass (`docs/card-improvement-process.md`, now at v33+
 a new agent picking this up is not starting from zero. Read that doc's Changelog before assuming a
 pattern is undiscovered; it very likely already has a name, a fix pattern, and a confirmed-instance
 count. One open item handed off from that pass, not yet resolved:
-- **Live off-topic contamination with zero blockers**: at least four cards were found `PUBLISHED`/
+- **Live off-topic contamination with zero blockers**: at least five cards were found `PUBLISHED`/
   `active` (or having already produced a live `providers` record) with completely off-topic
   sourceHosts (a foreign university LMS, a general-audience reference article, a toy manufacturer's
-  own e-commerce checkout page, a media app's own App Store listing) and no blocker at all on the live
-  record — never caught by quarantine (see `docs/card-improvement-process.md` v35/v36). All four were
-  found by chance while working an oldest-first queue, not a targeted sweep, which is itself evidence
-  there are very likely more — notably, the third and fourth instances were the #1 and #2
-  oldest-updated records in the ENTIRE pool, both untouched since June, suggesting the oldest end of
-  the queue is disproportionately where this contamination lives. Note the third/fourth instances
-  specifically: the *contentCard* upstream for the third did carry a blocker (`low_source_trust`), but
-  the live `providers` record it had already produced carried none — a content card's own blocker is
-  not proof its downstream live record is protected. The fourth instance had zero blockers on BOTH
-  records. Worth a targeted sweep, not just reactive fixes as they're stumbled on. See the "Children's
-  safety comes first" section above — this is the concrete reason that principle exists.
+  own e-commerce checkout page, a media app's own App Store listing, a tech-news how-to article) and no
+  blocker at all on the live record — never caught by quarantine (see
+  `docs/card-improvement-process.md` v35/v36/v37). All five were found by chance while working an
+  oldest-first queue, not a targeted sweep, which is itself evidence there are very likely more —
+  notably, instances 3/4/5 were the #1, #2, and #3 oldest-updated records in the ENTIRE pool (three in a
+  row), all untouched since June, confirming the oldest end of the queue is disproportionately where
+  this contamination lives. A **distinct but related pattern** also confirmed a second instance the same
+  session: a real out-of-market business (a Georgia camp company) given a fabricated NYC borough,
+  compounded with an aggregator-style mashup of unrelated programs under one identity — see
+  `docs/card-improvement-process.md`'s out-of-market section. **Operating stance**: once the reality
+  check fails, quarantine immediately, don't hold it for confirmation (see "Children's safety comes
+  first" above) — but the very next record checked after the fifth instance (a real, legitimate
+  multi-location NYC tennis program with genuine data gaps) was correctly left alone, confirming this is
+  "quarantine when the check fails," not "quarantine anything old." Worth a targeted sweep of the oldest
+  records specifically, not just reactive fixes as they're stumbled on.
 
 Card-splitting (the other open item as of the last update to this file) is now designed and built — see
 item 4 above and `docs/card-improvement-process.md`'s splitting section for when to use it.
