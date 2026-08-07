@@ -1511,6 +1511,32 @@ applied to a new failure mode: confirm the entity is real via independent search
 sourceUrl itself now resolves to something completely unrelated, rather than defaulting to
 off-topic-contamination quarantine on domain content alone.
 
+### Batch 5/10 (cards 40-49, plus a 4-way split)
+
+| Card | Finding | Action |
+|---|---|---|
+| BMS PlayLab / Brooklyn Music School | Already `PUBLISHED`, correct; confirmed 126 St Felix St matches Fort Greene | Touch only |
+| NY Preschool Camp - Brooklyn Locations | **Split candidate**: already `PUBLISHED` but mashed 4 confirmed real Brooklyn locations (Brooklyn Heights 182 Henry St, Cobble Hill 299 Court St, Dumbo 30 Pearl St, Park Slope) into one record — own neighborhoodGuess literally named all 4 | → `POST /split`: 4 new real-location cards created, parent → `BLOCKED_TERMINAL` |
+| BubbleDad | Real, well-known touring bubble-show entertainer (Chris Catanese); sourceUrl was a media article (curbed.com), not the business's own site | → `BLOCKED_REPAIRABLE`, weak_location_evidence removed per touring-performer precedent |
+| Sportime Randall's Island | Real, established (1994) sports chain; confirmed real Randall's Island location listed on own site | → `BLOCKED_REPAIRABLE` |
+| Pier 57 Discovery Tank / Hudson River Park | Real, official NYC public-benefit corp's well-known children's exhibit; source 403 (bot-block) | → `BLOCKED_REPAIRABLE` |
+| Gymstars Brooklyn | Real, single address (579 Vanderbilt Ave, Prospect Heights) but card's neighborhoodGuess named 3 WRONG neighborhoods (Fort Greene, Cobble Hill, Park Slope) — none matching | → `BLOCKED_REPAIRABLE`, neighborhoodGuess corrected to Prospect Heights |
+| The Muse Brooklyn | Real circus/immersive-arts venue, 350 Moffat St — matches card's Bushwick exactly | → `BLOCKED_REPAIRABLE` |
+| Blue Balloon Songwriting UWS | **Duplicate of an already-quarantined sibling card** (cc-a2f936b3…, "Blue Balloon Songwriting School") — same real no-fixed-venue business, plus its own sourceUrl (blueballoon.com) is also wrong (real site is blueballoonschool.com) | Left `QUARANTINED`, terminalReason documents the duplicate + wrong domain |
+| Tiger Schulmann's Upper East Side | Real franchise location, confirmed 1470 1st Ave, NY 10075 | → `BLOCKED_REPAIRABLE` (kept as canonical) |
+| Tiger Schulmann's UES | **Duplicate content card**: same sourceUrl, same real location as the card above, differing only by title abbreviation | → `BLOCKED_TERMINAL` (duplicate/superseded) |
+
+**New patterns found this batch**: (1) **a card can be a genuine multi-location split candidate even
+while already `PUBLISHED`**, not just while `QUARANTINED` — the "one card per physical location" rule
+in CLAUDE.md applies regardless of current pipeline state, and this pass proactively split a live
+record for the first time; (2) **two distinct content cards can represent the identical real physical
+location**, differing only by a title abbreviation ("Upper East Side" vs "UES") sharing the same
+sourceUrl — this bridge has no merge/delete capability for content cards, so the fix is to pick one as
+canonical (fix it with real facts), and mark the other `BLOCKED_TERMINAL` as a duplicate rather than
+carrying two copies of the same facts through the pipeline; this is distinct from the earlier
+content-card-vs-live-provider "superseded" pattern (batch 2) — here BOTH records are pre-publish content
+cards, not one card vs. one live provider.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -1865,3 +1891,10 @@ off-topic-contamination quarantine on domain content alone.
   the real business moved to `urbandunes.co`) — distinct from both off-topic contamination and a
   pipeline-guessed-wrong-domain; verify the entity via independent search rather than judging by what the
   stored sourceUrl currently resolves to. See "Batch 4/10..." above.
+- v48 (2026-08-07): batch 5/10 of the 100-card test complete (cards 40-49, plus a 4-way split). 7 real
+  entities corrected, 1 already-correct card touched, 1 duplicate-of-an-already-quarantined-sibling left
+  QUARANTINED, 1 duplicate content card marked `BLOCKED_TERMINAL`, and a 4-location split (NY Preschool &
+  Kids Club: Brooklyn Heights/Cobble Hill/Dumbo/Park Slope). Two new patterns: a card can be a genuine
+  split candidate even while already `PUBLISHED`, not just `QUARANTINED`; two distinct content cards can
+  represent the identical real physical location (differing only by title abbreviation) — pick one
+  canonical, mark the other `BLOCKED_TERMINAL` as duplicate/superseded. See "Batch 5/10..." above.

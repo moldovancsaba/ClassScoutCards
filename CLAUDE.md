@@ -323,6 +323,21 @@ in a comment when you add one, the way the existing ports do.
   the stored sourceUrl currently resolves to would wrongly quarantine a real, currently-operating
   business — always verify the entity itself via independent search before concluding "off-topic" from
   domain content alone.
+- **A one-card-per-physical-location split candidate can surface even on an already-`PUBLISHED` record,
+  not just a `QUARANTINED` one.** Real case (100-card test, batch 5, 2026-08-07): a live, published card
+  ("NY Preschool Camp - Brooklyn Locations") mashed 4 confirmed distinct real Brooklyn locations of NY
+  Preschool & Kids Club into one record — its own `neighborhoodGuess` literally listed all 4
+  neighborhoods, the same tell as the earlier Tennis Innovators case. The one-card-per-location rule
+  applies regardless of current pipeline state; don't reserve split candidates for cards that happen to
+  already be blocked.
+- **Two distinct content cards can represent the identical real physical location**, differing only by a
+  title abbreviation. Real case (same session): "Tiger Schulmann's Upper East Side" and "Tiger
+  Schulmann's UES" shared the same sourceUrl and the same real address (1470 1st Ave, NY 10075) — the
+  same location under two separately-discovered card records. This bridge has no merge/delete capability
+  for content cards, so the fix is: pick one as canonical (fix it with the real facts), and mark the
+  other `BLOCKED_TERMINAL` as a duplicate rather than carrying two copies of the same facts through the
+  pipeline. Distinct from the earlier card-vs-live-provider "superseded" pattern — here both records are
+  pre-publish content cards, not one card versus one already-live provider.
 
 ## Before you write anything real
 
