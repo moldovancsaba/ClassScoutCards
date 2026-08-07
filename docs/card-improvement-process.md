@@ -1263,6 +1263,72 @@ edit (there is no "correct NYC location" to supply, and no single one of the thr
 picked as "the real" Happy Kidz Yoga without fabricating that choice) — both records quarantined,
 `boroughGuess`/`neighborhoodGuess` cleared rather than left standing as a false NYC location.
 
+## A 5-card batch (2026-08-07): the oldest end of the queue is mostly stale-blocker false positives, not off-topic contamination
+
+Working the next 5 globally-oldest records (all pre-publish `contentCards`, none with a linked live
+`providers` record) after the off-topic-contamination run above found a different dominant pattern:
+**4 of 5 were the `"page too large"`/`"fetch failed"`/`"fetch 403"` stale-blocker false positive already
+documented** (`cc-a116f19d7a8892531ef1dfa0` Dance Atlantic, `cc-a273d040385ebd2c40f7f4b3` School of Rock
+Huntington, `cc-a2f936b36185eb4921272f11` Blue Balloon Songwriting School, `cc-a494bab566ace22895ec3c37`
+Hopalong Andrew), and the 5th (`cc-a37aa481de3f1400d4664291` Tim Morehouse Fencing Club NYC) was a real,
+prominent multi-location business. **None were off-topic contamination or fabricated entities** — every
+single one was a real, verifiable business or performer. This suggests the earlier off-topic-contamination
+cluster (the #1-#3 oldest records) was itself an anomaly from one bad discovery run, while the broader
+oldest end of the queue is dominated by real entities wrongly parked behind stale/bot/TLS source checks.
+
+**Important limitation on what this bridge can actually fix here**: all 5 were pre-publish `contentCards`,
+which have NO description/phone/email/address fields at all in this bridge's schema (`title`, `state`,
+`categoryHint`, `boroughGuess`, `neighborhoodGuess`, `blockerCodes`, `terminalReason`, `enrichmentStatus`,
+`incompleteFields` only — see `cardBridgeRegistry.ts`). Real contact/address/schedule facts found via
+research (School of Rock Huntington's real address/phone/hours; Tim Morehouse's two real Manhattan
+addresses) could only be recorded as prose in `terminalReason` for a future enrichment pass to use — this
+bridge cannot itself populate a `providers.shortDescription`/`phone`/`address` field until the main app's
+own pipeline has actually created a live provider record for the card. **Description/contact-detail
+enrichment (this session's specific ask) only becomes directly actionable through this bridge once a
+record reaches `providers`** — see the split's children in the case below, which will go through the
+real pipeline and become enrichable this way once (if) they publish.
+
+Per-card findings:
+- **Dance Atlantic** — real Iowa dance studio (Atlantic, Oakland, Manning, IA), wrongly matched to
+  Brooklyn by name coincidence (Atlantic → Atlantic Avenue). Out-of-market; `boroughGuess`/
+  `neighborhoodGuess` cleared, `terminalReason` corrected, left `QUARANTINED`.
+- **School of Rock Huntington** — real national franchise location, bot-blocked (a browser User-Agent
+  loads it fine). Real address/phone/hours/age-graded programs found. Genuinely on Long Island, outside
+  the 5-borough taxonomy — the SAME open scope question already raised for Tennis Innovators' Fort Lee/
+  Water Mill. Moved `QUARANTINED` → `BLOCKED_REPAIRABLE` (a real entity blocked by a taxonomy gap, not a
+  quality/safety problem); `boroughGuess: "Long Island"` left as-is (honest, not fabricated).
+- **Blue Balloon Songwriting School** — real music-education business, but explicitly "in-home and
+  virtual" with no fixed studio address of its own (a network of independent teachers). **A new sub-case
+  of the physical-only policy**: distinct from the hybrid-business rule (a real fixed location that also
+  offers an online option) — here there is no fixed venue at all to assign a borough/neighborhood to.
+  Left `QUARANTINED`, `terminalReason` corrected to name this specific reason.
+- **Tim Morehouse Fencing Club NYC** — real, prominent business (founded by an Olympic silver medalist,
+  100+ Google reviews) with 4 real locations: 2 in Manhattan (Upper West Side, Midtown East — real
+  addresses found and used) plus Westchester, NY and New Canaan, CT (again outside the 5-borough
+  taxonomy). Split into 2 Manhattan location cards via the one-card-per-location policy; the out-of-
+  taxonomy locations deliberately excluded, same as prior cases.
+- **Hopalong Andrew** — a real, well-known NYC children's musician (Andrew Vladeck, a former NYC Urban
+  Park Ranger), confirmed via independent web search (WNYC feature, KidPass listings, Riverside Park
+  Conservancy, Brooklyn Bridge Parents) after his own site failed with a genuine, current TLS handshake
+  error (a real problem, not a stale false positive like the other 3 — worth telling apart). Tours NYC
+  parks/venues rather than operating from one address, matching the touring/itinerant-program pattern
+  already in this doc (its `boroughGuess`/`neighborhoodGuess` left broad, not forced to one venue).
+  `sourceUrl` is read-only through this bridge; `terminalReason` names working secondary sources for a
+  future enrichment pass. Moved `QUARANTINED` → `BLOCKED_REPAIRABLE`.
+
+**New policy nuance surfaced**: the physical-only rule (`CLAUDE.md`) needs an explicit "no fixed venue"
+sub-case alongside the existing "hybrid business" sub-case — a business whose entire delivery model is
+in-home/mobile/virtual, with no address of its own, fails the test even though real physical rooms (a
+family's own home) are technically where the activity happens.
+
+**Recommend to the core team, escalating a pattern now confirmed 3 times independently this session**:
+Fort Lee NJ / Water Mill NY (Tennis Innovators), Long Island (School of Rock Huntington), and Westchester
+NY / New Canaan CT (Tim Morehouse Fencing) are all real, well-documented physical locations serving
+greater-NYC-metro families that this platform's 5-borough `Borough` type cannot represent at all. This is
+no longer a one-off edge case — it recurred with 3 different real, prominent businesses in a single
+session. Worth a real product decision (a new city-tenant value? an explicit "greater metro" category?),
+not further individual flagging each time it's found.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -1566,3 +1632,12 @@ picked as "the real" Happy Kidz Yoga without fabricating that choice) — both r
   children's program at all; the card's own "Kids" title was fabricated. Corrected the title and
   rewrote `terminalReason` to state the real finding, left `state: QUARANTINED` unchanged. See the new
   addendum to "A source-unreachable blocker can be a stale false positive" above.
+- v41 (2026-08-07): a 5-card batch of the next globally-oldest records found the queue's dominant issue
+  here isn't off-topic contamination but stale source-check false positives on REAL businesses (4 of 5).
+  Corrected all 5 (see the new "A 5-card batch..." section above): Dance Atlantic (real, but Iowa, not
+  NYC), School of Rock Huntington (real, bot-blocked, real address/phone/hours found, but Long Island is
+  outside the 5-borough taxonomy), Blue Balloon Songwriting School (real, but no fixed venue at all — a
+  new physical-only sub-case), Tim Morehouse Fencing Club NYC (real, split into 2 confirmed Manhattan
+  locations), and Hopalong Andrew (a real, well-known NYC performer rescued from wrongful quarantine via
+  independent web search after his own site's genuine TLS failure). The 5-borough-taxonomy gap is now
+  confirmed 3 times independently this session — escalated as a real product decision, not a one-off.
