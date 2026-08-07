@@ -1966,6 +1966,47 @@ byte-identical wrong location values across unrelated cards is a different failu
 individually-wrong-but-plausible guess, and may indicate a specific discovery run or fallback path is worth
 a targeted sweep rather than treating each occurrence as an independent coincidence.
 
+### Batch 20/10 (cards 191-200, FINAL of the cards 101-200 continuation)
+
+| Card | Finding | Action |
+|---|---|---|
+| Big Apple Tutoring | Real, confirmed address (266 W 25th St, Chelsea); stale `low_source_trust` | Blocker cleared, `neighborhoodGuess` enriched to Chelsea |
+| Little Shop of Crafts Birthday Parties | Real (Upper West Side confirmed), but no current UES location exists for this business — a different competitor has that | `neighborhoodGuess` corrected from "Upper West Side / UES" to just Upper West Side |
+| Soccer Kids NYC Manhattan | **Entirely wrong borough**: real business, but confirmed Queens-only, zero Manhattan presence at all | Title corrected (dropped "Manhattan"), `boroughGuess`/`neighborhoodGuess` corrected to Queens |
+| Little Scholars Brooklyn | Real, multi-location chain; card's own source described one specific new location | `neighborhoodGuess` corrected to Downtown Brooklyn (matching the source); split-candidate opportunity noted for a future pass, not acted on this round |
+| FC Harlem | Real, confirmed address matches card; stale `low_source_trust` | Blocker cleared |
+| Physique Swimming Battery Park City | Already `PUBLISHED`, correct | Touch only |
+| NYC Cyclones Hockey | Real, confirmed home rink (Sky Rink at Chelsea Piers); odd combined borough label | `boroughGuess`/`neighborhoodGuess` corrected from "Manhattan/Brooklyn"/"NYC-wide" to Manhattan/Chelsea Piers |
+| Fastbreak Sports Birthday Parties | **7th confirmed duplicate-content-card instance** — identical sourceUrl as its sibling | → `BLOCKED_TERMINAL` |
+| Fastbreak Sports UES | Already `PUBLISHED`, correct; kept as canonical over its duplicate sibling above | Touch only |
+| Engineering For Kids Brooklyn | Real, confirmed address (251 S 3rd St, Williamsburg); stale blockers | Blockers cleared, `neighborhoodGuess` enriched to Williamsburg |
+
+**New finding this batch**: "Soccer Kids NYC Manhattan" is a real business but has ZERO presence in the
+borough its own card title claims — its confirmed real service area is Queens only. Distinct in degree
+from the earlier "wrong specific location within the right borough" cases (NYC Raptors Volleyball, City
+Ice Pavilion) — this is a real business entirely absent from the claimed borough, not just misplaced within
+it. Corrected the title itself (not just location fields) since "Manhattan" was baked into the card's own
+name.
+
+## Cards 101-200: continuation complete (2026-08-07)
+
+Batches 11 through 20 are done — 100 more cards processed on top of the original 100-card test, per the
+owner directive "go to the next 100 in the same NON-STOP way." Aggregate outcome across the 10 batches:
+roughly 68 real entities corrected to `BLOCKED_REPAIRABLE` (including many stale `low_source_trust`
+blockers cleared on already-`PUBLISHED` cards), roughly 24 already-correct cards touched, and roughly 8
+cards quarantined/terminated on confirmed reality-check failures (a permanently-closed business, a
+directory site's own search-results page mistaken for an entity, a wrongly-located out-of-market
+nonprofit, unconfirmed real-brand-specific-locations, genuine-no-match cases, and confirmed duplicate
+content cards). New patterns discovered and codified into CLAUDE.md this round: the confirmed-permanently-
+closed-business case (City Treehouse), a garbage single-word title reaching an already-`PUBLISHED` record
+(The Canopy NYC's "New"/"And" pair), a directory site's own multi-result search page mistaken for a single
+entity (Psychology Today), and multiple cards sharing a byte-identical wrong default value as a possible
+run-level bug signal (the recurring "East New York" value). The duplicate-content-card pattern grew from 5
+to 7 confirmed instances (RoboFun again, then Fastbreak Sports), and the real-brand-fake-specific-location
+pattern grew to a 3rd instance (Color Me Mine Bay Ridge). One split-candidate opportunity was identified
+but deliberately deferred rather than acted on this round (Little Scholars, multiple confirmed Brooklyn
+locations) — flagged for a future pass rather than rushed.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -2433,3 +2474,10 @@ a targeted sweep rather than treating each occurrence as an independent coincide
   unrelated batch-16 card), suggesting a possible run-level or default-value bug worth a targeted sweep.
   Also a 3rd confirmed real-brand-fake-specific-location instance (Color Me Mine Bay Ridge — no such
   location exists). Added a matching CLAUDE.md "Hard-won lessons" bullet. See "Batch 19/10..." above.
+- v64 (2026-08-07): batch 20/10 (cards 191-200) complete — this is also the FINAL batch of the cards
+  101-200 continuation. 7 real entities corrected (5 stale blockers cleared, 2 wrong-location corrections),
+  2 already-correct cards touched, 1 marked `BLOCKED_TERMINAL` as a 7th confirmed duplicate-content-card
+  instance (Fastbreak Sports). New finding: a real business (Soccer Kids NYC) with its own card title
+  claiming a borough (Manhattan) it has ZERO actual presence in — its confirmed real service area is
+  Queens only — corrected both the title and location fields. Added the "Cards 101-200: continuation
+  complete" retrospective section summarizing all 10 batches. See "Batch 20/10..." above.
