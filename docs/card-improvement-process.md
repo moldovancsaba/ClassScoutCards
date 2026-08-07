@@ -433,7 +433,10 @@ Don't assume every bad address is at least a neighborhood-level placeholder; ver
 
 ## A source-unreachable blocker can be a stale false positive — re-check before trusting it (found 2026-08-07)
 
-Real case: `cc-dfc0ee1004428bb39e92133a` (Kaufman Music Center, a `contentCards` record). Its
+TWO confirmed instances now: `cc-dfc0ee1004428bb39e92133a` (Kaufman Music Center) and
+`cc-b85fc529f946a0772f0b9d12` (Marlene Meyerson JCC Manhattan) — both `sourceAuthorityGrade: "official"`
+sources blocked on a stale `source_unreachable` that no longer reproduces, suggesting this is systemic
+rather than a one-off. The first case: `cc-dfc0ee1004428bb39e92133a`'s
 `enrichmentSummary` recorded `"fetch 404"`/`source_unreachable` from 2026-06-13, producing a
 `low_source_trust` blocker that kept the card parked (not visitor-visible) for nearly two months despite
 `state: "PUBLISHED"`. Directly re-fetching the same URL now shows it loads fine with real content — the
@@ -1020,3 +1023,9 @@ sending, dry-run or not.
   clear it (recommending re-enrichment) if it's wrong. And the aggregator-source pattern applies to
   `contentCards` too, using its own real `state: "QUARANTINED"` value plus `terminalReason`, distinct
   from the `qualityStatus`/`visibility` mechanism used on `providers`/`meetupGroups`.
+- v27 (2026-08-07): cards 59-60 reached the halfway point of the second 50 (60/100 overall). The stale
+  source_unreachable blocker pattern reached a second confirmed instance (both `sourceAuthorityGrade:
+  "official"` — the low-trust blocker directly contradicted the source's own official grade even before
+  re-checking). Also found an aggregator-source detection inconsistency worth flagging to the core team:
+  two aggregator-sourced cards from the same discovery period — one correctly quarantined by the
+  pipeline, one left published/parked with no aggregator-related blocker at all.
