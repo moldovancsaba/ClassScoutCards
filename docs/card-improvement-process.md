@@ -97,6 +97,19 @@ The four target properties (category, age/schedule/location, image, copy) do NOT
 class schedule; applying the provider checklist to it is itself a mistake.
 
 ### A. Always (every content card, any entityKindHint) — rule doc "Content Card Identity"
+- [ ] **Physical-only check (owner directive, 2026-08-07, part of the reality check in `CLAUDE.md`)**:
+      does this describe a real, physical, brick-and-mortar location a child actually attends? An
+      e-commerce/shopping platform, a social media platform, or a pure online-only service is
+      categorically prohibited regardless of how internally tidy the rest of the record looks —
+      quarantine on sight, no field-level fix exists. This is about the ENTITY, not the source
+      domain: a real physical business whose only findable source is a social-media-hosted page is a
+      "real entity, bad source" case, not a prohibition — investigate before assuming. A real
+      brick-and-mortar business that also offers an online/virtual option stays in scope; only strip
+      the online-class language, don't quarantine.
+- [ ] **Multi-location check**: does research reveal the organization operates more than one distinct
+      real physical location? If so, this is a split candidate (`POST /api/card-bridge/split`) — one
+      card per location — not a single generic record to leave standing with a vague/multi-value
+      borough or `neighborhoodGuess: "Multiple"`.
 - [ ] `contentCardId`, `normalizedTitle`, `sourceUrl`, `sourceHost` all present and non-empty
 - [ ] `sourceAuthorityGrade` is not silently "unknown" without a stated reason
 - [ ] `fingerprint` is present (dedupe depends on it — a card missing this can't be deduped against)
@@ -1479,3 +1492,11 @@ picked as "the real" Happy Kidz Yoga without fabricating that choice) — both r
   record checked (Tennis Innovators NYC, a real multi-location NYC tennis program) was correctly NOT
   quarantined, confirming the directive is "quarantine when the reality check fails," not "quarantine
   anything old."
+- v38 (2026-08-07, owner directive): two hard rules added to the reality check, folded into the
+  Verification Checklist (step 2/4, section A) and `CLAUDE.md`: (1) only physical, brick-and-mortar
+  activities are in scope — e-commerce/shopping platforms, social media platforms, and pure online-only
+  services are categorically prohibited regardless of the source domain vs. entity distinction (a real
+  physical business sourced from a social-media page is a bad-source case, not a prohibition; a real
+  physical business that also offers an online option keeps its card with the online language
+  stripped); (2) an organization confirmed to operate more than one distinct physical location must
+  become one card per location via `split`, proactively, not only when a review happens to notice.
