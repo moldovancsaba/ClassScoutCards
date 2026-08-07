@@ -125,6 +125,15 @@ export const BRIDGE_REGISTRY: Record<BridgeCollectionKey, BridgeCollectionConfig
       lastReviewedBy: 1,
       updatedAt: 1,
       publishedAt: 1,
+      // Read-only research fields (2026-08-07 finding, same class of gap as meetupGroups.website): the
+      // real Provider type has address/website/phone/email/sourceUrls, but none were exposed here,
+      // forcing a review to guess an org's identity from garbage scraped copy instead of going straight
+      // to its own source/contact info. Not in writableFields — this bridge doesn't touch contact fields.
+      address: 1,
+      website: 1,
+      phone: 1,
+      email: 1,
+      sourceUrls: 1,
     },
     // qualityStatus/visibility are the DEFENSIVE direction only — this bridge can quarantine/hide an
     // already-published record found to be bad on re-review, but (unlike serviceLeads' public-status
