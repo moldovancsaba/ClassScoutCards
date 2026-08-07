@@ -175,6 +175,14 @@ authoritative record.
 | A field is genuinely absent from *every* available source (not just this one) | Leave the gap recorded (`incompleteFields` / `blockerCodes`), do not invent a value |
 | The card's real record lives partly in another collection (e.g. a `FamilyServiceLead`) and THAT record has the actual defect | Fix it there directly (`serviceLeads` writes are supported, v2) — see "Explicit boundaries" for the derived-field rules (`visibility`/`blockers`) and the cascade to `servicePlaceFacts`/`serviceReviewPackets` |
 
+**Content-quality/data enrichment is a rigid, standing requirement, not an optional nicety (owner
+directive, 2026-08-07 — see `CLAUDE.md`)**: passing the reality check is not the finish line for a real
+card. A generic, identical-in-both-fields placeholder description, a borough-level-only address when a
+real street is findable, or a schedule field polluted with leaked scraper/pipeline metadata are all
+defects to fix on every review pass, the same tier as the prohibition checks above — not something to
+reach for only when there happens to be time left over. See "First real description/copy enrichment..."
+below for the concrete precedent this standard is built from.
+
 ## Decision Matrix B — block / draft / publish / leave (step 5, `contentCards.state`, PRE-publish cards only)
 
 | Outcome | `state` to set | When |
