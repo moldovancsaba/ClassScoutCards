@@ -24,6 +24,15 @@ requirement of every pass through the loop.
 This is not a one-time cleanup. It runs forever, card after card, as the pool grows and as the rules
 below get corrected from real mistakes.
 
+**Children's safety comes first (owner directive, 2026-08-07): before judging whether a card's fields
+are correct, first establish whether it describes a real entity that actually operates a children's
+activity/class/camp/program serving NYC families at all.** See `CLAUDE.md`'s own section on this — a
+record can look internally tidy (a plausible name, category, borough, schedule) and still not be a
+provider of anything to a child; that's a distinct, more fundamental failure than a wrong field, and it
+is the check that caught every off-topic-contamination case in this document. When the reality check is
+negative or can't be confirmed, default to protecting families (quarantine), not to giving the record
+the benefit of the doubt.
+
 ## The loop
 
 1. **Pull the GLOBALLY oldest-updated record**, across ALL THREE card-bearing collections — not just
