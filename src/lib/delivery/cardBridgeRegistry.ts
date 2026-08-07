@@ -176,6 +176,10 @@ export const BRIDGE_REGISTRY: Record<BridgeCollectionKey, BridgeCollectionConfig
       "borough",
       "neighborhood",
       "phone",
+      // (2026-08-07 finding) phone/email can carry an obvious template/webbuilder placeholder value
+      // (e.g. "555-555-5555", "mymail@mailservice.com") rather than real scraped data -- phone was
+      // already writable to fix this; email was not, blocking the same fix for the sibling field.
+      "email",
       "activityTypes",
       "primaryActivityType",
       "primaryActivityTypeConfidence",
