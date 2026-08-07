@@ -243,6 +243,45 @@ recommendation**: quarantining removes a bad listing, but when the underlying en
 someone re-ingests it under the correct entity kind (`providers`, in that case) — the quarantine write
 alone does not fix that; flag it as follow-up work, don't let it read as "handled."
 
+**Is this a live discovery bug, or legacy data? Check before recommending a pipeline fix.** A third case
+(`meetup-bedford-stuyvesant-early-childhood-development-center`, a real Head Start program) confirmed
+this specific sub-pattern — an early-childhood/education *center* filed as a `meetupGroup` — is legacy
+data, not something the current pipeline would still produce: `inferListingKind`'s actual regex signals
+(`discoveryWorker.ts`) require specific phrases like "parent... group/meetup/support/circle" or
+"family meet-up" — plain words like "family," "community," or "center" alone never match. None of the
+three cases' real text (daycare marketing copy, Head Start program copy) would trip these signals today,
+and all three share zero `updatedAt` ever set — consistent with pre-dating current classification, not a
+fresh miscategorization happening right now. **Don't assume "found 3 in a row" means "live pipeline bug"
+— check the actual matching logic against the actual bad text first.** When it's legacy (as here), the
+right recommendation is a one-time bulk audit/backfill (scan `meetupGroups` for enrollment/tuition/
+business-signal keywords — "enroll," "tuition," "daycare," "Head Start," "3K," "license") to find the
+rest of this batch, not a pipeline code change — the code isn't what's wrong. Save "propose a discovery
+code fix" for a pattern you can show the CURRENT logic would still produce, the way the aggregator/
+`scoreAuthority` case was.
+
+## Writing voice: specific and warm, never generic — this is a recommendation, not a listing (owner directive, 2026-08-07)
+
+"Enough facts, correctly placed" is not the finish line for a description — it also has to read like a
+real recommendation from someone who knows the place, not an institutional summary. Two failures are
+both real, both already found this session, and both matter equally:
+
+- **Data-quality failure**: wrong facts, URL leaks, scraped chrome, wrong entity kind. Everything above
+  this section is about catching these.
+- **Voice failure**: facts are all correct and clean, but the copy is generic, impersonal, or
+  meta-referential ("the page says...") — see the Verification Checklist item above. This is just as
+  much a defect as a wrong fact, even though `validateCopyQuality` can't catch it mechanically.
+
+**What "good" looks like**: specific over generic (name the actual address, the actual day/time, the
+actual topics — never "various activities" when the source says exactly what they are), warm over
+clinical (write like a knowledgeable local telling a parent about a place worth checking out, not like a
+directory entry), and a real point of view where the source supports one (why this might be worth a
+family's time — the age-appropriate structure, the free cost, the specific community it serves) — while
+staying 100% source-backed. **Never invent a recommendation-worthy detail that isn't in the source** —
+"why it's worth going" has to come from real facts already gathered (free, specific curriculum, a
+distinctive community focus), not from generic enthusiasm ("a great place for families!") that could be
+copy-pasted onto any card. If the source doesn't give you anything genuinely distinctive to say, say the
+plain facts well rather than padding with unearned warmth.
+
 ## Cross-collection lookups (before deciding anything)
 
 Before acting on a `contentCard`, check whether a linked record exists elsewhere — acting on the
@@ -354,3 +393,11 @@ committing.
   Quarantine is still the only available action through this bridge, but the recommendation must say
   explicitly when a real business is being lost from the catalog by that quarantine, not just a bad
   listing removed.
+- v8 (2026-08-07, owner directive): added two things after a third wrong-entity-kind case (a real Head
+  Start program). First, a live-bug-vs-legacy-data check: confirmed `inferListingKind`'s actual regex
+  wouldn't misclassify any of the three cases' real text, and all three share zero `updatedAt` ever set —
+  this is legacy data, and the recommendation should be a bulk audit, not a discovery pipeline fix; don't
+  assume "found N in a row" means "live bug" without checking the current logic against the actual text.
+  Second, a "Writing voice" section — generic/impersonal copy is a defect exactly as real as a wrong
+  fact, even when `validateCopyQuality` can't catch it; descriptions should read like a specific, warm
+  recommendation from someone who knows the place, never invented enthusiasm.
