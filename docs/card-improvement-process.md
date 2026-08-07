@@ -1537,6 +1537,31 @@ carrying two copies of the same facts through the pipeline; this is distinct fro
 content-card-vs-live-provider "superseded" pattern (batch 2) — here BOTH records are pre-publish content
 cards, not one card vs. one live provider.
 
+### Batch 6/10 (cards 50-57, plus two splits: 2-way and 3-way)
+
+| Card | Finding | Action |
+|---|---|---|
+| Basketball City NYC | Real, 299 South Street, Pier 36; confirmed neighborhood Two Bridges (card said vague "Manhattan") | → `BLOCKED_REPAIRABLE`, neighborhoodGuess corrected |
+| Brooklyn Ninja Academy | Real (Park Slope/Gowanus border), but card's neighborhoodGuess said "Prospect Heights" — wrong | → `BLOCKED_REPAIRABLE`, neighborhoodGuess corrected to Park Slope |
+| Science Teacher Sarah / Science workshops NYC | Real (now branded Science Adventure Kids), confirmed 112 W 14th St; sourceUrl was google.com (search page) | → `BLOCKED_REPAIRABLE`, neighborhoodGuess Manhattan-wide→Chelsea |
+| Asphalt Green Soccer | **Split candidate**: 2 confirmed real campuses (UES 555 E 90th St, Battery Park City 212 N End Ave) mashed into one card | → `POST /split`: 2 new location cards, parent → `BLOCKED_TERMINAL` |
+| Amerikick Park Slope | Real; domain now redirects to a related rebrand (brooklynmartialarts.net), confirmed 529 5th Ave matches Park Slope | → `BLOCKED_REPAIRABLE` |
+| Mill Basin Day Camp | Real, reachable, distinctive neighborhood name matches | → `BLOCKED_REPAIRABLE` |
+| Ifetayo Cultural Arts Academy | Real nonprofit, 1561 Bedford Ave; source .com fails at network layer, real domain is .org | → `BLOCKED_REPAIRABLE` |
+| CBE Kids / Congregation Beth Elohim | Already `PUBLISHED`, correct; well-known real Park Slope synagogue | Touch only |
+| Playgarden Prep | **Split candidate**: 3 confirmed real Manhattan campuses (Tribeca, UES 1366 Madison Ave, UWS Amsterdam & 89th) mashed into one card (neighborhoodGuess literally said "Multiple Manhattan") | → `POST /split`: 3 new location cards, parent → `BLOCKED_TERMINAL` |
+| Mathnasium UES | **Duplicate content card**: same sourceUrl/location as the already-fixed "Mathnasium Upper East Side" (batch 4) — 2nd confirmed instance of the title-abbreviation duplicate pattern | → `BLOCKED_TERMINAL` (duplicate/superseded) |
+
+**New patterns found this batch**: none genuinely new — this batch reinforced three already-documented
+patterns at higher confidence: (1) the split-on-already-live-or-not-yet-published-record principle
+applied twice more (2-way and 3-way splits, both from `QUARANTINED` cards this time, not `PUBLISHED`);
+(2) the title-abbreviation duplicate-card pattern (first seen with Tiger Schulmann's in batch 5) confirmed
+a 2nd time with Mathnasium UES vs. Mathnasium Upper East Side — now a recurring failure mode, not a
+one-off; (3) a domain that now redirects elsewhere is not automatically a hijack/squat (Urban Dunes,
+batch 4) — Amerikick's redirect target (brooklynmartialarts.net) is a genuine, related rebrand of the
+same real business, confirmed by matching address/phone, distinguishing it from the squatted-by-unrelated-
+content case.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -1898,3 +1923,10 @@ cards, not one card vs. one live provider.
   split candidate even while already `PUBLISHED`, not just `QUARANTINED`; two distinct content cards can
   represent the identical real physical location (differing only by title abbreviation) — pick one
   canonical, mark the other `BLOCKED_TERMINAL` as duplicate/superseded. See "Batch 5/10..." above.
+- v49 (2026-08-07): batch 6/10 of the 100-card test complete (cards 50-57, plus a 2-way and a 3-way
+  split). 7 real entities corrected, 1 already-correct card touched, 1 more title-abbreviation duplicate
+  confirmed (Mathnasium UES vs. Mathnasium Upper East Side — 2nd instance of the batch-5 pattern), plus
+  splits for Asphalt Green Soccer (UES + Battery Park City) and Playgarden Prep (Tribeca + UES + UWS). No
+  new pattern — reinforced split-on-QUARANTINED-record, the duplicate-card pattern, and clarified that a
+  domain redirect to a genuine related rebrand (Amerikick → brooklynmartialarts.net) is NOT the same
+  failure as the batch-4 domain-hijack case. See "Batch 6/10..." above.
