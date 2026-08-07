@@ -955,6 +955,42 @@ direction or a slash-joined compromise ("Downtown/West Side", "Midtown/Uptown") 
 real, single, standard neighborhood name for a well-known address rather than accept the vague guess as
 good enough.
 
+## A bot-blocked *official* domain is a different failure than a bad aggregator source pick, but gets the same fix (found 2026-08-07)
+
+`cc-9d30c55f3acb35abc7840c86` (El Museo del Barrio Family Programs) was `QUARANTINED` with
+`policy_or_safety_review` set, `sourceUrl` already the museum's own correct official domain
+(`elmuseo.org`) — but that domain returns `403` for both the pipeline's fetch and a direct re-check,
+almost certainly scraper/bot protection rather than a real outage. This is a distinct failure mode from
+the Creativity Soccer Pro case above (there, the source itself was the wrong pick — an aggregator page —
+even though a better direct source existed); here the source was already right, it's just currently
+inaccessible to automated fetchers. Independent search confirmed El Museo del Barrio is a major, very
+well-known East Harlem museum with well-documented recurring family programming (monthly free Super
+Sábado festivals, Three Kings Day, Day of the Dead, K-12 group visits).
+
+**Fix pattern**: same corrective shape as the bad-source-pick case — move `state` from `QUARANTINED` to
+`BLOCKED_REPAIRABLE`, drop `policy_or_safety_review` (misapplied to a real, on-topic, extremely
+well-established institution), and write a `terminalReason` that names the real cause (bot-blocked
+fetch, not a fabricated/off-topic entity) so a future pass knows to retry the fetch — possibly with a
+different method — rather than treat this as unfixable.
+
+## A `boroughGuess`/`neighborhoodGuess` can be a flat-out wrong borough for a real multi-location business (found 2026-08-07)
+
+`cc-0db68ccdb770e32dc68e24c9` (Penguin City Swim) had `boroughGuess: "Brooklyn"` /
+`neighborhoodGuess: "Brooklyn Heights"`, but independent search confirmed Penguin City Swim has **zero**
+Brooklyn locations — its real locations are three in Manhattan (Midtown East, John Jay College near
+Columbus Circle, the Moise Safra Center on the UES) and one in the Bronx (Riverdale); its own homepage
+text mentions only "Manhattan," never Brooklyn. This is a plain wrong-borough hallucination, distinct
+from the earlier-documented wrong-borough-via-bad-geocode pattern — here there's no address-text or geo
+data to blame, the borough/neighborhood guess itself is simply invented. A separate, correctly-labeled
+sibling record for the same business (`cc-a46d53aaa7b92ec8569a4081`, "Penguin City Swim Upper West Side")
+confirms the pipeline *can* get this business's location right — this one instance just didn't.
+
+**Fix pattern**: when a business has multiple real locations and no address text to check, search for the
+business by name to get its actual location list before trusting a stored borough. Correct to the
+dominant/most-supported borough and set `neighborhoodGuess` to a borough-level placeholder like `"Multiple"`
+rather than inventing a specific neighborhood — same reasoning as the touring/multi-location pattern
+already documented (Puppetsburg, Brooklyn Crescents).
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -1168,3 +1204,10 @@ good enough.
   capitalization to generic title-casing ("Arts in Action Vap" → "VAP", "Nyu Langone" → "NYU Langone");
   and a `neighborhoodGuess` can be a vague compass-direction placeholder ("Downtown/West Side") instead of
   a real neighborhood name (corrected to Chelsea for Chelsea Piers Field House).
+- v32 (2026-08-07): reached 90/100. The seventh confirmed stale-blocker instance (Puppetsburg) and the
+  fifth `support.google.com` YouTube Help off-topic instance. Two new findings: a bot-blocked *official*
+  domain (El Museo del Barrio, `403` from real scraper protection, not an outage) gets the same
+  `BLOCKED_REPAIRABLE` treatment as a bad-source-pick, but is a distinct failure mode worth naming
+  separately in `terminalReason`. And a `boroughGuess` can be a flat-out wrong borough with no bad
+  geocode or address text to blame (Penguin City Swim tagged "Brooklyn" with zero real Brooklyn
+  locations) — confirmed and corrected by searching the business's real location list directly.
