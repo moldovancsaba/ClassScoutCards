@@ -105,6 +105,45 @@ describe("validateWriteRequest", () => {
     });
   });
 
+  describe("activityTypes cap (2026-08-07 owner directive: at most 3, never a raw keyword dump)", () => {
+    it("accepts up to 3 activityTypes", () => {
+      expect(validateWriteRequest({ ...validProviderBody, updates: { activityTypes: ["Soccer", "Swimming", "Running"] } }).ok).toBe(true);
+    });
+
+    it("rejects more than 3 activityTypes", () => {
+      const result = validateWriteRequest({
+        ...validProviderBody,
+        updates: { activityTypes: ["Soccer", "Swimming", "Running", "Art", "Music"] },
+      });
+      expect(result.ok).toBe(false);
+      expect(!result.ok && result.error).toMatch(/at most 3 entries/);
+    });
+  });
+
+  describe("geo writes (2026-08-07 owner directive: this bridge has no real geocoder)", () => {
+    it("accepts geo with source=\"approximate\"", () => {
+      const result = validateWriteRequest({
+        ...validProviderBody,
+        updates: { geo: { lat: 40.68, lng: -73.96, precision: "approximate", source: "approximate" } },
+      });
+      expect(result.ok).toBe(true);
+    });
+
+    it("rejects geo claiming a real geocoder source it never performed", () => {
+      const result = validateWriteRequest({
+        ...validProviderBody,
+        updates: { geo: { lat: 40.68, lng: -73.96, precision: "exact", source: "google" } },
+      });
+      expect(result.ok).toBe(false);
+      expect(!result.ok && result.error).toMatch(/geo\.source must be "approximate"/);
+    });
+
+    it("rejects geo with no source at all", () => {
+      const result = validateWriteRequest({ ...validProviderBody, updates: { geo: { lat: 40.68, lng: -73.96 } } });
+      expect(result.ok).toBe(false);
+    });
+  });
+
   describe("quarantine/hide a meetup group — same one-directional rule as providers", () => {
     const meetupBody = {
       collection: "meetupGroups",
