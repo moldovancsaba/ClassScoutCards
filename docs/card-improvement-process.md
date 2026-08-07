@@ -105,6 +105,16 @@ class schedule; applying the provider checklist to it is itself a mistake.
 - [ ] A real image exists (not a category banner masquerading as one, not a UI asset) once published
 - [ ] Public copy passes `validateCopyQuality` (URL-free, chrome-free, no placeholder, no raw entities,
       >= 20 real chars) once it reaches a `shortDescription`/`longDescription` field
+- [ ] Public copy is written in DIRECT voice, describing the entity itself — not meta-referential
+      framing that describes a SOURCE PAGE ("the official event page says...", "the page describes...",
+      "X publishes Y as a Z") instead of the group/provider directly. `validateCopyQuality` doesn't
+      catch this (it's not a URL/chrome/entity defect — the prose is otherwise clean), so it has to be
+      caught by reading the copy, not just running the validator. Real miss, 2026-08-07: a first pass
+      fixed a URL-leak defect but left "AFFCNY publishes NYC Caregiver Connection LIVE! Manhattan as a
+      free... The official event page says the group is generally scheduled..." in place — technically
+      valid copy, but generic and impersonal, describing a webpage instead of the group. Rewrite so
+      every sentence is about the entity ("the group meets on...", "monthly discussions cover...") —
+      keep every fact exactly as-is, change only the framing.
 - [ ] Address is a real, number-bearing street address (main app rule: "no address → no publish")
 
 ### C. entityKindHint = "familyService" (its OWN track — never the provider checklist)
@@ -307,3 +317,8 @@ committing.
   deterministic rule. Selection must always be reproducible from the same data. The tie-break is now
   explicit: `idField` ascending, the same mechanism already used within one collection, extended across
   all three.
+- v6 (2026-08-07, owner-prompted): added a Verification Checklist item (section B) for meta-referential
+  copy — "the page says...", "X publishes Y as..." — that describes a source page instead of the entity
+  itself. `validateCopyQuality` doesn't catch this (the prose is otherwise clean); it was found only by
+  re-reading a fix that had already resolved a real URL-leak defect on the same record and still left
+  this generic framing in place.
