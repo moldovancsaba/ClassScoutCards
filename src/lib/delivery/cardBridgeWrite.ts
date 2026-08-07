@@ -91,10 +91,10 @@ export function validateWriteRequest(body: unknown): WriteValidationResult {
     }
   }
 
-  if (collection === "providers" && "qualityStatus" in updates && updates.qualityStatus !== "quarantined") {
+  if ((collection === "providers" || collection === "meetupGroups") && "qualityStatus" in updates && updates.qualityStatus !== "quarantined") {
     return { ok: false, status: 400, error: 'qualityStatus can only be set to "quarantined" (the only real value the main app defines) — omit the field entirely rather than trying to clear it through this bridge' };
   }
-  if (collection === "providers" && "visibility" in updates && updates.visibility !== "hidden") {
+  if ((collection === "providers" || collection === "meetupGroups") && "visibility" in updates && updates.visibility !== "hidden") {
     return { ok: false, status: 400, error: 'visibility can only be set to "hidden" (the only real value the main app defines) — omit the field entirely rather than trying to clear it through this bridge' };
   }
 

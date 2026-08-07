@@ -177,11 +177,26 @@ export const BRIDGE_REGISTRY: Record<BridgeCollectionKey, BridgeCollectionConfig
       // forcing research to rely on guessing the org from garbage description text (2026-08-07 finding).
       website: 1,
       instagram: 1,
+      qualityStatus: 1,
+      visibility: 1,
       lastReviewedAt: 1,
       lastReviewedBy: 1,
       updatedAt: 1,
     },
-    writableFields: ["groupType", "description", "coverImageUrl", "ageRange", "cadence", ...REVIEW_PROVENANCE_FIELDS],
+    // qualityStatus/visibility mirror the providers entry above (added to MeetupGroup itself in the main
+    // app 2026-08-07, business-rules.md rule 81) — same DEFENSIVE-only direction, same one-directional
+    // allowed values enforced in cardBridgeWrite.ts (visibility only "hidden", qualityStatus only
+    // "quarantined"), no un-quarantine path through this bridge.
+    writableFields: [
+      "groupType",
+      "description",
+      "coverImageUrl",
+      "ageRange",
+      "cadence",
+      "qualityStatus",
+      "visibility",
+      ...REVIEW_PROVENANCE_FIELDS,
+    ],
     copyFields: ["description"],
   },
   // The four below back the family-services pipeline: lead -> place fact -> review packet, driven by

@@ -105,6 +105,25 @@ describe("validateWriteRequest", () => {
     });
   });
 
+  describe("quarantine/hide a meetup group — same one-directional rule as providers", () => {
+    const meetupBody = {
+      collection: "meetupGroups",
+      id: "meetup-1",
+      reason: "Research confirms this is not an active recurring group",
+      source: "test",
+    };
+
+    it("accepts qualityStatus=quarantined and visibility=hidden", () => {
+      expect(validateWriteRequest({ ...meetupBody, updates: { qualityStatus: "quarantined" } }).ok).toBe(true);
+      expect(validateWriteRequest({ ...meetupBody, updates: { visibility: "hidden" } }).ok).toBe(true);
+    });
+
+    it("rejects any other qualityStatus/visibility value", () => {
+      expect(validateWriteRequest({ ...meetupBody, updates: { qualityStatus: "approved" } }).ok).toBe(false);
+      expect(validateWriteRequest({ ...meetupBody, updates: { visibility: "visible" } }).ok).toBe(false);
+    });
+  });
+
   it("meetupGroups: rejects a description that fails the quality gate the same way providers does", () => {
     const result = validateWriteRequest({
       collection: "meetupGroups",
