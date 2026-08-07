@@ -228,20 +228,33 @@ in the same review session:
 - `meetup-baby-steps-daycare-preschool-in-queens-ny` — a real, currently-operating PAID daycare/preschool
   business (three locations, posted tuition, age-tiered enrollment programs), not a free parent meetup —
   there is no recurring social gathering to attend, only enrollment.
+- `meetup-bedford-stuyvesant-early-childhood-development-center` — a real federally-funded Head Start
+  program (six centers, free toddler/3K/Pre-K enrollment for ages 2–5), the same sub-pattern as the
+  daycare case — an early-childhood EDUCATION provider, not a meetup group.
+- `meetup-bedstuy-community-partnership` — a DIFFERENT sub-pattern: a broad multi-service community
+  resource hub (housing assistance, food distribution, medical referrals, youth employment, senior
+  services), where the one workshop that sounds group-like ("Mommy & Me, Daddy & Me Game Night") has no
+  confirmed recurring schedule, and the org's only confirmed cadence is a *monthly* admin meeting, not
+  the stored `"Weekly"`.
 
 **Recognizing it**: the description reads like a business's own marketing copy (services, tuition,
-programs "for your children") or like editorial/media copy (articles, an events calendar), not like an
-invitation to a recurring gathering — with no cadence/schedule that's actually about people meeting up,
-even though the record has a `cadence` value filled in. Check what the source page is actually FOR, not
-just whether its facts are individually plausible.
+programs "for your children"), like editorial/media copy (articles, an events calendar), or like a
+resource/referral hub's mission statement (connecting families to services across many unrelated
+domains) — not like an invitation to a recurring gathering — with no cadence/schedule that's actually
+about people meeting up, even though the record has a `cadence` value filled in. Check what the source
+page is actually FOR, not just whether its facts are individually plausible.
 
 **Handling it**: quarantine (Decision Matrix C) — there is no combination of `meetupGroups` fields that
-makes a paid business or a media outlet accurately describable as a meetup group, and this bridge cannot
-move a record to a different collection (no create capability, by design). **Say so explicitly in the
-recommendation**: quarantining removes a bad listing, but when the underlying entity is a real business
-(the daycare case, not the blog case), a real business also disappears from the catalog entirely unless
-someone re-ingests it under the correct entity kind (`providers`, in that case) — the quarantine write
-alone does not fix that; flag it as follow-up work, don't let it read as "handled."
+makes a paid business, a media outlet, or a resource hub accurately describable as a meetup group, and
+this bridge cannot move a record to a different collection (no create capability, by design). **Say so
+explicitly in the recommendation, AND name the specific correct destination** — not every misfiled record
+belongs in `providers`: an education/childcare business (daycare, Head Start center) belongs in
+`providers`; a broad referral/resource hub belongs in the family-services domain (`serviceLeads`), which
+is a materially different pipeline with its own review track (see Cross-collection lookups below) — get
+this specific, don't default every wrong-entity-kind recommendation to "should be a provider." Quarantining
+removes a bad listing, but the real entity also disappears from the catalog entirely unless someone
+re-ingests it under the correct entity kind — the quarantine write alone does not fix that; flag it as
+follow-up work, don't let it read as "handled."
 
 **Is this a live discovery bug, or legacy data? Check before recommending a pipeline fix.** A third case
 (`meetup-bedford-stuyvesant-early-childhood-development-center`, a real Head Start program) confirmed
@@ -401,3 +414,8 @@ committing.
   Second, a "Writing voice" section — generic/impersonal copy is a defect exactly as real as a wrong
   fact, even when `validateCopyQuality` can't catch it; descriptions should read like a specific, warm
   recommendation from someone who knows the place, never invented enthusiasm.
+- v9 (2026-08-07): a fourth wrong-entity-kind case (a broad community resource hub) surfaced a distinct
+  sub-pattern from the daycare/Head-Start cases — not every misfiled `meetupGroup` belongs in `providers`
+  when re-ingested; a referral/resource hub belongs in the family-services domain instead. The
+  recommendation for this pattern must now name the specific correct destination collection, not default
+  to "should be a provider."
