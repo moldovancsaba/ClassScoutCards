@@ -916,6 +916,45 @@ with the correct answer every time until a record got touched between listing an
 now a 400 rather than one silently winning. Before this fix, the reliable way to fetch one specific record
 was `&filter={"<idField>":"<value>"}` — that still works and always did.
 
+## A record can be genuinely real even though its only source failed to fetch — verify independently before treating it as unfixable (found 2026-08-07)
+
+`cc-9c5fa54470883203b62fc67c` ("Creativity Soccer Pro") was `state: "QUARANTINED"` with
+`policy_or_safety_review` set — its only `sourceUrl` was a `hisawyer.com` blog roundup post that returns
+`fetch 403` (bot-blocked). On the surface this looks like the aggregator/off-topic pattern: no usable
+extracted facts, a secondary source, a policy blocker already applied. But an independent web search
+confirmed Creativity Soccer Pro is a real, distinct Brooklyn kids' soccer program with its own direct site
+(`creativitysoccerpro.com`), a Yelp listing, a Facebook page, and several named Brooklyn program locations.
+The aggregator page just happened to be a bad pick for a source, not evidence the entity is fake.
+
+**Distinguish this from real aggregator/off-topic contamination before quarantining as unfixable**: search
+for the entity by name before accepting "source unreachable + no facts" as proof it doesn't exist. If it's
+real, `sourceUrl` is read-only through this bridge so it can't be repointed directly — instead move
+`state` to `BLOCKED_REPAIRABLE` (not `QUARANTINED`), drop `policy_or_safety_review` (the real block is a
+fixable bad source, not an off-topic/fabricated entity), and write a `terminalReason` naming the correct
+direct-source domain so a future enrichment pass knows exactly what to re-fetch instead of the aggregator
+page. When the confirmed entity has multiple locations and no single obvious HQ, leave `neighborhoodGuess`
+at the borough level rather than picking one venue — same reasoning as the touring-program pattern above.
+
+## Records referencing organizations with well-known acronym names can have their `title` mis-cased (found 2026-08-07)
+
+Two cards this batch had a `title` that mechanically title-cased a real acronym into a normal word:
+"Arts in Action Vap" (the org's own site title is "Arts in Action VAP") and "Nyu Langone Parent &
+Postpartum Support" (should be "NYU Langone …"). Both are otherwise-correct records — same organization,
+same location — just with the acronym's capitalization lost, most likely by a generic title-case
+normalization step somewhere in extraction that doesn't know which words are acronyms. **Fix pattern**:
+when a record's own official site or a well-known public identity (a university, a named program) uses a
+capitalized acronym, correct `title` to match — this is a cheap, high-confidence fix, not a judgment call.
+
+## A `neighborhoodGuess` can be a vague compass-direction placeholder instead of a real NYC neighborhood name (found 2026-08-07)
+
+`cc-6d334b1b29b839f5931309c1` (Chelsea Piers Field House) had `neighborhoodGuess: "Downtown/West Side"` —
+not a real, recognized NYC neighborhood, closer to a fallback guess than an actual place name. The real
+answer was available cheaply: Chelsea Piers' own well-known location (Pier 62, 17th-23rd St along the
+Hudson) places it squarely in Chelsea. **Fix pattern**: treat a `neighborhoodGuess` that reads like a
+direction or a slash-joined compromise ("Downtown/West Side", "Midtown/Uptown") as a signal to look up the
+real, single, standard neighborhood name for a well-known address rather than accept the vague guess as
+good enough.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -1122,3 +1161,10 @@ was `&filter={"<idField>":"<value>"}` — that still works and always did.
   (`official`-grade source, `official_available` already recorded, contradicted by the stored blocker),
   strengthening the recommendation that the core team root-cause this rather than treat each instance as
   one-off.
+- v31 (2026-08-07): reached 80/100. Cards 71-80 added the sixth confirmed stale-blocker instance (Amazing
+  Athletes) and three new findings: a record can be genuinely real even when its only source fails to
+  fetch (Creativity Soccer Pro, confirmed real via independent search, moved from `QUARANTINED` to
+  `BLOCKED_REPAIRABLE` rather than treated as unfixable); a `title` can lose a real acronym's
+  capitalization to generic title-casing ("Arts in Action Vap" → "VAP", "Nyu Langone" → "NYU Langone");
+  and a `neighborhoodGuess` can be a vague compass-direction placeholder ("Downtown/West Side") instead of
+  a real neighborhood name (corrected to Chelsea for Chelsea Piers Field House).
