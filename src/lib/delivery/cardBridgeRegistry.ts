@@ -144,6 +144,7 @@ export const BRIDGE_REGISTRY: Record<BridgeCollectionKey, BridgeCollectionConfig
     writableFields: [
       "category",
       "categoryConfidence",
+      "address",
       "shortDescription",
       "longDescription",
       "image",
