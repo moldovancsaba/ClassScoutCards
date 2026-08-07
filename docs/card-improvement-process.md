@@ -514,7 +514,10 @@ entity out of an aggregator page (that's the aggregator pattern above, not this 
 
 ## Extraction-failure text can leak directly into a stored content field (found 2026-08-07)
 
-Real case: `prov-camp-half-blood-brooklyn`. `longDescription` contained, verbatim, the LLM extraction
+THREE confirmed instances now: `prov-camp-half-blood-brooklyn`, `prov-kate` (Steve & Kate's Camp), and
+`prov-pier-40-baseball-greenwich-village-little-league` (Greenwich Village Little League) — the last had
+the identical text in BOTH `shortDescription` and `longDescription`. This is a recurring pipeline
+failure, not a one-off. The first case: `longDescription` contained, verbatim, the LLM extraction
 prompt's own instruction text: `"Extract age or grade evidence from the official program page.."`. This
 is a different, more severe failure than the nav-menu-scrape-dump pattern documented above — that pattern
 is real (if messy) page content; this is not page content at all, it's the PROMPT that was supposed to
@@ -599,6 +602,55 @@ program (weekly clinics, named days/times), confirmed via an independent local n
 advocacy-heavy or mission-statement-heavy description means the underlying wrong-entity-kind pattern
 applies — verify whether a real, concrete program exists before quarantining just because the visible
 text reads as advocacy rather than a program listing.
+
+## A touring/itinerant program has no single correct address — say so honestly, don't pin one venue (found 2026-08-07)
+
+Real case: `prov-mozart-for-munchkins`, a touring interactive concert series performing at many NYC venues
+(Lincoln Center, Hudson Yards, NYPL, MoMA, schools) and other cities entirely (Boston, Portland). The
+stored address named just ONE of many venues as if it were a home base, and the geo didn't even match
+that venue's real coordinates. Distinct from the multi-venue-but-fixed-home cases already documented
+(AYSO's Parade Ground, Skyhawks' registered office) — a touring act has no home venue at all, fixed or
+otherwise.
+
+**Handling it**: don't pin one incidental venue as the address. Write an honest, non-specific address
+(e.g. `"Touring — various NYC venues (X, Y, Z)"`) with `addressConfidence: "unknown"`, and don't attempt
+to fix geo — there's no single correct place to point it, so leave whatever's there rather than invent a
+replacement anchor.
+
+## Live/operational status (temporary closures, site relocations) shouldn't be written into permanent description text (found 2026-08-07)
+
+Two real cases: `prov-la-brea-tar-pits-museum` (indoor exhibits paused for a multi-year renovation, though
+outdoor grounds/programs continue) and `prov-nyc-lions-tackle-football` (displaced from its long-time
+practice field by park construction, per a 2025 news report, with no confirmed new site yet). Both are
+real, verified facts about the organization's CURRENT operational state — but they're time-sensitive and
+likely to go stale by the time a family reads the card.
+
+**Handling it**: don't encode a temporary operational status as if it were a durable program fact.
+Describe the organization's real, standing offerings (what it does, who it serves) rather than its
+current construction/relocation status. Where a stored fact (like a specific practice address) is
+directly contradicted by a live-status change, prefer downgrading its confidence (e.g.
+`addressConfidence: "unknown"`) over asserting a now-unconfirmed specific value — but don't rewrite the
+whole description around the temporary situation either.
+
+## A record can point to the wrong site when an org runs both a B2B and a B2C brand/domain (found 2026-08-07)
+
+Real case: `prov-musicolor-method`. The record's stored `website`/`sourceUrl` was `musicolormethod.com`
+— the org's curriculum-LICENSING site aimed at schools ("bring this into your classroom, no specialist
+required"), not something an individual family can enroll a child in. The SAME brand also runs a
+consumer-facing site under a different domain (`musicolor.nyc`, formerly "Park Slope Music Lessons")
+offering real, family-enrollable in-home/in-studio lessons. The description on file was already about
+the B2B product, not the family service — a subtly different failure from the fabricated-identity
+pattern (this IS the right organization, just the wrong one of its two audiences/domains).
+
+**Recognizing it**: when a description reads like it's selling TO an institution ("bring this into your
+classroom/program," "no specialist required," "licensing," "for schools & districts") rather than to a
+family, search for whether the same brand has a separate consumer-facing domain — franchises and
+curriculum brands commonly do.
+
+**Handling it**: `website`/`sourceUrls` are read-only through this bridge — flag the mismatch explicitly
+as a recommendation (name both domains, and which one families actually need) rather than silently
+rewriting the description around content pulled from the wrong site. Fix what IS writable (description,
+activityTypes, ages) using the REAL consumer-facing program facts, verified from the correct domain.
 
 ## Writing voice: specific and warm, never generic — this is a recommendation, not a listing (owner directive, 2026-08-07)
 
@@ -877,3 +929,13 @@ sending, dry-run or not.
   diversity got misread as a `"Language"` activity offering. And a caution on wrong-entity-kind
   judgment: an advocacy-heavy description can still front a real, listable kids program — verify before
   quarantining on the strength of surface tone alone. The spurious-"Music" count reached seven.
+- v23 (2026-08-07): cards 31-40 of the same mass run added three more findings. A touring/itinerant
+  program (Mozart for Munchkins, performing at many venues across multiple cities) has no single correct
+  address — write an honest non-specific description with `addressConfidence: "unknown"` rather than pin
+  one incidental venue. Live/operational status (a museum's temporary renovation, a football team
+  displaced by park construction) shouldn't be written into permanent description text — describe the
+  org's durable offerings, not its current construction/relocation status. And a record can point to the
+  wrong domain when an org runs both a B2B curriculum-licensing brand and a separate B2C consumer site
+  (Musicolor Method) — flag the mismatch since `website` is read-only, and source the real description
+  from the correct (family-facing) domain. The extraction-failure-text pattern reached three confirmed
+  instances; the spurious-"Music" count reached nine.
