@@ -165,6 +165,10 @@ export const BRIDGE_REGISTRY: Record<BridgeCollectionKey, BridgeCollectionConfig
     // for the exact allowed values (visibility can only be set to "hidden", qualityStatus only to
     // "quarantined" — the ONLY two real values either field takes per the main app's Provider type).
     writableFields: [
+      // (2026-08-07 finding) a provider's own name can itself be a scrape/extraction defect -- e.g. a
+      // record literally named "Camp" when the real org is "Camp Orot" -- and there was previously no
+      // way to correct it through this bridge at all, only its description/address/etc.
+      "name",
       "category",
       "categoryConfidence",
       "programType",
