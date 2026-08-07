@@ -469,6 +469,26 @@ failure class (e.g. flag any stored description containing extraction-prompt phr
 "official program page", or containing directory-listing markers like "Index of /") since it indicates
 the pipeline should retry against a different URL/extraction path, not just that the copy needs editing.
 
+## Duplicate provider records for the same real organization under different IDs (found 2026-08-07)
+
+Real case: `prov-congregation-beth-elohim-camps` and `prov-cbe-kids-congregation-beth-elohim`. Same
+website domain (`cbebk.org`), same phone, same real camp — but two separate provider records with
+different generated IDs, apparently created because the discovery pipeline scraped the org's homepage
+and its `/cbe-kids-camp/` subpage as if they were two different businesses. One record carried a
+much noisier, broader nav-menu scrape (the whole congregation's homepage: worship, K-12 education, adult
+programs) while the other was already correctly scoped to the camp itself.
+
+**Recognizing it**: check `website`/`email`/`phone` against records you've already reviewed this session
+(or spot-check via search) — a shared domain + matching contact info across two differently-named,
+differently-ID'd provider records is the signal, not matching names (the two IDs here don't even look
+alike: `congregation-beth-elohim-camps` vs `cbe-kids-congregation-beth-elohim`).
+
+**Handling it**: this bridge cannot merge or delete records, so don't try to enrich both in parallel —
+that just produces two diverging descriptions of one real camp. Quarantine the noisier/less-specific
+duplicate, keep the better-scoped one as canonical (enrich that one, if not already done), and recommend
+the core team dedupe the pair and check whether the discovery pipeline is generally capable of treating
+two pages on the same domain as two separate businesses — this may not be a one-off.
+
 ## Writing voice: specific and warm, never generic — this is a recommendation, not a listing (owner directive, 2026-08-07)
 
 "Enough facts, correctly placed" is not the finish line for a description — it also has to read like a
@@ -713,3 +733,9 @@ sending, dry-run or not.
   extraction prompt's own instruction text (not scraped page content at all), alongside a
   `shortDescription` that was a raw Apache directory listing from the wrong URL — a more severe failure
   than the nav-scrape-dump pattern, worth a distinct detection signature recommendation to the core team.
+- v19 (2026-08-07): added "Duplicate provider records for the same real organization under different
+  IDs" after finding two provider records (`prov-congregation-beth-elohim-camps` and
+  `prov-cbe-kids-congregation-beth-elohim`) sharing a website domain and phone but generated as
+  separate entities, apparently from two different pages on the same org's site. This bridge can't
+  merge/delete, so the fix is quarantine-the-noisier-duplicate + recommend a core-team dedupe pass, not
+  independently enriching both.
