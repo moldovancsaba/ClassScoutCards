@@ -1562,6 +1562,32 @@ batch 4) — Amerikick's redirect target (brooklynmartialarts.net) is a genuine,
 same real business, confirmed by matching address/phone, distinguishing it from the squatted-by-unrelated-
 content case.
 
+### Batch 7/10 (cards 58-67)
+
+| Card | Finding | Action |
+|---|---|---|
+| Sportball Brooklyn | Real, touring franchise at multiple host sites (Downtown Brooklyn, Brooklyn Heights, Prospect Park), same pattern as Amazing Athletes Brooklyn | → `BLOCKED_REPAIRABLE` |
+| Liberated Movement Kids prospect | **Genuine ambiguity, left QUARANTINED**: real org "Liberated Movement" exists but its studio closed (March 2026), now rents space elsewhere, no confirmed kids program or "Prospect" connection found | Left `QUARANTINED`, findings documented for future re-research |
+| Chelsea Piers Swim School | Real, distinct program at the already-confirmed-real Chelsea Piers complex | → `BLOCKED_REPAIRABLE` |
+| The Tutorverse | Real NYC test-prep company, confirmed 2 offices (UES + Financial District); source 403 (bot-block) | → `BLOCKED_REPAIRABLE` |
+| Prospect Gymnastics Ditmas Park | Real, confirmed 1023 Church Ave matches card exactly | → `BLOCKED_REPAIRABLE` |
+| Yogi Beans | Real, well-known children's yoga studio, reachable + phone confirmed | → `BLOCKED_REPAIRABLE` |
+| American Tap Dance Foundation Youth Program | Real, confirmed 154 Christopher St — card said vague "Lower Manhattan" | → `BLOCKED_REPAIRABLE`, neighborhoodGuess corrected to West Village |
+| Aikido of Park Slope Kids / Teen Classes | Real, confirmed 630 Sackett St | → `BLOCKED_REPAIRABLE` |
+| Brooklyn Boulders Gowanus | Real, well-known national climbing-gym chain, confirmed reachable | → `BLOCKED_REPAIRABLE` |
+| Joy Gymnastics | Real, confirmed 253 36th St, Sunset Park; source persistent 502 (network layer) | → `BLOCKED_REPAIRABLE` |
+
+**New pattern found this batch**: **a named real organization can fail the reality check even when it
+clearly exists**, if the specific facts needed to confirm THIS card don't hold up — Liberated Movement is
+a genuine NYC nonprofit, but its studio closed months ago, it now operates from rented space rather than
+its own venue, and nothing found connects it to a "kids" program or to "Prospect" (this card's own
+neighborhood claim). This is distinct from every other "real but blocked" case this session (stale
+blocker, bot-block, network failure, wrong domain) — here the entity's own current facts, once found,
+don't support the specific claims on the card. Per the children's-safety-first principle, the correct
+outcome is to leave it `QUARANTINED` rather than assume real just because a same-named organization
+turned up in search — findings are documented in `terminalReason` so a future pass doesn't have to
+re-research from scratch, but the card itself is not moved forward on an unconfirmed guess.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -1930,3 +1956,9 @@ content case.
   new pattern — reinforced split-on-QUARANTINED-record, the duplicate-card pattern, and clarified that a
   domain redirect to a genuine related rebrand (Amerikick → brooklynmartialarts.net) is NOT the same
   failure as the batch-4 domain-hijack case. See "Batch 6/10..." above.
+- v50 (2026-08-07): batch 7/10 of the 100-card test complete (cards 58-67). 9 real entities corrected, 1
+  left `QUARANTINED` on genuine ambiguity. New pattern: a named real organization can still fail the
+  reality check for a SPECIFIC card even though it clearly exists — Liberated Movement is a real nonprofit
+  but its studio closed, it now rents space elsewhere, and nothing ties it to "kids" classes or to
+  "Prospect" (the card's own neighborhood claim); left `QUARANTINED` rather than assumed real, findings
+  documented for a future re-research pass. See "Batch 7/10..." above.
