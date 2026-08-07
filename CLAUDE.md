@@ -35,6 +35,37 @@ fabricated record should be quarantined; that question has already been answered
 Reserve actually asking for genuinely ambiguous cases only — e.g. a real, legitimate entity where the
 correct field-level fix is unclear, not "is this off-topic thing allowed to stay live."
 
+## Physical-only providers; one card per physical location (owner directive, 2026-08-07)
+
+Two hard rules, additive to "Children's safety comes first" above — part of the same reality check, not
+a separate review pass:
+
+1. **Only physical, brick-and-mortar activities are in scope.** A card must represent a real place
+   children physically attend for an activity. Categorically prohibited — same tier as off-topic
+   contamination, quarantine on sight, no field-level fix exists — are e-commerce/shopping platforms
+   (Amazon, eBay, and equivalents), social media platforms (YouTube, Instagram, Facebook, TikTok, and
+   equivalents), and pure online-only services with no physical location a child ever attends.
+   - **Prohibition is about what the ENTITY is, not which domain hosted the source page describing it.**
+     A real physical business whose only findable source happens to be a social-media-hosted page (a
+     Facebook event listing for a real library story-time, a `psychologytoday.com` directory entry for
+     a real physical therapist's office) is a "real entity, bad source pick" case — handle it the same
+     way as any other real-entity-behind-a-bad-source finding already in this doc (find a better source,
+     or leave sourced-as-is with the gap noted), not an automatic prohibition. Investigate first: does a
+     real physical location actually exist behind this listing?
+   - **A real brick-and-mortar business that also offers an online/virtual option stays in scope.** Keep
+     the card — a real physical location exists — but strip online-class language from the description/
+     `activityTypes` so the record doesn't read as an online offering; the physical program is what's
+     being listed, not the virtual add-on.
+2. **One card per real physical location, not one card vaguely covering "multiple" locations.** When
+   research finds an organization operates more than one distinct physical location (real case: Tennis
+   Innovators' several separate NYC courts, under one generic card with `neighborhoodGuess: "Multiple"`),
+   each location should become its own separate card via `POST /api/card-bridge/split` (see its own
+   section in `README.md`/`docs/card-improvement-process.md`) — one location per card is itself a
+   distinct choice a family is making, not an implementation detail to compress away. This is now a
+   PROACTIVE part of the review, not something to wait for a review to accidentally stumble into:
+   whenever research surfaces more than one confirmed physical location for the same org, that is itself
+   a split candidate, evaluated the same review pass that found it.
+
 ## The main `classscout` repo is READ-ONLY (owner directive, 2026-08-07)
 
 **Every commit and push you make belongs in THIS repo (`classscoutcards`), never in the main
