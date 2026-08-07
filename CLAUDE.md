@@ -421,6 +421,33 @@ in a comment when you add one, the way the existing ports do.
   one live record. Fixed by renaming the canonical card to a real, descriptive title and correcting its
   neighborhood, then marking the duplicate sibling `BLOCKED_TERMINAL`. Worth treating any single-word or
   obviously-fragmentary title as its own trigger for closer review, independent of `blockerCodes`.
+- **A directory or media site's own multi-result search-results page can be scraped and mistaken for a
+  single business — this is a step further than the already-documented "real entity behind a bad source
+  pick" case, and it means there is nothing left to repair.** Real case (cards 101-200 continuation,
+  batch 19, 2026-08-07): a card titled literally "Psychology Today" had `sourceUrl`
+  `psychologytoday.com/us/groups/ny/brooklyn?category=pregnancy-prenatal-postpartum` — Psychology Today's
+  own CATEGORY SEARCH page, listing many unrelated therapist/group results, not a page for any one
+  business. The card's own title is the tell: it's the directory site's own brand name, proof no singular
+  real entity was ever identified during discovery. Contrast with the earlier, already-documented case (a
+  `psychologytoday.com` directory page for ONE specific real business, e.g. a physical therapist's own
+  listing) — there a real business sits behind a bad source pick and a better source can be found; here the
+  source itself never named any one business, so there is nothing to find. Marked `BLOCKED_TERMINAL`, not
+  `QUARANTINED` — no future re-research fixes this, the defect is structural to the source itself.
+- **Multiple cards sharing a byte-identical wrong default value (not just a similarly-wrong guess) is a
+  possible run-level pipeline bug, not independent per-card coincidence — worth flagging even without time
+  to fix the root cause.** Real case (same batch): the "Psychology Today" card above and an adjacent card
+  (Postpartum Resource Center of New York, a real Long Island nonprofit with zero connection to Brooklyn)
+  shared the identical `latestRunId`, identical `createdAt`/`updatedAt` timestamps, AND the exact same
+  wrong `neighborhoodGuess` value, `"East New York"` — despite describing two completely unrelated
+  organizations. The same `"East New York"` value also turned up as a wrong-neighborhood defect on an
+  unrelated card in batch 16 (The Canopy NYC, a real Williamsburg business). Three unrelated cards landing
+  on the identical specific wrong value is a different failure signature than three cards independently
+  guessing wrong in three different ways — it smells like a shared fallback/default path in a specific
+  discovery run rather than three unlucky individual misses. Not enough evidence yet to name the exact
+  code path (this bridge has no read access to the discovery pipeline's internals), but worth a targeted
+  sweep for other cards carrying this exact value, and worth naming as a distinct kind of finding: value
+  repetition across unrelated records is itself a signal, separate from whether any single card's guess
+  is right or wrong.
 
 ## Before you write anything real
 
