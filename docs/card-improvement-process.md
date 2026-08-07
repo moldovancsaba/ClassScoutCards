@@ -369,6 +369,25 @@ display) for indicating a headline activity — **not** a reason to truncate `ac
 invent a headline activity that isn't clearly supported by the source; leave `primaryActivityType` unset
 when the source doesn't make one activity obviously primary over the others.
 
+## The never-downgrade geo guard can trap a bad pin derived from bad address text (found 2026-08-07)
+
+Real case: `prov-brooklyn-ayso`. The stored `address` was a wrong neighborhood restatement
+(`"Downtown Brooklyn, Brooklyn, NYC"`) that didn't even match where the league actually plays (its own
+site: games are at Prospect Park's Parade Ground, nowhere near Downtown Brooklyn). The stored `geo`
+(`precision: "interpolated"`, `source: "nominatim"`) sits at coordinates consistent with having been
+geocoded FROM that same wrong address text — i.e. the "better-quality" geo is itself wrong, just
+confidently wrong. After correcting the address text, this bridge's own never-downgrade guard (see the
+address/geo standard above) correctly refuses to let a new `"approximate"` guess overwrite the existing
+`"interpolated"` value — but "existing precision tier is high" and "existing value is actually correct"
+are NOT the same thing, and this guard can only ever check the former.
+
+**Handling it**: don't fight the guard — it's doing its job (this bridge genuinely has no way to produce
+a trustworthy replacement pin). Fix the address text (which is independently verifiable and worth fixing
+on its own), leave `geo` untouched, and say so explicitly in the write's `reason`: name the likely-wrong
+existing geo, explain why it's suspect (it was almost certainly derived from the bad address text that's
+being corrected), and recommend a real re-geocode of the corrected address as external follow-up work —
+don't let "the guard blocked the geo write" read as "geo is now fine."
+
 ## Writing voice: specific and warm, never generic — this is a recommendation, not a listing (owner directive, 2026-08-07)
 
 "Enough facts, correctly placed" is not the finish line for a description — it also has to read like a
@@ -581,3 +600,10 @@ sending, dry-run or not.
   swim program, not the swim school implied by the stored name) and repeated site-extraction defects
   recurring across sibling records under one source domain (multiple Aviator Sports records sharing the
   same nav-menu-scrape-dump defect).
+- v14 (2026-08-07): added "The never-downgrade geo guard can trap a bad pin derived from bad address
+  text" after a real case (`prov-brooklyn-ayso`) where the existing `"interpolated"` geo was itself
+  wrong — almost certainly geocoded from the same bad address text being corrected. The v13 guard
+  correctly refused to let a new approximate guess overwrite it (it can only check precision tier, not
+  correctness), so the fix was to correct the address text, leave geo alone, and name the suspect geo
+  plus a re-geocode recommendation explicitly in the write's `reason` — don't let "the guard blocked it"
+  read as "handled."
