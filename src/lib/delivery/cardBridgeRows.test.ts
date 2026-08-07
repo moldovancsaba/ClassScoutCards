@@ -31,7 +31,7 @@ describe("parseSimpleFilter", () => {
   });
 
   it("rejects a field not in the collection's read projection", () => {
-    const result = parseSimpleFilter("providers", JSON.stringify({ email: "x@example.com" }));
+    const result = parseSimpleFilter("providers", JSON.stringify({ ssn: "123-45-6789" }));
     expect(result.ok).toBe(false);
   });
 
