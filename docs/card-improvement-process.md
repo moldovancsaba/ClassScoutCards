@@ -38,11 +38,14 @@ below get corrected from real mistakes.
    including `enrichmentSummary` (what the pipeline already extracted) and, for family-service cards,
    the linked `serviceLeads`/`servicePlaceFacts`/`serviceTasks` records (see "Cross-collection lookups"
    below) — the content card is frequently NOT the only record for the same real-world entity.
-3. **Research** the real organization/program. At minimum, fetch the card's own `sourceUrl` fresh —
-   never rely solely on `enrichmentSummary.sourceTextSample`, which may be stale or truncated. Prefer
-   corroborating with a second source (web search) when the first source is thin, ambiguous, or the
-   card's stored facts look wrong. **Never fabricate a fact that isn't source-backed.** If research
-   can't confirm something, that is itself the finding — record it as a gap, don't guess.
+3. **Research** the real organization/program. At minimum, fetch the record's own source fresh —
+   `sourceUrl` for `contentCards`/`serviceLeads`, **`website` for `meetupGroups`** (it has no `sourceUrl`
+   field at all; `website` is the closest real analog, added to the bridge's read projection 2026-08-07
+   after a review had to guess the org from garbage scraped text instead) — never rely solely on
+   `enrichmentSummary.sourceTextSample`, which may be stale or truncated. Prefer corroborating with a
+   second source (web search) when the first source is thin, ambiguous, or the record's stored facts
+   look wrong. **Never fabricate a fact that isn't source-backed.** If research can't confirm something,
+   that is itself the finding — record it as a gap, don't guess.
 4. **Decide: enrich, fix, or leave as-is.** Compare researched facts against the four in-scope quality
    properties (category/activity classification, age/schedule/location, image presence & integrity,
    public copy quality) and the card's own state-machine correctness (Decision Matrix A below). A

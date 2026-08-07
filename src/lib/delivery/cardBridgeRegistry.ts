@@ -162,6 +162,12 @@ export const BRIDGE_REGISTRY: Record<BridgeCollectionKey, BridgeCollectionConfig
       coverImageUrl: 1,
       ageRange: 1,
       cadence: 1,
+      // website/instagram are read-only here (not in writableFields) — MeetupGroup has no sourceUrl
+      // field at all (src/types/meetup.ts in the main app), so website is the closest real analog for
+      // step 3's "fetch the card's own source fresh" and was previously invisible to this bridge,
+      // forcing research to rely on guessing the org from garbage description text (2026-08-07 finding).
+      website: 1,
+      instagram: 1,
       lastReviewedAt: 1,
       lastReviewedBy: 1,
       updatedAt: 1,
