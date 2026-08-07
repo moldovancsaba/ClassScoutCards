@@ -361,6 +361,42 @@ POST /api/card-bridge/update                                        # steps 6-7
 Always dry-run first (`dryRun` defaults to `true` — no flag needed) to review the diff before
 committing.
 
+## Bulk operations (touching many records at once, not one card at a time)
+
+The API has no "not equal to" filter and no way to page through an entire collection by offset/cursor —
+`GET /rows` only ever answers "give me the current oldest N (optionally matching this exact-equality
+filter)." That shapes how any bulk operation has to be written.
+
+**The stopping-condition trap (real incident, 2026-08-07)**: "fetch oldest N, touch them, repeat until
+the fetch returns empty" looks like it terminates, but it never does on real data — touching a record
+only refreshes its `updatedAt`, it never removes the record from matching the query again. A first
+attempt at bulk-deprioritizing every non-Classes/Camps record ran this exact pattern against `meetupGroups`
+(~70 real documents) and looped indefinitely, re-touching the same ~70 records roughly 70+ times each
+(over 5,100 total writes) before being caught and killed manually. No content was corrupted — `touch`
+only ever stamps `updatedAt`/`lastReviewedAt`/`lastReviewedBy` — but it wasted thousands of writes and
+audit-log entries on records that only needed touching once.
+
+**The fix, required in any bulk-touch script**: track every ID touched *this run* in a Set, and stop a
+given phase the moment a fetched batch contains zero IDs not already in that set — that's the real
+signal a full cycle has completed and you're seeing already-touched records again, not fresh ones.
+Layer a hard numeric safety cap on top as a backstop regardless of how careful the logic looks. Verify
+the fix on a small/cheap phase first (a small collection, or a narrow filter) before trusting it against
+a large one, and watch the first real output live rather than only checking after the fact.
+
+**Filter by the exact category values you want to touch, not by "the current global oldest," whenever
+you can** — `filter={"category":"Birthday Parties"}` naturally exhausts (every real match will eventually
+have been touched, and each fetch reveals genuinely new candidates) far more predictably than an
+unfiltered "oldest N" sweep, which mixes matching and non-matching records together with no way to skip
+past one without touching it.
+
+**Payloads with an apostrophe**: passing JSON through a shell one-liner (`curl -d '{...}'`) makes an
+apostrophe inside a description a real hazard — it's easy to silently drop it while escaping around the
+outer shell quotes ("Prospect Parks" instead of "Prospect Park's" happened live during this session,
+caught only because the dry-run output was actually read before applying). Write the JSON body to a file
+and use `curl --data @file.json` instead — no shell-quoting interaction with the payload's own content at
+all. Always validate the file with `JSON.parse` (or equivalent) and eyeball the exact field value before
+sending, dry-run or not.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -419,3 +455,12 @@ committing.
   when re-ingested; a referral/resource hub belongs in the family-services domain instead. The
   recommendation for this pattern must now name the specific correct destination collection, not default
   to "should be a provider."
+- v10 (2026-08-07): added "Bulk operations" after a real incident — a bulk-deprioritization script's
+  "fetch oldest N, touch, repeat until empty" stopping condition never actually terminates on real data,
+  and looped ~5,100 times against a ~70-document collection before being caught. Documents the required
+  fix (track touched-this-run IDs, stop on a batch with nothing fresh, add a hard safety cap) and a
+  separate lesson from the same session: pass write payloads with apostrophes via a JSON file
+  (`curl --data @file.json`), not an inline shell string, after one silently lost an apostrophe mid-fix.
+- v11 (2026-08-07): widened `providers.address` to writable — the SOP's own checklist requires a real
+  street address before publish, but this bridge had no way to correct one until a real card's stored
+  address turned out to be a completely different, wrong Brooklyn neighborhood.
