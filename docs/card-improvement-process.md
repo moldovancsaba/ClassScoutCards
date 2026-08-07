@@ -1165,6 +1165,39 @@ provider record. This strongly suggests the oldest end of the queue (the earlies
 disproportionately where this contamination lives, and a targeted sweep of old, never-re-reviewed
 records — not just continued oldest-first processing — would likely surface more of these quickly.
 
+**A fifth instance followed immediately** (`cc-42907e50611702c538085a7a` / `prov-how-to-add-voiceovers-
+to-your-tiktoks`, the #3 oldest-updated record in the pool): a Mashable tech-news how-to article
+("How to Add Voiceovers to Your TikToks"), scraped copy containing raw broken Alpine.js/HTML template
+fragments rather than prose, zero blockers on the live `providers` record. Same fix pattern applied to
+both records. Three off-topic instances in the three oldest-updated records checked in a row is no
+longer "found by chance" — it is the queue's current leading edge, and reinforces that the priority
+audit recommended above should happen before continuing pure oldest-first processing much further.
+
+**Important boundary, so this isn't mistaken for "quarantine everything old"**: the #4 oldest-updated
+record checked immediately after (`cc-9bbab6a42d8cfc4c2741ba77`, "Tennis Innovators NYC") is a real,
+legitimate multi-location NYC tennis program (Upper West Side and Upper East Side courts, per its own
+site) — not quarantined. Its gaps (`missing_age_range`, `missing_schedule`, `missing_official_image`)
+are genuine repair-needed items requiring real enrichment, not fabrication or off-topic contamination.
+The reality check is a check, not a blanket policy against old or currently-`PUBLISHED` records — it
+still requires actually reasoning about the source each time.
+
+## A second confirmed out-of-market instance, layered with an aggregator-style identity mashup (found 2026-08-07)
+
+`cc-7301d08f62989749b1bd4450` / `prov-happy-kidz-yoga` ("Happy Kidz Yoga") extends the out-of-market
+pattern documented earlier in this doc (Governors' Village STEM Academy, Charlotte NC): `sourceUrl`
+(`funclubs.com/camps`) is a real camp-enrichment marketing company, but its own scraped text places it
+"at Mt. Bethel Christian Academy in East Cobb, Marietta" serving "the Atlanta metro area" — Georgia, not
+New York City. Discovery fabricated `boroughGuess: "Brooklyn"`; the live `providers` record carried a
+fabricated `address: "Downtown Brooklyn, Brooklyn, NYC"` and a Brooklyn geo pin with no basis at all.
+
+**Layered on top**: the extracted text mashes together three distinct, unrelated program offerings —
+Happy Kidz Yoga, Marietta Martial Arts Karate Camp, and a Guitar Club — as if they were one entity's own
+description, the same aggregator-style identity confusion documented earlier in this doc, just combined
+with the wrong-market problem rather than appearing alone. Neither defect is fixable by a field-level
+edit (there is no "correct NYC location" to supply, and no single one of the three programs can be
+picked as "the real" Happy Kidz Yoga without fabricating that choice) — both records quarantined,
+`boroughGuess`/`neighborhoodGuess` cleared rather than left standing as a false NYC location.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -1437,3 +1470,12 @@ records — not just continued oldest-first processing — would likely surface 
   pool) confirmed why this matters at scale: a fourth instance of the same contamination pattern, this
   time a media app's own App Store listing, with zero blockers on BOTH the content card and its live
   provider record — see "A fourth confirmed instance..." above. Both records quarantined.
+- v37 (2026-08-07, owner directive): "quarantine is not a question — shoot first, then ask" codified in
+  `CLAUDE.md` — once the reality check fails, quarantine immediately (dry-run then apply) rather than
+  pausing mid-loop for confirmation. Continuing the loop under this directive found a fifth off-topic
+  instance in a row (Mashable TikTok-voiceover article) and a distinct pattern: a real out-of-market
+  business (a Georgia camp company, `funclubs.com`) with a fabricated NYC location AND an aggregator-
+  style mashup of three unrelated programs under one name — see both new sections above. The very next
+  record checked (Tennis Innovators NYC, a real multi-location NYC tennis program) was correctly NOT
+  quarantined, confirming the directive is "quarantine when the reality check fails," not "quarantine
+  anything old."
