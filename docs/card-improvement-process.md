@@ -195,6 +195,14 @@ legitimate business does not list several *other* companies' phone numbers and e
 copy. Don't wait for the text to look obviously broken; check this whenever a description reads like a
 list rather than a description.
 
+**A related nuance (found 2026-08-07, card 50 of a mass run)**: an aggregator source can contaminate
+just the `activityTypes` tags even when the main description is otherwise fine and accurate.
+`prov-sweat-fc`'s real description (a soccer-specific club) was correct, but `activityTypes` carried 10
+entries including several sports the club doesn't offer at all (confirmed via search: "not a multi-sport
+facility") — traced to one of its `sourceUrls` being a general "spring sports guide" aggregator page
+covering many unrelated programs. Check `activityTypes` against the source even when the description
+text reads clean.
+
 **Handling it, in this loop**:
 1. **Never treat the aggregator page as this record's own source.** Don't "fix" the record by picking
    one of the bundled organizations and rewriting the description to be about just that one — that's
@@ -972,3 +980,9 @@ sending, dry-run or not.
   real local organization's name. Distinct from fabricated-identity (same general space, wrong specific
   business) — this is a different industry entirely. Recommend the core team check whether short,
   single-common-word business names are systematically vulnerable to this in the domain-resolution step.
+- v25 (2026-08-07): reached the halfway point (50/100) of the mass-enrichment run. Cards 41-50 mostly
+  reinforced already-documented patterns (a third wrong-source-by-name-coincidence case, this one
+  unsalvageable and quarantined; more spurious-"Music" instances) and added one nuance to the
+  aggregator-sources section: an aggregator sourceUrl can contaminate just `activityTypes` even when the
+  main description reads clean and accurate — check tags against the source independently of description
+  quality.
