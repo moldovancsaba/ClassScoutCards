@@ -1400,6 +1400,43 @@ literally contained leaked internal pipeline metadata ("Source: https://... Cate
 Manhattan Neighborhood: Upper West S...") standing in for a real schedule — replaced with an honest
 summary rather than inventing specific days/times that aren't available from any source checked.
 
+## 100-card sovereign autonomous test (2026-08-07 onward): batch reporting convention
+
+Owner-requested continuous-improvement test: process 100 cards in batches of 10, with a
+learn-and-improve-the-rules checkpoint after every batch. Given the doc's own history (early instances
+got full write-ups; by the 30s/40s it had already shifted to "Nth confirmed instance" one-liners for
+repeat patterns), batches in this test are reported as a compact table plus a short "new patterns found"
+callout — full prose sections are reserved for genuinely NEW failure modes or policy questions, not
+another instance of something already named and understood. Rejected findings, i.e. cards that did NOT
+need correction, are as valuable a report as fixed ones — this section tracks both.
+
+### Batch 1/10 (cards 1-10, plus 4 bonus live-provider content-quality fixes)
+
+| Card | Finding | Action |
+|---|---|---|
+| Little Maestros | Real 24-year-old multi-site music franchise, stale blocker | → `BLOCKED_REPAIRABLE` |
+| Lavner Education Brooklyn | Real national STEM camp franchise, host-site delivery, stale blocker | → `BLOCKED_REPAIRABLE` |
+| PLAYDAY NYC Brooklyn | Real business, 2 distinct confirmed Brooklyn locations (Cobble Hill, Park Slope) | Split into 2 location cards |
+| Chelsea Piers Tennis Brooklyn | Real, already correctly specific (Prospect Heights); direct fetch was obfuscated junk (new anti-scraping technique: zero-width-character padding) | → `BLOCKED_REPAIRABLE`, no location change needed |
+| Brooklyn Apple Academy | Real, but sourceUrl's `.com` TLD doesn't resolve at all — real site is `.org` (2nd confirmed instance of "pipeline guessed a domain that doesn't exist") | → `BLOCKED_REPAIRABLE`, neighborhood corrected (Brooklyn Heights has no numbered avenues; real address is on Park Slope's 5th Ave) |
+| The GIANT Room UES | Real STEM/maker hub, but confirmed real address (550 W 28th St) is Chelsea, not UES — the wrong neighborhood was baked into BOTH the title and `neighborhoodGuess` | Title and neighborhood both corrected |
+| French Institute Alliance Française | Real, prominent nonprofit, Cloudflare-blocked; confirmed via multiple secondary sources | → `BLOCKED_REPAIRABLE` |
+| Camp Gan Israel Central Long Island | Real Jewish day camp, genuinely on Long Island — 5th confirmed instance of the out-of-5-borough-taxonomy gap | → `BLOCKED_REPAIRABLE`, location left as-is (honest) |
+| Planet Han UES | Real Mandarin school, stale blocker, address matches existing neighborhood guess exactly | → `BLOCKED_REPAIRABLE` |
+| Brooklyn Conservatory of Music | Real, well-known, already correctly `PUBLISHED` with zero blockers — no defect found | Touch only |
+| **Bonus**: 4 live `providers` (Chelsea Piers Multi-Sport/Gymnastics/Ninja & Parkour/Golf Camps) | All 4 labeled `neighborhood: "Upper West Side"`, but Chelsea Piers' real complex (62 Chelsea Piers, Piers 59-62) is in Chelsea — found by cross-referencing `sourceHost` against live providers, not by oldest-first order alone | Neighborhood + address corrected on all 4 |
+
+**New patterns found this batch** (not repeats): (1) obfuscated zero-width-character padding as an
+anti-scraping technique, distinct from a Cloudflare challenge or a plain bot-detection 403 — add to the
+mental checklist of "reachable but not actually usable" signatures; (2) a wrong neighborhood can be baked
+into a card's `title` AND `neighborhoodGuess` simultaneously from the same root cause, not just one field;
+(3) **cross-referencing a confirmed-real `sourceHost` against the `providers` collection by website can
+surface live content-quality defects that oldest-first processing alone would never reach** — the 4
+Chelsea Piers camps weren't anywhere near the front of any oldest-first queue, but checking "does this
+real business's other listed programs have the same defect" found four wrong-neighborhood live records in
+one pass. Worth doing this check whenever a card's underlying real business is confirmed to have multiple
+programs/products in the pool.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -1727,3 +1764,10 @@ summary rather than inventing specific days/times that aren't available from any
   the first time (kept the card, led with the physical location over the online option); also fixed
   `address` and a `recurringPrograms` entry whose `timeText` had leaked raw internal pipeline metadata
   instead of a real schedule. See the new "First real description/copy enrichment..." section above.
+- v44 (2026-08-07): started the owner-requested 100-card sovereign autonomous test (10 batches of 10,
+  learn-and-improve-the-rules checkpoint after each). Adopted a compact table+callout reporting
+  convention for this test rather than full prose per card. Batch 1/10 complete: 9 real entities
+  corrected, 1 split (PLAYDAY → 2 real Brooklyn locations), 1 already-correct card touched, plus 4 bonus
+  live-provider content-quality fixes found by cross-referencing a confirmed business's other pool
+  entries rather than by oldest-first order alone. See the new "100-card sovereign autonomous test..."
+  section above for the full batch table and new patterns found.
