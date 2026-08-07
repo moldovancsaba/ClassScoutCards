@@ -1329,6 +1329,46 @@ no longer a one-off edge case — it recurred with 3 different real, prominent b
 session. Worth a real product decision (a new city-tenant value? an explicit "greater metro" category?),
 not further individual flagging each time it's found.
 
+## A 10-card batch (2026-08-07): the stale-blocker pattern generalizes far beyond a handful of instances
+
+Continuing oldest-first past the 5-card batch above, the next 10 records were ALL from the same original
+discovery run signature (`"page too large"` / bot-blocked / search-host source), and every single one was
+a REAL entity — zero off-topic contamination, zero fabricated businesses. This confirms the 5-card
+batch's finding at much higher confidence: **the dominant defect at this part of the queue is a systemic
+stale-blocker/bad-source-pick problem on genuinely real NYC youth organizations**, not entity fabrication.
+
+**8 of 10 were straightforward stale-blocker corrections** (source now reachable or independently
+confirmed, real facts found, moved `QUARANTINED` → `BLOCKED_REPAIRABLE`): NYC Impact Volleyball, Asphalt
+Green Upper East Side, Amazing Athletes Brooklyn (a franchise delivered at host sites, no fixed venue —
+matches the touring precedent, not fabrication), Aqua Skills (a genuinely CURRENT hosting/TLS-certificate
+misconfiguration — `CN=*.web-hosting.com`, a shared-hosting default cert that doesn't match the domain —
+distinct from the stale crawl-time false positives elsewhere in this batch), Jamel Gaines Creative Outlet
+(confirmed real address, 138 South Oxford St, Brooklyn — exactly matches the card's own `neighborhoodGuess:
+"Fort Greene"`), JCH of Bensonhurst (confirmed real address + phone, matches `neighborhoodGuess:
+"Bensonhurst"` exactly), and British Swim School Downtown Brooklyn (site has stronger bot-detection than
+a User-Agent swap could beat; independently confirmed via Yelp/Nextdoor/Chamber-of-Commerce instead).
+
+**A new variant found**: `cc-a994f0621d4c5044aee0f55a` ("Crescents NYC Lacrosse") — the sourceUrl domain
+(`crescentsnyclacrosse.com`) does not exist at all (404, not a stale unreachable flag). Independent search
+found the real organization: **Brooklyn Crescents Lacrosse Club**, a real 501(c)(3) since 2006, at
+`brooklyncrescents.com`, physically in Bay Ridge, Brooklyn. The card's own `boroughGuess`/
+`neighborhoodGuess` (`"Manhattan"`/`"Manhattan"`) were themselves fabricated with no basis — not just the
+source, the location too. Corrected `title` (the card's own name was a garbled partial extraction),
+`boroughGuess`/`neighborhoodGuess` (Brooklyn/Bay Ridge), and `terminalReason` naming the real domain for a
+future enrichment pass. **This is a distinct failure mode from every prior "bad source pick" case**: those
+had a real-but-wrong-TYPE source (a search page, an aggregator); this one had a plausible-sounding source
+domain that was simply never real at all.
+
+**1 of 10 could NOT be confirmed real**: `cc-a9904112b7b86cf4a1473678`, titled "Make Meaning UES
+legacy/prospect." Independent web search for this exact name plus "Upper East Side kids classes" returned
+zero matches of any kind — no listing, review, or mention anywhere. The title itself contains what reads
+like leaked internal pipeline/lead-tracking metadata (`"legacy/prospect"`), not a business name. **Left
+`QUARANTINED`** (not moved to `BLOCKED_REPAIRABLE` like the other 9) since — unlike every other card in
+this batch — there was no confirmed real entity to repair toward; flagged `policy_or_safety_review` and
+recommended the core team check whether this record should exist in the pool at all. Worth naming as its
+own pattern: **not every card behind a "bad source" blocker is a real entity with a fixable source** — the
+default assumption should be "verify," not "assume real," even when 9 out of the last 10 turned out to be.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -1641,3 +1681,11 @@ not further individual flagging each time it's found.
   locations), and Hopalong Andrew (a real, well-known NYC performer rescued from wrongful quarantine via
   independent web search after his own site's genuine TLS failure). The 5-borough-taxonomy gap is now
   confirmed 3 times independently this session — escalated as a real product decision, not a one-off.
+- v42 (2026-08-07): a 10-card batch confirmed the stale-blocker pattern at much higher confidence — all 10
+  were real entities, zero off-topic contamination. 8 corrected as straightforward stale-blocker/bad-source
+  cases (moved `QUARANTINED` → `BLOCKED_REPAIRABLE`); 1 (Crescents NYC Lacrosse → corrected to "Brooklyn
+  Crescents Lacrosse Club") had a sourceUrl domain that never existed at all, a new failure-mode variant,
+  with its own fabricated boroughGuess/neighborhoodGuess corrected via independent search; 1 (Make Meaning
+  UES "legacy/prospect") could NOT be confirmed real at all and was correctly left `QUARANTINED` rather
+  than assumed real — a needed reminder that "verify," not "assume real," is still the default even after
+  9 real entities in a row. See the new "A 10-card batch..." section above.
