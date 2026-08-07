@@ -1614,6 +1614,31 @@ TLS issue is environment-side rather than claim a site defect that isn't actuall
 checking the certificate chain, not just the curl error message, before categorizing a TLS failure as
 "real hosting misconfiguration" going forward.
 
+### Batch 9/10 (cards 78-87)
+
+| Card | Finding | Action |
+|---|---|---|
+| Gymstars Brooklyn (2nd instance) | **3rd confirmed duplicate-content-card instance**: same sourceUrl/location as the card already fixed in batch 5 | → `BLOCKED_TERMINAL` (duplicate/superseded) |
+| NY Kids Club Tribeca prospect | Already `PUBLISHED`, correct; confirmed genuinely distinct real Tribeca location (88 Leonard St) from the same org already split for Brooklyn (batch 5) | Touch only |
+| Henry Street Settlement | **Significant wrong-neighborhood error on an already-`PUBLISHED` card**: real address is 269 Henry St, Lower East Side — card said "Harlem" | neighborhoodGuess corrected Harlem→Lower East Side |
+| PLAYDAY NYC Tribeca | **Confirmed the specific claimed location does not exist**: PLAYDAY (real, already split in batch 1) never opened or has since closed its Tribeca studio; its 4 real current studios are elsewhere | Left `QUARANTINED` — reality check fails for this specific claim even though the parent brand is real |
+| Williamsburg Soccer Club | Real, confirmed 196 North 14th St matches card; sourceUrl (.org) network-failed, real site is .com | → `BLOCKED_REPAIRABLE` |
+| Amazing Athletes Manhattan | Real, national touring/mobile franchise (no storefront); TLS issue traced to research environment | → `BLOCKED_REPAIRABLE` |
+| i9 Sports Manhattan | Real, national touring youth-sports franchise | → `BLOCKED_REPAIRABLE` |
+| Manhattan Kickers Soccer Club | Already `PUBLISHED` but carrying a stale `low_source_trust` blocker despite a fully reachable, legitimate source | Blocker cleared |
+| Dodge YMCA Brooklyn | Already `PUBLISHED`, correct; confirmed 225 Atlantic Ave matches Brooklyn Heights | Touch only |
+| Brooklyn Bridge Park Youth Volleyball League | Already `PUBLISHED`, correct; official park conservancy site confirms program | Touch only |
+
+**New pattern found this batch**: **a real, multi-location brand can have one card whose SPECIFIC claimed
+location is confirmed to no longer exist (or never opened)**, distinct from every other "real but
+mis-tagged" case this session — PLAYDAY is a real business (2 of its real locations were already split
+into their own cards in batch 1), but this card's Tribeca claim was independently confirmed false: PLAYDAY
+never opened a Tribeca studio (or it closed), and its actual 4 current studios are Upper West Side, Park
+Slope, Cobble Hill, and Long Island City. The correct move is the same as any other reality-check failure
+— leave it `QUARANTINED` — even though the surrounding brand is unambiguously real and other cards for the
+same brand were correctly fixed. Being right about the brand is not the same as being right about the
+specific location a card claims.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -1995,3 +2020,12 @@ checking the certificate chain, not just the curl error message, before categori
   pattern: 2 TLS failures this batch traced to this research environment's own egress-proxy certificate,
   not the origin site — check the certificate issuer before calling a TLS failure a genuine site-side
   defect. See "Batch 8/10..." above.
+- v52 (2026-08-07): batch 9/10 of the 100-card test complete (cards 78-87). 4 real entities corrected, 4
+  already-correct cards touched (including a significant wrong-neighborhood fix on an already-`PUBLISHED`
+  card — Henry Street Settlement, "Harlem" corrected to its actual Lower East Side home of 130+ years), a
+  3rd confirmed duplicate-content-card instance (Gymstars Brooklyn), and a stale blocker cleared on an
+  already-`PUBLISHED` card (Manhattan Kickers). New pattern: a real brand's card can still fail the
+  reality check if the SPECIFIC location it claims is confirmed not to exist — PLAYDAY NYC Tribeca left
+  `QUARANTINED` even though PLAYDAY itself is real (2 other locations already correctly split in batch 1),
+  because independent search confirmed no Tribeca studio ever opened or it has since closed. See "Batch
+  9/10..." above.
