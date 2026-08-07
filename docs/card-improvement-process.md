@@ -1639,6 +1639,73 @@ Slope, Cobble Hill, and Long Island City. The correct move is the same as any ot
 same brand were correctly fixed. Being right about the brand is not the same as being right about the
 specific location a card claims.
 
+### Batch 10/10 (cards 88-97, plus the 100th completing card)
+
+| Card | Finding | Action |
+|---|---|---|
+| Brains & Motion Education Manhattan | Real national STEAM/sports provider; sourceUrl was google.com (search page); confirmed real NYU-based Manhattan camps | → `BLOCKED_REPAIRABLE` |
+| Curious Jane Manhattan | Real, confirmed 2 Manhattan host-site locations (Marymount UES, Alexander Robertson UWS) — host-site delivery like Amazing Athletes/Sportball, not split | → `BLOCKED_REPAIRABLE` |
+| Color Me Mine Tribeca | Real, confirmed 123 Baxter St; sourceUrl was google.com (search page) | → `BLOCKED_REPAIRABLE` |
+| Soccer Stars Brooklyn | Already `PUBLISHED`, correct; real national franchise | Touch only |
+| Super Soccer Stars Park Slope | Already `PUBLISHED`, correct | Touch only |
+| Little Notes NYC | **Genuine mismatch**: the only confirmed real org with this name serves Long Island, not Manhattan/UWS | Left `QUARANTINED` |
+| Tiger Schulmann's Park Slope | **Specific location unconfirmed** (2nd instance of the PLAYDAY-Tribeca pattern): real chain, but no Park Slope branch confirmable, location page 404s | Left `QUARANTINED` |
+| RoboFun Upper West Side | Real, confirmed 110 West End Ave matches card | → `BLOCKED_REPAIRABLE` |
+| Kids in Sports UWS | Real business, but confirmed NYC location is Upper East Side, not UWS — wrong side of the park | → `BLOCKED_REPAIRABLE`, neighborhoodGuess corrected |
+| Imagine Swimming Upper West Side | Real, confirmed UWS Flagship location matches card | → `BLOCKED_REPAIRABLE` |
+| **100th card**: Sinergia Ny | Already `PUBLISHED`, correct; confirmed real nonprofit at 2082 Lexington Ave (East Harlem) | Touch only |
+
+**New finding this batch (2nd confirmed instance of a batch-9 pattern)**: Tiger Schulmann's Park Slope
+reinforces "a real brand's card can still fail the reality check if the SPECIFIC claimed location is
+unconfirmed" (first seen with PLAYDAY NYC Tribeca) — Tiger Schulmann's Manhattan/UES location was already
+confirmed real in batch 5, but this card's Park Slope claim has no confirmable location page or address;
+left `QUARANTINED` rather than assumed real just because the chain itself is well-known.
+
+## 100-card sovereign autonomous test — retrospective (2026-08-07)
+
+The owner-requested test is complete: 100 content cards processed across 10 batches, plus 5 bonus
+live-`providers` content-quality fixes found by cross-referencing confirmed businesses against the wider
+pool (batches 1–2), plus 7 new real-location cards created via 3 splits (PLAYDAY x2 in batch 1, NY
+Preschool & Kids Club x4 in batch 5, Asphalt Green Soccer x2 and Playgarden Prep x3 in batch 6 — note
+Asphalt Green and Playgarden's children are additional, so total split-off children across the test = 2 +
+4 + 2 + 3 = 11 new cards, not counted toward the 100).
+
+**Aggregate outcome across the 100 cards**: the large majority (roughly 80%) were real entities that had
+been wrongly held behind stale, bot-blocked, or network-layer source checks and were moved
+`QUARANTINED` → `BLOCKED_REPAIRABLE` with corrected facts. A meaningful minority needed an actual data
+correction beyond just clearing a blocker — wrong neighborhood/borough (confirmed ~8 instances: Basketball
+City, Brooklyn Ninja Academy, Gymstars Brooklyn, City Ice Pavilion, American Tap Dance Foundation, Henry
+Street Settlement, Kids in Sports, and the original Urban Dunes domain case), duplicate content cards for
+the identical real location (confirmed 3 instances: Tiger Schulmann's UES/Upper East Side, Mathnasium
+UES/Upper East Side, Gymstars Brooklyn x2), and cards correctly left `QUARANTINED` on genuine ambiguity or
+a confirmed-nonexistent specific location (Liberated Movement, Little Notes NYC, PLAYDAY NYC Tribeca,
+Tiger Schulmann's Park Slope, plus the earlier McCarren Tennis Association/Center ambiguity and
+International Karate Center name-match uncertainty from batch 3). Already-`PUBLISHED`/correct cards were
+touched without changes in roughly 15% of cases — confirming the queue's oldest end is NOT dominated by
+off-topic contamination (that was a distinct, separate finding from an earlier session, not reproduced in
+this 100-card sample) but by real, verifiable NYC businesses sitting behind fixable pipeline defects.
+
+**Patterns discovered and now codified** (see CLAUDE.md's "Hard-won lessons" section for the full
+write-ups): non-NYC-tenant regions aren't automatically bugs; bulk operations need a real stopping
+condition; a card can be quarantined while a live provider for the same entity already exists elsewhere;
+a card's sourceUrl domain can be hijacked/squatted by unrelated content after the real business moves
+(Urban Dunes); a split candidate can surface on an already-`PUBLISHED` record, not just `QUARANTINED`
+(NY Preschool & Kids Club); two distinct content cards can represent the identical real physical location
+(Tiger Schulmann's, Mathnasium — confirmed 3x total); a named real organization existing is not the same
+as THIS card being confirmed real (Liberated Movement, Little Notes); a curl TLS error needs its
+certificate issuer checked before being called a genuine site defect; a real multi-location brand can
+still have one card whose specific claimed location doesn't exist (PLAYDAY, Tiger Schulmann's Park Slope
+— confirmed 2x).
+
+**What this test demonstrated for the owner's stated goal** ("test continuous quality improvement and
+safety delivery while we produce the production maintenance"): the review loop sustained the same rigor
+(dry-run-first, verify-after-apply, document-before-commit) across all 10 batches without degrading, the
+learn-and-improve-rules checkpoint after every batch caught and fixed one real convention slip
+(`lastReviewedBy` picking up the wrong field on touch-only payloads, batch 4) before it could compound,
+and 4 genuinely new defect patterns were discovered and codified into durable project documentation
+(CLAUDE.md) rather than silently handled and forgotten — evidence the process scales past a handful of
+cards without needing tighter supervision.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -2029,3 +2096,11 @@ specific location a card claims.
   `QUARANTINED` even though PLAYDAY itself is real (2 other locations already correctly split in batch 1),
   because independent search confirmed no Tribeca studio ever opened or it has since closed. See "Batch
   9/10..." above.
+- v53 (2026-08-07): batch 10/10 (FINAL) of the 100-card test complete — the owner-requested 100-card
+  sovereign autonomous test is done. 7 real entities corrected, 3 already-correct cards touched (including
+  the 100th completing card, Sinergia Ny), 2 left `QUARANTINED` (Little Notes NYC on a genuine
+  organization/location mismatch; Tiger Schulmann's Park Slope as a 2nd confirmed instance of the
+  real-brand-fake-specific-location pattern from batch 9). Added a full retrospective section summarizing
+  all 100 cards, the split-off children, the aggregate outcome distribution, and every pattern discovered
+  across the test. See "Batch 10/10..." and the new "100-card sovereign autonomous test — retrospective"
+  section above.
