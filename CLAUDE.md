@@ -26,6 +26,15 @@ place. This is the reasoning behind every quarantine decision documented in
 `docs/card-improvement-process.md`, and it should be treated as the first question asked on every card,
 not an occasional targeted sweep.
 
+**Quarantine is not a decision to hold for confirmation (owner directive, 2026-08-07): "shoot first,
+then ask."** Once the reality check comes back negative — the record does not describe a real entity
+operating a children's activity for NYC families — quarantine it immediately (dry-run then apply, per
+the bridge's own always-dry-run-first convention; that is the safety check, not a request for
+sign-off) and report what was done afterward. Do not pause mid-loop to ask whether an off-topic or
+fabricated record should be quarantined; that question has already been answered by this principle.
+Reserve actually asking for genuinely ambiguous cases only — e.g. a real, legitimate entity where the
+correct field-level fix is unclear, not "is this off-topic thing allowed to stay live."
+
 ## The main `classscout` repo is READ-ONLY (owner directive, 2026-08-07)
 
 **Every commit and push you make belongs in THIS repo (`classscoutcards`), never in the main
