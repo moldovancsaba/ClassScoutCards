@@ -217,6 +217,32 @@ list rather than a description.
    you find a fresh instance — don't just quarantine and move on silently, since the pipeline will keep
    producing the same class of bad record from other directory pages until this is fixed upstream.
 
+## Wrong entity-kind classification: a real business filed as a `meetupGroup` (owner-prompted, 2026-08-07)
+
+A distinct pattern from the aggregator case above — the record IS one real, single, legitimate entity
+(not several mashed together), just filed under the wrong collection/type entirely. Two real cases found
+in the same review session:
+- `meetup-a-child-grows-in-brooklyn` — a parenting blog/media publication with no recurring group at all
+  (its own About page: an events calendar plus two *annual* expos, nothing weekly or joinable), stored
+  with `cadence: "Weekly"` and `groupType: "Neighborhood Families"`.
+- `meetup-baby-steps-daycare-preschool-in-queens-ny` — a real, currently-operating PAID daycare/preschool
+  business (three locations, posted tuition, age-tiered enrollment programs), not a free parent meetup —
+  there is no recurring social gathering to attend, only enrollment.
+
+**Recognizing it**: the description reads like a business's own marketing copy (services, tuition,
+programs "for your children") or like editorial/media copy (articles, an events calendar), not like an
+invitation to a recurring gathering — with no cadence/schedule that's actually about people meeting up,
+even though the record has a `cadence` value filled in. Check what the source page is actually FOR, not
+just whether its facts are individually plausible.
+
+**Handling it**: quarantine (Decision Matrix C) — there is no combination of `meetupGroups` fields that
+makes a paid business or a media outlet accurately describable as a meetup group, and this bridge cannot
+move a record to a different collection (no create capability, by design). **Say so explicitly in the
+recommendation**: quarantining removes a bad listing, but when the underlying entity is a real business
+(the daycare case, not the blog case), a real business also disappears from the catalog entirely unless
+someone re-ingests it under the correct entity kind (`providers`, in that case) — the quarantine write
+alone does not fix that; flag it as follow-up work, don't let it read as "handled."
+
 ## Cross-collection lookups (before deciding anything)
 
 Before acting on a `contentCard`, check whether a linked record exists elsewhere — acting on the
@@ -322,3 +348,9 @@ committing.
   itself. `validateCopyQuality` doesn't catch this (the prose is otherwise clean); it was found only by
   re-reading a fix that had already resolved a real URL-leak defect on the same record and still left
   this generic framing in place.
+- v7 (2026-08-07): added "Wrong entity-kind classification" after two real cases (a parenting blog and a
+  paid daycare business, both stored as `meetupGroups` with a fabricated-looking `cadence`) distinct from
+  the aggregator pattern — one real entity, wrong collection/type entirely, not several mashed together.
+  Quarantine is still the only available action through this bridge, but the recommendation must say
+  explicitly when a real business is being lost from the catalog by that quarantine, not just a bad
+  listing removed.
