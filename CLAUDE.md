@@ -198,6 +198,22 @@ Gymstars), a named real org not guaranteeing THIS card is real (Liberated Moveme
 TLS-certificate-issuer-check methodology fix, and a real brand's card still failing on a
 confirmed-nonexistent specific location (PLAYDAY NYC Tribeca, Tiger Schulmann's Park Slope — 2x).
 
+**The owner-requested continuation past the first 100 (cards 101-200) is now also complete**
+(2026-08-07, 10 more batches of 10, `docs/card-improvement-process.md`'s "Cards 101-200: continuation
+complete" section has the full per-batch tables plus a retrospective). Aggregate: ~68 real entities
+corrected, ~24 already-correct cards touched, ~8 quarantined/terminated on confirmed reality-check
+failures. Four genuinely new patterns surfaced and are folded into the "Hard-won lessons" section below:
+a confirmed-permanently-closed business (real once, not now — City Treehouse), a garbage single-word title
+reaching an already-`PUBLISHED` live record (The Canopy NYC's "New"/"And" pair), a directory site's own
+multi-result search-results page mistaken for a single entity (Psychology Today), and multiple cards
+sharing a byte-identical wrong default value as a possible run-level pipeline bug signal (the recurring
+"East New York" value, seen on 3 unrelated cards across 2 batches). The duplicate-content-card count grew
+from 5 to 7 confirmed instances (RoboFun again, then Fastbreak Sports), and the real-brand-fake-location
+count grew to 3 (Color Me Mine Bay Ridge). Also implemented the `alignActivityTypes()` top-3-selection fix
+(see item 4 above) per an explicit owner directive mid-pass. One split-candidate opportunity (Little
+Scholars, several confirmed Brooklyn locations) was identified but deliberately deferred to a future pass
+rather than rushed.
+
 ## The one fact that will cost you hours if you get it wrong
 
 **`MONGODB_DB_NAME` must be `classscoutcluster`, not `classscout`.** The cluster name and the real
