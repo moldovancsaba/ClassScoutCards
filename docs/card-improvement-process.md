@@ -442,6 +442,18 @@ existing geo, explain why it's suspect (it was almost certainly derived from the
 being corrected), and recommend a real re-geocode of the corrected address as external follow-up work —
 don't let "the guard blocked the geo write" read as "geo is now fine."
 
+## A second shared-placeholder-geo cluster: "Manhattanville, Manhattan, NYC" (found 2026-08-07)
+
+Distinct from the "Downtown Brooklyn, Brooklyn, NYC" cluster below, a second literal placeholder string
+— `"Manhattanville, Manhattan, NYC"` — produced the identical geocoded pin (`lat: 40.8157775,
+lng: -73.951554`) on THREE unrelated records this session: `prov-manhattan-soccer-club`,
+`prov-metropolitan-oval-academy-manhattan-outreach`, and `prov-mo-motion-basketball`. Same underlying
+mechanism, different placeholder text — this is not a one-off fallback string, but a general pattern:
+whenever the discovery pipeline can't extract a real address, it falls back to SOME generic
+borough+neighborhood-guess string and geocodes that guess. Treat ANY record carrying either exact
+placeholder string as carrying a correspondingly suspect pin, and expect more such clusters (different
+placeholder text, same failure mode) to turn up in other boroughs.
+
 ## A shared placeholder address can produce an identical, wrong geo pin across unrelated records (found 2026-08-07)
 
 FOUR records so far, across two review runs, have shared the exact literal placeholder address text
@@ -566,6 +578,27 @@ appearing on unrelated records) — this is on-topic but redundant.
 
 **Handling it**: consolidate to the single clean value before applying the 3-item cap — don't let
 near-synonyms crowd out room for a second genuinely-distinct real activity the source also supports.
+
+## A mention of linguistic/cultural diversity can be misread as a "Language" activityType (found 2026-08-07)
+
+Real case: `prov-metropolitan-oval-academy-manhattan-outreach` had `activityTypes` including `"Language"`,
+but the source text was `"the range of languages reminds us that soccer is the world's sport"` — a
+statement about the PLAYERS' linguistic diversity, not any language-instruction offering. A subtler
+variant of the generic-activityType-contamination pattern: the extraction wasn't grabbing an unrelated
+keyword, it misread a real sentence's actual subject. When a tag like Language/Art/Music shows up, check
+what the specific source SENTENCE containing that word is actually describing, not just whether the word
+appears somewhere in the text.
+
+## An advocacy/community group can still have a real, listable kids program — check before assuming it's the wrong entity kind (found 2026-08-07)
+
+`prov-mccarren-tennis-association-kids`'s description was almost entirely park-advocacy language (court
+lighting, seating, a maintenance-schedule request, a stray anecdote about hawks) — reading, at a glance,
+like the wrong-entity-kind pattern (an org whose real purpose isn't running a kids program). But a
+targeted check found something the description itself buried: a real, specific, recurring free kids
+program (weekly clinics, named days/times), confirmed via an independent local news source. Not every
+advocacy-heavy or mission-statement-heavy description means the underlying wrong-entity-kind pattern
+applies — verify whether a real, concrete program exists before quarantining just because the visible
+text reads as advocacy rather than a program listing.
 
 ## Writing voice: specific and warm, never generic — this is a recommendation, not a listing (owner directive, 2026-08-07)
 
@@ -837,3 +870,10 @@ sending, dry-run or not.
   geocoded from a wrong address that a record's own name would have caught. And a new address-field
   failure mode: fully garbled non-address text (`"6-12 summer Institutes takes place"`) landing in the
   address field, worse than the usual neighborhood-restatement placeholder.
+- v22 (2026-08-07): cards 21-30 of the same mass run added three findings. A second shared-placeholder-
+  geo cluster (`"Manhattanville, Manhattan, NYC"` → the identical pin on 3 unrelated records) confirms
+  this is a general pipeline failure mode, not a one-off string — expect more clusters with different
+  placeholder text. A subtler activityType-contamination variant: a sentence about players' linguistic
+  diversity got misread as a `"Language"` activity offering. And a caution on wrong-entity-kind
+  judgment: an advocacy-heavy description can still front a real, listable kids program — verify before
+  quarantining on the strength of surface tone alone. The spurious-"Music" count reached seven.
