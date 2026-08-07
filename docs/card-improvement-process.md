@@ -1484,6 +1484,33 @@ the general rule — flag, don't guess — was already established). The 10th ca
 Chelsea Piers Birthday Parties (`cc-b51c2bc013474472336a113e`), was identified but not yet researched;
 deferred to the start of batch 4 rather than delaying the whole batch to research it.
 
+### Batch 4/10 (cards 30-39)
+
+| Card | Finding | Action |
+|---|---|---|
+| Chelsea Piers Birthday Parties | Real, massive well-known NYC institution; source 200 but zero-width-char-obfuscated (bot-block) | → `BLOCKED_REPAIRABLE` |
+| Sheridan Fencing Academy Manhattan | Real 3-location fencing school; Manhattan campus confirmed 1801 1st Ave, UES — matches card exactly | → `BLOCKED_REPAIRABLE` |
+| Families First Brooklyn | Real nonprofit early-childhood center, 250 Baltic St; source persistent 502 (network layer) | → `BLOCKED_REPAIRABLE` |
+| Beansprouts Nursery School Camps | Real, 453 6th Ave Park Slope — matches card exactly | → `BLOCKED_REPAIRABLE` |
+| Urban Dunes | **New pattern**: original sourceUrl domain (urbandunes.com) hijacked/squatted by an unrelated Dubai real-estate blog; real business (confirmed 122 E 91st St, UES) now lives at a different TLD (urbandunes.co) | → `BLOCKED_REPAIRABLE`, neighborhoodGuess corrected NYC/Manhattan→Upper East Side |
+| NYC Youth Football League | Real 30-year nonprofit league, plays at multiple real venues (Hofstra, Wagner College); source TLS failure | → `BLOCKED_REPAIRABLE`, NYC-wide neighborhoodGuess left as honest |
+| Mathnasium Upper East Side | Real, massive national tutoring franchise; source 403 (bot-block) | → `BLOCKED_REPAIRABLE` |
+| AoPS Academy Manhattan | Real, confirmed "AoPS Academy Upper West Side Campus," 2505 Broadway | → `BLOCKED_REPAIRABLE`, neighborhoodGuess Manhattan→Upper West Side |
+| Brooklyn Zoo NY | Already `PUBLISHED`, correct; confirmed 230 Bogart St matches East Williamsburg | Touch only |
+| NYC Elite Gymnastics Upper West Side | Already `PUBLISHED`, correct; confirmed 200 Riverside Blvd matches UWS (one of 3 real locations: Tribeca/UES/UWS) | Touch only |
+
+**New pattern found this batch**: **a card's `sourceUrl` domain can be hijacked/squatted by entirely
+unrelated content after the real business itself moves to a different domain/TLD** (Urban Dunes:
+`urbandunes.com` now serves a Dubai real-estate blog with zero relation to the original indoor-sandbox
+business, which now operates at `urbandunes.co`). This is distinct from both off-topic contamination
+(the CARD's entity was never real) and a wrong-domain-guessed-by-pipeline (the pipeline guessed a domain
+that never belonged to the business) — here the domain genuinely WAS the business's real site at some
+point, then changed hands/expired and got repurposed for unrelated content. The fix is the same
+verify-the-entity-not-the-domain principle already codified in CLAUDE.md's physical-only rule, just
+applied to a new failure mode: confirm the entity is real via independent search even when the stored
+sourceUrl itself now resolves to something completely unrelated, rather than defaulting to
+off-topic-contamination quarantine on domain content alone.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -1831,3 +1858,10 @@ deferred to the start of batch 4 rather than delaying the whole batch to researc
   — reinforced existing ones (persistent 502 as a distinct failure mode; stale blockers on now-reachable
   sites; genuine entity-name ambiguity between two similarly-named real orgs, flagged not guessed). See
   "Batch 3/10..." above.
+- v47 (2026-08-07): batch 4/10 of the 100-card test complete (cards 30-39, including the card deferred
+  from batch 3). 8 real entities corrected, 2 already-correct cards touched. New pattern: a card's
+  `sourceUrl` domain can be hijacked/squatted by entirely unrelated content after the real business moves
+  to a different domain/TLD (Urban Dunes: `urbandunes.com` now serves an unrelated Dubai real-estate blog;
+  the real business moved to `urbandunes.co`) — distinct from both off-topic contamination and a
+  pipeline-guessed-wrong-domain; verify the entity via independent search rather than judging by what the
+  stored sourceUrl currently resolves to. See "Batch 4/10..." above.
