@@ -2462,6 +2462,27 @@ The pop-up case is worth one note for the physical-only rule: The Craft Studio's
 real host venues *and* the business has its own fixed studios, so it is the hybrid case (kept), not the
 prohibited no-fixed-venue model (Blue Balloon).
 
+### Batch 34/10 (cards 332-341)
+
+4 stale `low_source_trust` blockers cleared (Harlem Little League, BAX Youth Education, NY Martial Arts
+Academy, Allergic to Salad), 3 already-correct cards touched (78 Youth Sports Baseball, SwimJim UES, NORY
+Brooklyn Heights), plus:
+
+- **Manhattan Youth** (bare) → `BLOCKED_TERMINAL` as an organization-level umbrella card, same treatment as
+  "New York City's Ymca" in batch 26. Its real location card (Downtown Community Center) and its real
+  venue-specific program cards (Pier 25 Beach Volleyball, Tennis, Flag Football) all remain.
+- **Manhattan Youth Flag Football / School Sports** → blockers cleared. A real program at a real host venue
+  (School of the Future), which is why its location names the host rather than an owned address.
+
+**A duplicate deliberately NOT called.** "Steve & Kate's Camp Manhattan" (sourced to the company's own
+domain) sits alongside "Steve & Kate's Camp - Upper West Side" (the aggregator-sourced card renamed in
+batch 28). It would have been easy to mark one a duplicate — but they are at **different granularity**:
+one is a specific confirmed location, the other the chain's broader Manhattan presence, and Steve & Kate's
+runs more than one NYC site. Collapsing them could destroy a real location card. Recorded as a split
+candidate instead. After the batch-32 reversal, the lesson applied here is the converse one: **order
+dependence cuts both ways — the fix is not to call duplicates faster, but to only call them when the
+addresses actually match.**
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -3062,3 +3083,12 @@ prohibited no-fixed-venue model (Blue Balloon).
   pushes it back and leaves its twin near the front, so reviewing a card reliably surfaces its duplicate
   one batch later. Predictable, but it means the duplicate count grows in step with review volume rather
   than converging -- reinforcing that dedupe belongs at creation. See "Batch 33/10..." above.
+- v79 (2026-08-07): batch 34/10 (cards 332-341) complete. 6 real entities corrected (4 stale
+  `low_source_trust` cleared; Manhattan Youth Flag Football's blockers cleared as a real host-site program),
+  3 already-correct cards touched, and the bare "Manhattan Youth" umbrella card marked terminal (same
+  treatment as "New York City's Ymca" in batch 26; all its real location and program cards remain).
+  Deliberately did NOT call a duplicate between "Steve & Kate's Camp Manhattan" (own domain) and
+  "Steve & Kate's Camp - Upper West Side" (batch 28): they are at different granularity and the chain has
+  more than one NYC site, so collapsing them risked destroying a real location card -- recorded as a split
+  candidate. Counterpart to the batch-32 reversal: only call a duplicate when the ADDRESSES match.
+  See "Batch 34/10..." above.
