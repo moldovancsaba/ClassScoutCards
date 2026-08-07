@@ -2270,6 +2270,49 @@ for one business when it encounters the same domain under different titles/paths
 name + neighborhood). A dedupe key on `sourceHost` + normalized street address — rather than on title —
 would collapse these at creation instead of leaving them to be found one at a time downstream.
 
+### Batch 27/11 (cards 261-271) — the internal seed-card class, and how big duplication really is
+
+| Card | Finding | Action |
+|---|---|---|
+| 9 × `classscout` seed cards | Physique Swimming BPC, Downtown Soccer League NYC, The Little Gym Brooklyn Heights, Imagine Swimming Brooklyn Heights, Brooklyn Italians SC, Brooklyn Martial Arts, Central Park Tennis Center Youth, Tiger Strong NYC, McCarren Tennis Center — **each individually verified to have a real externally-sourced sibling** | → `BLOCKED_TERMINAL` |
+| Dodge YMCA | Real branch, 225 Atlantic Ave | Blocker cleared |
+| Greenwich House Music School | Real, founded 1905, 46 Barrow St matches card | Blocker cleared |
+
+**A third record class in `contentCards`: platform-generated seed cards.** After `repair-*` rows (batch 22),
+these are cards whose `sourceHost` is the literal string `"classscout"` and whose `sourceUrl` is an internal
+placeholder (`internal://classscout/source-seed/seed-<hash>`), sitting in `PARKED_COOLDOWN` with
+`missing_source_url`. They are "we should source this business" to-do entries, not scraped cards. Not
+visitor-facing, so not a safety issue — but they are counted as content cards. Each of the nine was checked
+individually against its business rather than terminal-ed as a class, and **all nine already had a real
+externally-sourced card**, so none represented unsourced work that would be lost.
+
+**The duplication problem is much larger than the running count suggested.** Checking those nine businesses
+by `normalizedTitle` returned, per business, not one card but **three to seven**:
+
+| Business | Cards | Notable |
+|---|---|---|
+| Brooklyn Italians Soccer Club | **7** | one PUBLISHED, two PARKED_COOLDOWN, one DISCOVERED, one QUARANTINED, plus the seed |
+| Tiger Strong NYC | **6** | three PUBLISHED — including one sourced from **en.wikipedia.org** |
+| Brooklyn Martial Arts | **4** | split across `brooklynmartialarts.com` **and** `.net` |
+| Physique Swimming BPC | **3** | two PUBLISHED differing only by locale path (`/` vs `/en/`) |
+
+So the 17 duplicate instances counted one-at-a-time through batches 11–26 were not the population — they
+were the ones the oldest-first queue happened to surface. **Three to seven cards per business appears to be
+normal in this collection.** Two further sub-types show up here that earlier batches had not seen: the same
+page under two locale paths, and one business split across two TLDs of its own name.
+
+At that density, terminal-ing duplicates one at a time downstream is not a strategy — it is bailing. The
+fix belongs at creation. Recorded as a recommendation rather than attempted here, because this bridge
+cannot change how discovery creates cards.
+
+**Recommendation (main app, read-only from here)** — strengthening the batch-26 note now that the scale is
+known: dedupe content cards at creation on a key that survives the variation actually observed —
+normalized `sourceHost` **registrable domain** (collapsing `.com`/`.net` siblings), with locale/path
+prefixes (`/en/`) stripped, plus normalized street address where known. Titles vary too freely to be a key.
+A one-off reconciliation pass over the existing collection would also be worth it: at 3–7 cards per
+business, the published surface likely contains substantial hidden duplication that no amount of
+oldest-first review will clear at a useful rate.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -2808,3 +2851,14 @@ would collapse these at creation instead of leaving them to be found one at a ti
   "Family Office" on the topical axis, "Upper" on the location axis. Duplicates now at 17 confirmed and
   clearly systemic (5 in this batch alone), with a dedupe-key recommendation recorded for the main app.
   See "Batch 26/10..." above.
+- v72 (2026-08-07): batch 27/11 (cards 261-271) complete. 2 real entities corrected (Dodge YMCA,
+  Greenwich House Music School) and 9 internal `classscout` seed cards marked terminal -- a THIRD
+  `contentCards` record class after real cards and `repair-*` rows: platform-generated "should source this"
+  entries with `sourceHost: "classscout"` and an `internal://` placeholder URL. Each was verified
+  individually to have a real externally-sourced sibling before being terminal-ed. Headline finding: those
+  nine lookups revealed **3-7 cards per business** (Brooklyn Italians 7, Tiger Strong 6 including one
+  sourced from Wikipedia, Brooklyn Martial Arts 4 across .com and .net, Physique Swimming 3 with two
+  PUBLISHED differing only by `/en/` locale path) -- so the 17 duplicates counted so far were only what the
+  oldest-first queue surfaced, not the population. Two new duplicate sub-types (locale-path variants,
+  same-name different-TLD). Recommendation upgraded accordingly: dedupe at creation on registrable domain +
+  stripped locale path + street address, plus a one-off reconciliation pass. See "Batch 27/11..." above.
