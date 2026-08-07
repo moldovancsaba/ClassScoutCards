@@ -83,16 +83,20 @@ A 100-card mass-enrichment pass (`docs/card-improvement-process.md`, now at v33+
 a new agent picking this up is not starting from zero. Read that doc's Changelog before assuming a
 pattern is undiscovered; it very likely already has a name, a fix pattern, and a confirmed-instance
 count. One open item handed off from that pass, not yet resolved:
-- **Live off-topic contamination with zero blockers**: at least three cards were found `PUBLISHED`/
+- **Live off-topic contamination with zero blockers**: at least four cards were found `PUBLISHED`/
   `active` (or having already produced a live `providers` record) with completely off-topic
   sourceHosts (a foreign university LMS, a general-audience reference article, a toy manufacturer's
-  own e-commerce checkout page) and no blocker at all on the live record — never caught by quarantine
-  (see `docs/card-improvement-process.md` v35). All three were found by chance while working an
-  oldest-first queue, not a targeted sweep, which is itself evidence there are very likely more. Note
-  the third instance specifically: the *contentCard* upstream did carry a blocker
-  (`low_source_trust`), but the live `providers` record it had already produced carried none — a
-  content card's own blocker is not proof its downstream live record is protected. Worth a targeted
-  sweep, not just reactive fixes as they're stumbled on.
+  own e-commerce checkout page, a media app's own App Store listing) and no blocker at all on the live
+  record — never caught by quarantine (see `docs/card-improvement-process.md` v35/v36). All four were
+  found by chance while working an oldest-first queue, not a targeted sweep, which is itself evidence
+  there are very likely more — notably, the third and fourth instances were the #1 and #2
+  oldest-updated records in the ENTIRE pool, both untouched since June, suggesting the oldest end of
+  the queue is disproportionately where this contamination lives. Note the third/fourth instances
+  specifically: the *contentCard* upstream for the third did carry a blocker (`low_source_trust`), but
+  the live `providers` record it had already produced carried none — a content card's own blocker is
+  not proof its downstream live record is protected. The fourth instance had zero blockers on BOTH
+  records. Worth a targeted sweep, not just reactive fixes as they're stumbled on. See the "Children's
+  safety comes first" section above — this is the concrete reason that principle exists.
 
 Card-splitting (the other open item as of the last update to this file) is now designed and built — see
 item 4 above and `docs/card-improvement-process.md`'s splitting section for when to use it.

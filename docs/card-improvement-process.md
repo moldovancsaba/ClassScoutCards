@@ -1124,6 +1124,47 @@ for `sourceHost`s that are generic e-commerce/informational/platform domains rat
 entity's own site) would find more, and that relying on `blockerCodes` alone to gauge live-record safety
 is not sufficient — the content card's own blocker did not prevent this from publishing.
 
+## A fourth confirmed instance, this time with zero blockers on BOTH records: a media app's own App Store listing (found 2026-08-07)
+
+The very next globally-oldest record after the case above (`cc-77deeeb03a1ad8b054aba8dd`, `updatedAt`
+2026-06-20 — the second-oldest record in the entire pool) was `title: "‎ Youtube App - App Store"`,
+`state: "PUBLISHED"`, **`blockerCodes: []`** — zero blockers on the content card itself this time, unlike
+the Step2 case. `sourceUrl` is `https://apps.apple.com/us/app/youtube/id544007664`: the YouTube mobile
+app's own Apple App Store listing page. No reading of this source supports treating it as a children's
+activity/class/camp provider operating in New York City — it is a media platform's app-store marketing
+copy, nothing more.
+
+A cross-collection lookup found the same pattern as before: this content card had already produced a
+live `providers` record, `prov-youtube-app-app-store`, again with **zero** `qualityStatus`/`visibility`
+set. Its `shortDescription`/`longDescription` are raw App Store
+description text, ending with an unrelated scraped customer review complaining about a welding-program
+enrollment ("DOR pay to Advance career institute welding program around $13,000 for 36 weeks... I withdrew
+welding program.") — evidently scraped along with the App Store page's own review section and folded into
+the description as if it were part of the app's copy. That same review fragment was also used verbatim as
+the `recurringPrograms[0].timeText` — i.e., a completely unrelated customer complaint about an unrelated
+program stood in as this "provider"'s class schedule. `activityTypes` (`Sports, Art, Music, Martial Arts,
+Theater, Language, Soccer`) is an ungrounded grab-bag with no connection to the source at all.
+
+**Guiding principle applied (owner directive, 2026-08-07 — see `CLAUDE.md`)**: the reality check comes
+before the field-level check. Neither of these two records needed a field-by-field audit to catch —
+the first and only question that mattered was "does this describe a real entity that operates a
+children's activity for NYC families," and the answer was no for both. When that answer is no, the
+correct action is to protect families by quarantining, not to look for a field-level fix that doesn't
+exist.
+
+**Fix pattern applied (identical to the case above)**:
+- `contentCards`: `state` → `QUARANTINED`, `categoryHint`/`boroughGuess`/`neighborhoodGuess` cleared
+  (fabricated), `blockerCodes` gained `policy_or_safety_review`, `terminalReason` naming the real problem.
+- `providers`: `qualityStatus: "quarantined"` + `visibility: "hidden"`.
+
+**Recommend to the core team**: this is now a *fourth* confirmed live/public instance of the same root
+gap, and the second in a row found by simply working the globally-oldest-first queue — these two cases
+were the #1 and #2 oldest-updated records in the ENTIRE pool, both untouched since their original
+`createdAt` in June, both off-topic, one with zero blockers on both its content card and its live
+provider record. This strongly suggests the oldest end of the queue (the earliest discovery runs) is
+disproportionately where this contamination lives, and a targeted sweep of old, never-re-reviewed
+records — not just continued oldest-first processing — would likely surface more of these quickly.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -1388,3 +1429,11 @@ is not sufficient — the content card's own blocker did not prevent this from p
   third confirmed instance..." above. Quarantined both the source `contentCards` record and the live
   `providers` record it had already produced. Notable because it wasn't found by a targeted sweep; the
   oldest-first queue surfaced it on its own, reinforcing that this gap is not rare.
+- v36 (2026-08-07, owner directive): codified "children's safety comes first" as an explicit, standing
+  principle (also added to `CLAUDE.md`) — verify a card describes a REAL entity actually operating a
+  children's activity for NYC families BEFORE judging whether its fields are individually correct; when
+  that check is negative or unconfirmed, default to protecting families over giving the record the
+  benefit of the doubt. The very next loop iteration after v35 (the #2 oldest-updated record in the whole
+  pool) confirmed why this matters at scale: a fourth instance of the same contamination pattern, this
+  time a media app's own App Store listing, with zero blockers on BOTH the content card and its live
+  provider record — see "A fourth confirmed instance..." above. Both records quarantined.
