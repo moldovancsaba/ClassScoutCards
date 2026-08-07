@@ -2313,6 +2313,38 @@ A one-off reconciliation pass over the existing collection would also be worth i
 business, the published surface likely contains substantial hidden duplication that no amount of
 oldest-first review will clear at a useful rate.
 
+### Batch 28/10 (cards 272-281)
+
+| Card | Finding | Action |
+|---|---|---|
+| 5 × `classscout` seed cards | Elite Skills Basketball, Shihan Martial Arts, The Party Fairy NYC, Playgarden Prep, Park Slope United SC — all verified to have real sourced siblings | → `BLOCKED_TERMINAL` |
+| YouTube Partner Program Overview… | Google/YouTube **help documentation**, fabricated UWS location | `QUARANTINED` → `BLOCKED_TERMINAL` |
+| Upload YouTube Videos - Computer… | Same — sibling help article | `QUARANTINED` → `BLOCKED_TERMINAL` |
+| "Summer Camps" (Manhattanville) | Aggregator's own section label as the title; URL names the real business | Renamed **Steve & Kate's Camp - Upper West Side**, neighborhood corrected, kept canonical |
+| "Summer Camps" (East Village) | **18th duplicate — byte-identical sourceUrl** to the card above | → `BLOCKED_TERMINAL` |
+| "Kids Multi" | Class-label fragment as the title; `funfitnyc.com` names the business | Renamed **FunFit NYC** |
+
+**The cleanest duplicate yet, and it says something.** The two "Summer Camps" cards have a *byte-identical*
+`sourceUrl` — the same aggregator page scraped twice. No judgement call, no near-match: the same URL
+produced two cards. Both inherited the directory's generic section label ("Summer Camps") instead of the
+real business name, and each was assigned a **different fabricated neighborhood** (Manhattanville and East
+Village) even though the URL itself contains `steve-kates-camp-manhattan-upper-west-side`. So the same
+input yielded two different wrong answers — which means the neighborhood was not derived from the source at
+all. That is direct evidence for the location-fabrication pattern first suspected with the repeated "East
+New York" value (batch 19) and the `upper.school` collision (batch 22), and it strengthens the batch-27
+recommendation: **`sourceUrl` equality alone would have caught this at creation.**
+
+**Vendor help documentation is structurally unrepairable, like a directory search page.** Both YouTube
+cards were correctly quarantined by the pipeline, but quarantine implies "re-research might fix this." A
+Google product help article can never become a children's activity provider, so both were moved to
+`BLOCKED_TERMINAL` — same reasoning as the Psychology Today search-results page in batch 19.
+
+**Three title defects in one batch, one family.** "Summer Camps" (aggregator section label), "Kids Multi"
+(class-listing fragment), and earlier "New"/"And" (batch 16) are all the same failure: **the title was taken
+from page furniture rather than from the business.** Worth noting that in two of the three cases the real
+business name was recoverable from the card's own `sourceUrl` without any external research —
+`steve-kates-camp-manhattan-upper-west-side` and `funfitnyc.com` each name the business outright.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -2862,3 +2894,12 @@ oldest-first review will clear at a useful rate.
   oldest-first queue surfaced, not the population. Two new duplicate sub-types (locale-path variants,
   same-name different-TLD). Recommendation upgraded accordingly: dedupe at creation on registrable domain +
   stripped locale path + street address, plus a one-off reconciliation pass. See "Batch 27/11..." above.
+- v73 (2026-08-07): batch 28/10 (cards 272-281) complete. 5 more `classscout` seed cards terminal-ed
+  (each verified to have a real sourced sibling), 2 Google/YouTube help-documentation cards moved from
+  `QUARANTINED` to `BLOCKED_TERMINAL` as structurally unrepairable, 2 title defects corrected from facts in
+  the cards' own sourceUrls ("Summer Camps" -> Steve & Kate's Camp - Upper West Side; "Kids Multi" ->
+  FunFit NYC), and the 18th duplicate instance marked terminal. That duplicate is the clearest yet: a
+  BYTE-IDENTICAL sourceUrl scraped twice, producing two cards with two DIFFERENT fabricated neighborhoods
+  (Manhattanville, East Village) despite the URL itself reading `...manhattan-upper-west-side` -- direct
+  evidence that neighborhood is not being derived from the source, and that plain sourceUrl equality would
+  have caught the duplicate at creation. See "Batch 28/10..." above.
