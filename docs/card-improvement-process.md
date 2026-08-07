@@ -286,6 +286,89 @@ rest of this batch, not a pipeline code change — the code isn't what's wrong. 
 code fix" for a pattern you can show the CURRENT logic would still produce, the way the aggregator/
 `scoreAuthority` case was.
 
+## A fabricated business identity: the record's name matches nothing real (found 2026-08-07)
+
+A distinct pattern from both wrong-entity-kind and aggregator sources — the record's every field
+(address, phone, website) traces conclusively to ONE real, verifiable entity, but that entity's real
+name is different from what's stored, and the stored name implies an activity the real entity does not
+itself offer. Real case: `prov-big-apple-swim-school-brooklyn`. Address (2937 86th Street), phone
+((718) 333-0300), and website (bigappleacademy.com) all corroborate (Yelp, PropertyShark, the site
+itself) to **Big Apple Academy**, a full-time private PreK–Grade 8 school — which explicitly has no
+in-house swim program; swimming is provided through an unrelated external partner, Dolphin Swimming
+School, listed under the school's own "Our Partners" page. The stored name conflates the school's real
+details with an activity type it doesn't offer.
+
+**Recognizing it**: don't stop verifying once address/phone/website all corroborate each other — also
+confirm the corroborated entity's real name and real offerings actually match what the record's `name`
+and `activityTypes` claim. A record can have 100% internally-consistent, real contact details and still
+have a fabricated identity if those details belong to a *different* real business than the one implied by
+its own name.
+
+**Handling it**: quarantine (Decision Matrix C) — this bridge cannot rename a record to the entity its
+own facts actually belong to, and even if it could, a full-time private day school is the wrong entity
+kind for this platform's supplemental-activity categories regardless of the name. Recommend a fresh
+discovery pass under the real offering entity's real name (here, Dolphin Swimming School) if a card for
+that activity is wanted — don't salvage-by-renaming.
+
+## Repeated site-extraction defects across sibling records under one source domain (found 2026-08-07)
+
+When several records share one real underlying source site (e.g. multiple `prov-aviator-sports-*`
+records, all really describing programs hosted at the same Floyd Bennett Field facility), a scrape/
+extraction defect found on one record is likely to recur on its siblings, not be a one-off: a full
+nav-menu/news-snippet scrape dump and un-decoded HTML entities (`&amp;`, `&#038;`) were found
+independently on more than one Aviator Sports record in the same review run. When you find this kind of
+defect, check sibling records sharing the same source domain before moving on — the underlying extraction
+step is what's broken, and it will keep producing the same class of defect for every record it touches
+until fixed upstream. Note it as a recommendation the same way the aggregator/`scoreAuthority` gap is
+flagged, rather than treating each sibling as an independent, unrelated fix.
+
+## Address must be map-accessible and geo-confirmed, not just a nicer street line (owner directive, 2026-08-07)
+
+Fixing an incomplete address (e.g. `"900 Fulton St"` with no borough/zip) is not just about making the
+text read better — it must become something a maps service can actually place with confidence. When
+correcting or filling in a `providers.address`:
+
+1. **Verify the full address** via source corroboration: street number + name, borough, city, state,
+   **and zip code** — a bare street name with no zip/borough is not "done," even if it happens to be
+   technically findable.
+2. **Set structured fields alongside the address string**, using the real schema (`src/types/provider.ts`
+   in the main app, exposed read/write through this bridge as of this version): `addressComponents`
+   (`streetNumber`, `route`, `locality`, `administrativeArea`, `postalCode`, `country`),
+   `addressNormalized` (the canonical single-line form), and `addressConfidence`
+   (`"rooftop"`/`"range"`/`"neighborhood"`/`"region"`/`"unknown"` — be honest about which one actually
+   applies; a verified street address with a confirmed zip is `"rooftop"`, a confirmed neighborhood with
+   no verified street number is `"neighborhood"`, never claim `"rooftop"` you didn't actually verify).
+3. **Set `geo` (`lat`, `lng`) with `source: "approximate"`, and only `"approximate"`** — this bridge
+   enforces that at write time now (see `cardBridgeWrite.ts`). This bridge has no real geocoder; it is
+   not honest to claim `"google"`/`"nominatim"`/`"places"`/`"civic"` quality for a value derived from
+   research and lookup, not an actual geocoding call. Pick `lat`/`lng` for the verified address/
+   neighborhood centroid — good enough for map placement, not a false claim of rooftop-geocoder precision.
+4. **Never downgrade existing better geo.** If a record already has `geo.precision` of `"exact"` or
+   `"interpolated"` (real geocoder output), this bridge now rejects any write that would replace it with
+   an `"approximate"` value — enforced at write time, both dry-run and apply. This bridge can only fill
+   gaps where no real geocoding exists, never overwrite it with a guess.
+5. **Confirm neighbourhood, borough, and city are all mutually consistent** — not just individually
+   plausible. Re-verify all three together against the confirmed address, the same way the multi-city-
+   tenant rule above requires checking `city` before judging a borough/region value.
+
+## Cap `activityTypes` at 3, and name the real headline activity via `primaryActivityType` (owner directive, 2026-08-07)
+
+Cards must show at most the top 3 activities a source itself lists, in the order the source lists them —
+never a longer list, and never a re-sorted "most important first" guess. This bridge now enforces the
+3-item cap at write time (`cardBridgeWrite.ts` rejects more than 3). If a source lists more than 3 (e.g.
+"Soccer, Swimming, Running, Art, Music"), take the source's own first 3 and drop the rest — **but record
+what was cut in the write's `reason` text**, so it isn't silently lost from the review trail, even though
+it must never be shown or used live.
+
+When one of the (at most 3) activities is clearly the headline/main one — the source's own primary
+offering, not just alphabetically or positionally first — set `primaryActivityType` (plus
+`primaryActivityTypeConfidence` when you have a real basis for a number) to that value, using the exact
+string as it appears in `activityTypes`. This is the main app's real, already-consumed mechanism
+(`classifyPrimaryActivityType` at ingestion; consumed by the category-banner picker and the "Activities"
+display) for indicating a headline activity — **not** a reason to truncate `activityTypes` further. Don't
+invent a headline activity that isn't clearly supported by the source; leave `primaryActivityType` unset
+when the source doesn't make one activity obviously primary over the others.
+
 ## Writing voice: specific and warm, never generic — this is a recommendation, not a listing (owner directive, 2026-08-07)
 
 "Enough facts, correctly placed" is not the finish line for a description — it also has to read like a
@@ -485,3 +568,16 @@ sending, dry-run or not.
   non-NYC-tenant record whose region was wrong within ITS OWN city's geography. Added the "non-NYC
   borough may be correct" rule after the last case, so a future pass checks `city` before treating an
   unfamiliar region value as a bug.
+- v13 (2026-08-07, owner directive): exposed `providers.geo`/`.addressComponents`/`.addressNormalized`/
+  `.addressConfidence`/`.primaryActivityType`/`.primaryActivityTypeConfidence` for read/write (all real
+  main-app schema fields, previously unreachable through this bridge), and added three write-time
+  guards: `activityTypes` capped at 3 entries, `geo.source` restricted to `"approximate"` (the only
+  honest value — this bridge has no real geocoder), and a never-downgrade check rejecting any `geo`
+  write that would replace an existing `"exact"`/`"interpolated"` pin with a lower-confidence one.
+  Documents the resulting standard: a corrected address must be zip-inclusive and geo-confirmed, not
+  just a nicer street line, and a headline activity is indicated via `primaryActivityType`, never by
+  truncating `activityTypes` further. Also documents two patterns found the same session: a fabricated
+  business identity (`prov-big-apple-swim-school-brooklyn` — every fact traces to a real school with no
+  swim program, not the swim school implied by the stored name) and repeated site-extraction defects
+  recurring across sibling records under one source domain (multiple Aviator Sports records sharing the
+  same nav-menu-scrape-dump defect).
