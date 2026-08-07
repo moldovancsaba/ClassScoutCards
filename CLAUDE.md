@@ -4,6 +4,28 @@ These instructions OVERRIDE any default behavior. Read this file before touching
 repo — most of what looks like a design choice here was a hard-won lesson from a real debugging
 session, not a preference, and re-deriving it costs real time.
 
+## Children's safety comes first — always verify the card's reality before deciding (owner directive, 2026-08-07)
+
+Every decision this bridge or its review loop makes — enrich, fix, leave, block, or quarantine — is
+ultimately a decision about what a real family sees when looking for a real activity for their child.
+**Before judging whether a card's fields are internally correct, first establish whether the card
+describes a real entity that actually operates a children's activity/class/camp/program serving NYC
+families at all.** A record can be internally tidy — a plausible-looking name, a category, a borough, a
+schedule — and still fail this first, more fundamental test: the `cc-854c0e40e153afb2891ec461` /
+`prov-replacement-parts-step2` case (a toy manufacturer's e-commerce checkout page) and the
+`cc-77deeeb03a1ad8b054aba8dd` / `prov-youtube-app-app-store` case (a video app's own App Store listing)
+were BOTH internally plausible-looking and both were not children's activity providers of any kind —
+the reality check, not a field-by-field audit, is what caught them.
+
+**When that reality check is negative or genuinely can't be confirmed, the safe default is to protect
+families, not to give the record the benefit of the doubt.** Don't leave an off-topic, fabricated, or
+unverifiable record live just because no single field is individually wrong enough to justify the
+call alone — the four target properties (category, age/schedule/location, image, copy) are checks for
+an already-established real entity, not a substitute for confirming the entity is real in the first
+place. This is the reasoning behind every quarantine decision documented in
+`docs/card-improvement-process.md`, and it should be treated as the first question asked on every card,
+not an occasional targeted sweep.
+
 ## The main `classscout` repo is READ-ONLY (owner directive, 2026-08-07)
 
 **Every commit and push you make belongs in THIS repo (`classscoutcards`), never in the main
