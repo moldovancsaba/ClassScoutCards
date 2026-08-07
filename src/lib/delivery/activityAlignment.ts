@@ -19,6 +19,30 @@
  * bridge always matches what the main app's classifier itself would recognize.
  */
 
+/**
+ * Ingestion-only placeholder, ported from the main `classscout` app's
+ * `extractionEngine.ts` (`NO_CATEGORY_PLACEHOLDER` / `stripActivityPlaceholder`). Discovery seeds the
+ * literal string "no category" into `activityTypes` when it has no category hint, and every read path
+ * there is supposed to strip it before display.
+ *
+ * (2026-08-07 finding, owner-reported) It reaches real families anyway: the string is genuinely STORED
+ * in live `providers.activityTypes` (25+ records found via the bridge), and the main app's detail/profile
+ * components render `provider.activityTypes` raw rather than through its own `topActivityTypes()`
+ * normalization seam -- so a card shows a literal "NO CATEGORY" chip. That render bug lives in the
+ * read-only main app and is written up as a recommendation; what this bridge CAN do is stop the
+ * placeholder ever surviving a write it performs, and clean the stored data.
+ *
+ * Stripping it here is load-bearing, not cosmetic: without it `derivePrimary` can pick "no category" as
+ * the PRIMARY activity whenever the title matches nothing else (real case: "Take Me to the Water" with
+ * `["no category","Art","Music","Swimming"]` returned primary "no category" and dropped "Swimming"),
+ * which is strictly worse than the mixed-category bug this module was built to fix.
+ */
+export const NO_CATEGORY_PLACEHOLDER = "no category";
+
+function isPlaceholder(activity: string): boolean {
+  return activity.trim().toLowerCase() === NO_CATEGORY_PLACEHOLDER;
+}
+
 export const ACTIVITY_CLUSTERS: Record<string, readonly string[]> = {
   sportsAndFitness: ["Sports", "Soccer", "Basketball", "Gymnastics", "Martial Arts", "Swimming", "Yoga"],
   artsAndPerformance: ["Dance", "Art", "Music", "Theater"],
@@ -59,16 +83,62 @@ export interface AlignActivityTypesResult {
   dropped: string[];
 }
 
+/**
+ * Keyword patterns per canonical activity, ported from the main `classscout` app's
+ * `extractionEngine.ACTIVITY_KEYWORDS` (same regexes, same order). Used ONLY to read a listing's own
+ * title -- this bridge never re-scans body text.
+ *
+ * (2026-08-07) Added after the `no category` cleanup exposed a real weakness: matching a title by exact
+ * activity-label substring only ("does the title contain the word 'Swimming'?") misses every listing
+ * that names its activity the way people actually do. Real cases from live data -- "Park Slope Academy
+ * Jiu Jitsu Kids" has no literal "Martial Arts" in it, and "Take Me to the Water" has no literal
+ * "Swimming" -- so both fell through to `candidates[0]`, i.e. raw discovery-scan order, which is exactly
+ * the arbitrary ordering this module exists to distrust. Removing the placeholder from slot 0 made that
+ * fallback visible by promoting whatever happened to sit second (usually "Art").
+ */
+const ACTIVITY_TITLE_PATTERNS: ReadonlyArray<readonly [string, RegExp]> = [
+  ["Sports", /\bsport|athletic\b/i],
+  ["Dance", /\bdance|ballet|hip hop\b/i],
+  ["Gymnastics", /\bgymnastics\b/i],
+  ["Art", /\bart|craft|painting|drawing\b/i],
+  ["Music", /\bmusic|sing|piano|guitar|drum\b/i],
+  ["STEM", /\bstem|coding|robot|engineering\b/i],
+  ["Martial Arts", /\bkarate|taekwondo|jiu jitsu|martial arts|mma\b/i],
+  ["Swimming", /\bswim|swimming|aquatic|water\b/i],
+  ["Theater", /\btheater|theatre|acting|drama\b/i],
+  ["Language", /\blanguage|spanish|mandarin|bilingual\b/i],
+  ["Tutoring", /\btutoring|academic support\b/i],
+  ["Indoor Play", /\bindoor play|play space|open play\b/i],
+  ["Outdoor Activities", /\boutdoor|garden|park\b/i],
+  ["Yoga", /\byoga\b/i],
+  ["Soccer", /\bsoccer\b/i],
+  ["Basketball", /\bbasketball\b/i],
+  ["Science", /\bscience\b/i],
+  ["Birthday Entertainment", /\bbirthday\b/i],
+];
+
 function derivePrimary(input: AlignActivityTypesInput): string | undefined {
   const candidates = input.activityTypes;
   if (candidates.length === 0) return undefined;
   if (input.primaryActivityType && candidates.includes(input.primaryActivityType)) {
     return input.primaryActivityType;
   }
-  const title = (input.title ?? "").toLowerCase();
+  const title = input.title ?? "";
   if (title) {
-    const titleMatch = candidates.find((activity) => title.includes(activity.toLowerCase()));
-    if (titleMatch) return titleMatch;
+    // 1. The title literally names one of the candidate activities ("Basketball School").
+    const lower = title.toLowerCase();
+    const exact = candidates.find((activity) => lower.includes(activity.toLowerCase()));
+    if (exact) return exact;
+
+    // 2. The title names it the way people actually write it ("Jiu Jitsu" -> Martial Arts). Only
+    //    activities the listing ALREADY carries are eligible -- this never invents a new tag.
+    //    Most specific wins: a specific sport outranks the generic "Sports" bucket.
+    const keywordMatches = ACTIVITY_TITLE_PATTERNS
+      .filter(([activity, pattern]) => candidates.includes(activity) && pattern.test(title))
+      .map(([activity]) => activity);
+    const specific = keywordMatches.find((activity) => activity !== "Sports");
+    if (specific) return specific;
+    if (keywordMatches.length > 0) return keywordMatches[0];
   }
   return candidates[0];
 }
@@ -82,20 +152,24 @@ function derivePrimary(input: AlignActivityTypesInput): string | undefined {
  * safety, rather than aggressively dropping everything down to one entry on unfamiliar data.
  */
 export function alignActivityTypes(input: AlignActivityTypesInput): AlignActivityTypesResult {
-  const candidates = [...new Set(input.activityTypes)];
-  const primary = derivePrimary({ ...input, activityTypes: candidates });
-  if (!primary) return { activityTypes: [], primaryActivityType: undefined, dropped: [] };
+  // Strip the ingestion placeholder BEFORE anything else -- it must never be eligible to become the
+  // primary activity, nor occupy one of the three slots. See NO_CATEGORY_PLACEHOLDER above.
+  const placeholders = [...new Set(input.activityTypes)].filter(isPlaceholder);
+  const candidates = [...new Set(input.activityTypes)].filter((activity) => !isPlaceholder(activity));
+  const primaryInput = input.primaryActivityType && isPlaceholder(input.primaryActivityType) ? null : input.primaryActivityType;
+  const primary = derivePrimary({ ...input, primaryActivityType: primaryInput, activityTypes: candidates });
+  if (!primary) return { activityTypes: [], primaryActivityType: undefined, dropped: placeholders };
 
   const primaryCluster = clusterFor(primary);
   const ordered = [primary, ...candidates.filter((activity) => activity !== primary)];
 
   if (!primaryCluster) {
     // Unrecognized activity label -- no cluster to reason about, preserve original relative order.
-    return { activityTypes: ordered.slice(0, 3), primaryActivityType: primary, dropped: ordered.slice(3) };
+    return { activityTypes: ordered.slice(0, 3), primaryActivityType: primary, dropped: [...ordered.slice(3), ...placeholders] };
   }
 
   const related = ordered.filter((activity) => activity === primary || clusterFor(activity) === primaryCluster);
   const kept = related.slice(0, 3);
-  const dropped = ordered.filter((activity) => !kept.includes(activity));
+  const dropped = [...ordered.filter((activity) => !kept.includes(activity)), ...placeholders];
   return { activityTypes: kept, primaryActivityType: primary, dropped };
 }

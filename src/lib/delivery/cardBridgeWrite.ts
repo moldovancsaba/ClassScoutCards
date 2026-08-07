@@ -9,7 +9,7 @@ import {
   type BridgeCollectionKey,
 } from "@/lib/delivery/cardBridgeRegistry";
 import { validateCopyQuality } from "@/lib/validation/copyQuality";
-import { alignActivityTypes } from "@/lib/delivery/activityAlignment";
+import { alignActivityTypes, NO_CATEGORY_PLACEHOLDER } from "@/lib/delivery/activityAlignment";
 import { buildFamilyServicePlaceFact, buildFamilyServiceReviewPacket, isPublicStatus, normalizeFamilyServiceLead, reviewPacketEligible } from "@/lib/familyServices/core";
 import { FAMILY_SERVICE_LEAD_STATUSES, type FamilyServiceLead } from "@/lib/familyServices/types";
 
@@ -89,6 +89,28 @@ export function validateWriteRequest(body: unknown): WriteValidationResult {
   if (collection === "providers" && "category" in updates) {
     if (!(CATEGORY_VALUES as readonly string[]).includes(updates.category as string)) {
       return { ok: false, status: 400, error: `category must be one of: ${CATEGORY_VALUES.join(", ")}` };
+    }
+  }
+
+  // (2026-08-07, owner directive: "Never add 'no category' even if no category") The ingestion-only
+  // placeholder must never enter ANY category/activity field through this bridge, on any collection.
+  // `alignActivityTypes` already strips it from `providers.activityTypes`, but that only covers one
+  // field on one collection -- this is the absolute boundary rule, so no future writable field can
+  // quietly reintroduce it. When there genuinely is no category, the correct value is ABSENT (omit the
+  // field), never a placeholder string standing in for one: a literal "NO CATEGORY" chip rendered on a
+  // real family's card is worse than no chip at all. See NO_CATEGORY_PLACEHOLDER in activityAlignment.ts
+  // for how this reached live records and why the strip is load-bearing.
+  const placeholderFields = ["category", "categoryHint", "primaryActivityType", "activityTypes"] as const;
+  for (const field of placeholderFields) {
+    if (!(field in updates)) continue;
+    const value = updates[field];
+    const values = Array.isArray(value) ? value : [value];
+    if (values.some((entry) => typeof entry === "string" && entry.trim().toLowerCase() === NO_CATEGORY_PLACEHOLDER)) {
+      return {
+        ok: false,
+        status: 400,
+        error: `${field} must never contain the ingestion placeholder "${NO_CATEGORY_PLACEHOLDER}" (owner directive: never add "no category" even when there is no category). Omit the field instead — an absent value is correct; a placeholder string renders as a literal "NO CATEGORY" chip on a real family's card.`,
+      };
     }
   }
 
