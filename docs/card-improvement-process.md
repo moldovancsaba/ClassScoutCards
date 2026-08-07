@@ -850,6 +850,64 @@ and use `curl --data @file.json` instead — no shell-quoting interaction with t
 all. Always validate the file with `JSON.parse` (or equivalent) and eyeball the exact field value before
 sending, dry-run or not.
 
+## An out-of-market entity (wrong city entirely) can get a fabricated NYC borough/neighborhood (found 2026-08-07)
+
+A `contentCards` record was a real public school — Governors' Village STEM Academy (Upper), run by
+Charlotte-Mecklenburg Schools in Charlotte, North Carolina (confirmed via the site's own repeated
+references to Charlotte/Mecklenburg County) — with zero connection to New York City. Discovery had still
+assigned it `boroughGuess: "Manhattan"` / `neighborhoodGuess: "Upper West Side"`, both fabricated with no
+factual basis at all — not a wrong-borough-within-NYC mistake, a wrong-*city* mistake. It was already
+correctly `state: "QUARANTINED"`, but the stored `terminalReason` (`weak_location_evidence`, …) undersold
+the real problem, reading like a fixable NYC-evidence gap rather than "this isn't in our market at all."
+
+**Fix pattern**: clear the fabricated borough/neighborhood guesses entirely (don't leave a false NYC
+location standing just because some field must be non-empty), and rewrite `terminalReason` to name the
+real reason plainly (e.g. `out_of_market_wrong_city: ...`) so a future reviewer never mistakes this for a
+fixable location gap. Add `policy_or_safety_review` to `blockerCodes` alongside the existing ones to mark
+it as categorically wrong, not just weakly evidenced.
+
+## Off-topic, non-provider web pages can enter discovery entirely — the most severe contamination found this run (found 2026-08-07)
+
+Three consecutive `contentCards` records (`cc-9687eb501e67896f3057ddd6`, `cc-65bc326e96da00fb4f9f724a`,
+`cc-bebfbed864a8626764d27443`) were all `support.google.com` **YouTube Help** articles — "Submit A
+Copyright Removal Request," "Verify Your Youtube Account," "How to Earn Money on Youtube" — with zero
+connection to children's activities, camps, or classes of any kind. `sourceAuthorityGrade` was
+`"authoritative"` on all three (technically true of support.google.com in general, but meaningless here),
+and discovery had still assigned fabricated `boroughGuess: "Manhattan"` / `neighborhoodGuess: "Upper West
+Side"` / `categoryHint: "Classes"`. This is worse than the aggregator-source pattern (a roundup page that
+at least *mentions* real camps) — there is no real-world entity here at all, just an unrelated Google
+support page that happened to get crawled.
+
+All three were already correctly `state: "QUARANTINED"` / `operationalVisibility: "quarantined"`, so
+visitor-facing risk was already contained — but the stored `terminalReason` values didn't reflect the
+real problem. **Fix pattern**: same as the out-of-market case above — clear the fabricated
+borough/neighborhood/category fields, rewrite `terminalReason` to state plainly that this is off-topic
+source contamination (e.g. `off_topic_source_not_a_provider: ...`), and add `policy_or_safety_review` to
+`blockerCodes`. **Recommend to the core team**: `support.google.com` (and likely other help-center /
+platform-support domains) should probably never be eligible as a `live_discovery` source host at all —
+this isn't a one-off, it was three records from the same discovery period, suggesting whatever query or
+crawl step surfaced them isn't filtering by topical relevance before ingesting a URL as a candidate.
+
+## Tooling fix: the read endpoint's `&id` parameter was silently ignored (fixed 2026-08-07)
+
+`GET /api/card-bridge/rows` accepted an `&id=<value>` query parameter in every card-fetch call made
+throughout this run, but the handler never actually read it — only `limit` and `filter` were wired up.
+A request like `?collection=contentCards&id=cc-xxx` silently fell back to returning the current
+globally-oldest row(s), ignoring the requested id entirely. This was caught when two supposedly-different
+`&id` lookups both returned the same record.
+
+No *write* was ever affected — `POST /api/card-bridge/update` already does a real per-id lookup, verified
+by its own `before` diff on every call — and no fetch-by-id call in this run had actually returned a wrong
+record before this either, because the deterministic-oldest workflow only ever asks for the id that is
+*already* the current oldest row, so the (bugged) "ignore id, return oldest" behavior happened to coincide
+with the correct answer every time until a record got touched between listing and fetching.
+
+**Fixed** by giving `&id` real handling in `src/pages/api/card-bridge/rows.ts`: it's now translated to
+`{[idField]: id}` merged into the Mongo filter (using each collection's own `idField` — `contentCardId` for
+`contentCards`, `id` for `providers`/`meetupGroups`, etc.), and passing both `&id` and `&filter` together is
+now a 400 rather than one silently winning. Before this fix, the reliable way to fetch one specific record
+was `&filter={"<idField>":"<value>"}` — that still works and always did.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -1041,3 +1099,12 @@ sending, dry-run or not.
 - v28 (2026-08-07): widened `contentCards.title` to writable after finding the same name-extraction
   defect already documented for `providers.name` on this collection too (`title: "Camps"` when the
   card's own extracted facts already named the real org, "Manhattan Youth").
+- v29 (2026-08-07): cards 63-67 surfaced the two most severe contamination patterns found this run —
+  "An out-of-market entity (wrong city entirely)" (a Charlotte, NC public school fabricated into a
+  Manhattan/UWS guess) and "Off-topic, non-provider web pages can enter discovery entirely" (three
+  `support.google.com` YouTube Help articles, no real-world entity involved at all, worth flagging to
+  the core team as a discovery-source-host filtering gap). Also fixed a real tooling bug found while
+  investigating why two `&id` lookups returned the same record: `GET /api/card-bridge/rows` never
+  actually read its own documented `&id` parameter, silently falling back to "return the current oldest
+  row" instead — no write was ever affected, but reads by id were unreliable. Fixed and pushed
+  separately (`src/pages/api/card-bridge/rows.ts`).
