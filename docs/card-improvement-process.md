@@ -2149,6 +2149,39 @@ a DOMAIN turning out to be genuinely distinct locations — Modern Martial Arts,
 doesn't prove duplication, and differing neighborhood doesn't disprove it. **The street address is the
 thing to compare; neighborhood labels are too soft to decide either way.**
 
+### Batch 25/10 (cards 241-250)
+
+| Card | Finding | Action |
+|---|---|---|
+| 2025 Ncaa Bracket: Scores, Stats… | **Live zero-blocker off-topic contamination** — an `ncaa.com` March Madness news article, fabricated as an Upper West Side activity | → `QUARANTINED` |
+| F45 Training | **New sub-pattern**: real brand, but an ADULT fitness franchise (studios 18+), generic card with no specific studio | → `QUARANTINED` |
+| Treasure Trunk Theatre Brooklyn | **13th duplicate instance** — single-neighborhood copy of a host-site program that correctly stays one broad card | → `BLOCKED_TERMINAL` |
+| Brooklyn Craft Company Kids | Real, confirmed 165 Greenpoint Ave matches card, genuine kids classes | Blocker cleared |
+| NYC Lions Youth Football | Real youth football organization | Blocker cleared |
+| West Side YMCA | Real YMCA branch, confirmed 5 W 63rd St matches card | Blocker cleared |
+| Hudson Cliffs Baseball League | Already `PUBLISHED`, correct | Touch only |
+| Brooklyn Bridge Park Basketball Clinics | Already `PUBLISHED`, correct | Touch only |
+| Bed-Stuy Sports Flag Football | Already `PUBLISHED`, correct | Touch only |
+| Brooklyn Force Soccer | Already `PUBLISHED`, correct | Touch only |
+
+**A second direct hit on the standing open item.** The NCAA card is exactly the failure CLAUDE.md has
+flagged since the first 100-card pass: `PUBLISHED`, `blockerCodes: []`, nothing wrong on the record's face —
+and it is a college-basketball news article, not a provider. As with `upper.school` in batch 22, its NYC
+location was pure fabrication. That makes **two live zero-blocker off-topic cards in four batches** of this
+third continuation, after the pattern was NOT reproduced at scale in the first 100. Both were found in the
+ordinary oldest-first queue rather than by a targeted sweep, which supports the long-standing suspicion that
+more remain.
+
+**New sub-pattern: a real, reputable brand that is simply not a children's activity.** F45 Training is
+unambiguously real and has real Brooklyn studios — every prior reality-check failure mode (never-real,
+closed, off-topic, fabricated location) misses it. What fails is narrower: F45's own support documentation
+puts studio membership at 18+ (16–17 only with guardian consent). The brand does run a separate youth
+program ("F45 Prodigy", 11–17), but this card names no studio and carries a generic "Brooklyn" for both
+borough and neighborhood, so nothing ties a real children's offering to a real place. **"Is this a real
+business?" and "is this a children's activity?" are two different questions, and a card can pass the first
+while failing the second.** Quarantined rather than repaired: a confirmed Brooklyn studio running Prodigy
+would be a new, properly-located card, not a fix to this generic one.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -2659,3 +2692,10 @@ thing to compare; neighborhood labels are too soft to decide either way.**
   locations when the street address is identical (Homage's single 83 3rd Ave facility sits on the
   Boerum Hill/Gowanus line and is described both ways) -- compare street addresses, not neighborhood
   labels, in either direction. See "Batch 24/10..." above.
+- v69 (2026-08-07): batch 25/10 (cards 241-250) complete. 3 real entities corrected, 4 already-correct
+  cards touched, 1 marked terminal as the 13th duplicate instance, and 2 quarantined. Second live
+  zero-blocker off-topic contamination of this continuation (an `ncaa.com` March Madness article published
+  as an Upper West Side activity), reinforcing that the standing open item is real and under-detected. New
+  sub-pattern: a real, reputable brand that simply is not a children's activity -- F45 Training's studios
+  are 18+ per its own documentation, and the card named no studio and no real address, so "is it real?" and
+  "is it for children?" separated for the first time as independent checks. See "Batch 25/10..." above.
