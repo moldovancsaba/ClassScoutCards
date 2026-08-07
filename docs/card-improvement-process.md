@@ -431,6 +431,33 @@ landing in the wrong field entirely, with zero location information in it.
 name, no neighborhood name, no borough) — reads like a clause from a sentence instead — is this pattern.
 Don't assume every bad address is at least a neighborhood-level placeholder; verify what's actually there.
 
+## A source-unreachable blocker can be a stale false positive — re-check before trusting it (found 2026-08-07)
+
+Real case: `cc-dfc0ee1004428bb39e92133a` (Kaufman Music Center, a `contentCards` record). Its
+`enrichmentSummary` recorded `"fetch 404"`/`source_unreachable` from 2026-06-13, producing a
+`low_source_trust` blocker that kept the card parked (not visitor-visible) for nearly two months despite
+`state: "PUBLISHED"`. Directly re-fetching the same URL now shows it loads fine with real content — the
+org (a well-known NYC institution) never actually had a dead link; the original check just hit a
+transient failure and nothing ever re-verified it.
+
+**Handling it**: when a card is blocked on `source_unreachable`/`low_source_trust`, don't take the stored
+blocker at face value — re-check the URL yourself. If it's actually reachable now, clear the blocker (via
+`blockerCodes`, writable on `contentCards`) so the card becomes eligible for a fresh enrichment pass, and
+say so explicitly rather than leaving a stale false-positive block in place. This bridge cannot re-run
+enrichment itself (no LLM extraction capability, and `contentCards` has no content fields of its own to
+fill in directly) — clearing the blocker is necessary but not sufficient; recommend the core team re-queue
+the card.
+
+## The aggregator-source pattern applies to `contentCards` too — use its own `QUARANTINED` state (found 2026-08-07)
+
+The aggregator/directory-source pattern above was first documented on `providers`, using
+`qualityStatus`/`visibility`. It recurs on `contentCards` just as often (a directory listing page scraped
+as if it were one business, producing a meaningless title fragment like `"West"` extracted from a
+heading such as "Upper WEST Side Camps"). `contentCards` has its own real `state` value for exactly this,
+`"QUARANTINED"` (distinct from `providers`/`meetupGroups`' `qualityStatus: "quarantined"` field) — use
+`state: "QUARANTINED"` plus `terminalReason` (both writable) to record why, mirroring the same "never
+guess which listed business it should be" handling already established for providers.
+
 ## The never-downgrade geo guard can trap a bad pin derived from bad address text (found 2026-08-07)
 
 Real case: `prov-brooklyn-ayso`. The stored `address` was a wrong neighborhood restatement
@@ -986,3 +1013,10 @@ sending, dry-run or not.
   aggregator-sources section: an aggregator sourceUrl can contaminate just `activityTypes` even when the
   main description reads clean and accurate — check tags against the source independently of description
   quality.
+- v26 (2026-08-07): the mass-enrichment run exhausted the `providers` never-touched queue and moved to
+  `contentCards` (per the cross-collection oldest-first rule) — added two `contentCards`-specific
+  findings. A `source_unreachable` blocker can be a stale false positive: a card parked for two months
+  on a 404 that no longer reproduces — re-check the URL yourself before trusting a stored blocker, and
+  clear it (recommending re-enrichment) if it's wrong. And the aggregator-source pattern applies to
+  `contentCards` too, using its own real `state: "QUARANTINED"` value plus `terminalReason`, distinct
+  from the `qualityStatus`/`visibility` mechanism used on `providers`/`meetupGroups`.
