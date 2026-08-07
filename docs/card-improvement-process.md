@@ -991,6 +991,33 @@ dominant/most-supported borough and set `neighborhoodGuess` to a borough-level p
 rather than inventing a specific neighborhood — same reasoning as the touring/multi-location pattern
 already documented (Puppetsburg, Brooklyn Crescents).
 
+## The worst-case off-topic-contamination outcome: it reaches `PUBLISHED`/`active` with no blocker at all (found 2026-08-07)
+
+Every off-topic contamination case earlier in this run (the `support.google.com` YouTube Help cluster,
+the Charlotte NC public school) was at least caught and `QUARANTINED` before going live — wrong, but
+contained. Two cards near the end of this run were not caught at all: `cc-ea60bc8db1446724644eea7a`
+("Welcome to Gift Lms") was `state: "PUBLISHED"` / `operationalVisibility: "active"` with **no**
+`blockerCodes` — its `sourceHost` was `lms.gift.edu.pk`, the login page for GIFT University in
+Gujranwala, **Pakistan** — and `cc-9a3f4490e64900528d60ed14` ("How to Improve Your English Speaking") was
+also live and unblocked, sourced from `learnenglish.britishcouncil.org`, a general English-learning
+article with nothing local or business-like about it at all. Both had fabricated `boroughGuess: "Manhattan"`
+/ `neighborhoodGuess: "Upper West Side"` and were visible in exactly the same way a real, correct card
+would be.
+
+This is a more severe failure mode than a wrong blocker or a stale one — here there is no quarantine
+signal whatsoever to notice; the only tell is that the `title` and `sourceHost` don't describe an actual
+local business, school, or organization. **Recommend to the core team as a priority**: audit live
+`PUBLISHED`/`active` cards for `sourceHost`s that are generic informational, reference, or platform-help
+domains (`.gov`-style government portals in other countries, general-audience learning sites, video
+platforms' own help centers, e-commerce/software login pages) rather than an actual local entity's own
+site — this run found two such cards by chance while working through a strictly oldest-first queue, which
+suggests there are very likely more elsewhere in the collection that a purely oldest-first sweep hasn't
+reached yet.
+
+**Fix pattern applied**: same as the already-quarantined off-topic cases — clear the fabricated
+borough/neighborhood/category fields, move `state` to `QUARANTINED`, and write a `terminalReason` naming
+the real problem plainly, with `policy_or_safety_review` in `blockerCodes`.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -1211,3 +1238,28 @@ already documented (Puppetsburg, Brooklyn Crescents).
   separately in `terminalReason`. And a `boroughGuess` can be a flat-out wrong borough with no bad
   geocode or address text to blame (Penguin City Swim tagged "Brooklyn" with zero real Brooklyn
   locations) — confirmed and corrected by searching the business's real location list directly.
+- v33 (2026-08-07): **the 100-card mass-enrichment run is complete.** Cards 91-100 added an eighth
+  stale-blocker instance (Ferox Athletics), a third acronym-title-casing fix (JCC), and a third confirmed
+  instance of "real entity, bad source pick" (Riverside Park Conservancy — its `sourceUrl` was a literal
+  Google search-results page, not the org's own site) plus a fourth (Peridance Center — a genuine
+  fetch-size failure on an already-correct official domain, also fixing a vague `"Manhattan"`
+  neighborhood placeholder to the real one, Union Square). Most importantly, found and documented the
+  worst-case failure mode of the run: "The worst-case off-topic-contamination outcome" — two cards (a
+  Pakistani university's LMS login page; a British Council English-learning article) were live
+  `PUBLISHED`/`active` with zero blockers, not caught by quarantine at all, unlike every other off-topic
+  case this run. Flagged as a priority audit item for the core team.
+
+  **End-of-run summary (100/100):** processed cards from both `providers` and `contentCards` (switching
+  collections mid-run per the deterministic cross-collection oldest-first rule). Recurring defect
+  patterns confirmed at scale: 9 spurious-"Music"-activityType instances, 8 stale
+  `source_unreachable`/`low_source_trust` blocker instances (all sharing one signature — an `official`
+  source contradicted by its own recorded history), 8 `support.google.com`/YouTube-Help off-topic
+  contamination cards (one cluster from a single discovery run), 2 shared-placeholder-geo clusters, and
+  4 confirmed "real entity blocked by a bad or failed source fetch" cases resolved to `BLOCKED_REPAIRABLE`
+  rather than left unfixable. Two cards were the single most severe finds of the run: live, published,
+  fully off-topic content (a foreign university's LMS, a language-learning article) with no blocker
+  whatsoever. Registry/tooling shipped to `classscoutcards` during the run: `providers.email`,
+  `providers.name`, and `contentCards.title` all made writable for the first time (each after finding a
+  real defect the bridge previously had no way to correct), and a real bug fixed in the read endpoint
+  (`&id` was silently ignored, always falling back to "return the oldest row"). All fixes were dry-run
+  verified before every apply, and no write ever touched `classscout` — only `classscoutcards`.
