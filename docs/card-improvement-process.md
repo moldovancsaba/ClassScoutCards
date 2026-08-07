@@ -481,6 +481,22 @@ signature (`official`/`official_available` contradicted by a stale trust blocker
 specific bug — e.g. a blocker set from one bad fetch attempt that never auto-clears on a later successful
 one — worth root-causing rather than relying on this bridge to spot-fix each instance by hand.
 
+**A fifth instance shows the re-check can go the OTHER way, too (found 2026-08-07)**: `cc-a0ea07808aae9a8e53e77e80`
+("Ninja Ballet Kids") was `state: "QUARANTINED"` with `terminalReason` including `source_rejected_or_unreachable`
+from a `"page too large"` crawl failure. Re-fetching `ninjaballet.com` now returns a full, real 1.5MB page —
+the site is genuinely reachable, exactly the same false-positive shape as the four cases above. But
+unlike those four (real kids/family orgs wrongly blocked), re-verifying THIS source revealed the entity
+itself is a real, professional, adult-oriented experimental dance company — ballet, martial arts (spear,
+bo staff), meditation, a "Cosmic Dance Healing" sound-bath class delivered via Zoom — with no children's
+program anywhere on the site. The card's own title, "Ninja Ballet Kids," had zero supporting content;
+"Kids" was fabricated. **The lesson generalizes**: re-checking a stale `source_unreachable` blocker is not
+a shortcut to "therefore clear it and republish" — it's a instruction to actually look at what the source
+says now. Here the correct outcome was the SAME as before (stay quarantined) but for the ACTUAL reason
+(not a children's activity at all, corrected via the physical-only/reality-check policy in `CLAUDE.md`),
+not the stale, now-disproven one (source unreachable). Corrected `title` (dropped the fabricated "Kids")
+and rewrote `terminalReason` to state the real finding; left `state: QUARANTINED` unchanged since that
+part was already right.
+
 ## The aggregator-source pattern applies to `contentCards` too — use its own `QUARANTINED` state (found 2026-08-07)
 
 The aggregator/directory-source pattern above was first documented on `providers`, using
@@ -1544,3 +1560,9 @@ picked as "the real" Happy Kidz Yoga without fabricating that choice) — both r
   platform's 5-borough taxonomy; a Bronx partner location lacking its own distinct source). The existing
   live `providers` record was itself an aggregator-mashup of the site's general camps page and was
   quarantined separately rather than folded into the split.
+- v40 (2026-08-07): a fifth stale-source_unreachable instance (`cc-a0ea07808aae9a8e53e77e80`, "Ninja
+  Ballet Kids") showed the re-check doesn't always end in "clear the blocker and republish" — the source
+  is reachable, but re-verifying it revealed a real adult-oriented dance/wellness company with no
+  children's program at all; the card's own "Kids" title was fabricated. Corrected the title and
+  rewrote `terminalReason` to state the real finding, left `state: QUARANTINED` unchanged. See the new
+  addendum to "A source-unreachable blocker can be a stale false positive" above.
