@@ -393,6 +393,19 @@ in a comment when you add one, the way the existing ports do.
   `MyAccountView.tsx`'s `SavedProviderCard` reads `activityTypes[0]` directly, bypassing even the
   classifier's own `primaryActivityType` verdict that every other consumer already respects; documented
   as a one-line recommendation in `docs/card-improvement-process.md` for whoever owns that repo.
+- **A business that was genuinely real can still fail the reality check today if it has since permanently
+  closed — this is a distinct case from every other "real but blocked" pattern above.** Real case (cards
+  101-200 continuation, batch 14, 2026-08-07): City Treehouse (129A W 20th St, Chelsea) is reachable at
+  its own domain and looks exactly like an ordinary stale-blocker case — but independent search (Yelp,
+  explicitly marked "CLOSED" as of July 2026) confirms the business has permanently closed. Every prior
+  "real but blocked" pattern (stale blocker, bot-block, network failure, hijacked/rebranded domain,
+  research-environment TLS false positive) describes a business that is still operating today; this one no
+  longer exists at all. A confirmed-closed business fails the children's-safety-first reality check the
+  same way a never-real one does — presenting it as a live option misleads a family exactly as badly as
+  fabrication would, regardless of whether the business was once genuinely real. Left `QUARANTINED`, not
+  moved to `BLOCKED_REPAIRABLE` (there is nothing to repair — the business doesn't exist to re-verify
+  against), with the closure finding recorded in `terminalReason` so a future pass doesn't re-research it
+  from scratch. Recommending a real, still-open replacement is out of scope for this bridge.
 
 ## Before you write anything real
 

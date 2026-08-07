@@ -1809,6 +1809,35 @@ South Brooklyn United) — both left `QUARANTINED` per the established principle
 Reinforces (not new) that a similarly-named real organization in a different location/borough is a
 red flag, not a fuzzy match to accept.
 
+### Batch 14/10 (cards 131-140)
+
+| Card | Finding | Action |
+|---|---|---|
+| The Art Studio NY | Already `PUBLISHED`, correct (enriched earlier this session) | Touch only |
+| NikosKids | Real Music Together/Canta y Baila Conmigo licensee, confirmed operating across FOUR Brooklyn neighborhoods (Park Slope, Brooklyn Heights, Boerum Hill, Dumbo), not just the one the card claimed | → `BLOCKED_REPAIRABLE`, `neighborhoodGuess` corrected to the full honest service area |
+| Keys to Success NYC | Real business, confirmed address (115 Atlantic Avenue) matches card's own `neighborhoodGuess` exactly | → `BLOCKED_REPAIRABLE` |
+| China Institute Mandarin Classes | Real, well-known cultural institution, confirmed address (100 Washington Street) matches card exactly | → `BLOCKED_REPAIRABLE` |
+| Allstar Children's Center | Real, NY State licensed daycare with sports enrichment; confirmed address is East Meadow, NY (Nassau County/Long Island) — **8th confirmed out-of-5-borough-taxonomy instance** | → `BLOCKED_REPAIRABLE` |
+| NYC Raptors Volleyball Club | Real, active club, but confirmed real address (70-02 54th Ave, Maspeth) is QUEENS, not the "Manhattan/Brooklyn" the card claimed | → `BLOCKED_REPAIRABLE`, `boroughGuess`/`neighborhoodGuess` corrected |
+| City Treehouse | **Confirmed permanently CLOSED** (Yelp, explicitly marked "CLOSED" as of July 2026) | Left `QUARANTINED` — `terminalReason` updated with the finding (new pattern, see below) |
+| Urban Soccer NYC | Real host-site delivery model (BMCC, Baruch College, Pace School venues), matching the card's own honest broad location labels | → `BLOCKED_REPAIRABLE` |
+| Brooklyn United Music and Arts Program | Real nonprofit; confirmed specific neighborhood (Crown Heights, 110 Kingston Avenue) from the org's own structured address data | → `BLOCKED_REPAIRABLE`, `neighborhoodGuess` corrected from vague "Brooklyn" |
+| Nurture Baby Nyc | Already `PUBLISHED`, correct | Touch only |
+
+**New pattern this batch: a business that was once real but is now confirmed permanently closed.**
+City Treehouse (129A W 20th St, Chelsea) is reachable at its own domain and has every appearance of a
+normal, currently-blocked-but-real card — but independent search (Yelp) confirms it closed permanently in
+July 2026. This is distinct from every prior "real but blocked" pattern (stale blocker, bot-blocking,
+network failure, hijacked/rebranded domain, TLS false positive) because those all describe businesses
+that are still operating today; this one no longer exists at all. Per the children's-safety-first
+reality-check principle (a card is ultimately a promise to a real family that this is something they can
+actually go do), a confirmed-closed business fails the reality check the same way a never-real one does —
+presenting it as a live option would mislead families exactly as badly as outright fabrication would, even
+though the underlying business was genuinely real at some point. Left `QUARANTINED` (not moved to
+`BLOCKED_REPAIRABLE`, since there is no repair available — the business doesn't exist to re-verify), with
+the finding recorded in `terminalReason` so a future pass doesn't have to re-research it. Recommending a
+real, currently-open replacement is out of scope for this bridge (no such capability exists here).
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -2237,3 +2266,10 @@ red flag, not a fuzzy match to accept.
   California, not NYC; South Brooklyn United — no matching org found, a similarly-named real org exists
   in a different borough), plus a 3rd confirmed instance of the Blue Balloon no-fixed-venue business under
   yet another card. See "Batch 13/10..." above.
+- v58 (2026-08-07): batch 14/10 (cards 131-140) complete. 6 real entities corrected (including a wrong-
+  borough fix, an out-of-taxonomy 8th instance, and a falsely-narrowed-neighborhood fix), 2 already-correct
+  cards touched, 1 left `QUARANTINED` on a **new pattern**: a business confirmed permanently CLOSED (City
+  Treehouse) — treated as a reality-check failure the same as a never-real business, since presenting a
+  closed business as a live option misleads families just as badly, even though it was genuinely real at
+  some point. Distinct from every prior "real but blocked" pattern (all of which describe still-operating
+  businesses). Added a matching CLAUDE.md "Hard-won lessons" bullet. See "Batch 14/10..." above.
