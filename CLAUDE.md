@@ -56,6 +56,13 @@ a separate review pass:
      the card — a real physical location exists — but strip online-class language from the description/
      `activityTypes` so the record doesn't read as an online offering; the physical program is what's
      being listed, not the virtual add-on.
+   - **A "no fixed venue" business fails the test, even though it's real (found 2026-08-07, distinct from
+     the hybrid case above)**: a business whose entire delivery model is in-home/mobile/virtual — e.g. a
+     network of independent teachers who travel to a family's own home, with no studio address of the
+     business's own at all — is prohibited, not because the activity isn't physically real (a family's
+     home is a real place), but because there is no location belonging to the business itself to assign a
+     borough/neighborhood to. The hybrid rule above assumes a REAL FIXED LOCATION plus an online option;
+     this is the opposite case (no fixed location, period) and doesn't qualify.
 2. **One card per real physical location, not one card vaguely covering "multiple" locations.** When
    research finds an organization operates more than one distinct physical location (real case: Tennis
    Innovators' several separate NYC courts, under one generic card with `neighborhoodGuess: "Multiple"`),
@@ -148,8 +155,12 @@ into 3 real Manhattan location cards) — see item 4 above and `docs/card-improv
 splitting section (esp. "First real-world use...") for both when to use it and a real open scope
 question it surfaced: this platform's `Borough` type only covers the 5 NYC boroughs, with no defined way
 to represent a real physical location that's genuinely out of that taxonomy but still serves NYC
-families (e.g. Fort Lee, NJ, a 15-minute drive from the Upper West Side). Not decided here — flagged as
-a recommendation.
+families (e.g. Fort Lee, NJ, a 15-minute drive from the Upper West Side). **Confirmed 3 times
+independently in one session** (2026-08-07): Fort Lee NJ/Water Mill NY (Tennis Innovators), Long Island
+(School of Rock Huntington), and Westchester NY/New Canaan CT (Tim Morehouse Fencing) — see
+`docs/card-improvement-process.md`'s 5-card-batch section. No longer a one-off edge case; worth an actual
+product decision (a new city-tenant value? an explicit "greater metro" category?) rather than continued
+individual flagging. Not decided here — flagged as a recommendation.
 
 ## The one fact that will cost you hours if you get it wrong
 
