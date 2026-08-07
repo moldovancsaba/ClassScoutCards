@@ -378,6 +378,21 @@ in a comment when you add one, the way the existing ports do.
   Park Slope, Cobble Hill, and Long Island City. Being right about the brand is not the same as being
   right about the specific location a card claims — left `QUARANTINED` rather than assumed real just
   because sibling cards for the same brand had already been fixed.
+- **"Cap `activityTypes` at 3" was never enough on its own — WHICH 3 matters as much as how many**
+  (owner directive, 2026-08-07). The original rule ("take the source's own first 3, in source order")
+  reproduces the exact bug it was meant to prevent: a real "Basketball School" card with `activityTypes`
+  in discovery order `["Music", "Basketball", "Sports", "Soccer", "Handball"]` (a "Music" keyword pattern
+  happened to fire first) kept Music in its top 3 while cutting a genuinely-related activity. Fixed with
+  real selection logic, not a positional trim: `src/lib/delivery/activityAlignment.ts`'s
+  `alignActivityTypes()`, wired into `applyCardBridgeWrite` for every `providers` write touching
+  `activityTypes`/`primaryActivityType` — determines the primary activity (from `primaryActivityType` or
+  the provider's own name/title), keeps only OTHER activities from the SAME topical cluster (4 clusters
+  mirroring the main app's own `extractionEngine.ACTIVITY_KEYWORDS` vocabulary: Sports & Fitness, Arts &
+  Performance, Academic & STEM, Play & Recreation), caps at 3, primary always first. A separate, related
+  defect this does NOT fix lives in the main `classscout` repo (read-only from here) —
+  `MyAccountView.tsx`'s `SavedProviderCard` reads `activityTypes[0]` directly, bypassing even the
+  classifier's own `primaryActivityType` verdict that every other consumer already respects; documented
+  as a one-line recommendation in `docs/card-improvement-process.md` for whoever owns that repo.
 
 ## Before you write anything real
 

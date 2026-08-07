@@ -105,18 +105,18 @@ describe("validateWriteRequest", () => {
     });
   });
 
-  describe("activityTypes cap (2026-08-07 owner directive: at most 3, never a raw keyword dump)", () => {
-    it("accepts up to 3 activityTypes", () => {
-      expect(validateWriteRequest({ ...validProviderBody, updates: { activityTypes: ["Soccer", "Swimming", "Running"] } }).ok).toBe(true);
+  describe("activityTypes sanity ceiling (2026-08-07 owner directive: real top-3 selection happens in applyCardBridgeWrite via alignActivityTypes)", () => {
+    it("accepts a normal-length activityTypes list", () => {
+      expect(validateWriteRequest({ ...validProviderBody, updates: { activityTypes: ["Soccer", "Swimming", "Running", "Art", "Music"] } }).ok).toBe(true);
     });
 
-    it("rejects more than 3 activityTypes", () => {
+    it("rejects an obviously-garbage-length activityTypes list (>20)", () => {
       const result = validateWriteRequest({
         ...validProviderBody,
-        updates: { activityTypes: ["Soccer", "Swimming", "Running", "Art", "Music"] },
+        updates: { activityTypes: Array.from({ length: 21 }, (_, i) => `Tag${i}`) },
       });
       expect(result.ok).toBe(false);
-      expect(!result.ok && result.error).toMatch(/at most 3 entries/);
+      expect(!result.ok && result.error).toMatch(/looks like a raw keyword dump/);
     });
   });
 

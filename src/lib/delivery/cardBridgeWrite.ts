@@ -9,6 +9,7 @@ import {
   type BridgeCollectionKey,
 } from "@/lib/delivery/cardBridgeRegistry";
 import { validateCopyQuality } from "@/lib/validation/copyQuality";
+import { alignActivityTypes } from "@/lib/delivery/activityAlignment";
 import { buildFamilyServicePlaceFact, buildFamilyServiceReviewPacket, isPublicStatus, normalizeFamilyServiceLead, reviewPacketEligible } from "@/lib/familyServices/core";
 import { FAMILY_SERVICE_LEAD_STATUSES, type FamilyServiceLead } from "@/lib/familyServices/types";
 
@@ -99,13 +100,16 @@ export function validateWriteRequest(body: unknown): WriteValidationResult {
   }
 
   // (2026-08-07, owner directive) Cards must show at most 3 headline activities, never a raw keyword
-  // dump — cap activityTypes at the source's own top 3 here so the core system is never confused by a
-  // longer list. Anything cut belongs in the write's `reason` text (kept, just not shown), not in this field.
-  if (collection === "providers" && Array.isArray(updates.activityTypes) && (updates.activityTypes as unknown[]).length > 3) {
+  // dump. The actual top-3 SELECTION (which 3, in what order) is real business logic that needs the
+  // provider's own name/primaryActivityType to reason about — see `alignActivityTypes` in
+  // `activityAlignment.ts`, applied in `applyCardBridgeWrite` below, where that context is available.
+  // This is only a sanity ceiling here (pure validation, no DB access yet) to reject obviously-garbage
+  // input before it reaches that step, not the real cap.
+  if (collection === "providers" && Array.isArray(updates.activityTypes) && (updates.activityTypes as unknown[]).length > 20) {
     return {
       ok: false,
       status: 400,
-      error: `activityTypes can hold at most 3 entries through this bridge (got ${(updates.activityTypes as unknown[]).length}) — trim to the source's own top 3 and record anything cut in "reason"; use primaryActivityType to call out the headline activity instead of listing more.`,
+      error: `activityTypes has ${(updates.activityTypes as unknown[]).length} entries — that looks like a raw keyword dump, not a curated list. Trim to the source's own genuinely-evidenced activities before writing; this bridge realigns to the real top 3 automatically, but starting from garbage input defeats that.`,
     };
   }
 
@@ -236,11 +240,28 @@ export async function applyCardBridgeWrite(request: NormalizedWriteRequest): Pro
     }
   }
 
+  // Top-3 activity alignment (owner directive, 2026-08-07): whenever a providers write touches
+  // activityTypes and/or primaryActivityType, recompute BOTH from the full picture (incoming update
+  // falling back to the current document) rather than trusting the caller's raw array order or a
+  // stale primaryActivityType — see activityAlignment.ts for the real reasoning (primary activity
+  // first, only same-cluster activities kept, capped at 3). Checked in BOTH dry-run and apply, same
+  // convention as the serviceLeads/geo guards above, so the realigned result is visible before commit.
+  let activityAlignment: ReturnType<typeof alignActivityTypes> | undefined;
+  if (request.collection === "providers" && ("activityTypes" in request.updates || "primaryActivityType" in request.updates)) {
+    const candidateActivityTypes = (request.updates.activityTypes as string[] | undefined) ?? (current.activityTypes as string[] | undefined) ?? [];
+    const candidatePrimary = (request.updates.primaryActivityType as string | undefined) ?? (current.primaryActivityType as string | undefined);
+    const title = (request.updates.name as string | undefined) ?? (current.name as string | undefined);
+    activityAlignment = alignActivityTypes({ activityTypes: candidateActivityTypes, primaryActivityType: candidatePrimary, title });
+  }
+
   if (request.dryRun) {
     const previewExtra =
       request.collection === "serviceLeads" && normalizedLead
         ? { visibility: normalizedLead.visibility, blockers: normalizedLead.blockers, tags: normalizedLead.tags }
         : {};
+    const alignmentExtra = activityAlignment
+      ? { activityTypes: activityAlignment.activityTypes, primaryActivityType: activityAlignment.primaryActivityType, activityTypesDropped: activityAlignment.dropped }
+      : {};
     return {
       found: true,
       dryRun: true,
@@ -251,8 +272,8 @@ export async function applyCardBridgeWrite(request: NormalizedWriteRequest): Pro
       // Even in dry-run, show what a touch would actually stamp — so the caller can verify the
       // no-op-content path before committing to it, same as any other write.
       applied: request.touch
-        ? { ...request.updates, ...previewExtra, updatedAt: "<now>", lastReviewedAt: "<now>", lastReviewedBy: request.source }
-        : { ...request.updates, ...previewExtra },
+        ? { ...request.updates, ...previewExtra, ...alignmentExtra, updatedAt: "<now>", lastReviewedAt: "<now>", lastReviewedBy: request.source }
+        : { ...request.updates, ...previewExtra, ...alignmentExtra },
     };
   }
 
@@ -279,6 +300,14 @@ export async function applyCardBridgeWrite(request: NormalizedWriteRequest): Pro
     finalUpdates.visibility = normalizedLead.visibility;
     finalUpdates.blockers = normalizedLead.blockers;
     finalUpdates.tags = normalizedLead.tags;
+  }
+
+  // Never trust the caller's raw activityTypes/primaryActivityType directly — always persist the
+  // realigned result computed above, so the core app's own badge/banner pickers (which read exactly
+  // these two persisted fields) can never end up with a mixed-category top-3 through this bridge.
+  if (activityAlignment) {
+    finalUpdates.activityTypes = activityAlignment.activityTypes;
+    finalUpdates.primaryActivityType = activityAlignment.primaryActivityType;
   }
 
   const auditId = randomUUID();
