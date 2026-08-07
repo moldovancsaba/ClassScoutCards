@@ -162,6 +162,42 @@ main app's own gate, not this loop.
 Quarantining a live record is real and immediate — it stops being shown to families the moment the
 write applies. Always dry-run first, and write a `reason` a human could audit later and agree with.
 
+## Aggregator/directory sources are a discovery lead, never a single-entity source (owner directive, 2026-08-07)
+
+A real case (`prov-2026-bronx-summer-camps`): the record's `shortDescription`/`longDescription` were an
+incoherent mashup of contact info for FOUR+ separate organizations, no address/website/phone/email of
+its own, and `incompleteFields` falsely reported nothing missing. Research traced it to
+`bronxsummercamps.com` — a real directory/roundup page listing ~30 distinct camps — that had been
+ingested as if the page itself were one provider's own site.
+
+**Recognizing it**: multiple full contact-detail clusters (a distinct phone number + email domain +
+website, repeated) appearing in one record's description text is a strong, reliable signal — a single
+legitimate business does not list several *other* companies' phone numbers and email domains in its own
+copy. Don't wait for the text to look obviously broken; check this whenever a description reads like a
+list rather than a description.
+
+**Handling it, in this loop**:
+1. **Never treat the aggregator page as this record's own source.** Don't "fix" the record by picking
+   one of the bundled organizations and rewriting the description to be about just that one — that's
+   not source-backed (the record's own `name` doesn't necessarily match whichever org you'd pick, and
+   guessing which one it "should" be is exactly the fabrication Decision Matrix A forbids).
+2. **Quarantine the existing bad record** (Decision Matrix C) — it's actively misleading whoever views
+   it live, and a field-level fix isn't available for the reason above.
+3. **Use the aggregator page as a discovery SOURCE, not a card source.** If it's a real, current
+   directory, the individual businesses it lists are legitimate discovery candidates — but creating
+   cards from them is the main app's discovery/ingestion pipeline's job, not this bridge's (this bridge
+   has no card-creation capability at all, by design). Record the candidate list as part of your
+   findings/recommendation for the core team; do not attempt to create records for them yourself.
+4. **This is a known, evidenced gap in the main app's discovery pipeline, not just a one-off bad
+   record** — `scoreAuthority` (`discoveryWorker.ts`) grades any non-allowlisted custom domain
+   `authoritative` by default, with no content-level check for "this page describes many businesses, not
+   one"; a markup-structured directory classifier exists (`directoryExtraction.ts`) but is flag-gated off
+   by default and wouldn't catch a prose-style roundup post anyway; and the LLM extraction prompt already
+   says to skip multi-entity sources but silently falls back to a naive regex extractor (zero multi-entity
+   awareness) whenever the LLM call fails. Surface this as a recommendation to the core team every time
+   you find a fresh instance — don't just quarantine and move on silently, since the pipeline will keep
+   producing the same class of bad record from other directory pages until this is fixed upstream.
+
 ## Cross-collection lookups (before deciding anything)
 
 Before acting on a `contentCard`, check whether a linked record exists elsewhere — acting on the
@@ -249,3 +285,11 @@ committing.
   widened `providers` writes to support it: `qualityStatus` (only settable to `"quarantined"`) and
   `visibility` (only settable to `"hidden"`) — deliberately one-directional; un-quarantining is not
   supported through this bridge.
+- v4 (2026-08-07, owner directive): added the "Aggregator/directory sources" section after a real case
+  (`prov-2026-bronx-summer-camps`, a directory page's ~30 distinct camps mashed into one provider) —
+  never fix such a record by guessing which bundled organization it "should" be; quarantine it, and
+  surface the underlying pipeline gap (`discoveryWorker.ts`'s `scoreAuthority` grades any non-allowlisted
+  custom domain `authoritative` by default with no multi-entity content check) as a recommendation rather
+  than silently moving on. Also exposed `providers.address`/`website`/`phone`/`email`/`sourceUrls` and
+  `meetupGroups.website`/`instagram` as read-only research fields — both collections previously exposed
+  no way to find a record's own real source, which is what let this specific defect go undetected.
