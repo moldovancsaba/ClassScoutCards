@@ -433,15 +433,20 @@ Don't assume every bad address is at least a neighborhood-level placeholder; ver
 
 ## A source-unreachable blocker can be a stale false positive — re-check before trusting it (found 2026-08-07)
 
-TWO confirmed instances now: `cc-dfc0ee1004428bb39e92133a` (Kaufman Music Center) and
-`cc-b85fc529f946a0772f0b9d12` (Marlene Meyerson JCC Manhattan) — both `sourceAuthorityGrade: "official"`
-sources blocked on a stale `source_unreachable` that no longer reproduces, suggesting this is systemic
-rather than a one-off. The first case: `cc-dfc0ee1004428bb39e92133a`'s
-`enrichmentSummary` recorded `"fetch 404"`/`source_unreachable` from 2026-06-13, producing a
-`low_source_trust` blocker that kept the card parked (not visitor-visible) for nearly two months despite
-`state: "PUBLISHED"`. Directly re-fetching the same URL now shows it loads fine with real content — the
-org (a well-known NYC institution) never actually had a dead link; the original check just hit a
-transient failure and nothing ever re-verified it.
+FOUR confirmed instances now: `cc-dfc0ee1004428bb39e92133a` (Kaufman Music Center),
+`cc-b85fc529f946a0772f0b9d12` (Marlene Meyerson JCC Manhattan, first `contentCards` record for this org),
+`cc-06e77c12a16bea450bfea9f8` (Marlene Meyerson JCC Manhattan again — a second, separate `contentCards`
+record for the same real org from a different discovery run), and `cc-84751be06b4b5d1b0fca0356` (Silver
+Music) — all `sourceAuthorityGrade: "official"` sources blocked on a stale `source_unreachable`/
+`low_source_trust` that no longer reproduces, confirming this is systemic rather than a one-off. The first
+case: `cc-dfc0ee1004428bb39e92133a`'s `enrichmentSummary` recorded `"fetch 404"`/`source_unreachable` from
+2026-06-13, producing a `low_source_trust` blocker that kept the card parked (not visitor-visible) for
+nearly two months despite `state: "PUBLISHED"`. Directly re-fetching the same URL now shows it loads fine
+with real content — the org (a well-known NYC institution) never actually had a dead link; the original
+check just hit a transient failure and nothing ever re-verified it. All four cases share the same
+signature: an `official`-grade source, `enrichmentSummary.sourceAvailability: "official_available"`
+already recorded in the card's own history, and a `low_source_trust`/`source_unreachable` blocker that
+directly contradicts that — the blocker was very likely set once at a bad moment and never re-evaluated.
 
 **Handling it**: when a card is blocked on `source_unreachable`/`low_source_trust`, don't take the stored
 blocker at face value — re-check the URL yourself. If it's actually reachable now, clear the blocker (via
@@ -449,7 +454,10 @@ blocker at face value — re-check the URL yourself. If it's actually reachable 
 say so explicitly rather than leaving a stale false-positive block in place. This bridge cannot re-run
 enrichment itself (no LLM extraction capability, and `contentCards` has no content fields of its own to
 fill in directly) — clearing the blocker is necessary but not sufficient; recommend the core team re-queue
-the card.
+the card. **Recommend to the core team**: with four confirmed instances all sharing the exact same
+signature (`official`/`official_available` contradicted by a stale trust blocker), this looks like a
+specific bug — e.g. a blocker set from one bad fetch attempt that never auto-clears on a later successful
+one — worth root-causing rather than relying on this bridge to spot-fix each instance by hand.
 
 ## The aggregator-source pattern applies to `contentCards` too — use its own `QUARANTINED` state (found 2026-08-07)
 
@@ -1108,3 +1116,9 @@ was `&filter={"<idField>":"<value>"}` — that still works and always did.
   actually read its own documented `&id` parameter, silently falling back to "return the current oldest
   row" instead — no write was ever affected, but reads by id were unreliable. Fixed and pushed
   separately (`src/pages/api/card-bridge/rows.ts`).
+- v30 (2026-08-07): reached 70/100 of the mass-enrichment run. The stale source_unreachable/
+  low_source_trust blocker pattern reached a fourth confirmed instance (a second, separate `contentCards`
+  record for Marlene Meyerson JCC Manhattan, plus Silver Music) — all four share the exact same signature
+  (`official`-grade source, `official_available` already recorded, contradicted by the stored blocker),
+  strengthening the recommendation that the core team root-cause this rather than treat each instance as
+  one-off.
