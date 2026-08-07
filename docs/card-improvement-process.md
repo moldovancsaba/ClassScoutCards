@@ -2345,6 +2345,42 @@ from page furniture rather than from the business.** Worth noting that in two of
 business name was recoverable from the card's own `sourceUrl` without any external research —
 `steve-kates-camp-manhattan-upper-west-side` and `funfitnyc.com` each name the business outright.
 
+### Batch 29/10 (cards 282-291) — and a required change to how cards are selected
+
+**Selection change, made this batch.** The globally-oldest-first query stopped returning reviewable work:
+every row was a synthetic `repair-*` record already in `BLOCKED_TERMINAL`. Touching those would satisfy the
+letter of the touch-always rule while doing nothing — precisely the churn the bulk-operations section warns
+about. `/api/card-bridge/rows` supports equality filters on any projection field, so selection moved to
+**oldest-first *within* a state**: `filter={"state":"PUBLISHED"}` first (live cards, highest family
+impact), then `QUARANTINED`/`REPAIRING`/`DISCOVERED`/`PARKED_COOLDOWN`. This immediately surfaced real
+defects the unfiltered queue could not reach. **Future passes should select by state, not globally.**
+
+| Card | Finding | Action |
+|---|---|---|
+| "West" | Live, zero blockers, one-word title — and `summercamp-ny.com` is itself a camp **directory** ("NYC Summer Camps"), not a business | → `BLOCKED_TERMINAL` |
+| Advantage QuickStart Tennis UES/UWS | Source is `myaccount.aidvantage.studentaid.gov/Route/Inbox` — a **federal student-loan servicer's account inbox** | → `QUARANTINED` |
+| 14th Street Y Youth Programs | Real institution (344 E 14th St) attached to a **German travel page about Mount Rainier** | → `BLOCKED_REPAIRABLE`, re-source noted |
+| The Paint Place Brooklyn | **8th real-brand-fake-location** — real locations are UWS and Astoria (Queens), no Brooklyn | → `QUARANTINED` |
+| The Paint Place UWS | Real, confirmed 243 W 72nd St (earlier Amsterdam Ave listing is closed — moved, not shut) | Blockers cleared, kept canonical |
+| Park Slope United Soccer Club (×2) | **19th duplicate** — the club had 4 cards total | One canonical, one → `BLOCKED_TERMINAL` |
+| The School at Steps | Already `PUBLISHED`, correct | Touch only |
+| Brooklyn Robot Foundry | Already `PUBLISHED`, correct | Touch only |
+| Gymtime Rhythm & Glues | Real, confirmed 1520 York Ave | Blocker cleared |
+
+**The name-collision class now has a third and much starker instance.** "Advantage QuickStart Tennis" was
+sourced to **AIDVANTAGE**, the federal student-loan servicer — an authenticated `.gov` account-inbox URL
+attached to a children's tennis card. With `upper.school`→"Upper West Side" (batch 22) and Masttro's
+"Family Office" (batch 26), that is three separate cards whose source was chosen because a NAME matched,
+with no check that the entity was even the same kind of thing. Note the honest limit of what this tells us:
+Advantage QuickStart Tennis may well be a real NYC program — nothing about it is confirmed either way,
+because the attached source describes something else entirely.
+
+**A distinct, gentler case worth separating: real entity, absurd source.** The 14th Street Y is
+unambiguously real, but its card pointed at a German travel article about Mount Rainier National Park.
+Unlike the collision cases, there is no doubt about the entity — only the source is wrong — so the right
+call is `BLOCKED_REPAIRABLE` with the real facts recorded for re-sourcing, **not** quarantining a genuine
+community institution. The distinction that matters: *is the ENTITY in doubt, or only the SOURCE?*
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -2903,3 +2939,13 @@ business name was recoverable from the card's own `sourceUrl` without any extern
   (Manhattanville, East Village) despite the URL itself reading `...manhattan-upper-west-side` -- direct
   evidence that neighborhood is not being derived from the source, and that plain sourceUrl equality would
   have caught the duplicate at creation. See "Batch 28/10..." above.
+- v74 (2026-08-07): batch 29/10 (cards 282-291) complete, and **selection strategy changed**: the
+  globally-oldest-first query had filled with synthetic `repair-*` rows already in `BLOCKED_TERMINAL`, so
+  selection moved to oldest-first WITHIN a state (`filter={"state":"PUBLISHED"}` first). That immediately
+  surfaced defects the unfiltered queue could not reach. Findings: a live zero-blocker card titled "West"
+  sourced from a camp DIRECTORY site (terminal); a tennis card sourced to AIDVANTAGE, the federal
+  student-loan servicer's authenticated inbox URL -- a third name-collision instance after upper.school and
+  Masttro, and the starkest yet; the 14th Street Y attached to a German travel page about Mount Rainier,
+  separated as a distinct "real entity, absurd source" case fixed by re-sourcing rather than quarantine;
+  an 8th real-brand-fake-location (no Brooklyn Paint Place -- real ones are UWS and Astoria); and a 19th
+  duplicate. 3 real entities corrected, 2 touched. See "Batch 29/10..." above.
