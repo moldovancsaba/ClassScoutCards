@@ -379,6 +379,50 @@ display) for indicating a headline activity — **not** a reason to truncate `ac
 invent a headline activity that isn't clearly supported by the source; leave `primaryActivityType` unset
 when the source doesn't make one activity obviously primary over the others.
 
+## A record's own name can name its location — check it against borough/neighborhood/address (found 2026-08-07)
+
+Recurring pattern across four real cases this session: `prov-chelsea-piers-tennis-brooklyn` (name says
+Brooklyn, stored fields said Manhattan/Chelsea), `prov-impact-coaching-network-chess-brooklyn` (name says
+Brooklyn, stored fields said Manhattan/Upper East Side, with an address in neither), `prov-goldfish-swim-
+school-gowanus` (name says Gowanus, stored neighborhood said the different, non-adjacent Prospect
+Heights), `prov-karate-city-uws` (name says UWS, real address is on W 52nd St — Hell's Kitchen, not the
+Upper West Side at all).
+
+**Recognizing it**: whenever a record's `name` itself contains a place name (a borough, neighborhood, or
+`" - <City>"`/`" <Borough>"` suffix), treat that as a claim to verify — cross-check it against the
+stored `borough`/`neighborhood`/`address`, not just against the source's own text. A mismatch here is a
+strong, cheap signal of a real defect (wrong assignment, or in the worst case a fabricated/conflated
+identity per the section below) — don't skip this check just because the other fields look internally
+consistent with each other.
+
+**Handling it**: research the specific location the name claims (which is often the correct one, since
+names tend to be assigned closer to the true identity than a downstream borough/neighborhood guess), and
+correct borough/neighborhood/address to match — same evidentiary bar as any other field.
+
+## The never-downgrade geo guard's blind spot can hide a wrong-BOROUGH pin, not just an imprecise one (found 2026-08-07)
+
+A more severe variant of the section below: `prov-impact-coaching-network-chess-brooklyn` had a
+`precision: "exact"`, `source: "google"` geo pin — real geocoder output, seemingly trustworthy — but it
+was geocoded from the record's own wrong Manhattan address while the record's real identity (per its own
+name) is a Brooklyn program. The never-downgrade guard correctly refused to let an approximate correction
+override "exact" — but "exact" here means "confidently pinned to the wrong borough entirely," not just
+imprecise. Handle exactly like the general case below (correct the address text, leave geo alone, name
+the suspect pin and recommend a re-geocode) — but recognize that "exact"/"real geocoder source" is NOT
+by itself evidence the location is right when the record's own name and address text disagree with where
+it was actually pinned.
+
+## Garbled, non-address text can land directly in the address field, not just a neighborhood placeholder (found 2026-08-07)
+
+Real case: `prov-inner-city-arts-downtown-la` had `address: "6-12 summer Institutes takes place"` — a
+fragment of an unrelated sentence (likely about "grades 6-12 summer institutes"), not any kind of
+location text at all. Distinct from the common neighborhood-restatement placeholder
+(`"Downtown Brooklyn, Brooklyn, NYC"`) — this is extraction noise from somewhere else on the page
+landing in the wrong field entirely, with zero location information in it.
+
+**Recognizing it**: an address value that doesn't parse as ANY plausible location fragment (no street
+name, no neighborhood name, no borough) — reads like a clause from a sentence instead — is this pattern.
+Don't assume every bad address is at least a neighborhood-level placeholder; verify what's actually there.
+
 ## The never-downgrade geo guard can trap a bad pin derived from bad address text (found 2026-08-07)
 
 Real case: `prov-brooklyn-ayso`. The stored `address` was a wrong neighborhood restatement
@@ -784,3 +828,12 @@ sending, dry-run or not.
   same-concept strings (`"STEM / Science"`, `"STEM"`, `"Science"`) filling all 3 cap slots. The shared-
   placeholder-geo count also reached six confirmed instances and the spurious-generic-activityType
   pattern gained new off-topic values (`"Tutoring"`) beyond the already-documented Art/Music.
+- v21 (2026-08-07): during the same 100-card mass-enrichment run, cards 11-20 surfaced three more
+  patterns. "A record's own name can name its location" — four cases where a record's own name specified
+  a borough/neighborhood that its stored borough/neighborhood/address contradicted (Chelsea Piers Tennis
+  Brooklyn, Impact Coaching Network Chess Brooklyn, Goldfish Swim School Gowanus, Karate City UWS) — this
+  is now a specific, cheap cross-check to run on every card. A more severe never-downgrade blind spot: an
+  `exact`/`google`-sourced geo pin can be confidently wrong-BOROUGH, not just imprecise, when it was
+  geocoded from a wrong address that a record's own name would have caught. And a new address-field
+  failure mode: fully garbled non-address text (`"6-12 summer Institutes takes place"`) landing in the
+  address field, worse than the usual neighborhood-restatement placeholder.
