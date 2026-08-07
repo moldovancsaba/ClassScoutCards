@@ -38,10 +38,13 @@ Read it before running a review pass.
    `CLASSSCOUT_INGEST_KEY`. Generate any random string; set the same value in this app's environment
    and in whatever's calling it.
 4. **Read `docs/card-improvement-process.md` in full** before running any review/enrichment pass — it
-   defines the selection order, the verification checklist, the three decision matrices (pre-publish
-   card / already-published record), and the hard boundaries (nothing here can set a content card to
-   `PUBLISHED`; a family-service lead can only reach a public status when it has zero blockers;
-   quarantining a live provider is one-directional).
+   defines the selection order (always the globally oldest record, deterministic even on a tie — never a
+   random pick), the verification checklist, the decision matrices (pre-publish content card /
+   already-published provider or meetup group), the hard boundaries (nothing here can set a content
+   card to `PUBLISHED`; a family-service lead can only reach a public status when it has zero blockers;
+   quarantining a live provider or meetup group is one-directional), and the patterns found by actually
+   running the loop (aggregator/directory sources, wrong-entity-kind records, non-NYC city tenants,
+   generic/meta-referential copy, the bulk-operations stopping-condition trap).
 5. **Network access to `https://compare.messmass.com`** (or wherever this is currently deployed —
    confirm with `GET /api/status`, which reports the connected database name and collection count) is
    all that's required on the caller's side. No native MongoDB access needed.
@@ -105,9 +108,11 @@ The only write path. **Dry-run by default** — nothing is written unless the bo
 - Every collection has its own field allow-list, its own validation (a real `Category` enum check, a
   real `ContentCardState` check that rejects `"PUBLISHED"`, a real `FamilyServiceLeadStatus` check, the
   ported copy-quality gate on description fields, an https-URL sanity check on image fields, and
-  one-directional `qualityStatus`/`visibility` values on `providers`) — see
-  `src/lib/delivery/cardBridgeRegistry.ts` and `cardBridgeWrite.ts` for the exact current rules, and
-  `docs/card-improvement-process.md` for when each outcome is the right call.
+  one-directional `qualityStatus`/`visibility` values on both `providers` and `meetupGroups`) — see
+  `src/lib/delivery/cardBridgeRegistry.ts` and `cardBridgeWrite.ts` for the exact current rules (the
+  registry's writable-fields list is the living source of truth — it has grown well past the fields
+  listed anywhere in prose, including here), and `docs/card-improvement-process.md` for when each
+  outcome is the right call.
 - A `serviceLeads` write never lets the caller set `visibility` or `blockers` directly — both are
   always re-derived from the ported `normalizeFamilyServiceLead`/`validateFamilyServiceLead`, and the
   write cascades into `servicePlaceFacts` (and, when eligible, `serviceReviewPackets`) automatically.

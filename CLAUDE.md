@@ -72,6 +72,20 @@ in a comment when you add one, the way the existing ports do.
   validation, the way `category`, `state`, `status`, `qualityStatus`/`visibility`, and the copy fields
   all do), and **audited** (`cardBridgeAuditLog`, every applied write, with the before-image). Follow
   this pattern for any new writable field or collection — don't add a bare passthrough field.
+  `cardBridgeRegistry.ts` is the living source of truth for exactly which fields are writable today —
+  it has grown a lot (started with the copy/category fields; a single day of real card reviews added
+  `address`, `neighborhood`, `phone`, `activityTypes`, `borough`, `programType` on `providers` and
+  `qualityStatus`/`visibility` on `meetupGroups`, each one driven by a real defect the bridge couldn't
+  otherwise fix) — read the file itself, don't trust a field list written down anywhere else, including
+  this one.
+- **When you find a bug or a gap while reviewing cards, fix it at every layer it actually touches, not
+  just the one in front of you** — code (this bridge's registry/write validation, or the main app's
+  pipeline if the bug lives there), the SOP (`docs/card-improvement-process.md` — this is the part that
+  has held up consistently), AND this file plus `README.md` if the change is the kind of thing a future
+  agent would otherwise have to re-discover the hard way. That last part slipped for a real stretch this
+  session — several registry widenings and a runaway-loop bug (see below) landed in the SOP and the code
+  but not here, until asked directly whether that was actually happening. It wasn't, consistently. Treat
+  "did I update the onboarding docs too" as a real question to ask on every fix, not an afterthought.
 - **Tests**: plain Vitest (`describe`/`it`/`expect`, `@/` alias to `src`), `npm test`. Pure logic
   (validators, derivations, allow-list checks) is unit-tested directly; DB-touching code
   (`cardBridgeClient.ts`, the `db.collection(...).updateOne(...)` calls) is not mocked anywhere in this
@@ -86,6 +100,34 @@ in a comment when you add one, the way the existing ports do.
 - **Commits**: plain, descriptive, no AI-attribution footers/co-author trailers/model names — matches
   the main `classscout` repo's explicit owner directive; there's no reason for this sibling repo to
   differ.
+
+## Hard-won lessons from actually running the review loop (2026-08-07)
+
+- **A provider or meetup group can belong to a non-NYC city tenant** (`city: "la"`, absent = the "nyc"
+  default) with its own region/neighborhood vocabulary entirely distinct from NYC boroughs (LA uses
+  `"Central LA"`/`"Harbor"`, not `"Manhattan"`/`"Brooklyn"`). An unfamiliar-looking `borough` value is NOT
+  automatically a bug — check `city` first, then judge the region against THAT city's own geography (in
+  the main `classscout` repo, `src/data/laLocations.ts` for LA), not NYC boroughs. Real case:
+  `prov-angels-gate-cultural-center-san-pedro` looked like an out-of-scope LA record on an NYC platform;
+  it was actually a legitimate LA-tenant record with the wrong LA region.
+- **Bulk operations need a real stopping condition, and "fetch oldest N, touch, repeat until empty" is
+  NOT one.** Touching a record only refreshes its `updatedAt` — it never removes the record from
+  matching the same query again, so that loop never naturally terminates on real data. A first attempt
+  at bulk-deprioritizing every non-Classes/Camps record looped ~5,100 times against a 70-document
+  `meetupGroups` collection before being caught and killed manually. The fix: track every ID touched
+  *this run* in a Set, stop the moment a fetched batch contains nothing not already in that set, and add
+  a hard numeric safety cap regardless of how correct the logic looks. Full writeup, including the
+  filter-by-exact-category variant that avoids the problem more often:
+  `docs/card-improvement-process.md`'s "Bulk operations" section.
+- **A write payload with an apostrophe is a real hazard through an inline shell string.** `curl -d
+  '{"description": "..."}'` makes it easy to silently drop an apostrophe while escaping around the outer
+  shell quotes (happened live: "Prospect Parks" instead of "Prospect Park's", caught only because the
+  dry-run output was actually read). Write the JSON body to a file and use `curl --data @file.json`
+  instead — no shell-quoting interaction with the payload's own content.
+- **`incompleteFields: []` (or an empty array like `ageRanges: []`) is not proof a record is actually
+  complete.** It recurred across multiple real cards in one batch — a false "nothing missing" signal
+  sitting right next to a real, findable gap. Don't skip step 2's field-by-field read just because the
+  emptiness check looks clean.
 
 ## Before you write anything real
 
