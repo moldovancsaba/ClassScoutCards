@@ -2034,6 +2034,56 @@ a future split pass. Contrast with Sylvan Learning in the same batch, where exac
 location existed, making a correction (rather than a quarantine) the honest call. **The distinction that
 decides between correcting and quarantining is whether the research yields exactly one real answer.**
 
+### Batch 22/10 (cards 211-220)
+
+| Card | Finding | Action |
+|---|---|---|
+| Riverside Hawks Youth Basketball | Real 60+ yr nonprofit (Riverside Church Stone Gym, 84 Claremont Ave); its "UWS / Harlem" label is honest for Morningside Heights | Blocker cleared, kept **canonical** |
+| Yorkville Youth Soccer | Real 50+ yr nonprofit, confirmed 415 E 90th St matches card | Blocker cleared |
+| Jalopy Theatre School of Music | Real venue, confirmed 315 Columbia St matches card's Columbia Street Waterfront label | Blocker cleared |
+| Collina Italiana Kids Italian | Real, confirmed 1556 Third Ave (UES) matches card — **same building as Planet Han UES; verified NOT a duplicate** | Blocker cleared |
+| Riverside Hawks | **8th duplicate-content-card instance** (same org/domain as the canonical card above) | → `BLOCKED_TERMINAL` |
+| VITAL Climbing Gym Brooklyn Youth | Already `PUBLISHED`, correct | Touch only |
+| Tutu School UES | **6th real-brand-fake-location instance** — Tutu's only Manhattan studio is Tribeca | → `QUARANTINED` |
+| EBL Coaching Manhattan | Already `PUBLISHED`, correct | Touch only |
+| Prospect Park Zoo Education | Real WCS zoo with genuine education programming | Blocker cleared |
+| Concurs De Matematica Online - Upper School | **NEW pattern** — a Romanian online-only math competition, live `PUBLISHED` with zero blockers | → `QUARANTINED` |
+
+**New pattern this batch: an NYC neighborhood hallucinated out of a brand/domain token that merely
+resembles a place name.** "Concurs De Matematica Online - Upper School" was live and `PUBLISHED` with zero
+blockers, labelled Manhattan / **Upper West Side** — but it is a free ONLINE math competition for grades
+II–VIII run by the Upper Education Foundation in **Romania**, held entirely on the `app.upper.school`
+platform. It fails three checks simultaneously: the reality check (not an NYC activity), the physical-only
+rule (online-only, no venue anywhere), and the out-of-market rule (Romania). The tell for the root cause is
+the location itself: the fabricated "Upper West Side" almost certainly came from the token **"Upper"** in
+the source's own domain, `upper.school` — a neighborhood invented from a brand string that happens to share
+a word with an NYC place name, rather than from any location evidence. This is distinct from the
+already-documented "byte-identical wrong default value" signal (East New York): that one repeats the *same*
+wrong value across unrelated cards, whereas this one derives a *card-specific* wrong value from the card's
+own name. Both are location fabrication, but they'd need different fixes upstream.
+
+**Second new finding: a targeted sweep is cheap and it works — and it exposed a whole record class.**
+Having flagged three fabricated Tutu School locations across two batches, a sweep by
+`filter={"sourceHost":"tutuschool.com"}` (simple equality on any read-projection field — supported by
+`/api/card-bridge/rows`, and much faster than waiting for the oldest-first queue to surface them) returned
+25 rows and immediately found **two more live `PUBLISHED` Tutu School cards** (a 4th fabricated location,
+"Tutu School UWS", and a generic "Tutu School Brooklyn" multi-location card). It also surfaced something
+not previously documented anywhere in this repo: **the `contentCards` collection contains synthetic
+`repair-*` records — one per (parent card × blocker code)** — e.g.
+`repair-3e3b3eae96f3372b4e51eb26-missing_age_range`. They carry the parent's title with a `: <blockerCode>`
+suffix, inherit the parent's `boroughGuess`/`neighborhoodGuess` (including fabricated ones), and are all
+`BLOCKED_TERMINAL`. **22 of the 25 rows for this single domain were `repair-*` records, not real cards.**
+They are not visitor-facing, so this is not a safety issue — but it materially changes what "a card" means
+when counting this collection, and anyone reading `contentCards` totals (including the stats page) should
+know most rows for a busy domain may be these. Recorded here rather than acted on; see the recommendation
+below.
+
+**Recommendation (main app, read-only from here)**: `repair-*` records appear to be pipeline-internal
+repair tasks modelled as content cards in the same collection as real ones. Consider either a distinct
+`kind` value or a separate collection, so that consumers counting or sampling `contentCards` don't
+silently include them. This bridge deliberately makes no change — per the READ-ONLY convention, it is a
+written recommendation for whoever owns `classscout`.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -2516,3 +2566,14 @@ decides between correcting and quarantining is whether the research yields exact
   operating rule that distinguishes correcting from quarantining in that pattern: correct when research
   yields exactly ONE real answer (Sylvan Learning, same batch), quarantine when it yields zero or several
   equally-plausible ones (both Tutu School cards). See "Batch 21/10..." above.
+- v66 (2026-08-07): batch 22/10 (cards 211-220) complete. 5 real entities corrected (stale
+  `low_source_trust` blockers cleared), 2 already-correct cards touched, 1 marked `BLOCKED_TERMINAL` as an
+  8th duplicate-content-card instance (Riverside Hawks), 2 quarantined. New pattern: an NYC neighborhood
+  hallucinated out of a brand/domain token that merely resembles a place name — a Romanian ONLINE-only math
+  competition (`upper.school`) was live `PUBLISHED` with zero blockers and labelled "Upper West Side",
+  apparently from the word "Upper" in its own domain; distinct from the byte-identical-default-value signal
+  because the wrong value is derived per-card rather than repeated across cards. Also demonstrated that a
+  targeted `filter={"sourceHost":...}` sweep is cheap and effective: it found 2 more live Tutu School cards
+  the oldest-first queue had not yet reached, and revealed that `contentCards` contains synthetic `repair-*`
+  records (one per parent card x blocker code) which made up 22 of 25 rows for that domain — recorded with
+  a recommendation for the main app. See "Batch 22/10..." above.
