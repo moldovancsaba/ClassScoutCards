@@ -1929,6 +1929,43 @@ No new pattern this batch — all findings are instances of already-documented c
 `low_source_trust` clearing, host-site delivery, search-engine-link-as-source, neighborhood-precision
 enrichment).
 
+### Batch 19/10 (cards 181-190)
+
+| Card | Finding | Action |
+|---|---|---|
+| Uws & Midtown Nyc Family Events | Real, confirmed active family-events resource; stale `low_source_trust` | Blocker cleared |
+| Brooklyn Bridge Park | Real, well-known NYC park; stale `low_source_trust` | Blocker cleared, genuine `missing_age_range` gap retained |
+| Aviator Sports Youth Programs | Already `PUBLISHED`, correct | Touch only |
+| Brooklyn Brainery Kids / Family Workshops | Real venue, confirmed address matches card; stale `low_source_trust` | Blocker cleared |
+| Vitor Shaolin's Brazilian Jiu Jitsu | Already `PUBLISHED`, correct | Touch only |
+| Brooklyn Clay Industries Kids Workshops | Already `PUBLISHED`, correct | Touch only |
+| Color Me Mine Bay Ridge | **3rd confirmed real-brand-fake-specific-location instance**: real franchise, but no Bay Ridge location found anywhere (real NYC locations are Tribeca, UWS, Baxter St) | → `QUARANTINED` |
+| Downtown United Soccer Club | Real, well-established nonprofit (since 1982), confirmed at Pier 40 matching card; stale `low_source_trust` | Blocker cleared |
+| "Psychology Today" | **NEW pattern**: sourceUrl is the directory site's own multi-result category SEARCH PAGE, not any single business — card title is literally the directory site's own name | → `BLOCKED_TERMINAL` (no repair possible) |
+| Postpartum Resource Center of New York | **Related new finding**: real statewide nonprofit, but headquartered in West Islip, Long Island — "East New York" (this card's neighborhoodGuess) has no connection to it at all; its own source page is itself a referral directory to other providers, and its support groups rotate across venues statewide with no fixed NYC location | → `QUARANTINED` |
+
+**New pattern this batch: a directory/media site's own search-results page can be scraped and mistaken for
+a single business.** "Psychology Today"'s card came from `psychologytoday.com/us/groups/ny/brooklyn?category=pregnancy-prenatal-postpartum`
+— a CATEGORY SEARCH page listing many unrelated therapist/group results, not any one entity. The card's own
+title ("Psychology Today") is the tell: it's literally the directory site's own brand name, proof no
+singular real business was ever identified during discovery. This is a step further than the
+already-documented "real entity behind a bad source pick" case (CLAUDE.md's physical-only-providers
+section, e.g. a `psychologytoday.com` page for one specific real therapist) — there, a real business sits
+behind a bad source choice and can be found with a better source; here, the source itself never named any
+one business, so there is nothing to repair. Marked `BLOCKED_TERMINAL`, not `QUARANTINED`, since no future
+re-research could fix it.
+
+**Related finding, same discovery run**: this "Psychology Today" card and the immediately-adjacent
+"Postpartum Resource Center of New York" card share the identical `latestRunId`
+(`run-b8m2jrt5-1782009599981`), identical `createdAt`/`updatedAt` timestamps, and the byte-identical
+`neighborhoodGuess: "East New York"` — despite describing two completely unrelated organizations (one not
+even a real single entity, the other a real Long Island nonprofit with no Brooklyn connection at all).
+"East New York" also turned up as the wrong neighborhood on an unrelated card in batch 16 (The Canopy NYC,
+a Williamsburg business). Worth flagging as a possible run-level or default-value bug — several
+byte-identical wrong location values across unrelated cards is a different failure signature than an
+individually-wrong-but-plausible guess, and may indicate a specific discovery run or fallback path is worth
+a targeted sweep rather than treating each occurrence as an independent coincidence.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -2385,3 +2422,14 @@ enrichment).
 - v62 (2026-08-07): batch 18/10 (cards 171-180) complete. 6 real entities corrected (4 stale
   `low_source_trust` blockers cleared, 2 new `BLOCKED_REPAIRABLE` fixes for search-engine-link-sourced
   cards), 4 already-correct cards touched. No new pattern. See "Batch 18/10..." above.
+- v63 (2026-08-07): batch 19/10 (cards 181-190) complete. 4 stale `low_source_trust` blockers cleared, 3
+  already-correct cards touched, 3 cards quarantined/terminated on reality-check failures. New pattern: a
+  directory site's own multi-result search-results page (not a page for any single business) can be
+  scraped and mistaken for one entity — "Psychology Today"'s card came from a Psychology Today category
+  search URL, with the card's own title literally being the directory site's brand name; marked
+  `BLOCKED_TERMINAL` since no repair is possible. Related finding: that card and an adjacent one
+  (Postpartum Resource Center of New York, a real but wrongly-located Long Island nonprofit) share an
+  identical `latestRunId` and a byte-identical wrong `neighborhoodGuess` ("East New York" — also seen on an
+  unrelated batch-16 card), suggesting a possible run-level or default-value bug worth a targeted sweep.
+  Also a 3rd confirmed real-brand-fake-specific-location instance (Color Me Mine Bay Ridge — no such
+  location exists). Added a matching CLAUDE.md "Hard-won lessons" bullet. See "Batch 19/10..." above.
