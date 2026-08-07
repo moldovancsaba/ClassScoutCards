@@ -125,15 +125,21 @@ export const BRIDGE_REGISTRY: Record<BridgeCollectionKey, BridgeCollectionConfig
       lastReviewedBy: 1,
       updatedAt: 1,
       publishedAt: 1,
-      // Read-only research fields (2026-08-07 finding, same class of gap as meetupGroups.website): the
-      // real Provider type has address/website/phone/email/sourceUrls, but none were exposed here,
-      // forcing a review to guess an org's identity from garbage scraped copy instead of going straight
-      // to its own source/contact info. Not in writableFields — this bridge doesn't touch contact fields.
+      // Research fields (2026-08-07 finding, same class of gap as meetupGroups.website): the real
+      // Provider type has address/website/phone/email/sourceUrls, but none were exposed here, forcing a
+      // review to guess an org's identity from garbage scraped copy instead of going straight to its own
+      // source/contact info. address/phone/activityTypes are now also writable (see below); website/
+      // email/sourceUrls stay read-only — this bridge doesn't touch a provider's own contact links.
       address: 1,
       website: 1,
       phone: 1,
       email: 1,
       sourceUrls: 1,
+      // Read-only (2026-08-07 finding): a provider can belong to a non-NYC city tenant (issue 472 —
+      // absent means the "nyc" default) with its own region/neighborhood vocabulary entirely distinct
+      // from NYC boroughs (e.g. LA's "Central LA"/"Harbor" instead of "Manhattan"/"Brooklyn") — without
+      // seeing this field, a non-NYC borough value looks like a data-quality bug when it may not be one.
+      city: 1,
     },
     // qualityStatus/visibility are the DEFENSIVE direction only — this bridge can quarantine/hide an
     // already-published record found to be bad on re-review, but (unlike serviceLeads' public-status
