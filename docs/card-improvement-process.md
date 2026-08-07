@@ -288,27 +288,37 @@ code fix" for a pattern you can show the CURRENT logic would still produce, the 
 
 ## A fabricated business identity: the record's name matches nothing real (found 2026-08-07)
 
-A distinct pattern from both wrong-entity-kind and aggregator sources — the record's every field
-(address, phone, website) traces conclusively to ONE real, verifiable entity, but that entity's real
-name is different from what's stored, and the stored name implies an activity the real entity does not
-itself offer. Real case: `prov-big-apple-swim-school-brooklyn`. Address (2937 86th Street), phone
-((718) 333-0300), and website (bigappleacademy.com) all corroborate (Yelp, PropertyShark, the site
-itself) to **Big Apple Academy**, a full-time private PreK–Grade 8 school — which explicitly has no
-in-house swim program; swimming is provided through an unrelated external partner, Dolphin Swimming
-School, listed under the school's own "Our Partners" page. The stored name conflates the school's real
-details with an activity type it doesn't offer.
+Two real cases, two different sub-patterns — both quarantined, both worth recognizing on sight.
+
+**Sub-pattern A — real facts belong to a different, unrelated real entity.** `prov-big-apple-swim-school-
+brooklyn`: address (2937 86th Street), phone ((718) 333-0300), and website (bigappleacademy.com) all
+corroborate (Yelp, PropertyShark, the site itself) to **Big Apple Academy**, a full-time private
+PreK–Grade 8 school — which explicitly has no in-house swim program; swimming is provided through an
+unrelated external partner, Dolphin Swimming School, listed under the school's own "Our Partners" page.
+The stored name conflates the school's real details with an activity type it doesn't offer.
+
+**Sub-pattern B — the record's own NAME mashes together two unrelated real organizations.**
+`prov-edgies-teen-center-shorefront-y-kids-programs`: "Edgies Teen Center" is a Lower East Side
+MANHATTAN program (Manny Cantor Center, 197 East Broadway) — confirmed by every real fact actually
+present on the record (website, email, all sourceUrls, the entire description). "Shorefront Y Kids
+Programs" is a completely different, unrelated Brooklyn org (Shorefront YM-YWHA, 3300 Coney Island
+Avenue) with zero shared facts anywhere. The record's stored borough/address reflected Shorefront Y's
+location while every other field was 100% Edgies Teen Center's real content — the location fields and
+the content fields describe two different real businesses, not one entity under a wrong name.
 
 **Recognizing it**: don't stop verifying once address/phone/website all corroborate each other — also
 confirm the corroborated entity's real name and real offerings actually match what the record's `name`
-and `activityTypes` claim. A record can have 100% internally-consistent, real contact details and still
-have a fabricated identity if those details belong to a *different* real business than the one implied by
-its own name.
+claims (sub-pattern A), AND cross-check whether the record's OWN location fields (borough/address) match
+the org that its OWN content fields (description/website/sourceUrls) are actually about (sub-pattern B).
+A record can have 100% internally-consistent-LOOKING data and still be a fabricated identity if the
+consistency is between the wrong pairs of fields.
 
-**Handling it**: quarantine (Decision Matrix C) — this bridge cannot rename a record to the entity its
-own facts actually belong to, and even if it could, a full-time private day school is the wrong entity
-kind for this platform's supplemental-activity categories regardless of the name. Recommend a fresh
-discovery pass under the real offering entity's real name (here, Dolphin Swimming School) if a card for
-that activity is wanted — don't salvage-by-renaming.
+**Handling it**: quarantine (Decision Matrix C) in both sub-patterns — this bridge cannot rename a
+record to the entity its own facts belong to (A), nor split a conflated record into two separate real
+orgs (B). Recommend fresh discovery passes under each org's own correct name/location as follow-up —
+for sub-pattern B, name BOTH real destinations explicitly (the correctly-located one may be largely
+reusable from the existing content; the other needs a fully fresh pass since nothing about it survives
+in the record at all).
 
 ## Repeated site-extraction defects across sibling records under one source domain (found 2026-08-07)
 
@@ -488,6 +498,30 @@ that just produces two diverging descriptions of one real camp. Quarantine the n
 duplicate, keep the better-scoped one as canonical (enrich that one, if not already done), and recommend
 the core team dedupe the pair and check whether the discovery pipeline is generally capable of treating
 two pages on the same domain as two separate businesses — this may not be a one-off.
+
+## Template/webbuilder placeholder values in contact fields, not just description text (found 2026-08-07)
+
+Real case: `prov-champions-martial-arts-brooklyn` had `phone: "555-555-5555"` (the universal fictional
+phone number) and `email: "mymail@mailservice.com"` (a generic webbuilder default). Distinct from the
+`"no category"` string placeholder (which is obviously a system-internal default) — these look
+superficially like real contact info at a glance, because they're formatted like a real phone/email,
+just with template/placeholder VALUES. Both fields were also read-only through this bridge until this
+case surfaced the gap (see `providers.email`/`providers.name` additions this session).
+
+**Recognizing it**: `555-555-5555` (or similar all-repeated-digit patterns) and generic
+`mymail@`/`youremail@`/`example@` style addresses are webbuilder template defaults, not real scraped
+contact info — treat them exactly like a placeholder string: verify a real replacement via search, or
+clear the field entirely if none is found, never leave the fake value in place.
+
+## Redundant near-duplicate values wasting the activityTypes cap (found 2026-08-07)
+
+Real case: `prov-dna-learning-center-science-camps-brooklyn` had `activityTypes: ["STEM / Science", "STEM",
+"Science"]` — three different strings for the same one real concept, filling all 3 cap slots without
+adding any real information. Distinct from the recurring off-topic-contamination pattern (Music/Art/etc.
+appearing on unrelated records) — this is on-topic but redundant.
+
+**Handling it**: consolidate to the single clean value before applying the 3-item cap — don't let
+near-synonyms crowd out room for a second genuinely-distinct real activity the source also supports.
 
 ## Writing voice: specific and warm, never generic — this is a recommendation, not a listing (owner directive, 2026-08-07)
 
@@ -739,3 +773,14 @@ sending, dry-run or not.
   separate entities, apparently from two different pages on the same org's site. This bridge can't
   merge/delete, so the fix is quarantine-the-noisier-duplicate + recommend a core-team dedupe pass, not
   independently enriching both.
+- v20 (2026-08-07): during a 100-card mass-enrichment run: (1) extended the fabricated-identity section
+  with a second sub-pattern — a record's own NAME mashing together two unrelated real organizations,
+  with location fields describing one org and content fields describing the other
+  (`prov-edgies-teen-center-shorefront-y-kids-programs` — Manhattan's Edgies Teen Center content stored
+  under Brooklyn's Shorefront Y's location); (2) added "Template/webbuilder placeholder values in
+  contact fields" after finding `555-555-5555`/`mymail@mailservice.com` stored as real phone/email
+  (widened `providers.email` to writable to allow fixing this, alongside the already-added `.name`);
+  (3) added "Redundant near-duplicate values wasting the activityTypes cap" after finding three
+  same-concept strings (`"STEM / Science"`, `"STEM"`, `"Science"`) filling all 3 cap slots. The shared-
+  placeholder-geo count also reached six confirmed instances and the spurious-generic-activityType
+  pattern gained new off-topic values (`"Tutoring"`) beyond the already-documented Art/Music.
