@@ -357,6 +357,14 @@ in a comment when you add one, the way the existing ports do.
   independent search regardless, but the terminalReason should say the TLS issue is environment-side, not
   claim a site defect that was never actually confirmed. Check `openssl s_client ... | openssl x509 -noout
   -issuer` before writing "genuine current TLS misconfiguration" into a card's reasoning.
+- **A real, multi-location brand can have one card whose SPECIFIC claimed location is confirmed not to
+  exist, even while other cards for the same brand are correctly real.** Real case (100-card test, batch
+  9, 2026-08-07): "PLAYDAY NYC Tribeca" named a real children's art-studio brand (2 of its real locations
+  were already split into their own cards in an earlier batch) — but independent search confirmed PLAYDAY
+  never opened a Tribeca studio, or it has since closed; its actual 4 current studios are Upper West Side,
+  Park Slope, Cobble Hill, and Long Island City. Being right about the brand is not the same as being
+  right about the specific location a card claims — left `QUARANTINED` rather than assumed real just
+  because sibling cards for the same brand had already been fixed.
 
 ## Before you write anything real
 
