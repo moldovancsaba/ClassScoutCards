@@ -2359,7 +2359,7 @@ enrichment).
   — worse in degree than the already-documented generic-extraction-artifact pattern since the fragment
   isn't even a coherent word. Added a matching CLAUDE.md "Hard-won lessons" bullet. See "Batch 16/10..."
   above.
-- v61 (2026-08-07): batch 17/10 (cards 161-170) complete. 4 real entities corrected (2 stale
-  `low_source_trust` blockers cleared, 2 new `BLOCKED_REPAIRABLE` fixes with neighborhood enrichment), 6
+- v61 (2026-08-07): batch 17/10 (cards 161-170) complete. 5 real entities corrected (2 stale
+  `low_source_trust` blockers cleared, 3 new `BLOCKED_REPAIRABLE` fixes with neighborhood enrichment), 5
   already-correct cards touched. No new pattern — all findings are instances of already-documented
   categories. See "Batch 17/10..." above.
