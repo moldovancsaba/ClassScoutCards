@@ -2483,6 +2483,29 @@ candidate instead. After the batch-32 reversal, the lesson applied here is the c
 dependence cuts both ways — the fix is not to call duplicates faster, but to only call them when the
 addresses actually match.**
 
+### Batch 35/10 (cards 342-351)
+
+6 stale `low_source_trust` blockers cleared (The Brotherhood Sister Sol, Anderson's Martial Arts Academy,
+Good Day Play Cafe, The Whitney Museum, Inwood Little League, Peter Stuyvesant Little League), 2
+already-correct cards touched (East Harlem Little League, Japan Society), and the **23rd duplicate**.
+
+**A batch-29 decision superseded — and this one is instructive about a specific failure mode.** Batch 29
+found the 14th Street Y attached to a German travel page about Mount Rainier, correctly judged the entity
+real, and set it `BLOCKED_REPAIRABLE` with a note to **re-source** it. That reasoning was sound on the
+evidence then visible — but the correctly-sourced card already existed (`14streety.org`) and simply had not
+yet surfaced in the queue. **Acting on that plan would have created a duplicate rather than fixing
+anything.** The properly-sourced card is now canonical and the travel-page one is terminal.
+
+That is the third order-dependence case in four batches (92NY reversal in 32, two next-batch siblings in
+33, this one). They share a structure worth stating: **"repair this card" and "this card is redundant" look
+identical when you can only see one card.** The remedy is not more care per card — it is checking for
+siblings *before* prescribing a repair. Concretely, before setting anything `BLOCKED_REPAIRABLE` with a
+re-source plan, query `filter={"normalizedTitle":"..."}`; it costs one request and would have caught this.
+
+**Process amendment for future passes**: when a card is real but mis-sourced, look up the business by
+`normalizedTitle` first. If a correctly-sourced sibling exists, the right action is `BLOCKED_TERMINAL`
+(duplicate), not `BLOCKED_REPAIRABLE` (re-source).
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -3092,3 +3115,11 @@ addresses actually match.**
   more than one NYC site, so collapsing them risked destroying a real location card -- recorded as a split
   candidate. Counterpart to the batch-32 reversal: only call a duplicate when the ADDRESSES match.
   See "Batch 34/10..." above.
+- v80 (2026-08-07): batch 35/10 (cards 342-351) complete. 6 stale `low_source_trust` blockers cleared, 2
+  already-correct cards touched, and a 23rd duplicate that SUPERSEDES the batch-29 call on the 14th Street
+  Y: that card (sourced to a German travel page about Mount Rainier) was set `BLOCKED_REPAIRABLE` with a
+  re-source plan, but the correctly-sourced `14streety.org` card already existed and had not yet surfaced --
+  so re-sourcing would have created a duplicate rather than fixed anything. Third order-dependence case in
+  four batches. Added a process amendment: when a card is real but mis-sourced, look the business up by
+  `normalizedTitle` BEFORE prescribing a re-source; if a correctly-sourced sibling exists the right action
+  is `BLOCKED_TERMINAL`, not `BLOCKED_REPAIRABLE`. See "Batch 35/10..." above.
