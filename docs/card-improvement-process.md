@@ -2124,6 +2124,31 @@ for a known brand name rather than reading the brand's actual location list. Tha
 `upper.school` finding in batch 22 (a location invented from a name) rather than of the stale-blocker cases.
 Two of the four were found only because of the targeted sweep, not the oldest-first queue.
 
+### Batch 24/10 (cards 231-240)
+
+| Card | Finding | Action |
+|---|---|---|
+| New York City Children's Theater | Real nonprofit children's theater company | Blocker cleared |
+| Brooklyn Music Factory | Real, confirmed 495 Carroll St (Gowanus) matches card | Blocker cleared |
+| Camp Broadway | Real long-running youth theatre program, host-site delivery at real Midtown venues | Blocker cleared |
+| Broadway Workshop | Real NYC youth musical-theatre training program in Midtown | Blocker cleared |
+| West Side Soccer League | Already `PUBLISHED`, correct | Touch only |
+| Bed-Stuy Sluggers Baseball League | Already `PUBLISHED`, correct | Touch only |
+| Discovery Programs | Already `PUBLISHED`, correct | Touch only |
+| Opus 118 Harlem School of Music | Already `PUBLISHED`, correct | Touch only |
+| Homage Skateboard Academy Kids | **11th duplicate instance** — same 83 3rd Ave facility as the batch-15 card, labelled with the adjacent neighborhood name | → `BLOCKED_TERMINAL` |
+| Bedford-Stuyvesant YMCA Youth Programs | **12th duplicate instance** — same branch as the batch-21 card | → `BLOCKED_TERMINAL` |
+
+**Useful variant of the duplicate pattern this batch: two cards carrying DIFFERENT neighborhood labels are
+not evidence of two locations when the street address is the same.** "Homage Skateboard Academy Kids"
+(Gowanus) and the batch-15 "Homage Skateboard Academy" (Boerum Hill) look like two locations at a glance —
+different neighborhoods, plausibly a second branch. They are one facility: 83 3rd Ave sits on the
+Boerum Hill/Gowanus boundary, and the business's own site says Boerum Hill while directories describe it as
+Gowanus/Boerum Hill. This is the mirror image of the already-documented negative control (two cards sharing
+a DOMAIN turning out to be genuinely distinct locations — Modern Martial Arts, batch 12): shared domain
+doesn't prove duplication, and differing neighborhood doesn't disprove it. **The street address is the
+thing to compare; neighborhood labels are too soft to decide either way.**
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -2627,3 +2652,10 @@ Two of the four were found only because of the targeted sweep, not the oldest-fi
   that one brand), and 2 marked terminal as the 9th and 10th duplicate-content-card instances (Kids at Art;
   Fastbreak Sports -- the first confirmed THREE-card cluster for a single business). See "Batch 23/10..."
   above.
+- v68 (2026-08-07): batch 24/10 (cards 231-240) complete. 4 real entities corrected (stale
+  `low_source_trust` blockers cleared), 4 already-correct cards touched, 2 marked terminal as the 11th and
+  12th duplicate-content-card instances (Homage Skateboard Academy, Bedford-Stuyvesant YMCA). Useful
+  refinement of the duplicate rule: differing neighborhood labels on two cards do NOT indicate two
+  locations when the street address is identical (Homage's single 83 3rd Ave facility sits on the
+  Boerum Hill/Gowanus line and is described both ways) -- compare street addresses, not neighborhood
+  labels, in either direction. See "Batch 24/10..." above.
