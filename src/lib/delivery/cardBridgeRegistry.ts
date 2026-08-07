@@ -146,6 +146,8 @@ export const BRIDGE_REGISTRY: Record<BridgeCollectionKey, BridgeCollectionConfig
       "categoryConfidence",
       "address",
       "neighborhood",
+      "phone",
+      "activityTypes",
       "shortDescription",
       "longDescription",
       "image",
