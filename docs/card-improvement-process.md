@@ -2422,6 +2422,27 @@ scoring needs recalibration or it should not gate publication on its own — cur
 review noise around real institutions like 92NY, the New-York Historical Society and the Brooklyn Botanic
 Garden.
 
+### Batch 32/10 (cards 312-321)
+
+8 stale `low_source_trust` blockers cleared on confirmed real entities — Lavender Blues, Barking Cat
+Studio, Brooklyn Basketball Academy, Berkeley Carroll Summer Programs, UrbanGlass (647 Fulton St), Ferox
+Ninja Park, Irish Arts Center (726 11th Ave), Hudson River Community Sailing (Pier 66 Boathouse). Plus a
+**20th duplicate**: "92NY Basketball" and "92NY May Center / Sports Programs" are the same institution, the
+same domain and the same address (1395 Lexington Ave) — the May Center *is* 92NY's sports facility, so
+basketball happens inside it.
+
+**A reversal worth stating plainly.** Batch 30 cleared "92NY Basketball" as a correct canonical card. That
+was decided before its broader sibling was visible in the queue, and it was wrong: per the batch-24 rule,
+**the street address decides duplication, not the program name.** This batch keeps the May Center card
+(which names the real facility and covers its youth sports programming as a whole) and marks 92NY
+Basketball terminal. Both `terminalReason` texts record the supersession explicitly rather than quietly
+reversing it, so a future reader sees the change and its reason.
+
+The general hazard this exposes: **reviewing one card at a time makes duplicate detection order-dependent.**
+Whichever sibling the queue serves first looks canonical, because nothing on the card itself reveals that
+another exists. A same-address check at review time — or the dedupe-at-creation fix recommended in batches
+26-27 — is what removes the guesswork; judgement applied card-by-card cannot.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -3005,3 +3026,12 @@ Garden.
   real and has never once flagged a genuinely fake one -- every fabricated card in this continuation was
   caught by the reality check instead. The blocker appears to fire on ordinary first-party business domains
   and is adding review noise rather than signal. See "Batch 31/10..." above.
+- v77 (2026-08-07): batch 32/10 (cards 312-321) complete. 8 stale `low_source_trust` blockers cleared on
+  confirmed real entities (Lavender Blues, Barking Cat Studio, Brooklyn Basketball Academy, Berkeley
+  Carroll, UrbanGlass, Ferox Ninja Park, Irish Arts Center, Hudson River Community Sailing) and a 20th
+  duplicate instance resolved. That duplicate REVERSES a batch-30 decision: "92NY Basketball" was cleared
+  as canonical before its broader same-address sibling ("92NY May Center / Sports Programs", 1395 Lexington
+  Ave) was visible; the May Center card is now canonical and the basketball card terminal, with both
+  reasons recording the supersession explicitly. Names the underlying hazard: reviewing one card at a time
+  makes duplicate detection order-dependent, since nothing on a card reveals that a sibling exists --
+  only a same-address check or dedupe-at-creation removes the guesswork. See "Batch 32/10..." above.
