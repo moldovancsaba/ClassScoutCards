@@ -20,9 +20,7 @@ Two things live in this one repo, and they are unrelated:
    `src/pages/api/history.ts`, `src/pages/api/cards/[id].ts`, `src/lib/generator/`,
    `src/lib/delivery/{ingestApi,mongoDirect}.ts`) — an older, separate feature: generates new activity
    cards and delivers them to the main app either via its ingest API or by writing directly into the
-   main app's `providers` collection. Not part of the card-bridge; don't conflate the two. It has 2
-   pre-existing failing tests (`cardGenerator.test.ts` — an en-dash/hyphen mismatch and a
-   warnings-count assertion) that predate the card-bridge work; they are not something you broke.
+   main app's `providers` collection. Not part of the card-bridge; don't conflate the two.
 
 ## The one fact that will cost you hours if you get it wrong
 

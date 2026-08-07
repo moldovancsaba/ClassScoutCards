@@ -132,7 +132,9 @@ export function generateCard(input: GenerateCardInput): GenerationResult {
     neighborhood: input.neighborhood ?? "",
     address: input.address ?? "",
     activityTypes: input.activityTypes ?? ["General"],
-    ageRanges: input.ageRanges ? input.ageRanges.filter((a) => normaliseAgeRange(a)) : [],
+    ageRanges: input.ageRanges
+      ? input.ageRanges.map((a) => normaliseAgeRange(a)).filter((a): a is AgeRange => Boolean(a))
+      : [],
     dayTimeTags: [],
     pricePerClass: parsePriceToNumber(input.price) ?? 0,
     priceText: input.price ?? undefined,

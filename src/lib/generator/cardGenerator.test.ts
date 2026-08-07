@@ -58,6 +58,9 @@ describe("generateCard", () => {
     const result = generateCard({
       name: "Brooklyn Dance Academy",
       source: "manual",
+      category: "Classes",
+      borough: "Brooklyn",
+      activityTypes: ["Dance"],
       description: "Short",
     });
 

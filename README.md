@@ -149,9 +149,7 @@ npm run dev   # starts on port 3001
 
 ```bash
 npm install
-npm test              # vitest — 2 pre-existing failures in cardGenerator.test.ts predate the
-                       # card-bridge work (an en-dash/hyphen mismatch, a warnings-count assertion);
-                       # not something you broke
+npm test              # vitest — all passing
 npm run build         # next build — also type-checks
 npm run dev           # port 3001
 ```
