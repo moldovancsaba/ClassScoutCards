@@ -414,10 +414,11 @@ itself.
 
 ## A spurious "Music" activityType recurring on unrelated sports records (found 2026-08-07)
 
-A literal `"Music"` entry appeared in `activityTypes` on THREE unrelated, otherwise-normal sports records
-this session: `prov-brooklyn-ayso` (a soccer league), `prov-brooklyn-pro-volleyball-academy` (a
-volleyball academy), and `prov-brooklyn-skyhawks-football` (a football/cheerleading program) — none has
-any music offering anywhere in its real source material. Unlike the `"no category"` placeholder (an
+A literal `"Music"` entry appeared in `activityTypes` on FIVE unrelated, otherwise-normal records this
+session: `prov-brooklyn-ayso` (a soccer league), `prov-brooklyn-pro-volleyball-academy` (a volleyball
+academy), `prov-brooklyn-skyhawks-football` (a football/cheerleading program), `prov-brooklyn-sports-club-
+swim-academy` (a swim school), and `prov-camp-half-blood-brooklyn` (a mythology-themed adventure camp) —
+none has any music offering anywhere in its real source material. Unlike the `"no category"` placeholder (an
 obviously-fake string), `"Music"` is a real, valid `activityType` value elsewhere, so it doesn't stand out
 as broken the way a placeholder does — it just quietly doesn't belong. Three unrelated instances is enough
 to suspect a systemic classification issue (e.g. a keyword/embedding match firing on unrelated source
@@ -444,6 +445,29 @@ as a real gap — widened alongside this finding (`serviceLeads.name` was alread
 the same capability to `providers`). Correct the name from source-confirmed real identity, the same
 evidentiary bar as any other field — never invent a name, and never "fix" a name by picking one bundled
 entity out of an aggregator page (that's the aggregator pattern above, not this one).
+
+## Extraction-failure text can leak directly into a stored content field (found 2026-08-07)
+
+Real case: `prov-camp-half-blood-brooklyn`. `longDescription` contained, verbatim, the LLM extraction
+prompt's own instruction text: `"Extract age or grade evidence from the official program page.."`. This
+is a different, more severe failure than the nav-menu-scrape-dump pattern documented above — that pattern
+is real (if messy) page content; this is not page content at all, it's the PROMPT that was supposed to
+produce a real answer, stored as if it were the answer. The same record's `shortDescription` showed a
+related but distinct failure: a raw Apache directory-listing page (`"Index of / Name Last modified
+Size..."`), meaning the scraper fetched the wrong URL entirely (likely a broken/misconfigured path)
+rather than the camp's real page.
+
+**Recognizing it**: watch for description text that reads like a template/meta-instruction rather than
+prose about the entity ("Extract X from Y", "Summarize the...", any second-person instruction voice) —
+this is qualitatively different from messy-but-real scraped chrome and should be treated as a full
+content-fields failure, not a copy-editing job.
+
+**Handling it**: rewrite from real, independently-verified source material exactly as any other bad
+description would be fixed — the underlying entity is usually still real and findable even when the
+stored extraction completely failed. Recommend the core team add a detection signature for this specific
+failure class (e.g. flag any stored description containing extraction-prompt phrasing like "extract" +
+"official program page", or containing directory-listing markers like "Index of /") since it indicates
+the pipeline should retry against a different URL/extraction path, not just that the copy needs editing.
 
 ## Writing voice: specific and warm, never generic — this is a recommendation, not a listing (owner directive, 2026-08-07)
 
@@ -683,3 +707,9 @@ sending, dry-run or not.
   real org, "Camp Orot" — added "A record's own `name` field can itself be an extraction defect" to
   document this as a distinct failure mode from wrong-entity-kind/fabricated-identity: the right real
   entity, just under a mangled name.
+- v18 (2026-08-07): the spurious-"Music" pattern reached five instances across unrelated records —
+  strengthened that section's example list. Added "Extraction-failure text can leak directly into a
+  stored content field" after a record's `longDescription` was found to literally contain the LLM
+  extraction prompt's own instruction text (not scraped page content at all), alongside a
+  `shortDescription` that was a raw Apache directory listing from the wrong URL — a more severe failure
+  than the nav-scrape-dump pattern, worth a distinct detection signature recommendation to the core team.
