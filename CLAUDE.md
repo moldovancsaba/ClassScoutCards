@@ -311,6 +311,18 @@ in a comment when you add one, the way the existing ports do.
   specific defects to check and want to spend spare review time well, a targeted sweep for `PUBLISHED`
   cards with clearly-generic/non-local `sourceHost`s is a better bet than re-checking already-solid
   records.
+- **A card's stored `sourceUrl` domain can be hijacked or squatted by entirely unrelated content after
+  the real business itself moves to a different domain/TLD — this is NOT the same failure as off-topic
+  contamination.** Real case (100-card test, batch 4, 2026-08-07): `urbandunes.com` (a real card's
+  sourceUrl) now serves an unrelated Dubai real-estate blog with zero connection to the original
+  business; independent search confirmed Urban Dunes (a real NYC indoor sandbox playground, 122 E 91st
+  St) is still real and operating, just now at `urbandunes.co` — a different TLD. Off-topic contamination
+  means the CARD's entity was never real; a pipeline-guessed-wrong-domain means the pipeline attached a
+  domain that never belonged to the business. This is a third, distinct case: the domain genuinely WAS
+  the business's real site at some point, then expired/changed hands and got repurposed. Judging by what
+  the stored sourceUrl currently resolves to would wrongly quarantine a real, currently-operating
+  business — always verify the entity itself via independent search before concluding "off-topic" from
+  domain content alone.
 
 ## Before you write anything real
 
