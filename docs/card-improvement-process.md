@@ -414,16 +414,36 @@ itself.
 
 ## A spurious "Music" activityType recurring on unrelated sports records (found 2026-08-07)
 
-A literal `"Music"` entry appeared in `activityTypes` on two unrelated, otherwise-normal sports records
-this session: `prov-brooklyn-ayso` (a soccer league) and `prov-brooklyn-pro-volleyball-academy` (a
-volleyball academy) — neither has any music offering anywhere in its real source material. Unlike the
-`"no category"` placeholder (an obviously-fake string), `"Music"` is a real, valid `activityType` value
-elsewhere, so it doesn't stand out as broken the way a placeholder does — it just quietly doesn't belong.
-Two unrelated instances is enough to suspect a systemic classification issue (e.g. a keyword/embedding
-match firing on unrelated source text), not two independent one-off scrape errors. **When reviewing
+A literal `"Music"` entry appeared in `activityTypes` on THREE unrelated, otherwise-normal sports records
+this session: `prov-brooklyn-ayso` (a soccer league), `prov-brooklyn-pro-volleyball-academy` (a
+volleyball academy), and `prov-brooklyn-skyhawks-football` (a football/cheerleading program) — none has
+any music offering anywhere in its real source material. Unlike the `"no category"` placeholder (an
+obviously-fake string), `"Music"` is a real, valid `activityType` value elsewhere, so it doesn't stand out
+as broken the way a placeholder does — it just quietly doesn't belong. Three unrelated instances is enough
+to suspect a systemic classification issue (e.g. a keyword/embedding match firing on unrelated source
+text), not independent one-off scrape errors. **When reviewing
 `activityTypes`, check every entry against what the source ACTUALLY describes, not just for obviously-fake
 placeholder strings** — a real-looking value can be just as wrong as a fake one. Flag a repeat of this
 specific pattern (`"Music"` on a non-music record) explicitly as a recurrence, not a fresh unrelated find.
+
+## A record's own `name` field can itself be an extraction defect (found 2026-08-07)
+
+Real case: `prov-camp`. The record's `name` was literally `"Camp"` — while its own `shortDescription`
+already said "Camp Orot is a Jewish Day Camp...". The extraction pipeline had correctly captured the real
+name inside the description text but failed to extract it into the `name` field itself, likely truncating
+on a generic word. This is a different failure mode from the wrong-entity-kind or fabricated-identity
+patterns above — the record IS the right real entity, just under a mangled name.
+
+**Recognizing it**: check whether `name` actually matches the entity described in the record's own
+`shortDescription`/`longDescription`/source text — don't assume `name` is trustworthy just because it's
+a short, plausible-looking string ("Camp" reads as a reasonable generic label, not obviously broken, the
+same way `activityTypes: ["no category"]` or a placeholder address stand out).
+
+**Handling it**: `providers.name` was NOT writable through this bridge until this exact case surfaced it
+as a real gap — widened alongside this finding (`serviceLeads.name` was already writable; this extends
+the same capability to `providers`). Correct the name from source-confirmed real identity, the same
+evidentiary bar as any other field — never invent a name, and never "fix" a name by picking one bundled
+entity out of an aggregator page (that's the aggregator pattern above, not this one).
 
 ## Writing voice: specific and warm, never generic — this is a recommendation, not a listing (owner directive, 2026-08-07)
 
@@ -658,3 +678,8 @@ sending, dry-run or not.
   spurious 'Music' activityType recurring on unrelated sports records" after finding it independently on
   a soccer league and a volleyball academy — a real-looking value can be wrong just as often as an
   obvious placeholder; check every `activityTypes` entry against the source, not just for fake strings.
+- v17 (2026-08-07): widened `providers.name` to writable (mirroring `serviceLeads.name`, already
+  writable) after finding a record literally named `"Camp"` whose own description already named the
+  real org, "Camp Orot" — added "A record's own `name` field can itself be an extraction defect" to
+  document this as a distinct failure mode from wrong-entity-kind/fabricated-identity: the right real
+  entity, just under a mangled name.
