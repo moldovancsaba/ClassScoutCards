@@ -338,6 +338,16 @@ in a comment when you add one, the way the existing ports do.
   other `BLOCKED_TERMINAL` as a duplicate rather than carrying two copies of the same facts through the
   pipeline. Distinct from the earlier card-vs-live-provider "superseded" pattern — here both records are
   pre-publish content cards, not one card versus one already-live provider.
+- **A named real organization turning up in search is not the same as this card being confirmed real.**
+  Real case (100-card test, batch 7, 2026-08-07): "Liberated Movement Kids prospect" named a genuine NYC
+  nonprofit ("Liberated Movement," donation-based dance classes) — but its studio closed months earlier,
+  it now operates out of rented space rather than its own venue, and nothing found connected it to "kids"
+  classes or to "Prospect" (the card's own neighborhood claim). Every other "real but blocked" case this
+  session (stale blocker, bot-block, network failure, wrong/hijacked domain) still had the SPECIFIC facts
+  on the card confirmable once you found the real business. Here they weren't. When the entity's own
+  current facts don't support the specific claims on the card, the reality check still fails — leave it
+  `QUARANTINED` and document what was found, don't move it forward just because a same-named organization
+  exists somewhere.
 
 ## Before you write anything real
 
