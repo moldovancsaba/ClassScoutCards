@@ -2084,6 +2084,46 @@ repair tasks modelled as content cards in the same collection as real ones. Cons
 silently include them. This bridge deliberately makes no change — per the READ-ONLY convention, it is a
 written recommendation for whoever owns `classscout`.
 
+### Batch 23/10 (cards 221-230) — including the second-ever production split
+
+| Card | Finding | Action |
+|---|---|---|
+| **Tutu School Brooklyn** | Real brand, 3 confirmed distinct real Brooklyn studios compressed into one "Brooklyn-wide" card | **`POST /split` → 3 real per-location cards**, parent → `BLOCKED_TERMINAL` |
+| Tutu School UWS | **7th real-brand-fake-location instance** (4th fabricated Tutu card); no UWS studio exists | → `QUARANTINED` |
+| Greenpoint YMCA Youth Programs | Real YMCA branch, confirmed Greenpoint address matches card | Blocker cleared |
+| Vivvi Dumbo | Real 9,102 sq ft childcare center, confirmed 55 Prospect St matches card | Blocker cleared |
+| Planet Han UWS | Already `PUBLISHED`, correct — the proper per-location card for one of the two Planet Han studios | Touch only |
+| Bridge For Dance | Already `PUBLISHED`, correct | Touch only |
+| Eastside Westside Music Together | Already `PUBLISHED`, correct | Touch only |
+| Manhattan Youth Tennis | Already `PUBLISHED`, correct | Touch only |
+| Fastbreak Sports | **10th duplicate instance — and the first THREE-card cluster** for one business | → `BLOCKED_TERMINAL` |
+| Kids at Art NYC | Real studio, confirmed 1412 Second Ave matches card | Kept **canonical** |
+| Kids at Art | **9th duplicate instance** (same domain/location as the card above) | → `BLOCKED_TERMINAL` |
+
+**Second-ever production use of `POST /api/card-bridge/split`** (the first was Tennis Innovators). "Tutu
+School Brooklyn" carried `neighborhoodGuess: "Brooklyn-wide"` while the franchise's own locations page lists
+three genuinely distinct real studios — Dumbo (100 Jay St, 11201), Boerum Hill (200 Smith St, 11201) and
+Park Slope (235 5th Ave, 11215). Each child was given its own verified-reachable location page
+(`/dumbo/`, `/boerumhill/`, `/parkslope/`, all HTTP 200) as its distinguishing `sourceUrl`, satisfying the
+split contract's one-real-source-per-child rule. Dry-run first, then applied: children
+`cc-f3e2b1710ab896d473fc0cad`, `cc-e3cbf195a4e121d49a6ac945`, `cc-ea750ad380b22b4c5e3bf24c`.
+
+**Confirmation the split hands children back to the real pipeline correctly**: the children are created in
+`state: "DISCOVERED"`, and on re-fetch minutes later "Tutu School Dumbo" had already advanced on its own to
+`PUBLISH_PREFLIGHT_READY` — i.e. the main app's own gate picked them up and is processing them, exactly the
+intended behaviour. This is the first time that hand-off has been directly observed end-to-end, and it is
+worth knowing: after a split, the children are the main app's to progress, not something this bridge should
+push further.
+
+**The Tutu School cluster, resolved.** Across batches 21–23 this single brand produced **four fabricated
+per-neighborhood cards** (Brooklyn Heights, Williamsburg, UES, UWS — none of which the franchise has) plus
+**one legitimate multi-location card** (the "Brooklyn-wide" one, now correctly split into its three real
+studios). Every fabricated one was live and `PUBLISHED`. Four fabrications and one real record for one brand
+is not four independent bad guesses — it reads as a discovery run enumerating plausible NYC neighborhoods
+for a known brand name rather than reading the brand's actual location list. That makes it a sibling of the
+`upper.school` finding in batch 22 (a location invented from a name) rather than of the stale-blocker cases.
+Two of the four were found only because of the targeted sweep, not the oldest-first queue.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -2577,3 +2617,13 @@ written recommendation for whoever owns `classscout`.
   the oldest-first queue had not yet reached, and revealed that `contentCards` contains synthetic `repair-*`
   records (one per parent card x blocker code) which made up 22 of 25 rows for that domain — recorded with
   a recommendation for the main app. See "Batch 22/10..." above.
+- v67 (2026-08-07): batch 23/10 (cards 221-230) complete, including the **second-ever production split**.
+  "Tutu School Brooklyn" (a generic "Brooklyn-wide" card) split via `POST /split` into its 3 confirmed real
+  studios (Dumbo, Boerum Hill, Park Slope), each with its own verified-reachable location page as its
+  distinguishing source; parent -> `BLOCKED_TERMINAL`. First direct end-to-end observation that split
+  children re-enter the main app's own pipeline: a child created in `DISCOVERED` had advanced itself to
+  `PUBLISH_PREFLIGHT_READY` on re-fetch. Also: 2 real entities corrected, 4 already-correct cards touched,
+  1 quarantined as the 7th real-brand-fake-location instance (Tutu School UWS, the 4th fabricated card for
+  that one brand), and 2 marked terminal as the 9th and 10th duplicate-content-card instances (Kids at Art;
+  Fastbreak Sports -- the first confirmed THREE-card cluster for a single business). See "Batch 23/10..."
+  above.
