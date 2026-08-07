@@ -1077,6 +1077,44 @@ reached yet.
 borough/neighborhood/category fields, move `state` to `QUARANTINED`, and write a `terminalReason` naming
 the real problem plainly, with `policy_or_safety_review` in `blockerCodes`.
 
+## A third confirmed instance of the zero-blocker off-topic-contamination gap: a manufacturer's e-commerce page (found 2026-08-07)
+
+The globally-oldest record in the pool (`cc-854c0e40e153afb2891ec461`, `updatedAt` 2026-06-20 — untouched
+since creation) was `title: "Replacement Parts - Step2"`, `state: "PUBLISHED"`, `blockerCodes:
+["low_source_trust"]`. Its `sourceUrl` is Step2's (a children's outdoor-toy/playset manufacturer) own
+e-commerce "Replacement Parts" checkout page — not a children's activity/class provider by any reading.
+`categoryHint: "Classes"` and `boroughGuess/neighborhoodGuess: Manhattan/Upper West Side` were both
+fabricated with no factual basis, same as every other case in this pattern family.
+
+**What makes this a third confirmed instance of "The worst-case off-topic-contamination outcome" (above),
+not just another aggregator case**: a cross-collection lookup found this content card had already
+produced a **live `providers` record**, `prov-replacement-parts-step2`, and that live record had **zero**
+`qualityStatus`/`visibility` set at all — fully public, no quarantine signal whatsoever. Its
+`shortDescription`/`longDescription` were scraped cart/checkout/nav chrome verbatim ("Subtotal $0.00 Taxes
+and shipping calculated at checkout... Secure Checkout... Splish, Splash & Relax..."), and its one
+"recurring program" (`Monday`/`Friday`, `8:00am - 5:00pm`) was Step2's own store hours, not a class
+schedule — a detail worth checking on its own: a "schedule" that's actually business hours is itself a
+signal the record isn't describing a real program at all. Unlike the Pakistani-university-LMS and
+British-Council cases above, the *contentCard* here did carry one blocker (`low_source_trust`) — but the
+live, family-facing `providers` record it produced carried none. **The blocker existing upstream on the
+content card is not proof the live record is protected** — this run's real evidence is that it wasn't.
+
+**Fix pattern applied (mirrors the two cases above, on both collections since a live record existed)**:
+- `contentCards`: `state` → `QUARANTINED`, `categoryHint`/`boroughGuess`/`neighborhoodGuess` cleared
+  (not left as false NYC location data), `blockerCodes` gained `policy_or_safety_review` alongside the
+  existing `low_source_trust`, `terminalReason` naming the real problem plainly
+  (`off_topic_source_not_a_provider: ...`).
+- `providers`: `qualityStatus: "quarantined"` + `visibility: "hidden"` (Decision Matrix C) — the live
+  record is now hidden from families, same one-directional action as every other providers quarantine.
+
+**Recommend to the core team, reinforcing the v33 finding**: this is now a *third* confirmed live/public
+instance of the same root gap (the two v33 cases plus this one), found simply by picking up the
+globally-oldest record in the pool — i.e., not from a targeted sweep, an ordinary loop iteration surfaced
+it. This raises confidence that the priority audit recommended in v33 (scan `PUBLISHED`/`active` records
+for `sourceHost`s that are generic e-commerce/informational/platform domains rather than an actual local
+entity's own site) would find more, and that relying on `blockerCodes` alone to gauge live-record safety
+is not sufficient — the content card's own blocker did not prevent this from publishing.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -1336,3 +1374,8 @@ the real problem plainly, with `policy_or_safety_review` in `blockerCodes`.
   above) — the first capability in this repo that inserts new documents rather than only updating
   existing ones, built to handle the multi-location, aggregator-multi-business, and
   independently-re-sourced-conflated-identity splitting scenarios all found during the 100-card run.
+- v35 (2026-08-07): a single ordinary loop iteration (pulling the true globally-oldest record, per step 1)
+  landed on a third confirmed instance of the v33 zero-blocker off-topic-contamination pattern — see "A
+  third confirmed instance..." above. Quarantined both the source `contentCards` record and the live
+  `providers` record it had already produced. Notable because it wasn't found by a targeted sweep; the
+  oldest-first queue surfaced it on its own, reinforcing that this gap is not rare.
