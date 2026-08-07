@@ -2182,6 +2182,60 @@ business?" and "is this a children's activity?" are two different questions, and
 while failing the second.** Quarantined rather than repaired: a confirmed Brooklyn studio running Prodigy
 would be a new, properly-located card, not a fix to this generic one.
 
+### Owner-reported defect: the literal "NO CATEGORY" chip on live cards (2026-08-07)
+
+**Owner directive: "Never add 'no category' even if no category."**
+
+**What it is.** `"no category"` is an ingestion-only placeholder constant in the main app
+(`extractionEngine.ts`'s `NO_CATEGORY_PLACEHOLDER`), seeded into `activityTypes`/`categoryHint` when
+discovery has no category hint. It is supposed to be stripped before display — the main app has a
+`stripActivityPlaceholder()` helper and an owner-reported fix dated 2026-08-01 that wired it into the read
+paths (`topActivityTypes`, `publicListReads`, `publicDetailReads`, `readServingListings`, `activityMatch`).
+
+**Why it still reached families, on two independent layers:**
+
+1. **It is genuinely STORED in live data, not just a display artifact.** A bridge query
+   (`filter={"activityTypes":"no category"}` on `providers`) found the literal string in **89 live provider
+   records**. So the placeholder was never only cosmetic.
+2. **Two main-app components render `provider.activityTypes` RAW, bypassing the normalization seam** —
+   `ProviderProfile.tsx:511` and `ProviderDetailRouteView.tsx:260` both do `provider.activityTypes.map(...)`
+   instead of going through `topActivityTypes()`. That is why the owner's screenshot shows **nine** activity
+   chips (the seam caps at 3) with `NO CATEGORY` among them: the card in the screenshot matches
+   `prov-aviator-sports-gymnastics`, whose stored array was exactly
+   `["Gymnastics","Sports","Outdoor Activities","Soccer","Basketball","no category","Art","Music"]`.
+   This is the same class of bug as the already-documented `MyAccountView.tsx` `activityTypes[0]` bypass —
+   now **three** confirmed sites that skip the seam.
+
+**What was fixed here (bridge side, all applied):**
+- `alignActivityTypes()` now strips the placeholder before doing anything else. This was load-bearing, not
+  cosmetic: the placeholder often sat at index 0, and when a title matched no activity label the function
+  fell through to `candidates[0]` and **promoted `"no category"` to `primaryActivityType`** — worse than the
+  mixed-category bug the module was built to fix.
+- **Absolute boundary rule** in `validateWriteRequest`: no write through this bridge may put the placeholder
+  into `category`, `categoryHint`, `primaryActivityType` or `activityTypes`, on any collection,
+  case/whitespace-insensitive. When there is genuinely no category the correct value is **absent**, never a
+  placeholder standing in for one.
+- **Ported the main app's `ACTIVITY_KEYWORDS` regexes** for title matching. Removing the placeholder from
+  slot 0 exposed the weakness underneath it: exact-substring title matching missed how listings actually
+  name themselves, so "Park Slope Academy **Jiu Jitsu** Kids" became `Art` and "Take Me to the **Water**"
+  became `Art`. With the ported patterns they resolve to `Martial Arts` and `Swimming`. Title keywords can
+  only ever *reorder* activities the listing already carries — they never invent a tag.
+- **Cleaned all 89 live provider records** (bounded loop: seen-set + stop-when-no-new + 40-round hard cap,
+  per the runaway-loop convention). Verified 0 remaining in both `activityTypes` and `primaryActivityType`.
+
+**Still outstanding**: `contentCards.categoryHint` still carries the placeholder, but every sampled record
+is a synthetic `repair-*` row in `BLOCKED_TERMINAL` (see batch 22) — pipeline-internal and not
+visitor-facing, so no family sees it.
+
+**Recommendation (main app, read-only from here)** — two one-line-ish fixes:
+1. `ProviderProfile.tsx:511` and `ProviderDetailRouteView.tsx:260` should render
+   `topActivityTypes(provider)` rather than `provider.activityTypes`, matching every other surface. That
+   alone fixes both the chip count (9 → 3) and the placeholder leak on the detail/profile pages.
+2. Better still, stop seeding the placeholder at ingestion: `inferCategory()` returns
+   `fallback || NO_CATEGORY_PLACEHOLDER`, so absence is represented by a magic string that then has to be
+   stripped by every consumer forever. Returning `undefined` and letting the field be absent removes the
+   whole class of bug.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -2699,3 +2753,15 @@ would be a new, properly-located card, not a fix to this generic one.
   sub-pattern: a real, reputable brand that simply is not a children's activity -- F45 Training's studios
   are 18+ per its own documentation, and the card named no studio and no real address, so "is it real?" and
   "is it for children?" separated for the first time as independent checks. See "Batch 25/10..." above.
+- v70 (2026-08-07, owner-reported defect): fixed the literal "NO CATEGORY" chip appearing on live cards.
+  Confirmed it was STORED in 89 live `providers.activityTypes` records, not merely a display artifact, and
+  traced the display half to two main-app components rendering `provider.activityTypes` raw instead of via
+  `topActivityTypes()` (a third confirmed instance of the normalization-seam bypass). Bridge-side:
+  `alignActivityTypes()` now strips the placeholder first (it could previously be PROMOTED to
+  `primaryActivityType`); a new absolute boundary rule in `validateWriteRequest` rejects it in `category`,
+  `categoryHint`, `primaryActivityType` and `activityTypes` on every collection (owner directive: "never
+  add 'no category' even if no category"); and the main app's `ACTIVITY_KEYWORDS` regexes were ported for
+  title matching after the strip exposed that exact-substring matching mis-resolved real listings ("Jiu
+  Jitsu" -> Art, "Water" -> Art; now Martial Arts and Swimming). All 89 records cleaned via a bounded loop;
+  0 remain. 8 new unit tests (153 total passing). Recommendation recorded for the main app. See the
+  "Owner-reported defect..." section above.

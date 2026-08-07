@@ -96,6 +96,36 @@ applies to whatever fields DO exist (`title`, `categoryHint`, `boroughGuess`/`ne
 `terminalReason`) and to recording every real fact found in `terminalReason`/`reason` text so a future
 enrichment pass on the live `providers` record doesn't have to re-research from scratch.
 
+## Never write "no category" — absence is a value, a placeholder is not (owner directive, 2026-08-07)
+
+**"Never add 'no category' even if no category."** `"no category"` is an ingestion-only placeholder from
+the main app (`extractionEngine.ts`'s `NO_CATEGORY_PLACEHOLDER`), seeded when discovery has no category
+hint and meant to be stripped before display. It was not: the literal string was found **stored in 89 live
+`providers.activityTypes` records**, and rendered on real public cards as a `NO CATEGORY` chip (owner
+screenshot). When there is genuinely no category, the correct representation is the field being **absent** —
+never a magic string standing in for one, because every consumer then has to remember to strip it, and the
+day one forgets, a family sees "NO CATEGORY" on a card about their child's activity.
+
+This is enforced, not conventional:
+- `validateWriteRequest` (`cardBridgeWrite.ts`) **rejects** the placeholder in `category`, `categoryHint`,
+  `primaryActivityType` and `activityTypes`, on every collection, case/whitespace-insensitive.
+- `alignActivityTypes` (`activityAlignment.ts`) strips it before deriving anything. This is load-bearing:
+  the placeholder usually sat at index 0, so when a title matched no activity label the old code fell
+  through to `candidates[0]` and **promoted `"no category"` to the primary activity**.
+- All 89 polluted live records were cleaned (bounded loop, verified 0 remaining).
+
+Two lessons generalize beyond this one string. **First: a "display-only" bug is worth checking against the
+stored data before believing it.** The 2026-08-01 fix in the main app added stripping to the read paths,
+which made this look handled; it wasn't, because the data itself was polluted and two components
+(`ProviderProfile.tsx`, `ProviderDetailRouteView.tsx`) render `provider.activityTypes` raw, bypassing the
+`topActivityTypes()` normalization seam entirely — a third confirmed instance of that bypass after
+`MyAccountView.tsx`. **Second: removing a bad value can expose a worse one underneath.** Stripping the
+placeholder from slot 0 promoted whatever sat second — usually "Art" — so a jiu jitsu academy and a swim
+school both became Art cards. The real fix was porting the main app's own `ACTIVITY_KEYWORDS` regexes so
+title matching understands how listings actually name themselves ("Jiu Jitsu" → Martial Arts, "Water" →
+Swimming), matching only activities the listing already carries. **After deleting a bad value, re-check
+what took its place.**
+
 ## The main `classscout` repo is READ-ONLY (owner directive, 2026-08-07)
 
 **Every commit and push you make belongs in THIS repo (`classscoutcards`), never in the main

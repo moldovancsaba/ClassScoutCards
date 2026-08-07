@@ -120,6 +120,38 @@ describe("validateWriteRequest", () => {
     });
   });
 
+  describe('the "no category" placeholder (owner directive 2026-08-07: never add it, even when there is no category)', () => {
+    it("rejects it in activityTypes", () => {
+      const result = validateWriteRequest({ ...validProviderBody, updates: { activityTypes: ["Soccer", "no category"] } });
+      expect(result.ok).toBe(false);
+      expect(!result.ok && result.error).toMatch(/never contain the ingestion placeholder/);
+    });
+
+    it("rejects it in primaryActivityType", () => {
+      expect(validateWriteRequest({ ...validProviderBody, updates: { primaryActivityType: "no category" } }).ok).toBe(false);
+    });
+
+    it("rejects it in a contentCards categoryHint", () => {
+      const result = validateWriteRequest({
+        collection: "contentCards",
+        id: "cc-abc123",
+        updates: { categoryHint: "No Category" },
+        reason: "Testing the placeholder rejection rule",
+        source: "test",
+      });
+      expect(result.ok).toBe(false);
+    });
+
+    it("is case- and whitespace-insensitive", () => {
+      expect(validateWriteRequest({ ...validProviderBody, updates: { activityTypes: ["  NO CATEGORY "] } }).ok).toBe(false);
+    });
+
+    it("still accepts legitimate category/activity values", () => {
+      expect(validateWriteRequest({ ...validProviderBody, updates: { activityTypes: ["Soccer", "Sports"] } }).ok).toBe(true);
+      expect(validateWriteRequest({ ...validProviderBody, updates: { category: "Camps" } }).ok).toBe(true);
+    });
+  });
+
   describe("geo writes (2026-08-07 owner directive: this bridge has no real geocoder)", () => {
     it("accepts geo with source=\"approximate\"", () => {
       const result = validateWriteRequest({
