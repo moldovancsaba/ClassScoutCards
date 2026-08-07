@@ -2402,6 +2402,26 @@ Swimming has four cards across BPC (×2), Brooklyn and UES, and only the BPC pai
 UES and Brooklyn cards are genuinely separate real locations. Card count alone never settles duplication;
 the address does.
 
+### Batch 31/10 (cards 302-311)
+
+8 stale `low_source_trust` blockers cleared on real, independently-confirmed institutions — Launch Math +
+Science Centers UES, Brooklyn United Academy (the academy arm of the Crown Heights organization confirmed
+in batch 14), Karate City UES, The Door (555 Broome St, SoHo), Evolutionary Martial Arts UWS, Russian
+School of Mathematics UES, New-York Historical Society (170 Central Park West, home of the DiMenna
+Children's History Museum), and iCAMP (host-site STEAM camps at real Manhattan venues). The Rubin Museum
+and Brooklyn Botanic Garden were already correct and touched.
+
+No new defect patterns. Notable only for what it says about the `low_source_trust` blocker itself: across
+batches 17-31 that blocker has now been cleared on **dozens** of cards that turned out to be real, and has
+not once flagged a card that was genuinely fake. Every fabricated card found in this continuation was
+caught by the reality check, never by that blocker. It is not carrying signal.
+
+**Recommendation (main app, read-only from here)**: `low_source_trust` appears to fire on ordinary
+first-party business domains and has a very high false-positive rate against manual review. Either its
+scoring needs recalibration or it should not gate publication on its own — currently it mostly adds
+review noise around real institutions like 92NY, the New-York Historical Society and the Brooklyn Botanic
+Garden.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -2977,3 +2997,11 @@ the address does.
   control observed: Physique Swimming has 4 cards, but only the Battery Park City pair were duplicates --
   the UES and Brooklyn cards are genuinely distinct real locations, reinforcing that card count never
   settles duplication, the street address does. See "Batch 30/10..." above.
+- v76 (2026-08-07): batch 31/10 (cards 302-311) complete. 8 stale `low_source_trust` blockers cleared on
+  real, independently-confirmed institutions (Launch Math, Brooklyn United Academy, Karate City, The Door,
+  Evolutionary Martial Arts, Russian School of Mathematics, New-York Historical Society, iCAMP), 2
+  already-correct cards touched. No new defect patterns, but a cumulative observation recorded as a
+  recommendation: across batches 17-31 `low_source_trust` has been cleared on dozens of cards that were
+  real and has never once flagged a genuinely fake one -- every fabricated card in this continuation was
+  caught by the reality check instead. The blocker appears to fire on ordinary first-party business domains
+  and is adding review noise rather than signal. See "Batch 31/10..." above.
