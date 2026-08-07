@@ -388,6 +388,28 @@ existing geo, explain why it's suspect (it was almost certainly derived from the
 being corrected), and recommend a real re-geocode of the corrected address as external follow-up work —
 don't let "the guard blocked the geo write" read as "geo is now fine."
 
+## A shared placeholder address can produce an identical, wrong geo pin across unrelated records (found 2026-08-07)
+
+Two consecutive records in one review run (`prov-brooklyn-ayso`, `prov-brooklyn-ballet-school`) shared the
+exact literal placeholder address text `"Downtown Brooklyn, Brooklyn, NYC"` — AND the exact same geocoded
+`geo` coordinates (`lat: 40.6915721, lng: -73.9867644`) despite being two unrelated businesses. For the
+ballet school the coincidence was harmless (it really is in Downtown Brooklyn); for the AYSO league it
+was actively wrong (the league plays at Prospect Park's Parade Ground, nowhere near that pin). This is
+strong evidence the discovery pipeline has a fallback that geocodes a generic borough-level placeholder
+string when no real address was extracted, producing geo that LOOKS like real geocoder output
+(`precision: "interpolated"`, `source: "nominatim"`) but is really just "here's roughly where this
+borough is" — indistinguishable from trustworthy geo without cross-checking, and (per the section above)
+this bridge's own never-downgrade guard will defend a wrong placeholder-derived pin just as readily as a
+real one.
+
+**Handling it**: when you find one record with this pattern (a placeholder-style address string paired
+with `precision: "interpolated"`/`"exact"`), check whether the address text is truly the record's own
+data or a generic fallback — and flag it explicitly if two or more records so far have shared the exact
+same coordinates, since that's a much stronger signal than "this one pin looks a little off." Recommend
+the core team query for providers sharing this exact `geo` value (or the literal placeholder address
+string) as a batch, not record-by-record — this bridge has no bulk query capability to do that detection
+itself.
+
 ## Writing voice: specific and warm, never generic — this is a recommendation, not a listing (owner directive, 2026-08-07)
 
 "Enough facts, correctly placed" is not the finish line for a description — it also has to read like a
@@ -607,3 +629,10 @@ sending, dry-run or not.
   correctness), so the fix was to correct the address text, leave geo alone, and name the suspect geo
   plus a re-geocode recommendation explicitly in the write's `reason` — don't let "the guard blocked it"
   read as "handled."
+- v15 (2026-08-07): added "A shared placeholder address can produce an identical, wrong geo pin across
+  unrelated records" after finding the EXACT same `geo` coordinates on two consecutive, unrelated records
+  (`prov-brooklyn-ayso`, `prov-brooklyn-ballet-school`), both of which had previously stored the identical
+  literal placeholder address text `"Downtown Brooklyn, Brooklyn, NYC"`. This is stronger evidence than a
+  single bad pin — it points at a discovery-pipeline fallback that geocodes a generic borough placeholder
+  and produces geo indistinguishable from real geocoder output. Recommend a batch query for shared `geo`
+  values as core-team follow-up; this bridge has no bulk-detection capability of its own.
