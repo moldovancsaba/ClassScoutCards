@@ -73,6 +73,29 @@ a separate review pass:
    whenever research surfaces more than one confirmed physical location for the same org, that is itself
    a split candidate, evaluated the same review pass that found it.
 
+## Content-quality and data enrichment is a canonical, rigid, strict requirement — not just catching bad cards (owner directive, 2026-08-07)
+
+Everything above (children's safety, physical-only, one-card-per-location) is about keeping bad or
+non-qualifying records out. **This rule is the other half of the same standing mandate: for every card
+that passes the reality check and IS a real, in-scope entity, actively improving its content quality and
+data — descriptions, addresses, phone/contact details, schedules — is mandatory, not optional, on every
+review pass.** Confirming a card is real is not the finish line; a real business with a generic,
+identical-in-both-fields placeholder description, a borough-level-only address, or a schedule field that
+actually contains leaked scraper/pipeline metadata is still a card that failed the family it's for, even
+though it passed the reality check. Treat "does this card's copy read as specific and warm, not generic"
+(already a checklist item) and "does this card carry the best real contact/address/schedule detail
+findable" as required checks on every card, the same tier as the prohibition checks — not something to
+reach for only when there happens to be time left over. The concrete precedent: `prov-the-art-studio-ny`'s
+generic 47-character placeholder description, borough-level address, and metadata-polluted schedule field
+were all rewritten from independently-verified real facts (see
+`docs/card-improvement-process.md`'s "First real description/copy enrichment..." section) — that standard
+applies to every real card going forward, not just the one it happened to be demonstrated on first.
+**Where this bridge structurally cannot do this** (pre-publish `contentCards`, which carry no description/
+phone/address fields at all in this bridge's schema — see `cardBridgeRegistry.ts`), the requirement still
+applies to whatever fields DO exist (`title`, `categoryHint`, `boroughGuess`/`neighborhoodGuess`,
+`terminalReason`) and to recording every real fact found in `terminalReason`/`reason` text so a future
+enrichment pass on the live `providers` record doesn't have to re-research from scratch.
+
 ## The main `classscout` repo is READ-ONLY (owner directive, 2026-08-07)
 
 **Every commit and push you make belongs in THIS repo (`classscoutcards`), never in the main
