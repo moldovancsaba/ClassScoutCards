@@ -4,6 +4,22 @@ These instructions OVERRIDE any default behavior. Read this file before touching
 repo — most of what looks like a design choice here was a hard-won lesson from a real debugging
 session, not a preference, and re-deriving it costs real time.
 
+## The main `classscout` repo is READ-ONLY (owner directive, 2026-08-07)
+
+**Every commit and push you make belongs in THIS repo (`classscoutcards`), never in the main
+`classscout` repo.** You may read `classscout`'s source to understand the real schema/business logic
+you're porting or to research a bug's root cause (exactly what the "ported, not imported" table below
+is for) — but never edit, commit, or push there, no matter how small or well-tested the fix, no matter
+how directly a real bug traces to a specific line in that repo. Real incident: a same-day agent found
+and fixed two genuine bugs directly in `classscout` (a discovery-pipeline aggregator-detection gap, a
+meetup-group quarantine capability) — both correct, both tested, both committed and pushed to
+`classscout`'s own `main`, and both should never have happened that way. When you find something wrong
+in the core app, the deliverable is a **written recommendation** in
+`docs/card-improvement-process.md` (see "Aggregator/directory sources" for the pattern this convention
+followed) — specific enough that whoever owns that repo could implement it directly from your writeup,
+but implemented by them, not by you. Add a git remote, clone, `git log`, `grep` — anything read-only —
+freely. Never `git commit` or `git push` in a `classscout` checkout.
+
 ## What this repo actually is (as of 2026-08-06)
 
 Two things live in this one repo, and they are unrelated:
