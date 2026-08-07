@@ -87,6 +87,10 @@ export const BRIDGE_REGISTRY: Record<BridgeCollectionKey, BridgeCollectionConfig
       createdAt: 1,
     },
     writableFields: [
+      // (2026-08-07 finding) a contentCard's own title can be a generic extraction artifact -- e.g. a
+      // record titled just "Camps" when the real org (per its own extracted facts) is "Manhattan
+      // Youth" -- mirroring the same providers.name / prov-camp finding, just on this collection.
+      "title",
       "state",
       "categoryHint",
       "boroughGuess",
