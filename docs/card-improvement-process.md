@@ -217,6 +217,20 @@ list rather than a description.
    you find a fresh instance — don't just quarantine and move on silently, since the pipeline will keep
    producing the same class of bad record from other directory pages until this is fixed upstream.
 
+## A non-NYC borough/region value may be correct, not a bug — check `city` first (found 2026-08-07)
+
+`providers.borough` is typed as a general `Region`, not a fixed NYC-only enum — the main app supports at
+least one non-NYC city tenant (`city: "la"`, absent = the "nyc" default) with its own region/neighborhood
+vocabulary entirely distinct from NYC boroughs (LA uses `"Central LA"`/`"Harbor"`/etc., not
+`"Manhattan"`/`"Brooklyn"`). A record with a borough value that looks wrong for NYC (e.g. `"Central LA"`)
+is not automatically a data-quality bug — it may be a perfectly legitimate LA-tenant record. **Always
+check the record's `city` field before treating an unfamiliar borough/region value as a defect.** If
+`city` confirms a non-NYC tenant, judge the region/neighborhood against THAT city's own geography (in
+`classscout`, `src/data/laLocations.ts` for LA) rather than NYC boroughs — a real case
+(`prov-angels-gate-cultural-center-san-pedro`) had a legitimate LA-tenant record with the wrong LA region
+(`"Central LA"` instead of the correct `"Harbor"`, per the main app's own LA geo data) — a real defect,
+but a narrower one than "this shouldn't be on this NYC platform at all."
+
 ## Wrong entity-kind classification: a real business filed as a `meetupGroup` (owner-prompted, 2026-08-07)
 
 A distinct pattern from the aggregator case above — the record IS one real, single, legitimate entity
@@ -464,3 +478,10 @@ sending, dry-run or not.
 - v11 (2026-08-07): widened `providers.address` to writable — the SOP's own checklist requires a real
   street address before publish, but this bridge had no way to correct one until a real card's stored
   address turned out to be a completely different, wrong Brooklyn neighborhood.
+- v12 (2026-08-07): widened `providers.neighborhood`/`.phone`/`.activityTypes`/`.borough` to writable and
+  exposed `.city` as read-only, across a run of five consecutive cards. Each widening was driven by a
+  real defect found live: an internally-contradictory address/neighborhood pair, a literal placeholder
+  string (`"no category"`) polluting `activityTypes`, a findable-but-empty phone number, and a
+  non-NYC-tenant record whose region was wrong within ITS OWN city's geography. Added the "non-NYC
+  borough may be correct" rule after the last case, so a future pass checks `city` before treating an
+  unfamiliar region value as a bug.
