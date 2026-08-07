@@ -1369,6 +1369,29 @@ recommended the core team check whether this record should exist in the pool at 
 own pattern: **not every card behind a "bad source" blocker is a real entity with a fixable source** — the
 default assumption should be "verify," not "assume real," even when 9 out of the last 10 turned out to be.
 
+## First real description/copy enrichment of the session (found 2026-08-07)
+
+Every fix in this session's off-topic/stale-blocker runs above touched `contentCards`, which has no
+description/phone/address fields at all — so `prov-the-art-studio-ny` (the oldest untouched `providers`
+record in the pool, sitting since 2026-06-26) is the first case where an actual `shortDescription`/
+`longDescription` rewrite was possible. Its stored copy was a generic, identical-in-both-fields
+placeholder ("Offers online and in-person art classes for kids and teens," 47 characters) — passes
+`validateCopyQuality`'s length/URL/chrome checks but fails the "specific and warm, never generic" writing
+standard elsewhere in this doc. `theartstudiony.com` itself is behind a CAPTCHA gate and can't be fetched
+directly; independent web search confirmed real specifics: classes are held at a real West 72nd Street
+studio (the old Paint Place Studio, Upper West Side), class sizes run about one instructor per five
+students, and specific real programs exist (Comics/Cartooning/Manga Art for ages 7-13, drawing, painting,
+portfolio development).
+
+**Applied the physical-only hybrid-business rule for the first time in practice**: the business does
+offer both online and in-person classes, so per `CLAUDE.md` the card stays (a real physical location
+exists) but the rewritten copy leads with the physical studio, not the online option. Also corrected
+`address` (from the borough-level placeholder "Upper West Side, Manhattan, NYC" to the confirmed street,
+"West 72nd Street, Upper West Side, Manhattan, NYC") and `recurringPrograms[0].timeText`, which had
+literally contained leaked internal pipeline metadata ("Source: https://... Category: Art Borough:
+Manhattan Neighborhood: Upper West S...") standing in for a real schedule — replaced with an honest
+summary rather than inventing specific days/times that aren't available from any source checked.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -1689,3 +1712,10 @@ default assumption should be "verify," not "assume real," even when 9 out of the
   UES "legacy/prospect") could NOT be confirmed real at all and was correctly left `QUARANTINED` rather
   than assumed real — a needed reminder that "verify," not "assume real," is still the default even after
   9 real entities in a row. See the new "A 10-card batch..." section above.
+- v43 (2026-08-07): the first real `shortDescription`/`longDescription` rewrite of the session
+  (`prov-the-art-studio-ny`) — every prior fix touched `contentCards`, which has no description field at
+  all. Replaced a generic identical-in-both-fields placeholder with specific, source-confirmed prose
+  about the real West 72nd Street studio; applied the physical-only hybrid-business rule in practice for
+  the first time (kept the card, led with the physical location over the online option); also fixed
+  `address` and a `recurringPrograms` entry whose `timeText` had leaked raw internal pipeline metadata
+  instead of a real schedule. See the new "First real description/copy enrichment..." section above.
