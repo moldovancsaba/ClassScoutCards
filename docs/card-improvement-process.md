@@ -1838,6 +1838,29 @@ though the underlying business was genuinely real at some point. Left `QUARANTIN
 the finding recorded in `terminalReason` so a future pass doesn't have to re-research it. Recommending a
 real, currently-open replacement is out of scope for this bridge (no such capability exists here).
 
+### Batch 15/10 (cards 141-150)
+
+| Card | Finding | Action |
+|---|---|---|
+| World Martial Arts Center Brooklyn | Already `PUBLISHED`, correct | Touch only |
+| Pixie Pods | Already `PUBLISHED`, real (a Black-owned mobile enrichment studio); `neighborhoodGuess` was generic "Brooklyn" | `neighborhoodGuess` enriched to confirmed home base "Downtown Brooklyn" (Atlantic Terminal Mall) |
+| Sugar Hill Children's Museum of Art & Storytelling | Already `PUBLISHED`, correct | Touch only |
+| Camp Kidville UWS | Already `PUBLISHED`, correct | Touch only |
+| PMT House of Dance Kids | Real, well-known dance studio; stale "page too large" false block | → `BLOCKED_REPAIRABLE`, confirmed address (28 W 25th St, near Union Square) |
+| Homage Skateboard Academy | Real (est. 2007); stored `sourceUrl` domain (homagebrooklyn.com) no longer resolves — a domain change, not off-topic | → `BLOCKED_REPAIRABLE`, confirmed current domain + address (83 3rd Ave, Boerum Hill) |
+| Park Slope Day Camp | Real, established camp; confirmed main address plus area-wide shuttle service (not multiple physical locations — not a split candidate) | → `BLOCKED_REPAIRABLE` |
+| Marks JCH Youth Programs | Real, well-established nonprofit community center; bot-blocked source | → `BLOCKED_REPAIRABLE`, confirmed address (7802 Bay Parkway, Bensonhurst) matches card exactly |
+| HCHC Leadership Academy kids classes prospect | **Genuine no-match**: the only real "HCHC Leadership Academy" is an unrelated Howard County, Maryland homeschool co-op — no NYC entity found under this name/domain | Left `QUARANTINED` |
+| Tribeca Language Brooklyn/Manhattan | Real, established (since 2007) language school with a genuine fixed studio (Tribeca) plus a broader Manhattan/Brooklyn service area | → `BLOCKED_REPAIRABLE`, `boroughGuess`/`neighborhoodGuess` corrected from a vague combined label to the real fixed location (hybrid-business rule) |
+
+**New finding this batch**: a 3rd confirmed instance of the domain-change pattern (Homage Skateboard
+Academy's stored `homagebrooklyn.com` no longer resolves; the real current site is
+`homageskateboardacademy.com`) — reinforces this is a recurring, not one-off, failure mode alongside the
+prior Urban Dunes/Kids Creative NYC instances. Also a clean application of the hybrid-business rule from
+CLAUDE.md (Tribeca Language: real fixed studio + broader/online service area → anchor the card to the real
+fixed location rather than a vague combined-borough label) and of the genuine-no-match principle (HCHC
+Leadership Academy: a same-named real org exists, but in a different state entirely).
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -2273,3 +2296,9 @@ real, currently-open replacement is out of scope for this bridge (no such capabi
   closed business as a live option misleads families just as badly, even though it was genuinely real at
   some point. Distinct from every prior "real but blocked" pattern (all of which describe still-operating
   businesses). Added a matching CLAUDE.md "Hard-won lessons" bullet. See "Batch 14/10..." above.
+- v59 (2026-08-07): batch 15/10 (cards 141-150) complete. 6 real entities corrected, 3 already-correct
+  cards touched (one with a neighborhood enrichment: Pixie Pods), 1 left `QUARANTINED` on a genuine
+  no-match (HCHC Leadership Academy — the only real org under this name is an unrelated Maryland
+  homeschool co-op). 3rd confirmed domain-change instance (Homage Skateboard Academy), and a clean
+  hybrid-business-rule application (Tribeca Language: real fixed studio + broader service area, anchored
+  to the real location instead of a vague combined-borough label). See "Batch 15/10..." above.
