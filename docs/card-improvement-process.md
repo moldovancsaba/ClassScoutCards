@@ -390,17 +390,19 @@ don't let "the guard blocked the geo write" read as "geo is now fine."
 
 ## A shared placeholder address can produce an identical, wrong geo pin across unrelated records (found 2026-08-07)
 
-Two consecutive records in one review run (`prov-brooklyn-ayso`, `prov-brooklyn-ballet-school`) shared the
-exact literal placeholder address text `"Downtown Brooklyn, Brooklyn, NYC"` — AND the exact same geocoded
-`geo` coordinates (`lat: 40.6915721, lng: -73.9867644`) despite being two unrelated businesses. For the
-ballet school the coincidence was harmless (it really is in Downtown Brooklyn); for the AYSO league it
-was actively wrong (the league plays at Prospect Park's Parade Ground, nowhere near that pin). This is
-strong evidence the discovery pipeline has a fallback that geocodes a generic borough-level placeholder
-string when no real address was extracted, producing geo that LOOKS like real geocoder output
+FOUR records so far, across two review runs, have shared the exact literal placeholder address text
+`"Downtown Brooklyn, Brooklyn, NYC"` AND the exact same geocoded `geo` coordinates
+(`lat: 40.6915721, lng: -73.9867644`) despite being unrelated businesses: `prov-brooklyn-ayso`,
+`prov-brooklyn-ballet-school`, `prov-brooklyn-elite-volleyball`, `prov-brooklyn-pro-volleyball-academy`.
+For the ballet school the coincidence was harmless (it really is in Downtown Brooklyn); for the AYSO
+league it was actively wrong (the league plays at Prospect Park's Parade Ground, nowhere near that pin).
+This is strong evidence the discovery pipeline has a fallback that geocodes a generic borough-level
+placeholder string when no real address was extracted, producing geo that LOOKS like real geocoder output
 (`precision: "interpolated"`, `source: "nominatim"`) but is really just "here's roughly where this
 borough is" — indistinguishable from trustworthy geo without cross-checking, and (per the section above)
 this bridge's own never-downgrade guard will defend a wrong placeholder-derived pin just as readily as a
-real one.
+real one. At four-for-four, treat ANY record still carrying this exact literal address string as
+carrying this exact suspect pin too — don't re-derive suspicion from scratch each time.
 
 **Handling it**: when you find one record with this pattern (a placeholder-style address string paired
 with `precision: "interpolated"`/`"exact"`), check whether the address text is truly the record's own
@@ -409,6 +411,19 @@ same coordinates, since that's a much stronger signal than "this one pin looks a
 the core team query for providers sharing this exact `geo` value (or the literal placeholder address
 string) as a batch, not record-by-record — this bridge has no bulk query capability to do that detection
 itself.
+
+## A spurious "Music" activityType recurring on unrelated sports records (found 2026-08-07)
+
+A literal `"Music"` entry appeared in `activityTypes` on two unrelated, otherwise-normal sports records
+this session: `prov-brooklyn-ayso` (a soccer league) and `prov-brooklyn-pro-volleyball-academy` (a
+volleyball academy) — neither has any music offering anywhere in its real source material. Unlike the
+`"no category"` placeholder (an obviously-fake string), `"Music"` is a real, valid `activityType` value
+elsewhere, so it doesn't stand out as broken the way a placeholder does — it just quietly doesn't belong.
+Two unrelated instances is enough to suspect a systemic classification issue (e.g. a keyword/embedding
+match firing on unrelated source text), not two independent one-off scrape errors. **When reviewing
+`activityTypes`, check every entry against what the source ACTUALLY describes, not just for obviously-fake
+placeholder strings** — a real-looking value can be just as wrong as a fake one. Flag a repeat of this
+specific pattern (`"Music"` on a non-music record) explicitly as a recurrence, not a fresh unrelated find.
 
 ## Writing voice: specific and warm, never generic — this is a recommendation, not a listing (owner directive, 2026-08-07)
 
@@ -636,3 +651,10 @@ sending, dry-run or not.
   single bad pin — it points at a discovery-pipeline fallback that geocodes a generic borough placeholder
   and produces geo indistinguishable from real geocoder output. Recommend a batch query for shared `geo`
   values as core-team follow-up; this bridge has no bulk-detection capability of its own.
+- v16 (2026-08-07): the shared-placeholder-geo pattern reached four-for-four
+  (`prov-brooklyn-elite-volleyball`, `prov-brooklyn-pro-volleyball-academy` joined the earlier two) —
+  strengthened that section to treat any record still carrying the literal `"Downtown Brooklyn, Brooklyn,
+  NYC"` address as carrying the suspect pin too, not something to re-derive each time. Also added "A
+  spurious 'Music' activityType recurring on unrelated sports records" after finding it independently on
+  a soccer league and a volleyball academy — a real-looking value can be wrong just as often as an
+  obvious placeholder; check every `activityTypes` entry against the source, not just for fake strings.
