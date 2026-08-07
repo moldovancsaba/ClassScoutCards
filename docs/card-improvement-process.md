@@ -652,6 +652,32 @@ as a recommendation (name both domains, and which one families actually need) ra
 rewriting the description around content pulled from the wrong site. Fix what IS writable (description,
 activityTypes, ages) using the REAL consumer-facing program facts, verified from the correct domain.
 
+## A completely unrelated company can contaminate a record by name coincidence alone (found 2026-08-07)
+
+Two real cases, both severe. `prov-riverside-hawks` (a real Manhattan youth basketball program at The
+Riverside Church) had a `sourceUrls` entry pointing at `riverside.com` — an unrelated podcast-recording
+SaaS company, pulled in only because it shares the one word "Riverside." That wrong source's own
+site-nav chrome ("Start for Free Company About us Blog Careers...") ended up in a `recurringPrograms`
+field. `prov-sky-rink-at-chelsea-piers` (the real ice rink at Chelsea Piers) was worse: its ENTIRE
+`website`/`sourceUrl` and description were `sky.com` — Sky UK, the British satellite TV/broadband
+provider — pulled in by the single word "Sky." The stored description was literally Sky UK's own
+TV-streaming copy, priced in British pounds (`"Sky Kids Pack: £8pm extra"`).
+
+**Recognizing it**: this is NOT the fabricated-identity pattern (where facts trace to a different but
+still-plausible real business in the same general space) — here the wrong source is from a totally
+unrelated industry, often a much bigger/more web-visible company that happens to share one word with the
+real, usually smaller, local business's name. A description that reads like software marketing, a
+streaming service, or anything obviously outside kids'/family activities on a record that's supposed to
+be about a sport or class is the signal — don't assume "the site must have changed" or "this is a
+different location of the same brand."
+
+**Handling it**: rewrite entirely from real, independently-verified facts about the ACTUAL organization
+— the wrong source contributes nothing salvageable. Recommend the core team review this class of defect:
+a discovery step that resolves a business name to a domain via a naive search/match is vulnerable to
+exactly this collision, and it's worth checking whether other short, common-word business names
+(a recognizable pattern: single common English words, not distinctive multi-word names) have the same
+risk.
+
 ## Writing voice: specific and warm, never generic — this is a recommendation, not a listing (owner directive, 2026-08-07)
 
 "Enough facts, correctly placed" is not the finish line for a description — it also has to read like a
@@ -939,3 +965,10 @@ sending, dry-run or not.
   (Musicolor Method) — flag the mismatch since `website` is read-only, and source the real description
   from the correct (family-facing) domain. The extraction-failure-text pattern reached three confirmed
   instances; the spurious-"Music" count reached nine.
+- v24 (2026-08-07): cards 44 and 47 of the same mass run surfaced a severe new pattern — added "A
+  completely unrelated company can contaminate a record by name coincidence alone" after two cases
+  where a wrong `sourceUrl` pulled in a totally unrelated business (a podcast-software company named
+  Riverside; Sky UK, a British satellite TV provider) purely because it shared one common word with the
+  real local organization's name. Distinct from fabricated-identity (same general space, wrong specific
+  business) — this is a different industry entirely. Recommend the core team check whether short,
+  single-common-word business names are systematically vulnerable to this in the domain-resolution step.
