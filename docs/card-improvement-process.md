@@ -1766,6 +1766,29 @@ right move is to leave both alone: this bridge's quarantine/terminal actions are
 safeguards for demoting a bad record, not a dedup tool, and demoting an already-correct, already-live
 card would make things worse, not better, just to resolve the duplication cosmetically.
 
+### Batch 12/10 (cards 111-120)
+
+| Card | Finding | Action |
+|---|---|---|
+| The Coding Space Brooklyn | Already `PUBLISHED`, correct | Touch only |
+| Aviator Sports | Already `PUBLISHED`, correct; unaffected by the sibling nav-menu-scrape defect noted in CLAUDE.md | Touch only |
+| Brooklyn Children's Museum Programs | Already `PUBLISHED`, correct | Touch only |
+| Alvin Ailey Extension Kids & Teens | Real, extremely well-known institution; domain redirects to its real rebrand (ailey.org) | → `BLOCKED_REPAIRABLE` |
+| Kids Creative NYC | **2nd confirmed domain-hijack instance** (after Urban Dunes): real 501c3 nonprofit, but sourceUrl now redirects to an Indonesian gambling site | → `BLOCKED_REPAIRABLE`, hijack documented |
+| Friends Academy Day Camp | Real, confirmed 270 Duck Pond Rd, Locust Valley — out-of-taxonomy gap (7th instance) | → `BLOCKED_REPAIRABLE` |
+| Modern Martial Arts NYC Tribeca | Real, confirmed 78 Reade St; domain rebrand (mmanewyorkcity.com); verified distinct from its UWS sibling, not a duplicate | → `BLOCKED_REPAIRABLE` |
+| Sky Rink at Chelsea Piers | Real program at the already-confirmed Chelsea Piers complex | → `BLOCKED_REPAIRABLE` |
+| Modern Martial Arts Upper West Side | Real, confirmed 103 W 73rd St; verified distinct from its Tribeca sibling | → `BLOCKED_REPAIRABLE` |
+| RoboFun | **5th confirmed duplicate-content-card instance** — same sourceUrl as the already-fixed "RoboFun Upper West Side" (batch 10) | → `BLOCKED_TERMINAL` (duplicate/superseded) |
+
+**New finding this batch (2nd confirmed instance of a batch-4 pattern)**: Kids Creative NYC's sourceUrl
+(`kidscreative.org`) now redirects to an unrelated Indonesian online-gambling site — the 2nd confirmed
+domain-hijack case after Urban Dunes, reinforcing that this is a recurring failure mode worth watching
+for, not a one-off. Also confirmed a new negative-control case for the "duplicate title" pattern: Modern
+Martial Arts NYC Tribeca and Modern Martial Arts Upper West Side share a sourceUrl but are verified via
+independent search to be 2 genuinely distinct real locations (of 3 total) — same-domain-shared-by-siblings
+is a signal worth checking, not an automatic duplicate.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -2182,3 +2205,10 @@ card would make things worse, not better, just to resolve the duplication cosmet
   sides already `PUBLISHED`/correct (Manhattan Youth Downtown Community Center vs. its batch-3 sibling) —
   unlike every prior duplicate instance, neither side needs fixing here, so both are left as-is rather
   than demoting a correct live record just to resolve the duplication. See "Cards 101-200..." above.
+- v56 (2026-08-07): batch 12/10 (cards 111-120) complete. 6 real entities corrected, 3 already-correct
+  cards touched, 1 more duplicate-content-card instance (RoboFun, 5th confirmed). 2nd confirmed
+  domain-hijack instance (Kids Creative NYC, sourceUrl now an Indonesian gambling site) reinforces the
+  batch-4 pattern is recurring, not one-off. Also confirmed a useful negative control: 2 cards sharing a
+  domain (Modern Martial Arts NYC's Tribeca and UWS locations) verified as genuinely distinct real
+  locations, not a duplicate — shared domain alone isn't sufficient evidence, always verify. See
+  "Batch 12/10..." above.
