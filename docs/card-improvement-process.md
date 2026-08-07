@@ -531,6 +531,15 @@ text), not independent one-off scrape errors. **When reviewing
 placeholder strings** — a real-looking value can be just as wrong as a fake one. Flag a repeat of this
 specific pattern (`"Music"` on a non-music record) explicitly as a recurrence, not a fresh unrelated find.
 
+## The same `name`-field defect recurs on `contentCards.title` (found 2026-08-07)
+
+Same pattern as below, different collection: `cc-99ce8d7bebed9ddde20d0788` had `title: "Camps"` — a
+generic extraction artifact — while its own `enrichmentSummary.extractedFacts` already named the real
+org: "Manhattan Youth Recreation and Resources, Inc." `title` was read-only through this bridge until
+this case surfaced it as a gap, mirroring the earlier `providers.name` fix — widened alongside this
+finding. Check a contentCard's `title` against its own `extractedFacts`/`sourceTextSample`, not just a
+provider's `name`.
+
 ## A record's own `name` field can itself be an extraction defect (found 2026-08-07)
 
 Real case: `prov-camp`. The record's `name` was literally `"Camp"` — while its own `shortDescription`
@@ -1029,3 +1038,6 @@ sending, dry-run or not.
   re-checking). Also found an aggregator-source detection inconsistency worth flagging to the core team:
   two aggregator-sourced cards from the same discovery period — one correctly quarantined by the
   pipeline, one left published/parked with no aggregator-related blocker at all.
+- v28 (2026-08-07): widened `contentCards.title` to writable after finding the same name-extraction
+  defect already documented for `providers.name` on this collection too (`title: "Camps"` when the
+  card's own extracted facts already named the real org, "Manhattan Youth").
