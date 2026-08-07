@@ -1437,6 +1437,31 @@ real business's other listed programs have the same defect" found four wrong-nei
 one pass. Worth doing this check whenever a card's underlying real business is confirmed to have multiple
 programs/products in the pool.
 
+### Batch 2/10 (cards 11-20, plus 1 bonus live-provider description rewrite)
+
+| Card | Finding | Action |
+|---|---|---|
+| Mark Morris Student Company | Real, well-known dance company, already correctly `PUBLISHED`, real address matches | Touch only |
+| NY Kids Club Williamsburg | Real, well-known chain, already correct | Touch only |
+| SFX Youth Sports Baseball | Real, 100+ year Brooklyn youth org, already correct | Touch only |
+| British Swim School Manhattan | Real multi-location franchise, but claimed "Upper East Side" doesn't match ANY of its 5 confirmed real Manhattan sub-locations | Cleared the wrong neighborhood rather than leave an unconfirmed specific claim |
+| Music Together UES | Real franchise, sourceUrl was a Google search page | → `BLOCKED_REPAIRABLE`, likely real licensee named for future enrichment |
+| Tiny Tunes Studio Brooklyn Crossing | Real (Sawyer/hisawyer.com is a legitimate booking platform, not aggregator abuse), address matches exactly | → `BLOCKED_REPAIRABLE` |
+| NYC Basketball Kids | Real host-site registration portal, stale blocker | → `BLOCKED_REPAIRABLE` |
+| Purelements Evolution in Dance | Real, genuine current TLS handshake failure (not stale), address matches exactly | → `BLOCKED_REPAIRABLE` |
+| Brooklyn Nets Basketball Academy | Real; a live provider already exists via a separate path | → `BLOCKED_TERMINAL` (superseded), live record fixed instead |
+| Cumbe Kids Dance Classes | Real, confirmed 2 addresses both in Fort Greene — card claimed Bed-Stuy | Neighborhood corrected |
+| **Bonus**: `prov-brooklyn-nets-basketball-academy` (live) | Empty `neighborhood`, a broken `"no category"` placeholder mixed into `activityTypes` alongside spurious "Art"/"Birthday Entertainment" tags, description with scraped button-text ("Learn More") | Neighborhood filled in, `activityTypes` cleaned to `["Basketball"]`, description rewritten — 2nd real description enrichment this session |
+
+**New patterns found this batch**: (1) a real multi-location franchise can have a wrong neighborhood
+that matches NONE of its actual locations (British Swim School Manhattan) — the fix there is to clear
+the unconfirmed claim, not guess which of several real locations it meant, and flag it as a possible
+future split candidate once the intended location is identified; (2) **a content card can be quarantined
+while a live provider for the same real entity already exists and is well-populated** (Brooklyn Nets
+Basketball Academy) — the correct move is `BLOCKED_TERMINAL` (superseded) on the content card and fixing
+the live record directly, not trying to force the content card through further pipeline states it no
+longer needs.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -1771,3 +1796,10 @@ programs/products in the pool.
   live-provider content-quality fixes found by cross-referencing a confirmed business's other pool
   entries rather than by oldest-first order alone. See the new "100-card sovereign autonomous test..."
   section above for the full batch table and new patterns found.
+- v45 (2026-08-07): batch 2/10 of the 100-card test complete. 7 real entities corrected, 3 already-correct
+  cards touched, plus a 2nd real description-enrichment (`prov-brooklyn-nets-basketball-academy`: filled
+  in an empty neighborhood, cleaned a broken `"no category"` placeholder and spurious activityTypes,
+  rewrote scraped-button-text copy into real prose). New patterns: a real multi-location franchise can
+  have a wrong neighborhood matching NONE of its actual locations (clear it, don't guess); a content card
+  can be quarantined while a live provider for the same entity already exists elsewhere (use
+  `BLOCKED_TERMINAL`/superseded on the card, fix the live record directly). See "Batch 2/10..." above.
