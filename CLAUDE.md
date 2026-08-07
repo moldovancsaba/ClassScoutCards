@@ -465,6 +465,19 @@ in a comment when you add one, the way the existing ports do.
   repetition across unrelated records is itself a signal, separate from whether any single card's guess
   is right or wrong.
 
+- **What decides between CORRECTING a wrong location and QUARANTINING the card is whether research yields
+  exactly ONE real answer.** Sharpened 2026-08-07 (cards 201-300, batch 21) after three cards in a single
+  batch hit the same real-brand-wrong-location shape and correctly took two different outcomes. Sylvan
+  Learning's card claimed the Upper East Side; research found exactly one real Manhattan center (200 W
+  86th St, Upper West Side) — one unambiguous answer, so the neighborhood was CORRECTED and the card kept.
+  Tutu School's two cards claimed Brooklyn Heights and Williamsburg; the franchise's own locations page
+  lists neither, and for the Brooklyn Heights one, TWO real studios (Dumbo, Boerum Hill) sit in the same
+  11201 zip as the claim — so the card is plausibly a mislabel of one of them, but picking between two
+  equally-plausible real candidates would be fabrication. Both were QUARANTINED, with every confirmed real
+  location recorded in `terminalReason` for a future split pass. Zero real answers and several real
+  answers both mean quarantine; only exactly one means correct. This keeps the real-brand-fake-location
+  pattern from becoming an excuse either to guess or to discard real businesses wholesale.
+
 ## Before you write anything real
 
 1. Read `docs/card-improvement-process.md` in full — it is the binding process spec (selection order,

@@ -2007,6 +2007,33 @@ pattern grew to a 3rd instance (Color Me Mine Bay Ridge). One split-candidate op
 but deliberately deferred rather than acted on this round (Little Scholars, multiple confirmed Brooklyn
 locations) — flagged for a future pass rather than rushed.
 
+## Cards 201-500: third continuation, non-stop (owner directive, 2026-08-07)
+
+### Batch 21/10 (cards 201-210)
+
+| Card | Finding | Action |
+|---|---|---|
+| Bedford-Stuyvesant YMCA | Real YMCA branch, confirmed address (1121 Bedford Ave) matches card; stale `low_source_trust` | Blocker cleared |
+| Fit4Dance Brooklyn | Real (12+ yrs), confirmed Crown Heights address matches card; a 2nd Brooklyn address noted as a future split candidate | Blocker cleared |
+| Planet Han Mandarin | Real, **2 confirmed distinct Manhattan locations** (UWS 401 West End Ave, UES 1556 Third Ave) under one "Manhattan-wide" card | Blocker cleared, recorded as a one-card-per-location split candidate |
+| Super Soccer Stars Upper West Side | Already `PUBLISHED`, correct | Touch only |
+| Tutu School Brooklyn Heights | **4th real-brand-fake-specific-location instance**: franchise's own locations page lists no Brooklyn Heights studio (real Brooklyn ones are Dumbo, Boerum Hill, Park Slope) | → `QUARANTINED` |
+| The Painted Pot Park Slope | Already `PUBLISHED`, correct | Touch only |
+| Bedstuy Youth Soccer Club | Already `PUBLISHED`, correct | Touch only |
+| Tutu School Williamsburg | **5th instance of the same pattern**, and unlike its sibling there is not even an adjacent real location to explain the label | → `QUARANTINED` |
+| The Art Farm NYC | Already `PUBLISHED`, correct | Touch only |
+| Sylvan Learning Upper East Side | Real franchise with a real Manhattan center — but at 200 W 86th St, the Upper **West** Side; no UES center found | `neighborhoodGuess` corrected, blocker cleared |
+
+**Notable this batch**: two instances of the real-brand-fake-specific-location pattern surfaced on the
+same brand in one batch (Tutu School), bringing that pattern to 5 confirmed instances. Both were
+already-`PUBLISHED` live records. The Brooklyn Heights card is the more interesting of the two: two real
+Tutu School studios (Dumbo, Boerum Hill) sit in the *same 11201 zip* as the claimed neighborhood, so the
+card is plausibly a mislabel of one of them — but choosing between two equally-plausible real candidates
+would be fabrication, so it was quarantined with all three confirmed real Brooklyn locations recorded for
+a future split pass. Contrast with Sylvan Learning in the same batch, where exactly ONE real Manhattan
+location existed, making a correction (rather than a quarantine) the honest call. **The distinction that
+decides between correcting and quarantining is whether the research yields exactly one real answer.**
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -2481,3 +2508,11 @@ locations) — flagged for a future pass rather than rushed.
   claiming a borough (Manhattan) it has ZERO actual presence in — its confirmed real service area is
   Queens only — corrected both the title and location fields. Added the "Cards 101-200: continuation
   complete" retrospective section summarizing all 10 batches. See "Batch 20/10..." above.
+- v65 (2026-08-07): started the owner-requested third continuation (cards 201-500), same batch-of-10
+  cycle, non-stop. Batch 21/10 (cards 201-210) complete: 4 real entities corrected (3 stale
+  `low_source_trust` blockers cleared, 1 wrong-neighborhood fix), 4 already-correct cards touched, 2
+  quarantined as the 4th and 5th confirmed real-brand-fake-specific-location instances (Tutu School
+  Brooklyn Heights and Williamsburg — the franchise's own locations page lists neither). Sharpened the
+  operating rule that distinguishes correcting from quarantining in that pattern: correct when research
+  yields exactly ONE real answer (Sylvan Learning, same batch), quarantine when it yields zero or several
+  equally-plausible ones (both Tutu School cards). See "Batch 21/10..." above.
