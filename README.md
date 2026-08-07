@@ -131,6 +131,19 @@ ignoring `MONGODB_DB_NAME` entirely. Built to find the `classscoutcluster` vs `c
 evidence instead of guesswork — safe to reuse if a similar "is this even the right database" question
 comes up again.
 
+### `GET /api/card-bridge/stats`
+
+Read-only aggregate counts (requires the bridge key like every other `/api/card-bridge/*` route): total
+document count for `contentCards` and `providers`, each broken down by borough, neighborhood, and
+activity (`categoryHint` on `contentCards`; `activityTypes`, unwound, on `providers`). No individual
+record content — just counts. The same data, without needing the bridge key, is at `/stats` (see below).
+
+## Stats page
+
+`GET /stats` — a public page (no auth; it only ever shows aggregate counts) showing the same
+borough/neighborhood/activity breakdowns as the API above, rendered as simple tables. Queries MongoDB
+directly server-side rather than calling its own API. Live at `https://compare.messmass.com/stats`.
+
 ## Card generator (legacy, unrelated to the card-bridge)
 
 Generates new activity cards and delivers them to the main app.

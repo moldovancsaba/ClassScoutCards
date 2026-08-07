@@ -20,9 +20,9 @@ followed) — specific enough that whoever owns that repo could implement it dir
 but implemented by them, not by you. Add a git remote, clone, `git log`, `grep` — anything read-only —
 freely. Never `git commit` or `git push` in a `classscout` checkout.
 
-## What this repo actually is (as of 2026-08-06)
+## What this repo actually is (as of 2026-08-07)
 
-Two things live in this one repo, and they are unrelated:
+Three things live in this one repo:
 
 1. **The card-bridge** (`src/lib/delivery/`, `src/lib/auth/`, `src/lib/familyServices/`,
    `src/lib/validation/`, `src/pages/api/card-bridge/*`) — the current, active reason this repo
@@ -37,6 +37,29 @@ Two things live in this one repo, and they are unrelated:
    `src/lib/delivery/{ingestApi,mongoDirect}.ts`) — an older, separate feature: generates new activity
    cards and delivers them to the main app either via its ingest API or by writing directly into the
    main app's `providers` collection. Not part of the card-bridge; don't conflate the two.
+3. **The stats page** (`src/pages/stats.tsx`, `src/lib/delivery/cardBridgeStats.ts`,
+   `src/pages/api/card-bridge/stats.ts`) — a read-only reporting view: total counts for `contentCards`
+   and `providers`, each broken down by borough, neighborhood, and activity. Deliberately public (no
+   bridge-key auth) since it only ever returns aggregate counts, never individual record content — the
+   page queries MongoDB directly server-side in `getServerSideProps` rather than round-tripping through
+   its own API. Live at `https://compare.messmass.com/stats`.
+
+## Current status (2026-08-07)
+
+A 100-card mass-enrichment pass (`docs/card-improvement-process.md`, now at v33) has been completed —
+a new agent picking this up is not starting from zero. Read that doc's Changelog before assuming a
+pattern is undiscovered; it very likely already has a name, a fix pattern, and a confirmed-instance
+count. Two open items handed off from that pass, not yet resolved:
+- **Live off-topic contamination with zero blockers**: at least two cards were found `PUBLISHED`/
+  `active` with completely off-topic sourceHosts (a foreign university LMS, a general-audience
+  reference article) and no blocker at all — never caught by quarantine. Only two were found by chance
+  while working an oldest-first queue; there are very likely more. Worth a targeted sweep, not just
+  reactive fixes as they're stumbled on.
+- **Card-splitting** (an enrichment source that actually describes N real entities, or a real business
+  with several physical locations, currently force-fit into one record): no design has been committed
+  to yet — see whatever's most recent in conversation/PR history for where that discussion landed
+  before building anything here. Don't assume "one card → one entity" always held historically; some
+  of what looks like a data-quality bug in a single record may actually be an unsplit multi-entity card.
 
 ## The one fact that will cost you hours if you get it wrong
 
@@ -144,6 +167,24 @@ in a comment when you add one, the way the existing ports do.
   complete.** It recurred across multiple real cards in one batch — a false "nothing missing" signal
   sitting right next to a real, findable gap. Don't skip step 2's field-by-field read just because the
   emptiness check looks clean.
+- **A query parameter that's syntactically accepted is not proof it's actually wired up.** `GET
+  /api/card-bridge/rows?...&id=X` was called this way dozens of times across a full review pass before
+  anyone noticed the handler never read `id` at all — it silently fell back to "return the current
+  oldest row," which happened to coincide with the right answer every time only because the review loop
+  always asked for whatever was *already* the current oldest record. Caught only when two different
+  `&id` values both returned the same row. Now fixed (`src/pages/api/card-bridge/rows.ts`) — but the
+  general lesson stands: when you fetch "by id," check the id in the response actually matches the id
+  you asked for at least once, don't just trust that a parameter with the right name does what its name
+  suggests.
+- **The worst version of an off-topic-contamination bug leaves no trace to notice.** Every other
+  off-topic case found this run (an aggregator page, a totally unrelated site) was at least caught and
+  `QUARANTINED` before going live. Two cards were not: fully `PUBLISHED`/`active`, zero `blockerCodes`,
+  looking exactly like a correct record except that `sourceHost` was a foreign university's LMS login
+  page or a general-audience reference article. There is no field to check for this — the only tell is
+  that the `title`/`sourceHost` don't describe an actual local business. If you're ever short on
+  specific defects to check and want to spend spare review time well, a targeted sweep for `PUBLISHED`
+  cards with clearly-generic/non-local `sourceHost`s is a better bet than re-checking already-solid
+  records.
 
 ## Before you write anything real
 
