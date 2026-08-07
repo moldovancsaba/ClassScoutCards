@@ -399,23 +399,49 @@ correcting or filling in a `providers.address`:
    plausible. Re-verify all three together against the confirmed address, the same way the multi-city-
    tenant rule above requires checking `city` before judging a borough/region value.
 
-## Cap `activityTypes` at 3, and name the real headline activity via `primaryActivityType` (owner directive, 2026-08-07)
+## Cap `activityTypes` at 3, and name the real headline activity via `primaryActivityType` (owner directive, 2026-08-07; superseded 2026-08-07 by real top-3 SELECTION logic, not just a length cap)
 
-Cards must show at most the top 3 activities a source itself lists, in the order the source lists them —
-never a longer list, and never a re-sorted "most important first" guess. This bridge now enforces the
-3-item cap at write time (`cardBridgeWrite.ts` rejects more than 3). If a source lists more than 3 (e.g.
-"Soccer, Swimming, Running, Art, Music"), take the source's own first 3 and drop the rest — **but record
-what was cut in the write's `reason` text**, so it isn't silently lost from the review trail, even though
-it must never be shown or used live.
+**Original version of this rule (kept for history): "take the source's own first 3, in source order."**
+That was wrong on its own terms — "first 3 in source order" is exactly how a genuinely unrelated activity
+(see "A spurious 'Music' activityType..." below, and the real "Basketball School" case that prompted this
+rewrite: research found `["Music", "Basketball", "Sports", "Soccer", "Handball"]` in THAT order, purely
+because a "Music" keyword pattern happened to fire first during discovery) ends up kept in the top 3 while
+a genuinely-related one gets cut. Order-of-discovery was never a signal of relevance.
 
-When one of the (at most 3) activities is clearly the headline/main one — the source's own primary
-offering, not just alphabetically or positionally first — set `primaryActivityType` (plus
-`primaryActivityTypeConfidence` when you have a real basis for a number) to that value, using the exact
-string as it appears in `activityTypes`. This is the main app's real, already-consumed mechanism
-(`classifyPrimaryActivityType` at ingestion; consumed by the category-banner picker and the "Activities"
-display) for indicating a headline activity — **not** a reason to truncate `activityTypes` further. Don't
-invent a headline activity that isn't clearly supported by the source; leave `primaryActivityType` unset
-when the source doesn't make one activity obviously primary over the others.
+**The real rule now (owner directive, 2026-08-07): the top 3 must be the primary activity plus only
+OTHER activities from the SAME topical cluster as the primary — never a positional trim.** This bridge
+now enforces this automatically, not just as review guidance: `src/lib/delivery/activityAlignment.ts`'s
+`alignActivityTypes()` is applied inside `applyCardBridgeWrite` to every `providers` write that touches
+`activityTypes` and/or `primaryActivityType` (checked in both dry-run and apply, same convention as the
+geo/serviceLeads guards). It:
+1. Determines the primary activity — trusts an already-set `primaryActivityType` if it's still present in
+   `activityTypes`, else matches the provider's own `name`/title against the candidates (e.g. "Basketball
+   School" → "Basketball"), else falls back to the first candidate.
+2. Groups the canonical activity vocabulary (mirrored exactly from the main app's own
+   `extractionEngine.ACTIVITY_KEYWORDS` labels) into 4 clusters — Sports & Fitness, Arts & Performance,
+   Academic & STEM, Play & Recreation — and keeps only OTHER candidates from the primary's own cluster.
+   `["Music", "Basketball", "Sports", "Soccer", "Handball"]` with primary "Basketball" (Sports & Fitness)
+   now correctly resolves to `["Basketball", "Sports", "Soccer"]` — Music (Arts & Performance) is cut,
+   Handball is cut only for exceeding the 3-cap, not for being unrelated.
+3. Caps at 3, always with the primary first.
+4. An activity label the cluster map doesn't recognize (a custom/legacy tag) falls back to the OLD
+   "top 3 in original order" behavior for safety, rather than aggressively dropping it to just itself.
+
+**What this means for a manual review write through this bridge**: you no longer need to hand-curate the
+top 3 by source order — submit whatever real candidate `activityTypes` you found (even more than 3;
+`cardBridgeWrite.ts`'s own validation now only rejects an obviously-garbage-length list, >20 entries, not
+a normal one) plus a `primaryActivityType`/`name` for the alignment to key off of, and the bridge computes
+the correct, topically-coherent top 3 itself. Still worth recording anything you know was cut in the
+write's `reason` text for the review trail, but it's no longer YOUR job to decide which 3 belong together.
+
+**A second, separate defect this does NOT fix**: `src/components/scout/views/MyAccountView.tsx`'s
+`SavedProviderCard` (the "My Account" → "Saved listings" card) reads `provider.activityTypes[0]` directly
+for its "activities" metadata label, bypassing BOTH `primaryActivityType` and the top-3 alignment above —
+every other real consumer (`ProviderCard.tsx`, `publicBrowse.ts`, `ListingImage.tsx`, `activityMatch.ts`)
+already correctly reads `getPrimaryFirstActivityTypes()`/`primaryActivityType` first. This lives in the
+main `classscout` repo, which is read-only from here (see `CLAUDE.md`) — the fix is a one-line change
+(`provider.activityTypes[0]` → `getPrimaryFirstActivityTypes(provider)[0]`, importing the existing helper
+from `@/lib/categoryBanner`) for whoever owns that repo to apply directly.
 
 ## A record's own name can name its location — check it against borough/neighborhood/address (found 2026-08-07)
 
@@ -584,6 +610,11 @@ text), not independent one-off scrape errors. **When reviewing
 `activityTypes`, check every entry against what the source ACTUALLY describes, not just for obviously-fake
 placeholder strings** — a real-looking value can be just as wrong as a fake one. Flag a repeat of this
 specific pattern (`"Music"` on a non-music record) explicitly as a recurrence, not a fresh unrelated find.
+
+**This exact pattern is now handled automatically, not just flagged for manual review** — see the rewritten
+"Cap `activityTypes` at 3..." section above: `alignActivityTypes()` drops an out-of-cluster activity like a
+spurious "Music" tag on a sports record as part of every `providers` write this bridge makes, using the
+provider's own primary activity/title to decide what belongs, not source order.
 
 ## The same `name`-field defect recurs on `contentCards.title` (found 2026-08-07)
 
@@ -2104,3 +2135,15 @@ cards without needing tighter supervision.
   all 100 cards, the split-off children, the aggregate outcome distribution, and every pattern discovered
   across the test. See "Batch 10/10..." and the new "100-card sovereign autonomous test — retrospective"
   section above.
+- v54 (2026-08-07, owner directive): replaced the `activityTypes` "cap at 3, source order" rule with real
+  top-3 SELECTION logic — `src/lib/delivery/activityAlignment.ts`'s `alignActivityTypes()`, wired into
+  `applyCardBridgeWrite` for every `providers` write touching `activityTypes`/`primaryActivityType`. Fixes
+  the exact case already flagged in "A spurious 'Music' activityType..." (found earlier this session) at
+  the code level instead of leaving it a manual-review-only flag: primary activity determined from
+  `primaryActivityType`/title, only same-cluster activities kept (4 clusters mirroring the main app's own
+  `ACTIVITY_KEYWORDS` vocabulary), capped at 3, primary always first. 9 new unit tests, including the
+  literal owner-reported case (Music/Basketball/Sports/Soccer/Handball → Basketball/Sports/Soccer).
+  Read `/workspace/classscout` (read-only, per CLAUDE.md) to confirm root cause and scope: the main app's
+  `primaryActivityClassifier.ts`/`categoryBanner.ts` already do the "which ONE activity leads" half
+  correctly almost everywhere — the one place that doesn't is `MyAccountView.tsx`'s `SavedProviderCard`,
+  which reads `activityTypes[0]` directly, a one-line fix documented above for whoever owns that repo.
