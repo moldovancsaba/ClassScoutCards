@@ -1789,6 +1789,26 @@ Martial Arts NYC Tribeca and Modern Martial Arts Upper West Side share a sourceU
 independent search to be 2 genuinely distinct real locations (of 3 total) — same-domain-shared-by-siblings
 is a signal worth checking, not an automatic duplicate.
 
+### Batch 13/10 (cards 121-130)
+
+| Card | Finding | Action |
+|---|---|---|
+| Coach Derek Sports | **Genuine ambiguity**: the only confirmed real "Coach Derek Sports" is in Los Angeles/Manhattan Beach/Irvine, CA — possible Manhattan Beach/Manhattan NYC name confusion | Left `QUARANTINED` |
+| Chelsea Piers Soccer | Real program at the already-confirmed Chelsea Piers complex | → `BLOCKED_REPAIRABLE` |
+| Tiger Schulmann's Brooklyn | Real, multiple confirmed real Brooklyn locations (Bay Ridge, Carroll Gardens); card's own "Brooklyn-wide" label is honest, not fabricated | → `BLOCKED_REPAIRABLE` |
+| Upperline Code | Real NYC kids-coding program, confirmed via independent search after a network-layer source failure; 2 possible addresses found, neither picked | → `BLOCKED_REPAIRABLE` |
+| South Brooklyn United | **Genuine ambiguity**: no organization found under this exact name; a similarly-named real org ("South Bronx United") exists in a different borough | Left `QUARANTINED` |
+| Lavner Education Manhattan | Real national STEM camp provider, host-site delivery (NYU/Gramercy/Columbus Circle); sourceUrl was google.com | → `BLOCKED_REPAIRABLE` |
+| Harlem Grown | Already `PUBLISHED`, correct | Touch only |
+| Area 53 Adventure Park | Already `PUBLISHED`, correct | Touch only |
+| New York Aquarium Education | Already `PUBLISHED`, correct | Touch only |
+| Blue Balloon Songwriting | **3rd instance of the same no-fixed-venue business**, most accurately labeled of the three (real domain, honest broad borough) but still fails the physical-only policy | Left `QUARANTINED`, consistent with 2 siblings |
+
+**New finding this batch**: two independent genuine-ambiguity cases in one batch (Coach Derek Sports,
+South Brooklyn United) — both left `QUARANTINED` per the established principle rather than guessed real.
+Reinforces (not new) that a similarly-named real organization in a different location/borough is a
+red flag, not a fuzzy match to accept.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -2212,3 +2232,8 @@ is a signal worth checking, not an automatic duplicate.
   domain (Modern Martial Arts NYC's Tribeca and UWS locations) verified as genuinely distinct real
   locations, not a duplicate — shared domain alone isn't sufficient evidence, always verify. See
   "Batch 12/10..." above.
+- v57 (2026-08-07): batch 13/10 (cards 121-130) complete. 5 real entities corrected, 3 already-correct
+  cards touched, 2 genuine-ambiguity cases left `QUARANTINED` (Coach Derek Sports — only confirmable in
+  California, not NYC; South Brooklyn United — no matching org found, a similarly-named real org exists
+  in a different borough), plus a 3rd confirmed instance of the Blue Balloon no-fixed-venue business under
+  yet another card. See "Batch 13/10..." above.
