@@ -138,6 +138,14 @@ the nearest borough.
 freshly-checked phone number updates a whole-record `lastVerifiedAt` and makes an entirely stale listing
 look current.
 
+**Concrete schema for (a), (b) and (d), plus opening hours: `docs/structured-schedule-recommendation.md`**
+(owner-requested 2026-08-08). It specifies the field shapes against what the live data actually holds,
+anchored to schema.org's `OpeningHoursSpecification`/`Schedule` and OpenActive's SessionSeries →
+ScheduledSession split. Headline measurement: **only 226 of 830 live programs (27%) carry day + start +
+end**, so "what's on Friday at 5pm" is unanswerable for three quarters of the catalogue — not because the
+facts are missing but because `timeText` is prose. It also notes that `recurringPrograms` is a **writable
+bare passthrough**, so the program-level half can be adopted through the bridge with no core change.
+
 **g) `inclusion{}` and `trialPolicy{}`.** Usually stated on the provider's own page and currently discarded.
 Parents of disabled children cannot filter at all. `supportsAdditionalNeeds` should record **the provider's
 claim** with its `sourceText`, not an assessment.
