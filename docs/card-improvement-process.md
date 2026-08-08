@@ -5836,3 +5836,37 @@ only place it can go.
   **Consistency rule learned the same batch:** Soccer Shots was quarantined in New York earlier in this effort
   and its Los Angeles card was still live. When an operator is ruled out in one tenant, query the brand across
   ALL tenants immediately — applying a ruling to one city and not the other is how a catalogue drifts.
+- v129 (2026-08-08): **oldest-first continued — 60 cards through the queue plus 63 by cohort in this run.**
+  The 2026-06-30 Los Angeles discovery run dominates the oldest end: every card arrives with BOTH place
+  fields empty while stating its neighbourhood in its own TITLE, so most of the work is a lookup against
+  `locations.ts` rather than research. Located this way: Angels Gate (Harbor/San Pedro), Kidspace and A Noise
+  Within (San Gabriel Valley/Pasadena), Silverlake Conservatory (Central LA/Silver Lake), LA School of
+  Gymnastics and Broadway Gymnastics (Westside/West LA), Colburn (Central LA/Downtown), Aerials
+  (SFV/Chatsworth), SCEGA (Santa Clarita Valley), Media City Ballet (SFV/Burbank), Barnsdall (Central
+  LA/East Hollywood), Neighborhood Music School (Eastside/Boyle Heights), Tom Sawyer Camps and Armory
+  (SGV/Pasadena), Morgan-Wixson (Westside/Santa Monica), Inner-City Arts (Central LA/Downtown).
+
+  **NEW CORE-APP FINDING — the LA neighbourhood vocabulary systematically omits South LA.** Five cards in
+  four consecutive batches could not be located because `locations.ts` has no entry: **Baldwin Hills**
+  (Debbie Allen Dance Academy), **Crenshaw** (Lula Washington Dance Theatre), **University Park** (24th
+  Street Theatre), **Exposition Park** (Natural History Museum), **Malibu** (Aloha Beach Camp). Four of the
+  five are in South or South-Central Los Angeles. This is not an incomplete list, it is a list that omits one
+  part of the city — so real institutions serving those families cannot be located at all. Every one was
+  held as a draft rather than filled with a non-canonical value.
+
+  **`policy_or_safety_review` escalated to core-app recommendation 0d.** Three more false positives turned up
+  in this run (TLB Music, Bach to Rock Syosset, Manhattan Plaza Health Club). A census across the whole pool
+  finds **428 cards carrying it — 175 maintainable + 253 quarantined** — and a sample of the maintainable
+  ones is entirely ordinary children's businesses. **Deliberately NOT bulk-cleared**: wrongly clearing one
+  real safety flag is far worse than leaving several false ones, so it is removed only on individually
+  verified cards. The hypothesis worth testing in the core app is that an unreadable or non-200 source is
+  being treated as a safety signal.
+
+  **Two duplicates surfaced on identical sourceUrls** (YMCA of Metropolitan LA, Code Ninjas) — one copy
+  caught by the location-finder cohort, the other by the oldest-first queue. Neither method alone found
+  both, which is a small argument for running both. A duplicate-`sourceUrl` query is cheaper than either
+  and is the next cohort to add.
+
+  **Consistency across tenants:** Soccer Shots was quarantined in New York earlier in this effort and its
+  Los Angeles card was still live until this run. When an operator is ruled out in one tenant, query the
+  brand across all of them immediately.

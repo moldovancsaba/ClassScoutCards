@@ -473,3 +473,34 @@ titled "Camp Kidville UWS" was sourced to `camp.com`, which serves the real, glo
 only NYC store is in Flatiron — so it reads as a textbook fabricated location. It isn't: Camp Kidville is
 the real summer camp at Kidville Upper West Side, 205 West 88th Street, 212-362-7792. Judging by the
 domain would have deleted a real operating business.
+
+## 0d. `policy_or_safety_review` is being applied to ordinary businesses — 428 cards (2026-08-08)
+
+**This is the most serious blocker code the pipeline has, and it appears to be firing on cards with nothing
+safety-related about them.** It is the label most likely to bury a legitimate children's business
+permanently, because no reviewer wants to be the one who cleared a safety flag.
+
+**Scale (census, not a sample):** 428 content cards carry it — **175 maintainable + 253 quarantined**.
+
+**Four checked individually, none with any safety dimension:**
+- **TLB Music** — a real Upper East Side music school. Its site returns HTTP 403 to automated requests. The
+  page could not be READ, and that became a safety concern.
+- **Bach to Rock Syosset** — a Long Island music school. Out of market, nothing else.
+- **Manhattan Plaza Health Club Swim School** — a swim school at its own Hell's Kitchen facility, sourced to
+  its own domain.
+- A representative sample of the remaining 175 is likewise ordinary: Amerikick Park Slope, Bubbles Academy,
+  Clayhouse Brooklyn, Pier 2 Roller Rink, Fastbreak Sports, Elite Skills Basketball.
+
+**What this bridge did NOT do, deliberately:** it did not bulk-clear the code. The asymmetry is the whole
+point — wrongly clearing one real safety flag is far worse than leaving several false ones in place. It has
+been removed only on cards verified individually (three so far), each with the reason recorded.
+
+**What is needed from the core app:** the rule that sets this code. The strong hypothesis from the TLB Music
+case is that an unreadable or non-200 source is being treated as a safety signal, which would explain why
+bot-blocked sites and out-of-market pages both attract it. If that is the rule, the fix is to distinguish
+"could not fetch" from "fetched, and the content raises a concern" — they are not the same finding and only
+one of them is about children's safety.
+
+**Correction to an earlier note in this file's sibling doc:** a 25-card sample once found zero cards carrying
+this code and it was written up as "does not generalise". The census shows 21% of quarantined cards carry it.
+The sample was unrepresentative; the conclusion was wrong.
