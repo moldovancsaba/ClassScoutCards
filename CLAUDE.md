@@ -847,6 +847,21 @@ in a comment when you add one, the way the existing ports do.
   listings. 36 of them found in one probe (Greenwich House ×4, Berkeley Carroll ×4, Steve & Kate's ×4, NY
   Martial Arts ×4, Little Scholars ×3, Modern Martial Arts ×3), each now recorded with confirmed addresses so
   a split pass need not re-research.
+- **An OUT-OF-STATE address extracted from an operator's own site is the sharpest national-brand detector
+  there is.** Relaxing the address pattern over unresolved listings returned Newton MA (Russian School of
+  Mathematics), Columbus OH (Tinkergarten), Greenwood Village CO (FasTracKids), Montgomery AL (Tutu School),
+  Toronto (Prep Academy Tutors) and Atlanta (Sloomoo) — seven in one batch. A Manhattan children's listing
+  resolving to Alabama can only be a head office, so the local branch address is unevidenced. Sharper than
+  the root-domain predictor and worth running deliberately.
+- **A string shaped like an address is not an address — travel directions parse identically.** Three Brooklyn
+  Bridge Park listings yielded "3 Clark Street A C High Street", which is the subway block ("3 Clark Street,
+  A/C to High Street") with station names run together. Nearly every venue page carries directions.
+- **A website can contain a TEMPLATE PLACEHOLDER address** — Code Ninjas Brooklyn's own site returned the
+  literal "1234 Street Place". The source itself carries fabricated-looking data, so an extractor reading it
+  in good faith invents a street. Nothing downstream can catch this; only a sanity check on the value can.
+- **"No street address" is often the correct answer, not a gap.** Of 198 listings no probe could resolve, 30
+  say in their own words that they are mobile, run in schools, or have multiple locations. Those are the
+  `venueModel` gap in the wild — the fix is a schema field, not a street line.
 - **The `providers.phone` field has held Unix timestamps and the city switchboard.** Found 2026-08-08 in a
   pool-wide scan: nineteen live records carried 10-digit epoch seconds (`1742850639` = 2025-03-24,
   `1672214040` = 2022-12-28) where the phone number should be, and eighteen carried `311`, New York City's
