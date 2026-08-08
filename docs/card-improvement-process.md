@@ -5990,3 +5990,63 @@ only place it can go.
   whose NAME describes a judgement about the source or the content, applied on the basis of something
   mechanical. Worth checking every remaining blocker code the same way — what does the name claim, and what
   actually sets it?
+
+- v134 (2026-08-08): **the matrix collapse — `categoryHint`/`activityTypes` were holding two different
+  dimensions in one field, and a pipeline non-answer reached a live card as its lead chip.** Four owner
+  directives from two screenshots, all implemented in code rather than as a data sweep, because each was a
+  rule the bridge could enforce on every future write.
+
+  **"Classes and camps are not activities — those are a different dimension of the matrix."** The stats
+  page's single "By Activity" table ranked `Classes` (277) above every real activity, because most things
+  are classes. FORMAT (how/when: Classes, Camps, Birthday Parties, Drop-In Activities) and ACTIVITY (what:
+  Soccer, Art) are now separated by `src/lib/delivery/activityDimension.ts` and rendered as two tables.
+  The collapse was in the DATA, not only the display — ~40 records store both axes in one string
+  ("Sports / Camp", "Baseball Camp"), so values are split on `/` and a compound contributes to both
+  breakdowns instead of forming a bucket of its own.
+
+  **`activityTypes` now holds activities ONLY.** The format has its own field and its own badge on the
+  card, so a "Camps" chip in the activity row was both a duplicate and a category error. 19 live records
+  carried `Camps`, 13 `Classes`, 12 `Birthday Parties`.
+
+  **A Sports parent category.** A listing carries its specific sport FIRST and `"Sports"` SECOND — the
+  owner's three reasons: a parent reads the sport before the family it belongs to, analytics can collect
+  every sport listing on one equality check, and it retires `"Multi-Sport"` (39 live records), which read
+  as though it were a different sport sitting alongside Soccer. Seven further spellings of "sport,
+  unspecified" collapse onto the parent too (`Various Sports`, `Team Sports`, `Sports Camp`…).
+
+  **The sport-dominant rule**: when any sport is present, every non-sport tag is dropped. **This made
+  recognition safety-critical rather than cosmetic** — under a rule that deletes what it does not
+  recognise, a sport missing from the vocabulary is DELETED, not merely unlabelled. `isSportActivity`
+  therefore matches a sport term as WHOLE WORDS anywhere in the label, so "Swimming Lessons" survives.
+  Caught before any write, by an existing test.
+
+  **The leak the owner named: "Preschool / Multi-enrichment is a technical leak, not something informal
+  for a parent!!!"** On the live Kinder Prep Montessori card this was the LEAD chip. It is the same defect
+  as the `no category` placeholder in a different vocabulary — the pipeline recording its own failure to
+  classify, in the field a family reads. `Multi-category`, `Multi-enrichment`, `Multi-Activity` and their
+  compound forms are now rejected by `validateWriteRequest` on every category field of every collection,
+  and the 15 content cards carrying one (9 of them PUBLISHED) were given the canonical format value their
+  own title states.
+
+  Four things worth carrying forward, each of which cost something:
+
+  1. **A guard that deletes what it does not recognise inverts the cost of an incomplete vocabulary.**
+     Before the sport-dominant rule, an unlisted sport label was a missing tag. After it, the same gap
+     silently deletes a real tag. When adding a rule that drops values, re-audit every list it consults —
+     the list was written under the old cost model.
+  2. **Removing a bad value can manufacture a worse one.** Stripping the trailing format noun turned
+     `"Birthday Parties"` into a `"Birthday"` activity. Remainder extraction is now limited to formats
+     recognised BY their suffix; a value that is a format outright yields no activity. This is the second
+     instance of the already-recorded "after deleting a bad value, re-check what took its place".
+  3. **The stats page was counting 7,570 `kind: "repair"` stubs against 5,056 real cards — 60% machine
+     bookkeeping**, and those stubs were the source of both the "no category" bucket and most of the
+     "(none)" bucket. `fetchRawRecords` now filters `kind: "content"`. A page that aggregates a collection
+     must state which documents in it are cards.
+  4. **`providers.primaryActivityType` — the field the lead chip renders — was write-only through this
+     bridge.** The one value a family sees first could not be audited, only overwritten blind. Added to
+     the read projection. Worth asking of any field a defect report points at: can I actually READ it?
+
+  **A response echo is not proof a write landed.** One of the 15 `categoryHint` writes returned no error
+  and a truthy `found`, and did not change the field; three more showed the same shape in the dry run. Only
+  reading the records back caught it. Verify by re-reading, not by parsing the write response — this is the
+  same lesson already recorded for the silently-ignored `id` parameter, in a new place.
