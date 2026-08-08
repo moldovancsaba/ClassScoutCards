@@ -6252,3 +6252,36 @@ only place it can go.
   4. **`sourceAuthorityGrade: "authoritative"` is not evidence the card is real.** It grades the publisher,
      not the match between publisher and entity. It has now appeared on two confirmed contamination cases
      (a token-matched Wikipedia card, and the Daily Mail).
+
+- v138 (2026-08-08): **the media/reference-host sweep — 9 more cards, and a THIRD confirmed case of a
+  defect that was documented and never fixed.** Prompted by the Mail Online find, a scan of maintainable
+  cards whose `sourceHost` is a news, reference, retail or platform domain returned 30, of which 3 were
+  `PUBLISHED`.
+
+  **Equinox Sports Club "Kids Programs" was still PUBLISHED with zero blockers** — a card whose defect is
+  written up verbatim in `CLAUDE.md`'s hard-won lessons ("'Kids' in an AMENITY name is not evidence of a
+  children's programme": Equinox's only child-related offering is drop-off childcare for adult members
+  while they train, listed between the spa and the coat check). Quarantined now. **Together with the GIFT
+  University LMS and the Fit Soccer Kids collision, that is three confirmed instances this session of a
+  finding being written down and never applied to the record it was about.** The catalogue needs a sweep of
+  every named instance in the documentation against live data — being in the docs is not being fixed.
+
+  **Heal the Bay Aquarium contradicted its own title**: `boroughGuess: "Central LA"`,
+  `neighborhoodGuess: "Downtown"` on a card literally titled "Heal the Bay Aquarium (Santa Monica Pier)".
+  Santa Monica is Westside, ~15 miles from Downtown. A real, legitimate, currently-operating aquarium —
+  only the location was wrong, and the free check-a-record-against-itself test resolved it with no research.
+
+  **The sibling check changed the verdict on 4 of 6 token-matched cards.** Six real operators had been
+  matched to famous pages on one word — `espn.com/soccer` for "**Soccer** Kids NYC" and "**Soccer** Shots
+  Manhattan", `wikipedia/United_Kingdom` for "**British** Swim School", `wikipedia/Child` for
+  "**Children's** Aid Athletics", `wikipedia/Brooklyn` for "**Brooklyn** Brazilian Jiu-Jitsu" and
+  "**Brooklyn** Skate Garden". The instinct is to mark them all `BLOCKED_REPAIRABLE` with a re-source
+  target. Checking each operator's own domain first showed **four already have a correctly-sourced card,
+  three of them PUBLISHED** — so those are duplicates with nothing to re-source to, and only Soccer Shots
+  (zero cards on `soccershots.org`) and Brooklyn Skate Garden are genuinely repairable. A seventh,
+  "Pinterest Login" on `tr.pinterest.com/ideas`, names no entity at all and is structurally terminal.
+
+  **A methodology note, from my own error.** The host denylist regex matched `healthebay.org` because
+  "**ebay**" is a substring of "heal-**thebay**" — the exact `Art`-inside-`mARTial` bug already recorded
+  twice in this document, reproduced a third time in a throwaway scan. It surfaced a real defect by
+  accident, which is luck, not method. **Anchor host patterns on a dot or string boundary.**
