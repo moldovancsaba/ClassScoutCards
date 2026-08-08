@@ -6548,3 +6548,144 @@ only place it can go.
      would have made it identical to one of its two already-`BLOCKED_TERMINAL` twins. The guard is right,
      and the card keeps a slightly worse value as a result. Same wrinkle as the Fit Soccer Kids collision;
      worth a product decision rather than a third rediscovery.
+
+
+- v144 (2026-08-08): **the location-evidence audit — 64 live provider records.** Abandoned a 74-card
+  domain-keyed fill after reading the plan whole (rather than sampling it) exposed that the field it
+  keyed on was itself defective; found that the obvious audit of that field was circular, because 288
+  of 1,040 live providers store the neighbourhood name AS the address. Then ran three checks that rest
+  on facts instead: ZIP vs borough (21), the NYC Parks HQ address at census scale (26 — two of whose
+  parks are not in the borough claimed), and the record contradicting its own name (20). Cleared an
+  18-record shared-default location. New: `src/scripts/locationEvidence.ts` + 12 tests.
+
+## v144 (2026-08-08): the location-evidence audit — 64 live provider records, and a check that was measuring itself
+
+This round started as a routine continuation of the cross-collection neighbourhood fill and turned into
+something else entirely, because the plan's own sample would not survive being read.
+
+### The fill that was abandoned, and why the abandonment is the finding
+
+The plan was: map each `providers.website` domain to the single neighbourhood its provider record claims,
+then fill matching `contentCards` that have none. 74 candidates survived the guards already built for it
+(a multi-branch operator's domain cannot serve one answer to all its cards; a card whose own title names a
+different neighbourhood is not to be overridden). A random sample of ten read clean.
+
+**Reading all 74 instead of a sample killed it.** `"Downtown Brooklyn"` appeared 13 times and `"Harlem"` 11
+times, across operators with nothing to do with each other — and Trevor Day School (1 W 88th St) and
+Broadway Dance Center (37 W 65th St) are not in Harlem. The domain-keyed fill was not propagating facts; it
+was propagating a defect in the source it keyed on.
+
+Two lessons, and the second is the sharper one:
+
+- **A random sample is the wrong shape for detecting a REPEATED value.** Ten rows drawn from 74 are ten
+  chances to see one instance each; the defect only becomes visible as a frequency. `requireSample` (v142)
+  guards against trusting a count instead of the matches — it does not guard against a *sample* hiding a
+  distribution. When the suspected defect is repetition, count the values; when it is a bad match, read
+  the rows. Both, when the plan is small enough to print whole, which 74 was.
+- **Before keying a fill on another collection, audit the collection you are keying on.** This is not the
+  first bulk plan built on `providers` and it is the first to check whether the source field was sound.
+
+### The check that agreed with itself
+
+The natural audit of that source is "does the provider's `neighborhood` appear in its own `address`?" It
+returned 22 agree / 44 disagree, and **both numbers were meaningless**.
+
+Every "agree" row's address was the neighbourhood name: `"Downtown Brooklyn, Brooklyn, NYC"`,
+`"Gowanus, Brooklyn, NYC"`. The address is *derived from* the field being checked, so the substring test is
+circular and can only ever pass. And every row with a real street address read "disagree" purely because
+`"Bay Ridge"` is not a substring of `"9941 Fort Hamilton Pkwy"`. The test scored placeholders as healthy and
+real data as broken — exactly inverted. **A consistency check between two fields is worthless until you know
+the two fields were populated independently.** 288 of 1,040 live providers carry a placeholder address, so
+this was not a rare corner. Encoded as `isPlaceholderAddress` in `src/scripts/locationEvidence.ts`, with a
+test that asserts the circular pass explicitly so the shape stays visible.
+
+### What the sound checks then found — 64 records, all verified by re-reading
+
+Three checks that rest on facts rather than on one field agreeing with another:
+
+**1. ZIP versus stored borough (21 records).** A NYC ZIP prefix determines the borough; that is a postal
+fact and outranks every field on the record. Three clusters, and one of them inverted the expected fix:
+
+| cluster | verdict |
+| --- | --- |
+| Rockaway YMCA ×9 — `207 Beach 73rd Street, Arverne, NY 11692` filed under **Brooklyn** | borough → Queens, neighbourhood → Arverne. The address was right; only the borough contradicted it. |
+| Imagine Skateboarding — borough literally `"Manhattan or Brooklyn"` | 10013 settles it: Manhattan / Tribeca. |
+| NYC Parks ×11 — address `The Arsenal, Central Park, 830 Fifth Avenue` | **the borough was right and the ADDRESS was wrong.** Fixing the borough to match the ZIP would have moved eleven Brooklyn playgrounds to Manhattan. |
+
+**2. The parent-HQ address, at its real size (26 records).** The Arsenal is the NYC Parks Department's own
+headquarters, in the page furniture of every nycgovparks.org page. Already catalogued as a pattern; this is
+its census. Each park was resolved individually against NYC Parks' own property record and **that
+individually mattered** — two of the nine Brooklyn-filed parks are not in Brooklyn at all:
+
+- **The Big Park** is in Mariners Harbor, **Staten Island**.
+- **Lawrence Virgilio Playground** is in Woodside, **Queens** (and was additionally labelled Williamsburg).
+
+All 26 now carry their real venue address, and four empty neighbourhoods were filled (Washington Heights
+×3, Two Bridges) plus Samuel Seabury Playground corrected off Harlem — it is at 166 E 96th St.
+
+**A gap in my own scan, worth naming:** the ZIP/borough check found only 11 of the 26, because it can
+only see the HQ-address defect when the HQ is in a *different borough* from the venue. The other 15 are
+Manhattan parks with a Manhattan HQ address, and passed. **A check keyed on a contradiction is blind
+wherever the wrong value happens to agree.** The census came from querying the HQ string directly.
+
+**3. The record contradicting its own name (20 found, 15 corrected, 5 escalated).** Free to run: does the
+record's own name name a canonical neighbourhood other than the one in the field? Fifteen were resolvable
+from the record alone — Asphalt Green Battery Park City filed under Financial District (212 North End Ave),
+The Little Gym Dumbo under Brooklyn Heights (75 Front St), NYC Elite Gymnastics Tribeca under Upper West
+Side (44 Worth St), My Gym Park Slope under DUMBO, and so on.
+
+**The first row is the one that shaped the rule.** *Williamsburg Soccer Club* is filed under Greenpoint, and
+Greenpoint is **correct** — the WSC Clubhouse at 33 Nassau Ave is in Greenpoint, and "Williamsburg" is the
+club's brand. A name-wins rule would have broken a field that was already right. So the ordering is
+**address > name > stored field**, the name is consulted only when the address cannot answer, and when a
+street address and a name disagree outright *neither wins* — that is a `needs_human`, because an address
+can be a head office just as a name can be a brand. `judgeLocation()` encodes this with the Williamsburg
+case as its regression test.
+
+The five escalated: Williamsburg Soccer Club (confirmed, no change), Sugar Hill Children's Museum (both
+values defensible — Sugar Hill sits within greater Harlem), Physique Swimming Battery Park City (a
+three-way conflict between name, field and a 24 Maiden Lane office), "Uws & Midtown Nyc Family Events" (its
+own name is a compound), Riverdale Summer Camp (Riverdale vs Kingsbridge, adjacent, no address to break it).
+
+### The shared default, and how to tell one from a popular neighbourhood (18 records)
+
+`address: "Manhattanville, Manhattan, NYC"` + `neighborhood: "Harlem"` sat byte-identical on **18 unrelated
+live providers** — a tutoring company, a dance school, two soccer clubs, a language school, a chess
+programme, two school-yoga nonprofits. Confirmed false for Broadway Dance Center Children & Teens, which is
+at 37 W 65th St in Lincoln Square.
+
+**What makes this a default rather than a coincidence is the FIELD, not the count.** Thirty children's
+businesses really are on the Upper West Side, and `"Upper West Side, Manhattan, NYC"` appears 33 times
+without that proving anything. But a full ADDRESS should be near-unique, so eighteen operators sharing one
+is structural. `sharedDefaults()` therefore takes a threshold rather than hard-coding one — the right count
+depends on what the field is.
+
+Seventeen had both fields cleared; Broadway Dance Center got its real address. **Cleared, not replaced** —
+the same discipline as the undialable-phone sweep. And a note for the next pass is on each record: a
+striking share of this cohort are in-home or in-school operators with no venue of their own, which is
+plausibly *why* the extractor had nothing to read and reached for a default. Check the no-fixed-venue
+prohibition before hunting for an address that may not exist.
+
+### Totals
+
+| action | records |
+| --- | --- |
+| ZIP-contradicted borough corrected | 10 |
+| Parent-HQ address replaced with the real venue address | 26 |
+| Neighbourhood corrected from the record's own name/address | 15 |
+| Fabricated shared-default location cleared | 17 |
+| Real address written from an independent source | 1 |
+| Reviewed, verdict `needs_human` | 5 |
+| **total live provider records actioned** | **64** |
+
+Every one dry-run first and verified by re-reading the database rather than by parsing the write response.
+
+### Code
+
+`src/scripts/locationEvidence.ts` + 12 tests: `zipBorough` (declines rather than guesses — Fort Lee NJ and
+Long Island return null, which is the four-times-confirmed Borough-taxonomy gap showing up as an honest
+absence), `extractZip`, `isPlaceholderAddress`, `sharedDefaults`, `judgeLocation`. Deliberately **no**
+ZIP→neighbourhood map: NYC ZIP boundaries and neighbourhood boundaries genuinely disagree, and the
+21-entry hand-built map found in the scratchpad had 11225 as "Prospect Heights" and 11206 as
+"Williamsburg", both wrong. A map that is 80% right is worse than no map, because it writes with
+confidence.
