@@ -8,7 +8,8 @@
     "start": "next start -p 3001",
     "lint": "next lint",
     "generate:sample": "tsx src/scripts/generate-sample-card.ts",
-    "test": "vitest run"
+    "test": "vitest run",
+    "cohorts": "tsx src/scripts/defect-cohorts.ts"
   },
   "dependencies": {
     "next": "14.2.3",
