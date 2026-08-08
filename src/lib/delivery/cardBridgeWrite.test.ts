@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { validateWriteRequest } from "./cardBridgeWrite";
+import { parseSourceUrl, validateWriteRequest } from "./cardBridgeWrite";
+import { computeContentCardIdentity } from "./cardBridgeSplit";
 
 const validProviderBody = {
   collection: "providers",
@@ -105,18 +106,50 @@ describe("validateWriteRequest", () => {
     });
   });
 
-  describe("activityTypes cap (2026-08-07 owner directive: at most 3, never a raw keyword dump)", () => {
-    it("accepts up to 3 activityTypes", () => {
-      expect(validateWriteRequest({ ...validProviderBody, updates: { activityTypes: ["Soccer", "Swimming", "Running"] } }).ok).toBe(true);
+  describe("activityTypes sanity ceiling (2026-08-07 owner directive: real top-3 selection happens in applyCardBridgeWrite via alignActivityTypes)", () => {
+    it("accepts a normal-length activityTypes list", () => {
+      expect(validateWriteRequest({ ...validProviderBody, updates: { activityTypes: ["Soccer", "Swimming", "Running", "Art", "Music"] } }).ok).toBe(true);
     });
 
-    it("rejects more than 3 activityTypes", () => {
+    it("rejects an obviously-garbage-length activityTypes list (>20)", () => {
       const result = validateWriteRequest({
         ...validProviderBody,
-        updates: { activityTypes: ["Soccer", "Swimming", "Running", "Art", "Music"] },
+        updates: { activityTypes: Array.from({ length: 21 }, (_, i) => `Tag${i}`) },
       });
       expect(result.ok).toBe(false);
-      expect(!result.ok && result.error).toMatch(/at most 3 entries/);
+      expect(!result.ok && result.error).toMatch(/looks like a raw keyword dump/);
+    });
+  });
+
+  describe('the "no category" placeholder (owner directive 2026-08-07: never add it, even when there is no category)', () => {
+    it("rejects it in activityTypes", () => {
+      const result = validateWriteRequest({ ...validProviderBody, updates: { activityTypes: ["Soccer", "no category"] } });
+      expect(result.ok).toBe(false);
+      expect(!result.ok && result.error).toMatch(/never contain the ingestion placeholder/);
+    });
+
+    it("rejects it in primaryActivityType", () => {
+      expect(validateWriteRequest({ ...validProviderBody, updates: { primaryActivityType: "no category" } }).ok).toBe(false);
+    });
+
+    it("rejects it in a contentCards categoryHint", () => {
+      const result = validateWriteRequest({
+        collection: "contentCards",
+        id: "cc-abc123",
+        updates: { categoryHint: "No Category" },
+        reason: "Testing the placeholder rejection rule",
+        source: "test",
+      });
+      expect(result.ok).toBe(false);
+    });
+
+    it("is case- and whitespace-insensitive", () => {
+      expect(validateWriteRequest({ ...validProviderBody, updates: { activityTypes: ["  NO CATEGORY "] } }).ok).toBe(false);
+    });
+
+    it("still accepts legitimate category/activity values", () => {
+      expect(validateWriteRequest({ ...validProviderBody, updates: { activityTypes: ["Soccer", "Sports"] } }).ok).toBe(true);
+      expect(validateWriteRequest({ ...validProviderBody, updates: { category: "Camps" } }).ok).toBe(true);
     });
   });
 
@@ -271,5 +304,111 @@ describe("validateWriteRequest", () => {
       expect(validateWriteRequest({ ...leadBody, updates: { visibility: "public_support" } }).ok).toBe(false);
       expect(validateWriteRequest({ ...leadBody, updates: { blockers: [] } }).ok).toBe(false);
     });
+  });
+});
+
+describe("contentCards sourceUrl re-sourcing (2026-08-08)", () => {
+  const base = { collection: "contentCards", id: "cc-1", reason: "re-source to the branch's own page", source: "test" };
+
+  it("accepts a real https source URL", () => {
+    const result = validateWriteRequest({ ...base, updates: { sourceUrl: "https://www.codeninjas.com/ny-gowanus" } });
+    expect(result.ok).toBe(true);
+  });
+
+  it("rejects a non-https URL", () => {
+    const result = validateWriteRequest({ ...base, updates: { sourceUrl: "http://example.com/page" } });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toContain("parseable https");
+  });
+
+  it("rejects an unparseable value", () => {
+    const result = validateWriteRequest({ ...base, updates: { sourceUrl: "https://" } });
+    expect(result.ok).toBe(false);
+  });
+
+  it("rejects a hostname with no dot, which is never a real public source page", () => {
+    const result = validateWriteRequest({ ...base, updates: { sourceUrl: "https://localhost/page" } });
+    expect(result.ok).toBe(false);
+  });
+
+  it("rejects a non-string", () => {
+    const result = validateWriteRequest({ ...base, updates: { sourceUrl: 42 } });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toContain("must be a string");
+  });
+
+  it("is not writable on providers — sourceUrl belongs to contentCards only", () => {
+    const result = validateWriteRequest({ collection: "providers", id: "prov-1", reason: "attempt", source: "test", updates: { sourceUrl: "https://example.com/x" } });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toContain("not writable");
+  });
+
+  it("sourceHost is NOT writable — it is derived, so it can never drift from sourceUrl", () => {
+    const result = validateWriteRequest({ ...base, updates: { sourceHost: "example.com" } });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toContain("not writable");
+  });
+});
+
+describe("parseSourceUrl", () => {
+  it("strips www. so a re-sourced card stays in its own per-domain cluster", () => {
+    // Real shape from live data: sourceHost "streb.org" alongside sourceUrl "https://www.streb.org/".
+    expect(parseSourceUrl("https://www.streb.org/")?.host).toBe("streb.org");
+    expect(parseSourceUrl("https://streb.org/")?.host).toBe("streb.org");
+  });
+
+  it("lowercases the host", () => {
+    expect(parseSourceUrl("https://WWW.SwimJim.COM/locations")?.host).toBe("swimjim.com");
+  });
+
+  it("keeps subdomains other than www, which are real distinct sources", () => {
+    // Color Me Mine gives each studio its own subdomain -- collapsing these would merge two real studios.
+    expect(parseSourceUrl("https://tribeca.colormemine.com/")?.host).toBe("tribeca.colormemine.com");
+  });
+
+  it("returns null for the values validation rejects", () => {
+    expect(parseSourceUrl("http://example.com")).toBeNull();
+    expect(parseSourceUrl("not a url")).toBeNull();
+    expect(parseSourceUrl("https://localhost/x")).toBeNull();
+  });
+});
+
+describe("content-card fingerprint stays in step with its basis fields (PR review, 2026-08-08)", () => {
+  // `applyCardBridgeWrite` needs a live DB, which this repo does not mock (a known, pre-existing gap
+  // documented in CLAUDE.md). What CAN be tested purely is the invariant the fix rests on: the
+  // fingerprint really is a function of exactly these five fields, so editing any of them through the
+  // bridge genuinely does invalidate a stored fingerprint. If this ever stops holding, the recompute in
+  // applyCardBridgeWrite is either incomplete or unnecessary, and this test says which.
+  const base = {
+    title: "Ferox Ninja Park Greenpoint",
+    sourceUrl: "https://feroxathletics.com/ninja-park/",
+    categoryHint: "Indoor Play",
+    boroughGuess: "Brooklyn",
+    neighborhoodGuess: "Greenpoint",
+  };
+
+  it("is stable for identical input", () => {
+    expect(computeContentCardIdentity(base).fingerprint).toBe(computeContentCardIdentity(base).fingerprint);
+  });
+
+  it("changes when ANY of the five basis fields changes", () => {
+    const original = computeContentCardIdentity(base).fingerprint;
+    const variants: Array<[string, typeof base]> = [
+      ["title", { ...base, title: "Ferox Ninja Playground DUMBO" }],
+      ["sourceUrl", { ...base, sourceUrl: "https://feroxathletics.com/playground/" }],
+      ["categoryHint", { ...base, categoryHint: "Sports" }],
+      ["boroughGuess", { ...base, boroughGuess: "Manhattan" }],
+      ["neighborhoodGuess", { ...base, neighborhoodGuess: "DUMBO" }],
+    ];
+    for (const [field, variant] of variants) {
+      expect(computeContentCardIdentity(variant).fingerprint, `${field} must affect the fingerprint`).not.toBe(original);
+    }
+  });
+
+  it("derives contentCardId from the fingerprint, which is why the id is deliberately left stale", () => {
+    // Recomputing the id would be a primary-key change, i.e. a delete-and-recreate. The dedupe index is
+    // {fingerprint, kind}, so the fingerprint is the part that has to stay honest.
+    const identity = computeContentCardIdentity(base);
+    expect(identity.contentCardId).toBe(`cc-${identity.fingerprint}`);
   });
 });
