@@ -739,6 +739,29 @@ in a comment when you add one, the way the existing ports do.
 - **Check a record against ITSELF before opening a browser.** Ballet Tech's `address` field said "Flatiron"
   and its `neighborhood` field said "Midtown". Two fields of one record contradicting each other is a defect
   resolvable with no research at all, and it is free to look for.
+- **A defect found in one field is a defect to look for in every field of the same shape — the scan defines
+  the finding, so a narrow scan produces a confidently wrong count.** The leaked-prompt sweep reported "35
+  live records" because it read `shortDescription`/`longDescription`. The identical string was ALSO the whole
+  value of `recurringPrograms[].timeText` on **48 further records**, two of which had already been "fixed" in
+  the description pass and so read as clean while still showing a family the pipeline's own instruction where
+  the class time belongs. Total was 74 records, not 35. Cleared pool-wide, field emptied rather than invented.
+- **A parent organisation's HEADQUARTERS address can overwrite a venue's own, and the footer is where it comes
+  from.** Prospect Park Zoo was filed under *Fordham, the Bronx*: 2300 Southern Boulevard, Bronx is the
+  Wildlife Conservation Society's HQ, printed in the footer of every WCS site page, and the extraction took
+  the footer instead of the venue. Distinct from the administrative-office rule (one business's own back
+  office) — here a multi-site parent's HQ moved a different site to another borough. Check it wherever one
+  parent runs several venues.
+- **A non-local area code is not by itself evidence of a wrong phone number — check whose number it is.** Two
+  cards in one batch, opposite outcomes. Irish Arts Center carried a 202 (Washington DC) number matching
+  nothing on its own site: CLEARED, not replaced. Doc's NYC Lacrosse carried a 617 (Boston) number — published
+  on the operator's own front page as "the Doc's Hotline": KEPT. A mobile hotline keeps its original area code
+  forever; the test is whether the operator publishes it, not where the digits geolocate.
+- **Check for a correctly-located sibling BEFORE ruling on a wrong location — it changes the verdict, not just
+  the paperwork.** Karate City's card claimed the Upper East Side and looked like a straightforward
+  real-brand-fabricated-location correction to Hell's Kitchen (525A W 52nd St). A sibling card already carried
+  that dojo correctly, so correcting this one would have produced two cards for one dojo; it was RETIRED as a
+  duplicate instead. The exactly-one-real-answer rule tells you whether to correct or quarantine; the sibling
+  check tells you whether "correct" was ever the right verb.
 - **The `providers.phone` field has held Unix timestamps and the city switchboard.** Found 2026-08-08 in a
   pool-wide scan: nineteen live records carried 10-digit epoch seconds (`1742850639` = 2025-03-24,
   `1672214040` = 2022-12-28) where the phone number should be, and eighteen carried `311`, New York City's
