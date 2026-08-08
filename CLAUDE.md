@@ -596,6 +596,21 @@ in a comment when you add one, the way the existing ports do.
   pre-registration; it was deliberately NOT carded, because listing it sends families to a pool that has not
   opened. Same family of judgement as the confirmed-permanently-closed case (City Treehouse), at the other
   end of the lifecycle — a real brand's real future site is still not somewhere a child can go this week.
+- **A raw HTML tag can reach the public `title`, and the text wrapped around it is usually real
+  information.** Found 2026-08-08 across the library clusters: `Kew Gardens Hills <br> (temporary Location)
+  Library (QPL)`, `Ozone Park <br> (closed For Renovations) Library (QPL)`, `Brighton Beach <br> (closed For
+  Renovation) Library (BPL)` — the literal string `<br>` scraped out of a branch-list's markup. A scan of 742
+  titles found exactly these three, so it is rare rather than systemic. **Don't just strip the markup**: two
+  of those three branches really are closed for renovation, which is the more important finding and the
+  reason both were blocked rather than tidied. Lifecycle judgements now confirmed at three points —
+  pre-opening (Goldfish UWS Broadway), temporarily closed (these two branches, `BLOCKED_REPAIRABLE` since
+  they reopen), permanently closed (City Treehouse, quarantined).
+- **NYPL, Brooklyn Public Library and Queens Public Library are three legally separate systems** — NYPL
+  serves Manhattan, the Bronx and Staten Island ONLY. Confirmed 2026-08-08 by a live card titled "New York
+  Public Library Children's Programs" carrying `boroughGuess: "Brooklyn"`. Any card attributing an NYPL
+  branch to Brooklyn or Queens is wrong on its face, no research needed. (Both of NYPL's only live cards were
+  also sourced to `/events/programs/childrens`, the system-wide programme index — a programme, not a branch —
+  while 61 correct per-branch cards sat unpublished behind them.)
 - **Cluster size alone is not evidence of a defect — a genuine multi-site operator produces a large, CORRECT
   cluster.** The necessary counterweight to the letsgobaby finding above, established the same session
   (2026-08-08). `laparks.org` carries 30 cards on a municipal `.org` domain, which looks like exactly the same

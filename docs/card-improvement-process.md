@@ -3416,6 +3416,45 @@ it is extended in the type.
 deliberately not carded — listing it would send families to a pool that has not opened. Same family of
 judgement as the confirmed-permanently-closed case (City Treehouse), at the other end of the lifecycle.
 
+### Cluster backlog, tranche 6: the three library systems — mostly a negative control (2026-08-08)
+
+The three biggest remaining clusters were the public-library systems: **nypl.org (63 cards),
+queenslibrary.org (27), bklynlibrary.org (28) — 118 cards, of which 113 were deliberately left alone.**
+They are one card per real branch, each on that branch's own `/locations/` or `/branch/` URL, each with the
+correct borough. Second confirmation of the laparks.org lesson: **cluster size is not evidence of a
+defect**, and a large correct cluster is what a genuine multi-site operator looks like.
+
+Five cards were wrong, and two of them badly.
+
+**Both of NYPL's only live cards were wrong, while 61 correct branch cards sat unpublished behind them.**
+Both are titled "New York Public Library Children's Programs" and both are sourced to
+`/events/programs/childrens` — the system's **programme index**, a listing of events across the whole
+system, naming no branch a family could walk into. One of the two also carried `boroughGuess: "Brooklyn"`
+and `neighborhoodGuess: "Downtown Brooklyn"`. **NYPL does not serve Brooklyn at all** — Brooklyn Public
+Library and Queens Public Library are legally separate systems, which is precisely why all three appear as
+separate hosts in this scan. So the only NYPL card a family could see was a programme index attributed to
+the wrong library system. Both retired.
+
+**A raw HTML tag in the public title — a new title-defect shape.** Three cards carry the literal string
+`<br>`, scraped straight out of a branch-list's markup and never stripped:
+- `Kew Gardens Hills <br> (temporary Location) Library (QPL)`
+- `Ozone Park <br> (closed For Renovations) Library (QPL)`
+- `Brighton Beach <br> (closed For Renovation) Library (BPL)`
+
+This joins the trailing `" prospect"` token, `": family_service_review_required"` and the single-word
+fragments — but it is markup rather than jargon or truncation, so it is its own shape. **A scan of 742
+titles found exactly these three**, so it is rare rather than systemic; all three are on library branch
+lists, which points at one scraper path.
+
+**The parentheticals turned out to matter more than the markup.** Stripping `<br>` is cosmetic; the text
+around it was real information. Two of the three branches are **closed for renovation**, per their own
+systems' branch lists, and were blocked rather than carded — a closed branch is not somewhere a child can go
+this week. `BLOCKED_REPAIRABLE`, not terminal: they reopen. That completes a small family of
+lifecycle judgements now seen at three points — **pre-opening** (Goldfish's UWS Broadway pool),
+**temporarily closed** (these two branches), and **permanently closed** (City Treehouse). The third branch,
+Kew Gardens Hills, is operating from a *temporary* location, so it was kept with that fact moved out of the
+title and into the record.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -4312,3 +4351,18 @@ judgement as the confirmed-permanently-closed case (City Treehouse), at the othe
   gap confirmed a fourth time, and **the data is already violating the type** -- three cards carry
   `boroughGuess: "Long Island"` and one carries `"NYC / Long Island"`. Also: **a pre-opening location is not
   a location** -- Goldfish's UWS Broadway school is in pre-registration and was deliberately not carded.
+- v99 (2026-08-08): cluster tranche 6 -- the three public-library systems, **118 cards audited, 113
+  deliberately left alone**. One card per real branch on that branch's own URL with the correct borough:
+  second confirmation, after laparks.org, that **cluster size is not evidence of a defect**. Five were wrong.
+  **Both of NYPL's only live cards** are the system's children's-programme INDEX page rather than a branch,
+  and one of the two carried `boroughGuess: "Brooklyn"` -- **a borough NYPL does not serve** (Brooklyn Public
+  Library and Queens Public Library are legally separate systems). So the only NYPL card a family could see
+  was a programme index attributed to the wrong library system, while 61 correct branch cards sat unpublished
+  behind it. Both retired. **New title-defect shape: a raw HTML tag in the public title** -- three cards
+  carry the literal `<br>`, scraped out of branch-list markup. A scan of 742 titles found exactly these
+  three, so it is rare rather than systemic, and all three sit on library branch lists (one scraper path).
+  **The parentheticals mattered more than the markup**: two of the three branches are closed for renovation
+  per their own systems' lists and were set BLOCKED_REPAIRABLE, which completes a lifecycle family now seen
+  at three points -- pre-opening (Goldfish UWS), temporarily closed (these), permanently closed (City
+  Treehouse). The third is operating from a temporary location and was kept with that fact moved out of the
+  title into the record.
