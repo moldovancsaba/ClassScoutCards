@@ -3917,6 +3917,50 @@ administrative office, and its actual sessions are open gyms in rented school an
 "Ridgewood" would put **a back office into the field a family reads as the place to turn up**. That is a
 worse error than the vague value it would replace.
 
+### Sovereign maintenance run, cards 16-20: the same run, and it splits five ways (2026-08-08)
+
+Same 2026-06-28 discovery run, same signature. What makes this batch useful is that five superficially
+identical cards — five youth sports organisations, all "NYC-wide", all `DISCOVERED` with no blockers — took
+**five different outcomes**, and the difference each time was one question: *does this operator have a venue,
+and whose is it?*
+
+| Card | Venue situation | Outcome |
+| --- | --- | --- |
+| New York Gauchos | **Owns its gym** — 478 Gerard Ave | → Mott Haven, Bronx |
+| Dribbl Basketball | Rents, but runs a continuing programme there | → Upper East Side |
+| PAL Sports Leagues | Many real centres, card names none | terminal — split candidate |
+| Volo Kids NYC | Real programme, city landing page, HQ in **Baltimore** | repairable |
+| NYC Juniors Volleyball | No venue published anywhere | **left alone** |
+
+**The Gauchos card is the cleanest in the entire run.** A real operator, a building it actually runs —
+Gauchos Gym, 478 Gerard Avenue, open 9am–8pm daily, the gym its own site calls "The Mecca" — and no
+ambiguity to resolve. Almost every other card in this run has been an operator without a venue; this is the
+counter-example, and it took one fetch.
+
+**Dribbl is the rented-venue rule applied without hesitation.** Its classes run at the Dalton PE Center, 200
+E 87th St — someone else's building — but fall, winter and spring seasons plus camps and parties at a fixed
+address is a continuing programme, which is the test that kept Physique Swimming's seven host pools. Its
+UWS, Brooklyn and Stuyvesant Town sessions were deliberately **not** carded: real, but not tied to a
+published address from this source.
+
+**PAL is a case where being a big, genuine organisation is why the card is wrong.** The Police Athletic
+League runs centres across all five boroughs and its own navigation lists them per borough — but this card
+is the homepage at "NYC-wide", and the only address on it is the head office at 34½ East 12th Street, which
+is not a place children attend. One card per PAL centre is the right representation, so this is a genuine
+`POST /split` candidate rather than something to repair. Fourth programme-index card from this one run.
+
+**Volo Kids adds a variant: a national nonprofit's city landing page.** Same shape as a franchise city page,
+but on a charity — `/city/new-york/` names no NYC venue, and the only street address anywhere on it is the
+foundation's head office **in Baltimore**. Blocked rather than retired, because Volo Kids NYC really does
+play at identifiable public parks on a recurring schedule; the fix is to re-source onto whichever park page
+publishes it.
+
+**A pattern in the sport, not just the cards: volleyball clubs in this pool publish tryouts and no venue.**
+NYC Juniors is the second in two batches (after NYC Impact) to be left deliberately unchanged for exactly
+this reason. Both are real, both have decades of history, and neither publishes a gym — they train in rented
+school gyms and their sites are organised around tryout dates. That is a recognisable shape worth expecting
+rather than re-diagnosing: **for this sport, expect to find the club and not the venue.**
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -4971,3 +5015,17 @@ worse error than the vague value it would replace.
   a location. And a fourth deliberate non-action, with sharper reasoning: NYC Impact Volleyball's only
   findable address is an administrative office, and **writing it would put a back office into the field a
   family reads as the place to turn up.**
+- v110 (2026-08-08): sovereign maintenance run, cards 16-20 of the 2026-06-28 run. Five superficially
+  identical cards -- five youth sports orgs, all "NYC-wide" -- took **five different outcomes**, separated by
+  one question: does this operator have a venue, and whose is it? **New York Gauchos OWNS its gym** (478
+  Gerard Ave, "The Mecca") -> Mott Haven, Bronx, and is the cleanest card in the whole run. **Dribbl rents
+  but runs a continuing multi-season programme** at the Dalton PE Center, 200 E 87th St -> Upper East Side,
+  the Physique test applied without hesitation; its UWS/Brooklyn/Stuy Town sessions deliberately not carded
+  for want of a published address. **PAL is wrong precisely because it is big**: centres across all five
+  boroughs, a per-borough Locations menu, and a card that is the homepage at "NYC-wide" whose only address is
+  a head office -- one card per centre is the right answer, so a genuine split candidate; fourth
+  programme-index card from this one run. **Volo Kids adds a variant, a national nonprofit's CITY LANDING
+  PAGE** -- names no NYC venue, and its only street address is the foundation HQ in Baltimore. And a
+  sport-level pattern worth expecting rather than re-diagnosing: **volleyball clubs in this pool publish
+  tryouts and no venue** -- NYC Juniors is the second in two batches left deliberately unchanged for that
+  reason, after NYC Impact.
