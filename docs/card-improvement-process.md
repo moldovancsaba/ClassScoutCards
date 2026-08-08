@@ -6107,3 +6107,45 @@ only place it can go.
 
   Two traps fired in one query here, which is the point: a count is only as good as the scope statement
   attached to it. Say which `kind`, say whether it was capped, and prefer loop-until-empty to a single page.
+
+- v135 (2026-08-08): **the `source_seed` cohort — 573 name-only stubs, and the mechanical test that split
+  them into a safe 512 and a 61 that must not be swept.** Working the oldest-first queue surfaced this as
+  the dominant thing at the old end: every one of the ten globally-oldest maintainable content cards was a
+  `sourcePool: "source_seed"` record — `sourceUrl` `internal://classscout/source-seed/…`, `sourceHost`
+  `classscout`, `entityKindHint: "unknown"`, `sourceAuthorityGrade: "weak"`, no category, held on
+  `missing_source_url`. 537 of the 573 come from ONE run, `content-card-backfill-2026-06-16`.
+
+  **A first reading of this cohort was wrong, and the error is the ordinary one.** The first ten titles are
+  all cultural institutions ("Italian American Museum", "Society Of Illustrators, Inc.", "Drawing Center,
+  Inc."), and the legal-entity styling reads exactly like a nonprofit-registry dump. Across all 573 it is
+  nothing of the kind: ~28 are cultural institutions and the rest are ordinary children's providers —
+  Super Soccer Stars, Chelsea Piers Swim School, NYJTL Community Tennis, Renzo Gracie Kids, Park Slope Day
+  Camp, SwimJim UES. **Ten records is not a sample of 573**, and this is the third time in two days that
+  generalising from the head of a list produced a confident wrong description.
+
+  **The cheap mechanical test was the whole job.** These stubs never named a page, so there is nothing to
+  re-source and `missing_source_url` can never be cleared on its own terms — the only question worth asking
+  is whether a correctly-sourced card for the same business already exists. Matching normalised titles
+  against the 3,739 content cards that DO carry a real `sourceUrl` answered it: **572 of 573 have an
+  exact-title twin.** No research, one enumeration.
+
+  **Then the sample rule earned its place again.** A twin existing is not the same as a twin that can carry
+  the business: **61 of the 572 have twins that are ALL exempt** (QUARANTINED or BLOCKED_TERMINAL), so
+  retiring those stubs would take the operator from one maintainable card to zero. Split accordingly —
+  **512 retired as duplicates** with the canonical card's id recorded in the reason, **61 held**.
+
+  **Token-overlap fuzzy matching was tried on the 61 and deliberately thrown away.** Most of those
+  operators are real and their canonical card was RETITLED by earlier corrections (Goldfish Swim School
+  Brooklyn Heights → the Gowanus school; Riverside Hawks → the correctly-sourced `riversidehawks.org`
+  card), so exact matching cannot see them. A 60%-token-overlap matcher claimed to cover 47 of the 61 and
+  was wrong in ways that would have retired real businesses: **"The Little Gym Upper West Side" → "Super
+  Soccer Stars Upper West Side"** (matched on the neighbourhood) and **"Brooklyn City FC Academy" →
+  "Friends Of City Reliquary Incorporated"** (matched on "city"). A title is mostly place words and
+  audience words; the distinctive operator token is a small minority of it, so overlap ratios are dominated
+  by exactly the parts that do not identify anybody. The 61 are `needs_human`, per the spec's own line —
+  *a listing correctly escalated costs minutes; a listing confidently rewritten wrong costs a family*.
+
+  A useful negative control on the 512: 14 of the exact-title pairs disagree on `boroughGuess`, and in
+  13 of the 14 it is the STUB carrying a compound placeholder ("Manhattan/Brooklyn") against a canonical
+  with a real value — evidence the canonical is the better record, not evidence they are different
+  businesses.
