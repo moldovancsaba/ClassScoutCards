@@ -6149,3 +6149,59 @@ only place it can go.
   13 of the 14 it is the STUB carrying a compound placeholder ("Manhattan/Brooklyn") against a canonical
   with a real value — evidence the canonical is the better record, not evidence they are different
   businesses.
+
+- v136 (2026-08-08): **`recurringPrograms[]` is a SECOND activity list and a SECOND copy field, and the
+  taxonomy pass missed both — caught by the owner, not by this loop.** "Recurring programs shows much more
+  sports than the main part." The Flatbush YMCA card's top-level chip correctly read SPORTS after the
+  taxonomy sweep while the block underneath still showed nine tags including the compound "SPORTS / CAMP".
+
+  **This is a failure of a rule already written in this document.** "A defect found in one field is a
+  defect to look for in every field of the same shape" was recorded about
+  `recurringPrograms[].timeText` — the exact sub-document swept here. The activityTypes pass never asked
+  what else holds activity tags. The cost was not cosmetic: **178 live programs still carried the banned
+  `"no category"` placeholder** after it had been reported as cleared. Writing a lesson down is not the
+  same as following it.
+
+  Fixed at both layers. `applyCardBridgeWrite` now aligns `recurringPrograms[].activityTypes` whenever a
+  providers write touches either list, so the two cannot drift apart again (a program's own title is
+  preferred over the provider's when deriving its primary activity — it is better evidence of what that
+  specific program is). 452 providers swept; verified against a fresh read of all 1,040 live listings:
+  0 placeholders, 0 formats, 0 generic sport spellings, 0 over the cap, 0 compounds, 0 with the parent out
+  of second place.
+
+  **Then the same question was asked of EVERY field, which is what should have happened first.** Walking
+  all string values of all live providers by path found the real prize: **276 `recurringPrograms[].timeText`
+  values holding scraped page furniture** — "skip navigation", "Skip to content", menu bars, page titles,
+  staff bios, testimonials, contact emails, and pipeline-internal text ("Supporting schedule evidence
+  from ..."). That is the field a family reads to learn WHEN a class runs. All cleared, never replaced;
+  inventing a schedule would be fabrication.
+
+  **Length was the wrong test and nearly cost real data.** The first cut cleared everything over 45
+  characters, which would have destroyed *"Summer camp runs July 6-10, 2026, Monday through Friday, 9:00
+  a.m. to 3:00 p.m."* and *"Mon/Thu 4:30-6:00 PM; Tue 3:30-5:00 PM; Sat 9:00-10:30 AM"* — the most useful
+  schedule strings in the whole field. Classify by CONTENT (does it name a time, a day, a month, a
+  schedule word?) and read the long survivors individually: of 26 over 85 characters, 9 were genuine and
+  17 were navigation, marketing, a bio or a testimonial.
+
+  **The scan found four live, unquarantined reality-check failures as a side effect**, three now
+  quarantined and one repaired:
+  - `prov-welcome-to-gift-lms` — **the foreign-university-LMS instance already named in CLAUDE.md's
+    contamination list, never actually quarantined.** `lms.gift.edu.pk`, GIFT University in Gujranwala,
+    Pakistan, filed as an Upper West Side children's activity, describing ODL and the Flipped Classroom
+    model. **A defect being documented is not the same as it being fixed** — worth re-checking every named
+    instance in that list against live data.
+  - `prov-hoop-heaven-nyc-manhattan` — its own site says "New Jersey's Premier Basketball Facilities",
+    locations Whippany/Bridgewater/Waldwick. Out of market, Manhattanville fabricated.
+  - `prov-cocoon-nyc` — prenatal and postpartum wellness coaching for WOMEN; no child attends. Fails the
+    reality check the same way an adults-only gym does. Its scraped text also names Chicago.
+  - `prov-peter-stuyvesant-little-league` — website was `en.wikipedia.org/wiki/Saint_Peter`, the token-match
+    bug firing on the word "Peter". Entity real, so the website was cleared and the card KEPT. The
+    description is scraped from the same article (it describes the Stuyvesant Town housing complex) and
+    could NOT be cleared, because the copy-quality gate rejects an empty value — recorded in `reason` for a
+    research pass rather than replaced with invented prose.
+
+  Method note worth reusing: **walking every string value of a record BY PATH, rather than checking the
+  fields you already suspect, is what turns one reported symptom into a census.** It also produced two
+  false positives that were correctly not acted on — "Multi-activity summer camp" in a description is
+  ordinary English, not the banned category value. The placeholder rules apply to CATEGORY FIELDS, not to
+  prose.
