@@ -495,6 +495,37 @@ in a comment when you add one, the way the existing ports do.
   repetition across unrelated records is itself a signal, separate from whether any single card's guess
   is right or wrong.
 
+- **A card's stored domain can belong to a DIFFERENT REAL COMPANY whose name merely shares a word — a fourth
+  wrong-domain shape, and the only one in which nothing is fake.** Found 2026-08-08 (batch 40). A card titled
+  "Camp Kidville UWS" was sourced to `camp.com`, the family-experience retailer CAMP — an entirely separate
+  company from Kidville, sharing only the token "camp". Both companies are real, and the card names the right
+  one: Camp Kidville is the genuine summer camp at Kidville Upper West Side, 205 West 88th Street,
+  212-362-7792. Distinguish all four now: *off-topic contamination* (the entity was never real),
+  *pipeline-guessed-wrong-domain* (the domain never belonged to the business), *domain hijacking* (Urban
+  Dunes — the domain WAS the business's, then changed hands), and *token collision* (this). The danger is
+  that this one is the hardest to see: `camp.com` serves a real, glossy, obviously-legitimate children's
+  business, and CAMP's own location list names exactly one NYC store (Flatiron), so a card reading "Camp …
+  UWS" looks like a textbook real-brand-fake-location fabrication. Quarantining on that reading would have
+  deleted a real operating business. **Search for the card's own named ENTITY before ruling on what its
+  domain serves** — already the rule for hijacking, and it generalizes: the sourceUrl is evidence about the
+  pipeline, not about whether the business exists.
+- **A multi-location franchise's bare ROOT DOMAIN as `sourceUrl` is a defect predictor, not a neutral fact.**
+  Found 2026-08-08 (batch 40): all five root-domain cards in one batch (`sylvanlearning.com`,
+  `codeninjas.com`, `c2educate.com`, `camp.com`, `completebody.com`) were defective, each in one of exactly
+  two ways — a **borough-level duplicate** of a single real center already carried by a correctly-sourced
+  sibling ("Sylvan Learning Manhattan" for the one real 200 W 86th St center; "Code Ninjas Brooklyn" for the
+  one real Gowanus dojo), or a **fabricated location** naming a borough where the franchise has no branch at
+  all (C2 Manhattan, Code Ninjas Manhattan, CAMP Brooklyn). That is structural, not luck: a root domain
+  carries no location evidence, so whatever borough landed on the card was inferred rather than read. The
+  per-location cards on those same hosts (`codeninjas.com/ny-gowanus`, `camp.com/locations/fifth-ave-nyc`)
+  were correct. Fetching each brand's own location directory resolved five cards in five requests — do that
+  before accepting any root-domain card's borough.
+- **Fabrication can live in the TITLE, not just in a location or category field.** Found 2026-08-08 (batch
+  40): "CompleteBody Kids / Kids Sports NYC" welds a real **adults-only** gym brand (its own site: "Premium
+  Gym NYC — 5 Locations", none on the UWS, no children's programming anywhere) to a second name the source
+  never mentions, prefixed "Kids". Every previously catalogued fabrication sat in a field a family reads
+  second; this one is in the field they read first. Both copies were quarantined rather than deduplicated —
+  when neither copy describes a real children's provider, "which is canonical" is the wrong question.
 - **What decides between CORRECTING a wrong location and QUARANTINING the card is whether research yields
   exactly ONE real answer.** Sharpened 2026-08-07 (cards 201-300, batch 21) after three cards in a single
   batch hit the same real-brand-wrong-location shape and correctly took two different outcomes. Sylvan
