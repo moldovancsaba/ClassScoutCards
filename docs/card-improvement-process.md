@@ -5965,3 +5965,28 @@ only place it can go.
   its key can see. Normalised phone found punctuation and ID-truncation duplicates; shared `sourceHost` found
   cross-title clusters; shared `sourceUrl` finds exact re-creations. Each finds pairs the others structurally
   cannot, so running one and stopping produces a confidently incomplete answer.
+- v133 (2026-08-08): **277 free public facilities unparked — `low_source_confidence` on official government
+  and public-library domains.** Found when a batch of `laparks.org` per-facility cards surfaced in the
+  oldest-first queue, all PARKED_COOLDOWN.
+
+  The cohort is 280 cards and **every host in it is an official municipal or public-library domain**:
+  `laparks.org` (233), `queenslibrary.org` (18), `bklynlibrary.org` (8), `nypl.org` (8), `lacity.org`,
+  `griffithobservatory.org`. The blocker asserts the source cannot be trusted. For a city parks department
+  or a public library system that premise is simply false, and 277 cards were held on it.
+
+  **What was parked matters more than the count.** 233 Los Angeles parks, pools and recreation centres, and
+  34 public library branches — the free, walk-in, no-cost children's programmes that families with the least
+  money rely on most. An earlier pass had already examined the `laparks.org` set and concluded it was
+  CORRECT — one card per real facility on a legitimate LA-tenant source — and deliberately left 28 of 30
+  untouched as an example of the one-card-per-location rule working at scale. **They were parked the whole
+  time on a code nobody had looked at.** Confirming a card is right does not surface the blocker holding it.
+
+  Only this blocker was removed, only on official domains (3 non-official hosts in the cohort were skipped),
+  state was left alone, and other blockers were kept — clearing a blocker still requires its own premise to
+  be false.
+
+  **This is the third false-premise blocker class found today**, after `low_source_trust` on institutions'
+  own domains and `policy_or_safety_review` tracking record completeness. All three share a shape: a code
+  whose NAME describes a judgement about the source or the content, applied on the basis of something
+  mechanical. Worth checking every remaining blocker code the same way — what does the name claim, and what
+  actually sets it?
