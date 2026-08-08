@@ -11,6 +11,7 @@ import {
 import { validateCopyQuality } from "@/lib/validation/copyQuality";
 import { alignActivityTypes, isNonAnswerCategoryValue, NO_CATEGORY_PLACEHOLDER } from "@/lib/delivery/activityAlignment";
 import { computeContentCardIdentity } from "@/lib/delivery/cardBridgeSplit";
+import { monthsToAgeBuckets, validateRecurringPrograms } from "@/lib/delivery/programSchema";
 import { buildFamilyServicePlaceFact, buildFamilyServiceReviewPacket, isPublicStatus, normalizeFamilyServiceLead, reviewPacketEligible } from "@/lib/familyServices/core";
 import { FAMILY_SERVICE_LEAD_STATUSES, type FamilyServiceLead } from "@/lib/familyServices/types";
 
@@ -157,6 +158,18 @@ export function validateWriteRequest(body: unknown): WriteValidationResult {
         status: 400,
         error: `${field} must not contain "${nonAnswer.trim()}" — it records the pipeline's failure to classify rather than naming anything a family can act on, and it renders on the card as a chip. Omit the field, or write the real activity.`,
       };
+    }
+  }
+
+  // (2026-08-08) recurringPrograms was a BARE PASSTHROUGH -- writable as a whole array with no shape
+  // validation at all, which is exactly what this repo's own convention forbids. It now carries the
+  // structured programme schema (times, ages in months, price with an evidence enum), so a malformed value
+  // is no longer a cosmetic problem: it feeds the per-day query. Legacy entries validate unchanged --
+  // every new field is optional and only checked when present. See programSchema.ts.
+  if (collection === "providers" && "recurringPrograms" in updates) {
+    const programCheck = validateRecurringPrograms(updates.recurringPrograms);
+    if (!programCheck.ok) {
+      return { ok: false, status: 400, error: programCheck.error ?? "recurringPrograms is invalid" };
     }
   }
 
@@ -464,6 +477,21 @@ export async function applyCardBridgeWrite(request: NormalizedWriteRequest): Pro
         return { ...program, activityTypes: aligned.activityTypes };
       });
     }
+  }
+
+  // Keep the five display buckets DERIVED from the numeric truth, so the two can never disagree. Months
+  // are what a query uses; the buckets are what a card shows. The owner's own example -- "ages 8-12" --
+  // straddles "6–8" and "9–12", so a hand-written bucket list would round outward and send a parent of an
+  // eight-year-old to a class that starts at nine. Same pattern as alignActivityTypes: derive, don't trust.
+  if (request.collection === "providers" && Array.isArray(alignedRecurringPrograms ?? request.updates.recurringPrograms)) {
+    const source = (alignedRecurringPrograms ?? request.updates.recurringPrograms) as Record<string, unknown>[];
+    alignedRecurringPrograms = source.map((program) => {
+      if (!program || typeof program !== "object") return program;
+      const min = program.ageMinMonths;
+      const max = program.ageMaxMonths;
+      if (typeof min !== "number" || typeof max !== "number") return program;
+      return { ...program, ageRanges: monthsToAgeBuckets(min, max) };
+    });
   }
 
   if (request.dryRun) {
