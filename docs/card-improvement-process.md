@@ -5675,3 +5675,45 @@ only place it can go.
   empty value is deliberately still allowed** — clearing a place field is how a reviewer records an honest
   absence, and that must stay available. Checked against the platform's own canonical vocabulary: **zero** of
   the 340 real borough/neighbourhood names would be rejected. Six tests added, 182 passing.
+- v125 (2026-08-08): **sovereign loop, cards 1-16, and the loop itself improved twice off the evidence.**
+
+  **Batch 1 (10 cards, oldest-first).** Every one had a real defect. Two terminal token-matches (The Party
+  Fairy NYC sourced to the **FIFA World Cup 2026 NY/NJ host committee's fan-events page**; Mommy Poppins,
+  which is a directory), one quarantine (New York Party Characters — costumed performers who come to your
+  party), two demotions from PUBLISHED (Mozart for Munchkins, Commonpoint — both chain/touring duplicates of
+  correctly-carded live listings), one blocker correction, two confirmations with a category fix, one program
+  card, and one **repurpose**.
+
+  **Loop improvement 1 — a token-matched card is not automatically terminal. Check whether the SOURCE is
+  itself a real, in-scope, uncarded business.** "Bubbles and Balloons NYC" (no such business findable) was
+  sourced to `gazillionbubbleshow.com` by a match on "Bubbles". The Party Fairy card, structurally identical,
+  went terminal — but this one did not, because the Gazillion Bubble Show is real, plays at a permanent
+  Off-Broadway venue (New World Stages, 340 W 50th St) and had **no card of its own**. Retitled onto it. The
+  same defect shape yields a discard in one case and a new listing in the other; the deciding question is
+  what is on the other end of the wrong URL.
+
+  **Loop improvement 2 — query the DEFECT COHORT, and work its PUBLISHED members first.** Batch 1 noticed
+  every card of one discovery run carried `boroughGuess: "Manhattan/Brooklyn"` and
+  `neighborhoodGuess: "NYC-wide"`. Querying those values directly returned **219 distinct cards** — of which
+  **six were PUBLISHED**, and those six became batch 2. Walking oldest-first would have reached them after
+  hundreds of held cards. **Oldest-first finds cards; cohort-plus-published-first finds live harm.**
+
+  **The inversion worth remembering: a compound place value is often the data telling the truth.** These were
+  being treated as guessing failures. In batch 2 they were mostly accurate: Music To Your Home ("Manhattan/
+  Brooklyn" / "Multiple") sends teachers to your home; Soccer Stars ("Manhattan / Brooklyn / NYC" /
+  "NYC-wide") teaches in rented gyms; Mozart for Munchkins ("Multiple") tours. The field could not name one
+  place **because there is not one**. A compound is therefore a strong pre-screen for the no-fixed-venue
+  prohibition and for split candidates — not merely a value to tidy.
+
+  **A hypothesis that did NOT generalise, recorded because negative results are cheap and worth keeping.**
+  TLB Music sat QUARANTINED carrying `policy_or_safety_review` — the most serious code available — purely
+  because its site returns HTTP 403 to automated requests. That looked like it might be a systemic false
+  positive, so a sample of 25 quarantined cards was checked: **zero** carried the code. It was an outlier,
+  not a pattern. (The real dominant quarantine reasons in that sample are `placeholder_or_junk_source` 19/25
+  and `compacted_low_value` 10/25, which look broadly correct.) The TLB blocker was still removed and the
+  three genuine content gaps kept — clearing a blocker requires its PREMISE to be false, and "the page
+  couldn't be read" is not a safety finding.
+
+  **Category signal**: three of four "Birthday Entertainment" cards across the two batches were travelling
+  performers. For that category, check the DELIVERY MODEL first — it is the fastest disqualifier and saves a
+  full research pass.
