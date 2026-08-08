@@ -3014,7 +3014,9 @@ The oldest-`PUBLISHED` off-topic sweep had been an open recommendation since bef
 run. Started here. **Pool size: 908 published content cards** (of 12,626 total). Two pages, 50 cards
 screened, 12 defects resolved.
 
-**Headline: the sweep did NOT find what it was looking for.** Not one instance of off-topic contamination
+**CORRECTION (later the same day, after the sweep continued past 50 cards): the paragraph below is WRONG, and is kept rather than deleted because being wrong in a recorded way is the point of these notes.** At ~150 cards the sweep found **15 PUBLISHED zero-blocker cards** whose `sourceUrl` had been chosen by token-matching the business name to an unrelated famous page — `en.wikipedia.org/wiki/Tiger` (the animal) for Tiger Schulmann's, `Marlene_Dietrich` for the Marlene Meyerson JCC, `Saint_Peter` for Peter Stuyvesant Little League, `Asphalt_concrete` for Asphalt Green, `youtubekids.com` for six cards containing "Kids", `nytimes.com` for three containing "NY". See the section below and item 0 of `classscout-core-recommendations.md`. **The lesson about the negative result is not that it was wrong to record, but that 50 cards was too small a sample to generalise from, and the write-up did not say so loudly enough.**
+
+**Headline at 50 cards (superseded): the sweep did NOT find what it was looking for.** Not one instance of off-topic contamination
 — no e-commerce checkout pages, no app-store listings, no reference articles, no foreign university LMS —
 appeared in 50 cards. Every card was a plausible NYC children's activity business on its own domain. On
 this evidence the published pool is *not* where that defect concentrates, which is worth knowing: the five
@@ -3049,7 +3051,20 @@ operating business with zero live cards**. The company's own contact page gives 
 location resolves both; without one, the tension would have been real and the card should be kept and
 flagged rather than retired into a gap.**
 
-**Coverage is partial and the honest number is 50 of 908 (~5.5%).** Paging further currently costs a write
+**The token-match finding, in full.** Continuing the sweep past 50 cards turned up **25 cards** whose
+`sourceUrl` was chosen by matching a word from the business name to an unrelated famous page. Resolved as:
+13 `BLOCKED_TERMINAL` (duplicates of correctly-sourced canonicals, programme cards, or entities that could
+not be identified at all) and 12 `BLOCKED_REPAIRABLE` with the correct re-source target written into
+`terminalReason` for when `sourceUrl` becomes writable in production.
+
+The decision rule throughout was the one already in `CLAUDE.md`: **search the ENTITY before ruling on the
+domain.** Tiger Schulmann's, the JCC, Asphalt Green, Manhattan Youth, Downtown United Soccer Club and Peter
+Stuyvesant Little League are all real, so none of these was quarantined as contamination — they are
+wrong-domain cards, and the ones with no correctly-sourced sibling are repairable. Only where the entity
+itself could not be identified ("Kids Basketball NYC" — a generic activity phrase, not a business name) was
+the card terminated outright.
+
+**Coverage is partial and the honest number is ~150 of 908 (~16%).** Paging further currently costs a write
 per card, because advancing the queue means touching records — which is why `offset` was added to the rows
 endpoint in this same session. That capability is committed but **inert until the branch merges**, since
 production deploys from `main`. The remainder of this sweep should be run read-only against `offset` once
