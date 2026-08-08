@@ -3544,6 +3544,54 @@ twice, the flagship in southern Brooklyn not once.
 building at 129 W 67th St; Mark Morris's "Kids" and "Student Company" cards are programmes inside 3
 Lafayette Avenue. Same rule as the programme cards, one level of organisational structure up.
 
+### Cluster backlog, tranche 9: seven all-live clusters, and the first fully-correct one (2026-08-08)
+
+**21 cards, every one live at `PUBLISHED`, reduced to 12. One repurposed, one cluster left entirely
+untouched.**
+
+| Host | Cards | Real locations | After |
+| --- | --- | --- | --- |
+| `mmanewyorkcity.com` | 3 | 3 schools: Tribeca, UES, UWS | **3 canonical** (one repurposed onto UES) |
+| `paintedpot.com` | 3 | 2 studios: Park Slope, Carroll Gardens | 2 canonical, 1 terminal |
+| `psabjj.com` | 3 | 1: 518 5th Ave | 1 canonical, 2 terminal |
+| `superdupertennis.com` | 3 | **none of its own — it is mobile** | 2 terminal, 1 repairable |
+| `theartstudiony.com` | 3 | 1: 72nd St (UWS) | 1 canonical, 2 terminal |
+| `treasuretrunktheatre.com` | 3 | 4 locations | **3 kept, all correct** |
+| `warriorssportsclub.com` | 3 | 1: 260 W 231st St, Kingsbridge | 1 canonical, 2 terminal |
+
+**Treasure Trunk Theatre is the first cluster in this entire sweep where every card was already right** —
+TT Atlantic (141 Atlantic Ave), TT Park Slope (179 4th Ave) and TT Prospect Heights (700 Washington Ave),
+one card per real location, correctly named and located. Nothing was changed. It is also the first cluster
+with **fewer cards than real locations**: TT South Slope (408 7th Ave) has no card. Every other cluster this
+sweep had *surplus* cards to repurpose onto missing locations; here there is no surplus, so this is a
+genuine `POST /split` candidate — and it is the same "Treasure Trunk South Slope" gap an earlier pass
+deferred. Recorded rather than rushed.
+
+**Modern Martial Arts is the cleanest repurpose of the sweep**: three cards, three real schools, and the
+surplus was a *compound* card ("Upper West Side / Tribeca") duplicating two schools that already had their
+own cards — while the third school, Upper East Side at 220 E 86th St, had none. Compound cards have shown up
+repeatedly as duplicates; this is the first time one turned out to be a perfect repurpose target, because
+the location it was missing was the location it wasn't compounding.
+
+**Checking before retiring saved a real studio.** The Painted Pot's homepage names only its Park Slope
+address, so its Carroll Gardens card looked like the real-brand-fabricated-location pattern. An independent
+check confirmed 339 Smith Street is a genuine, currently-operating second studio. **A homepage naming one
+address is not evidence that the others are fake** — the entity-before-domain discipline applies to
+locations too.
+
+**Super Duper Tennis calls itself mobile in its own page title.** "Super Duper Tennis | *Mobile* Tennis &
+Pickleball Programs" — it has no courts, teaching at Asphalt Green, in Battery Park, inside schools, and at
+"partner vendor" sites. Its two Brooklyn cards claim a borough where it names no venue at all and were
+retired; the Manhattan one is repairable, with the note that a card must name one specific site with a
+continuing published schedule — the same test that kept Physique Swimming's host pools and retired The Art
+Farm's rented camp hall — and that Asphalt Green is *already carded as a venue in its own right*, so a Super
+Duper card there would be a programme inside somebody else's building.
+
+**Two more broken titles, both live.** Warriors Sports Club had a card titled simply **"Summer"** (truncated
+from the site's "Summer Camp" nav item — the same defect as The Canopy NYC's "New"/"And" pair) and another
+reading **"Programs Kids Programs in Kingsbridge Bronx"**, with the word "Programs" duplicated. Only one of
+its three live cards carried the business's actual name.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -4487,3 +4535,18 @@ Lafayette Avenue. Same rule as the programme cards, one level of organisational 
   found twice and the flagship not once. Also: **a division is not a location** (Kaufman's Lucy Moses School
   and Merkin Hall are one building; Mark Morris's "Kids" and "Student Company" are programmes inside one
   address).
+- v102 (2026-08-08): cluster tranche 9 -- seven clusters, **21 cards all live at PUBLISHED, down to 12**,
+  one repurposed, and **the first fully-correct cluster of the entire sweep**: `treasuretrunktheatre.com`'s
+  three cards are one per real location, correctly named and located, and nothing was changed. It is also
+  the first cluster with FEWER cards than locations (TT South Slope, 408 7th Ave, has none), so unlike every
+  other cluster here there is no surplus to repurpose -- a genuine POST /split candidate, and the same gap
+  an earlier pass deferred. **Modern Martial Arts is the cleanest repurpose yet**: the surplus was a COMPOUND
+  card ("Upper West Side / Tribeca") duplicating two already-carded schools while the third, UES at 220 E
+  86th St, had none -- the first time a compound card was a perfect repurpose target rather than just a
+  duplicate. **Checking before retiring saved a real studio**: The Painted Pot's homepage names only Park
+  Slope, so its Carroll Gardens card looked fabricated; 339 Smith Street is a genuine operating second
+  studio. A homepage naming one address is not evidence the others are fake. **`superdupertennis.com` calls
+  itself mobile in its own page title** and has no courts -- its Brooklyn cards name a borough with no venue
+  and were retired, the Manhattan one is repairable pending a specific site with a continuing schedule
+  (noting Asphalt Green, one of its venues, is already carded in its own right). Two more broken live titles:
+  a card titled simply **"Summer"** and one reading "Programs Kids Programs in Kingsbridge Bronx".

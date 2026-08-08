@@ -674,6 +674,21 @@ in a comment when you add one, the way the existing ports do.
   one building at 129 W 67th St; Mark Morris's "Dance Center Kids" and "Student Company" are programmes
   inside 3 Lafayette Avenue. Same rule as program-not-a-location, one level of organisational structure up:
   a named school, hall, academy or company inside a single venue does not earn its own card.
+- **A homepage naming ONE address is not evidence the operator's other locations are fake — check before
+  retiring.** Found 2026-08-08: The Painted Pot's homepage title and footer give only 188 5th Avenue (Park
+  Slope), so its "Carroll Gardens" card looked like textbook real-brand-fabricated-location. An independent
+  check confirmed 339 Smith Street is a genuine, currently-operating second studio. Quarantining on the
+  homepage alone would have deleted a real business. Same discipline as entity-before-domain, applied to
+  locations: **the absence of a location from the homepage is not evidence of its absence from the world.**
+- **A COMPOUND card can be the ideal repurpose target, not just a duplicate.** Modern Martial Arts NYC has
+  three schools; two had correct cards and the third (UES, 220 E 86th St) had none, while the surplus card
+  read "Upper West Side / Tribeca" — compounding exactly the two that were already covered. Compound
+  neighbourhoods have shown up throughout this sweep as duplicates to retire; check first whether the
+  location the compound is NOT naming is one that lacks a card.
+- **A cluster with FEWER cards than real locations is the genuine `POST /split` case — and it is rare.**
+  Treasure Trunk Theatre has four locations and three cards, all three correct. Almost every other cluster in
+  this sweep had surplus cards, which is why retitling kept beating splitting; this is the shape where it
+  does not. Recognise it by counting before reaching for either tool.
 - **Cluster size alone is not evidence of a defect — a genuine multi-site operator produces a large, CORRECT
   cluster.** The necessary counterweight to the letsgobaby finding above, established the same session
   (2026-08-08). `laparks.org` carries 30 cards on a municipal `.org` domain, which looks like exactly the same
