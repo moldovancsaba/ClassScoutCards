@@ -6459,3 +6459,36 @@ only place it can go.
   needless writes. And 34 descriptions flagged by a prompt-leak regex were **all false positives**: good,
   specific copy that merely ended in an ellipsis. Third time in two days that one of my own scan regexes
   over-fired; the fix each time was to read the matches before acting on the count.
+
+  **v142 continued — the rest of the 200.** 177 provider records written in this pass:
+
+  | fix | count | source of truth |
+  | --- | ---: | --- |
+  | descriptions replaced with the operator's `<meta description>` | 94 | the site's own tag |
+  | `longDescription` replaced with page prose (long field only) | 19 | first genuine paragraph |
+  | hard-truncated `shortDescription` regenerated | 33 | the record's own `longDescription` |
+  | misattributed `website` cleared | 10 | cross-provider URL grouping |
+  | `neighborhood` derived | 17 | the record's own `address` |
+  | `phone` added | 4 | the operator's own page, strictly validated |
+
+  Verified against a fresh read: broken descriptions on visible records **221 → 120**, truncated
+  descriptions **34 → 1**.
+
+  **A fourth naive-match false positive, caught before writing.** Deriving `neighborhood` by looking for a
+  canonical name anywhere in the stored address matched **"Richmond" inside "1000 Richmond Terrace"** and
+  would have filed six Staten Island museums in Richmondtown. Requiring the neighbourhood to be a
+  COMMA-DELIMITED COMPONENT of the address cut 58 candidates to 19, all correct. Two of those 19 were then
+  dropped because their "address" lists three neighbourhoods ("Fort Greene, Park Slope and Cobble Hill
+  locations") — split candidates, not addresses.
+
+  **This is now the session's most reliable finding about method.** Four separate scans in one pass
+  produced plausible-looking garbage from naive matching: `ebay` inside `heal-thebay`, `Art` inside
+  `mARTial`, `Richmond` inside `Richmond Terrace`, and a price of `$90 per person` from a sentence reading
+  "$450 per camper per week". **Every one was caught by reading the matches rather than the count, and
+  every one would have shipped if the count alone had been trusted.** Budget for reading a sample of any
+  scan's output before acting on it, every time.
+
+  **Where the new structured properties now stand** (830 programs on live records): 512 carry a
+  `schedule{}`, 121 of them `precision: "exact"`; 434 carry numeric ages; **0 carry a `price{}` — and that
+  is the correct number.** Price is the one field this loop should not automate, and the attempt above is
+  the evidence.
