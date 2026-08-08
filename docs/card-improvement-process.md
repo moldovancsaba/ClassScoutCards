@@ -2536,6 +2536,39 @@ nonetheless the institute's own first-party domain.** A `.de` domain is not evid
 contamination the way the batch-29 German travel site was; what matters is whether the domain belongs to
 the entity, not which country it is registered in.
 
+### Batch 37/16 (cards 362-377) — the first per-domain duplicate sweep
+
+Acting on the batch-36 recommendation rather than continuing one branch at a time. A single query —
+`filter={"sourceHost":"ymcanyc.org"}` — returned **16 non-repair cards covering roughly 7 real branches**:
+
+| Real branch | Cards found | Resolution |
+|---|---|---|
+| Dodge YMCA (225 Atlantic Ave) | **4** ("Dodge YMCA", "…Brooklyn", "…Youth Sports & Swim", "…Swim Lessons") | 1 canonical (batch 27), 3 terminal |
+| Park Slope area | **5** across TWO genuinely different branches | see below |
+| North Brooklyn YMCA | **3** | 1 canonical (batch 26), 2 terminal |
+| Coney Island YMCA | 2 (identical titles) | 1 canonical, 1 terminal |
+| Flatbush YMCA | 2 (identical titles) | 1 canonical, 1 terminal |
+| Chinatown YMCA | 1 | kept |
+| Vanderbilt YMCA | 1 | kept |
+| *(not a branch)* | "YMCA of Greater New York — Locations" | terminal — the org's own locations index |
+
+Net: **11 terminal, 5 canonical.** Duplicate instances 25–33.
+
+**The Park Slope group is the instructive one, because the naive read is wrong.** Five cards all labelled
+"Park Slope" look like five copies — but **Prospect Park YMCA (357 9th St) and Park Slope Armory YMCA
+(361 15th St) are two genuinely different real branches**, four blocks apart. Collapsing them would have
+destroyed a real location. The five resolved to: one card each for the two real branches, two duplicates,
+and one card titled "Prospect Park / Park Slope Armory YMCA" that **mashed both branches into one record**.
+That mashup is the Tennis Innovators / NY Preschool multi-location pattern again — but resolvable by
+deletion rather than `POST /split`, because both children already existed as their own cards.
+
+**Why the sweep beat the queue.** These 11 duplicates would have surfaced one at a time over ~11 more
+batches, each requiring its own research, and — per the batch-32/33/35 order-dependence problem — several
+would likely have been mis-assigned canonical along the way. Seeing all 16 at once made the branch
+structure obvious, including the two-real-branches-in-Park-Slope subtlety that card-at-a-time review would
+very likely have flattened. **For any domain with a known duplicate, sweep the domain instead of waiting
+for the queue.**
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -3164,3 +3197,14 @@ the entity, not which country it is registered in.
   written into `terminalReason` rather than guessed. Negative control recorded: Goethe-Institut's
   `goethe.de` source is a foreign TLD but the entity's OWN domain -- country of registration is not
   evidence of off-topic contamination. See "Batch 36/10..." above.
+- v82 (2026-08-07): batch 37/16 (cards 362-377) -- **first per-domain duplicate sweep**, acting on the
+  batch-36 recommendation. `filter={"sourceHost":"ymcanyc.org"}` returned 16 non-repair cards for ~7 real
+  branches: Dodge had FOUR cards, North Brooklyn three, the Park Slope area five, plus the org's own
+  locations index page masquerading as an entity. Resolved as one operation: 11 terminal, 5 canonical
+  (duplicate instances 25-33). The Park Slope group is the instructive part -- Prospect Park YMCA (357 9th
+  St) and Park Slope Armory YMCA (361 15th St) are two GENUINELY DIFFERENT real branches four blocks apart,
+  so collapsing the five would have destroyed a real location; one of the five was a card mashing both
+  branches together, resolvable by deletion rather than split since both children already existed.
+  Conclusion recorded: for any domain with a known duplicate, sweep the domain rather than waiting for the
+  oldest-first queue, which would have taken ~11 more batches and likely mis-assigned canonical along the
+  way. See "Batch 37/16..." above.
