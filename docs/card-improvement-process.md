@@ -5597,3 +5597,39 @@ only place it can go.
   Soccer Stars' Upper West Side office (606 Columbus Ave) for **five** listings at once, including two
   Brooklyn ones and one named for **Nassau County**. Nothing was written — the operator teaches in rented
   gyms and parks and has no venue of its own, so the office is not a substitute.
+- v123 (2026-08-08): **automated address recovery taken to its limit, and the limit itself turned out to be
+  the finding.** A widened probe (accepting a borough token where the strict one required a ZIP) recovered
+  four more addresses and surfaced two more duplicate pairs. Then a RELAXED pattern was run over the 198
+  listings nothing else could resolve, purely as a diagnostic — and it is the clearest demonstration yet of
+  why the guards exist.
+
+  **The relaxed pattern produced a candidate for 73 listings and most were wrong**, in ways that would each
+  have put a real family in the wrong place:
+  - **Out-of-state head offices** — Russian School of Mathematics resolved to **Newton, Massachusetts**;
+    Tinkergarten to **Columbus, Ohio**; FasTracKids to **Greenwood Village, Colorado**; Tutu School to
+    **Montgomery, Alabama**; Prep Academy Tutors to **Toronto**; Sloomoo to **Atlanta**. Seven in one batch.
+    **This is now the sharpest detector available for a national-brand listing whose specific local location
+    is unevidenced** — sharper than the root-domain predictor, because a Manhattan children's listing
+    resolving to Alabama cannot be anything else.
+  - **Subway directions parsed as an address**: three Brooklyn Bridge Park listings returned *"3 Clark Street
+    A C High Street"* — the station names from a travel-directions block run together. Nearly every venue
+    page carries directions, and they parse identically to an address.
+  - **An unreplaced template placeholder in the operator's own site**: Code Ninjas Brooklyn returned the
+    literal **"1234 Street Place"**. The one case where the *source itself* contains fabricated-looking data,
+    so any extractor reading it in good faith produces a street that does not exist.
+  - A sibling branch of the same chain in another borough (Tiger Schulmann's UWS → a Bayside, Queens address).
+
+  **Nothing from the relaxed pass was written automatically.** Eleven were hand-verified and written; the
+  rest were recorded as `needs_human` with the specific finding, so the next pass starts from a diagnosis
+  rather than a backlog.
+
+  **One real correction fell out of it, confirming a measured pattern.** Penguin City Swim was stored as
+  MANHATTAN; its pool is at 3220 Arlington Avenue in **Riverdale, the Bronx**. An earlier pass measured that
+  wrong location guesses err toward the fashionable core and found all eight of its cards saying Manhattan or
+  Brooklyn. This is the ninth instance of the same operator being pulled centrewards.
+
+  **Where the 198 unresolved listings actually stand**, which is a result rather than a backlog: 93 have a
+  reachable site that publishes no street address at all, 30 say in their own words that they have no fixed
+  venue (mobile, in schools, multiple locations), 2 are unreachable, and 73 have an address their site shows
+  in a form no safe pattern can extract. **The 30 no-fixed-venue ones are not defects** — they are the
+  `venueModel` gap in the wild, and the right answer for them is a schema field, not a street line.
