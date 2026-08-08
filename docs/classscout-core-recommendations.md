@@ -15,12 +15,30 @@ Ordered by family impact, worst first.
 
 ## 0. Discovery picks a source by TOKEN-MATCHING the business name to an unrelated famous page  [NEW, HIGHEST]
 
-**Found 2026-08-08 during the published-card sweep. 25 cards resolved, most of them `PUBLISHED` with zero
+**Found 2026-08-08 during the published-card sweep. 35 cards resolved, most of them `PUBLISHED` with zero
 blockers, across three host families and one root cause.** This is the worst defect found in the entire
 review effort, and the count kept growing every time another reference host was checked.
 
-The pipeline appears to take a *word* from the business name and resolve it to a well-known page, rather
-than finding the business. The results are self-evidently absurd once you look at the URL:
+**The mechanism, confirmed precisely.** The `merriam-webster.com` cluster is the smoking gun — seven cards
+sourced to **dictionary definitions of the first word of the business name**:
+
+| Card | `sourceUrl` |
+| --- | --- |
+| **Sweet** Displays NYC | `merriam-webster.com/dictionary/sweet` |
+| **Modern** Martial Arts NYC ×2 | `merriam-webster.com/dictionary/modern` |
+| **Prospect** Gymnastics | `merriam-webster.com/dictionary/prospect` |
+| **Field** House at Chelsea Piers | `merriam-webster.com/dictionary/field` |
+| **Super** Soccer Stars UES | `merriam-webster.com/dictionary/super` |
+| The **Little** Gym Upper Westside | `merriam-webster.com/dictionary/little` |
+
+So this is not "sometimes matches a famous page". It is: **the first token of the business name is resolved
+to whatever site ranks for that word** — a dictionary for common adjectives, Wikipedia for proper nouns,
+`youtubekids.com` for "Kids", `nytimes.com` for "NY". One card, titled "Browse", took this to its
+conclusion: the title was scraped from dictionary.com's own navigation chrome while the source was
+`dictionary.com/browse/upper`, the entry for "upper", reached from the *neighborhood string* "Upper West
+Side". Both halves of that card are artifacts of the same lookup.
+
+The full spread, self-evidently absurd once you read the URL:
 
 | Card title (all PUBLISHED, no blockers) | `sourceUrl` it was given | Matched on |
 | --- | --- | --- |
