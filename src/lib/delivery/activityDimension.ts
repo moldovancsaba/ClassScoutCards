@@ -58,13 +58,18 @@ const FORMAT_SET = new Set(FORMAT_VALUES);
 
 export type ActivityDimension = "format" | "activity";
 
+/** A format recognised only by its trailing noun ("Baseball Camp"), not as a known format in its own
+ *  right. The distinction matters: only these carry an activity in front of the noun to recover. */
+function isSuffixOnlyFormat(cleaned: string): boolean {
+  if (FORMAT_SET.has(cleaned)) return false;
+  return /\b(camp|camps|class|classes|party|parties|workshop|workshops)$/.test(cleaned);
+}
+
 /** True for a label naming the delivery format ("Camps") rather than what the child does ("Soccer"). */
 export function isFormatLabel(value: string | null | undefined): boolean {
   const cleaned = normalizePlaceLabel(String(value ?? ""));
   if (!cleaned) return false;
-  if (FORMAT_SET.has(cleaned)) return true;
-  // "Baseball Camp", "Multi-category Camp", "Sports Camp" -- a format word as the trailing noun.
-  return /\b(camp|camps|class|classes|party|parties|workshop|workshops)$/.test(cleaned);
+  return FORMAT_SET.has(cleaned) || isSuffixOnlyFormat(cleaned);
 }
 
 export function dimensionOf(value: string | null | undefined): ActivityDimension {
@@ -90,8 +95,10 @@ export function splitDimensions(value: string | null | undefined): { activities:
       continue;
     }
     formats.push(part);
-    // A compound single word like "Baseball Camp" carries an activity in front of the format noun.
-    // Strip the format noun and keep the remainder if anything meaningful is left.
+    // "Baseball Camp" carries an activity in front of the format noun; strip the noun and keep it.
+    // Only for suffix-recognised formats -- "Birthday Parties" is a format outright, and stripping its
+    // noun would manufacture a bogus "Birthday" activity out of a value that names no activity at all.
+    if (!isSuffixOnlyFormat(normalizePlaceLabel(part))) continue;
     const remainder = part.replace(/\s*\b(camps?|classes|class|part(y|ies)|workshops?)$/i, "").trim();
     if (remainder && remainder.toLowerCase() !== part.toLowerCase() && !isFormatLabel(remainder)) {
       activities.push(remainder);

@@ -261,6 +261,63 @@ describe("alignActivityTypes", () => {
     });
   });
 
+  describe("activityTypes holds activities only -- no formats, no pipeline jargon", () => {
+    it("the owner-reported Kinder Prep Montessori card: a 100% sport listing led by a technical leak", () => {
+      // Live card, owner screenshot. Chips read PRESCHOOL / MULTI-ENRICHMENT, DANCE, GYMNASTICS --
+      // the lead chip being, in the owner's words, "a technical leak, not something informal for a
+      // parent". Gymnastics is the activity, so the card should read Gymnastics first, Sports second.
+      const result = alignActivityTypes({
+        activityTypes: ["Preschool / Multi-enrichment", "Dance", "Gymnastics"],
+        title: "Kinder Prep Montessori",
+      });
+      expect(result.activityTypes).toEqual(["Gymnastics", "Sports"]);
+      expect(result.primaryActivityType).toBe("Gymnastics");
+      expect(result.dropped).toContain("Preschool / Multi-enrichment");
+      expect(result.dropped).toContain("Dance");
+    });
+
+    it("drops format values, which belong to the category field and its own badge", () => {
+      for (const format of ["Camps", "Classes", "Birthday Parties", "Drop-In Activities"]) {
+        const result = alignActivityTypes({ activityTypes: [format, "Art"], title: "Studio" });
+        expect(result.activityTypes).toEqual(["Art"]);
+        expect(result.dropped).toContain(format);
+      }
+    });
+
+    it("leaves the field empty rather than showing a format as though it were an activity", () => {
+      const result = alignActivityTypes({ activityTypes: ["Camps"], title: "Summer Program" });
+      expect(result.activityTypes).toEqual([]);
+      expect(result.primaryActivityType).toBeUndefined();
+    });
+
+    it("drops non-answers that record the pipeline's failure to classify", () => {
+      for (const jargon of ["Multi-category", "Multi-enrichment", "Multi-Activity"]) {
+        const result = alignActivityTypes({ activityTypes: [jargon, "Music"], title: "Studio" });
+        expect(result.activityTypes).toEqual(["Music"]);
+        expect(result.dropped).toContain(jargon);
+      }
+    });
+
+    it("splits a compound into its parts instead of storing one uninformative string", () => {
+      const result = alignActivityTypes({ activityTypes: ["Baseball / Softball"], title: "Little League" });
+      expect(result.activityTypes).toEqual(["Baseball", "Sports", "Softball"]);
+    });
+
+    it("keeps the activity out of a compound whose other half is a format", () => {
+      expect(alignActivityTypes({ activityTypes: ["Sports / Camp"], title: "x" }).activityTypes).toEqual(["Sports"]);
+      expect(alignActivityTypes({ activityTypes: ["Baseball Camp"], title: "x" }).activityTypes).toEqual([
+        "Baseball",
+        "Sports",
+      ]);
+    });
+
+    it("collapses every 'sport, unspecified' spelling onto the parent", () => {
+      for (const generic of ["Multi-Sport", "Various Sports", "Team Sports", "Multi-Sport Camp"]) {
+        expect(alignActivityTypes({ activityTypes: [generic], title: "x" }).activityTypes).toEqual(["Sports"]);
+      }
+    });
+  });
+
   describe("the sport-dominant rule (owner directive, 2026-08-08)", () => {
     it("drops music, art and STEM outright when any sport is present", () => {
       const result = alignActivityTypes({

@@ -144,7 +144,23 @@ export const SPORTS_PARENT = "Sports";
  * DIFFERENT sport sitting alongside Soccer and Basketball, when it is the same idea as the parent
  * category. Keeping two spellings of one concept also breaks the analytics case this taxonomy exists for.
  */
-const GENERIC_SPORT_LABELS = new Set(["sports", "sport", "multi-sport", "multi sport", "multisport"]);
+const GENERIC_SPORT_LABELS = new Set([
+  "sports",
+  "sport",
+  "multi-sport",
+  "multi sport",
+  "multisport",
+  // Other spellings of "sport, unspecified" found live on real listings. Each names no sport a parent
+  // could search for, so each is the parent category wearing a different hat.
+  "various sports",
+  "team sports",
+  "field sports",
+  "sports camp",
+  "multi-sport camp",
+  "multi sport camp",
+  "gym activities",
+  "athletic training",
+]);
 
 export function isGenericSportLabel(value: string | null | undefined): boolean {
   return GENERIC_SPORT_LABELS.has(normalizePlaceLabel(String(value ?? "")));

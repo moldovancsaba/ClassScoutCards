@@ -38,11 +38,59 @@
  * which is strictly worse than the mixed-category bug this module was built to fix.
  */
 import { isGenericSportLabel, isSpecificSport, isSportActivity, SPORTS_PARENT } from "@/lib/delivery/sportActivity";
+import { splitDimensions } from "@/lib/delivery/activityDimension";
 
 export const NO_CATEGORY_PLACEHOLDER = "no category";
 
+/**
+ * Non-answers: labels that record the pipeline's own failure to classify, in the field a parent reads.
+ * Exactly the same defect as NO_CATEGORY_PLACEHOLDER below, in a different vocabulary -- "Multi-category"
+ * does not tell a family anything about what their child would do.
+ *
+ * (owner-reported 2026-08-08, from a screenshot of the live Kinder Prep Montessori card) The card's
+ * lead chip read "PRESCHOOL / MULTI-ENRICHMENT" -- the owner's words: "a technical leak, not something
+ * informal for a parent". Absence is a value and a placeholder is not, so these are removed rather than
+ * replaced; if nothing survives, the field is simply empty.
+ */
+const NON_ANSWER_LABELS = new Set([
+  "multi-category",
+  "multi category",
+  "multicategory",
+  "multi-enrichment",
+  "multi enrichment",
+  "multi-activity",
+  "multi activity",
+  "enrichment",
+  "general",
+  "other",
+  "various",
+  "miscellaneous",
+]);
+
 function isPlaceholder(activity: string): boolean {
-  return activity.trim().toLowerCase() === NO_CATEGORY_PLACEHOLDER;
+  const cleaned = activity.trim().toLowerCase();
+  return cleaned === NO_CATEGORY_PLACEHOLDER || NON_ANSWER_LABELS.has(cleaned);
+}
+
+/**
+ * `activityTypes` holds ACTIVITIES ONLY -- what a child does, never how or when it is delivered.
+ *
+ * (owner directive 2026-08-08: "Classes and camps are not activities, those are a different dimension
+ * of the matrix.") The format already has its own field (`category`) and its own badge on the card, so
+ * a "Camps" chip sitting in the activity row is both a duplicate and a category error. This also splits
+ * the compound "A / B" values discovery stores as one string, so "Baseball / Softball" becomes two real
+ * sports and "Sports / Camp" keeps the sport while dropping the format.
+ *
+ * Order is preserved, since downstream selection still treats earlier candidates as better evidence.
+ */
+function toActivitiesOnly(values: readonly string[]): string[] {
+  const out: string[] = [];
+  for (const value of values) {
+    for (const activity of splitDimensions(value).activities) {
+      if (!out.includes(activity)) out.push(activity);
+    }
+  }
+  return out;
 }
 
 export const ACTIVITY_CLUSTERS: Record<string, readonly string[]> = {
@@ -186,8 +234,12 @@ function derivePrimary(input: AlignActivityTypesInput): string | undefined {
 export function alignActivityTypes(input: AlignActivityTypesInput): AlignActivityTypesResult {
   // Strip the ingestion placeholder BEFORE anything else -- it must never be eligible to become the
   // primary activity, nor occupy one of the three slots. See NO_CATEGORY_PLACEHOLDER above.
-  const placeholders = [...new Set(input.activityTypes)].filter(isPlaceholder);
-  const deduped = [...new Set(input.activityTypes)].filter((activity) => !isPlaceholder(activity));
+  // Split compounds and remove FORMAT values first, so what follows reasons over activities only.
+  // Anything the original list had that does not survive to `deduped` is reported in `dropped`.
+  const original = [...new Set(input.activityTypes)];
+  const activitiesOnly = toActivitiesOnly(original);
+  const deduped = activitiesOnly.filter((activity) => !isPlaceholder(activity));
+  const placeholders = original.filter((activity) => !deduped.includes(activity));
 
   // Collapse every "sport, unspecified" spelling onto the single parent label before anything reasons
   // about the list, so "Multi-Sport" can never survive as though it were a sport in its own right.
