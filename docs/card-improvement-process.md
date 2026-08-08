@@ -2814,6 +2814,59 @@ root-domain copies retired. Also one clean **exactly-one-answer correction**: Br
 card claimed Bay Ridge, research found precisely one studio — 497 Carroll Street Unit 21, Carroll Gardens —
 so the neighborhood was corrected rather than the card quarantined.
 
+### Batch 43/32 (cards 498-529)
+
+14 queue cards, 18 siblings, 14 hosts. 14 canonical or corrected, 12 terminal, 6 quarantined.
+
+**The program-not-a-location duplicate is now the single most common cluster member.** Batch 42 named it;
+this batch it accounted for **7 of 12 terminals** — Brooklyn Game Lab Birthday Parties, Brooklyn Strategist
+Birthday Parties, VITAL Climbing Gym /brooklyn-youth, Yorkville Youth Soccer, and the rest. It is worth
+promoting from "a pattern" to **the first thing to check in any cluster**: read the titles, and every card
+whose only distinguishing token is an activity or audience ("Birthday Parties", "Kids", "Youth", a sport
+name) is a duplicate before any research happens. VITAL is the neat case — both cards had a real, non-root
+source path, `/brooklyn` and `/brooklyn-youth`, so the per-location tie-breaker alone could not separate
+them; the program test could. **The two rules compose: per-location source picks the canonical among place
+pages, and the program test removes the program pages from contention first.**
+
+**New pattern: N cards for one venue, each guessing a DIFFERENT neighborhood — the disagreement itself
+locates the defect.** Cynthia King Dance Studio had three cards on the identical bare root URL claiming
+**Park Slope, Flatbush and Windsor Terrace**. Ordinary duplicate clusters repeat the same guess; this one
+contradicted itself three ways, which is a much louder signal than any single card looks. The studio's own
+site gives exactly one address — 327 East 5th Street, Brooklyn, (718) 521-4043 — on a block that sits in
+Kensington adjacent to both the Windsor Terrace and Flatbush borders, which is transparently why the
+pipeline produced three answers. Corrected to Kensington with the raw address written into `terminalReason`
+so the derivation is auditable rather than taken on trust. Compare the earlier byte-identical-wrong-value
+finding (three unrelated cards all saying "East New York"): *identical* wrong values suggest a shared
+fallback path; *divergent* wrong values on one venue suggest a genuinely ambiguous real address. Both are
+signals; they point at different bugs.
+
+**A follow-up pass caught two self-inflicted inconsistencies, which is why the verify step is not optional.**
+The fresh GET after applying showed (a) the Brooklyn Game Lab canonical still carrying `low_source_trust`
+that should have been cleared with its sibling, and (b) a card now reading title "Cynthia King Dance Studio
+**Park Slope**" with neighborhood "Kensington" — a contradiction *created by this batch's own correction*.
+Both fixed in a second write. **When a batch corrects a location field, re-read the title: a title that
+embeds the old neighborhood becomes wrong the moment the field is right.**
+
+**Second no-fixed-venue cluster, and the first at scale.** All four Brains & Motion Education cards were
+quarantined together: the company is real but runs its enrichment and camps *inside partner schools*, with
+no venue of its own anywhere on its site — so "Brooklyn", "Manhattan-wide" and "Long Island" are catchment
+areas, not addresses. Same structural failure as the Yombu marketplace case, and the Long Island card fails
+out-of-market as well. Related but distinct: **Metropolitan Oval Academy "Manhattan outreach"** — a real
+Queens club (based at the Metropolitan Oval in Maspeth, with Met Oval Brooklyn as its only other listed
+affiliate) whose card claims a Manhattan presence its own site does not support. The card's own title says
+*outreach*, which is a program reaching into a borough rather than a place a child attends there.
+**"Outreach", "catchment", "serving X" are all the same tell: a claim about where children come FROM, not
+where the activity IS.**
+
+One honest non-finding recorded rather than papered over: `mathschool.com` was checked on suspicion of token
+collision (it is not the obvious domain for Russian School of Mathematics) and turned out to be RSM's own
+site — so no collision. But RSM's location finder is JS-driven and could not be enumerated from here, so
+*which* Manhattan centers exist was never confirmed; the canonical choice between the two cards rests on
+specificity alone, and `terminalReason` says so. Likewise Taste Buds Kitchen Brooklyn was left live with its
+blocker intact: the domain is genuinely the chain's own, but the Brooklyn location could not be confirmed,
+and the location claim is exactly what is in doubt — clearing the blocker would have asserted more than was
+checked.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -3524,3 +3577,25 @@ so the neighborhood was corrected rather than the card quarantined.
   split one per-location canonical from two root copies) and one exactly-one-answer correction (Brooklyn
   Dance Conservatory: claimed Bay Ridge, has precisely one studio at 497 Carroll St, Carroll Gardens).
   See "Batch 42/29..." above.
+- v88 (2026-08-08): batch 43/32 (cards 498-529) -- 14 queue cards, 18 siblings, 14 hosts. 14 canonical or
+  corrected, 12 terminal, 6 quarantined. The **program-not-a-location duplicate** named in batch 42 is now
+  the most common cluster member (7 of 12 terminals), so it is promoted to the FIRST check in any cluster:
+  read the titles, and any card distinguished only by an activity or audience token ("Birthday Parties",
+  "Kids", "Youth", a sport name) is a duplicate before any research happens. VITAL Climbing Gym showed the
+  two rules composing -- both its cards had real non-root paths (`/brooklyn`, `/brooklyn-youth`) so the
+  per-location tie-breaker could not separate them, but the program test could. New pattern: **N cards for
+  one venue each guessing a DIFFERENT neighborhood** -- Cynthia King Dance Studio had three cards claiming
+  Park Slope, Flatbush and Windsor Terrace; the self-contradiction is a louder signal than any single card,
+  and the studio's one real address (327 East 5th St, Kensington, on the Windsor Terrace/Flatbush borders)
+  explains all three guesses. Contrast the earlier identical-wrong-value finding: identical wrong values
+  suggest a shared fallback path, divergent ones suggest a genuinely ambiguous address. Second
+  no-fixed-venue cluster and the first at scale: all four Brains & Motion cards quarantined (real company,
+  runs inside partner schools, no venue of its own; the Long Island card also out-of-market), plus
+  Metropolitan Oval's "Manhattan outreach" -- **"outreach"/"catchment"/"serving X" all name where children
+  come FROM, not where the activity IS**. The verify step caught two inconsistencies this batch created
+  itself, including a title still reading "Park Slope" after its neighborhood was corrected to Kensington:
+  **when a batch corrects a location field, re-read the title.** Two honest non-findings recorded rather
+  than papered over (mathschool.com checked for token collision and cleared -- it IS RSM's own domain -- but
+  its JS location finder could not be enumerated, so the canonical pick rests on specificity alone; Taste
+  Buds Kitchen Brooklyn left blocked because the location claim is exactly what could not be confirmed).
+  See "Batch 43/32..." above.
