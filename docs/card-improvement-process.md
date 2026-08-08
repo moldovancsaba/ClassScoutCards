@@ -2949,6 +2949,65 @@ two "looks wrong, isn't" cases sit together.
   business's location.** Its Brooklyn Heights sibling additionally claims a neighborhood absent from the
   company's own list of camp sites.
 
+### Cards 201-500: continuation complete — retrospective
+
+**Target reached and passed: 581 cards resolved** (the counter reached 500 during batch 42 and the sweep was
+run to the end of batch 45 rather than stopped mid-host). Batches 21-45, cumulative from the two earlier
+100-card passes.
+
+*On the number.* From batch 40 the count includes **siblings pulled in by the per-domain sweep**, not only
+cards that reached the front of the oldest-first queue. Each is a distinct real card record, read, decided
+and written — but the accounting changed mid-run and the figure should be read as "card records resolved",
+not "queue positions advanced". Batches 21-39 averaged 10 cards; batches 40-45 averaged 31.
+
+**The single biggest change this stretch was a change of unit: from the card to the domain.** Batch 37 swept
+one host with a known duplicate. Batch 40 swept every host in the queue. From there the arithmetic took
+over — 16 queue cards in batch 41 pulled in 30 siblings; only 3 of 16 hosts had a single card. The
+oldest-first queue reviews one card at a time and therefore cannot see that a business has seven cards,
+because nothing on any card mentions the others. **Per-domain sweeping is not an optimization of the queue;
+it is the only way duplicate structure becomes visible at all.**
+
+What that made routine, in rough order of how often it fired:
+
+| Rule | Origin | What it decides |
+| --- | --- | --- |
+| Program-not-a-location | b42 | A card differentiated only by an activity/audience token is a duplicate |
+| Per-location source beats root | b40/41 | Which card in a cluster is canonical — mechanical, no research |
+| Program test runs FIRST | b44 | A deeper path to a program page is still a program |
+| Blocker premise, not card reality | b41/42 | Clear a blocker when its claim is false, not when the card is real |
+| Retitle over split | b41/44 | Repurpose surplus cards onto real uncarded locations |
+| …but only onto an identified location | b41/44 | Otherwise record a split candidate and leave it |
+
+**The reality-check grounds also grew a tier.** No-fixed-venue was one documented case at the start of this
+stretch (Yombu). It is now five clusters — Brains & Motion, Bricks 4 Kidz, Prep Academy Tutors, Kids in the
+Game, plus the marketplace — and it spawned a stricter sibling, the **B2B training organization** (Little
+Flower Yoga, Bent on Learning), which does not serve children at all. The clearest single artifact of the
+whole stretch is a card titled *"Kids in the Game PS 29 Brooklyn"*: named after a New York City public
+school, i.e. after someone else's building.
+
+**Four wrong-domain shapes are now distinguished**, which matters because three of them look identical
+until you search: off-topic contamination (entity never real), pipeline-guessed-wrong-domain (domain never
+belonged to it), hijacking/squatting (it did, then didn't — Urban Dunes, HiArt!), and **token collision**
+(the domain belongs to a *different real company* sharing a word — camp.com/Kidville). Two negative controls
+sit beside them: a foreign TLD that is the entity's own (Goethe-Institut), and a sport/domain mismatch
+within one organization (NYC Skyline). **In every one of these the deciding move is the same: search for the
+card's named ENTITY before ruling on what its domain serves.** Judging by the domain would have deleted a
+real operating business at least once.
+
+**Honest limits of this stretch.**
+- The counter's unit changed mid-run, as above.
+- Several real businesses were left with a location gap rather than a guess: SwimJim's two unidentified
+  pools, Brooklyn BJJ's four schools, iCAMP's four Manhattan sites, Treasure Trunk's South Slope, Asphalt
+  Green's Bedford Ave, Color Me Mine's two real Manhattan studios with no cards at all. These are recorded
+  split candidates, not completed work.
+- Two cards were deliberately left blocked with the gap named (Taste Buds Kitchen Brooklyn, unconfirmed
+  location; DNA Learning Center, genuinely missing schedule) rather than cleared to look tidy.
+- `sourceUrl` is not writable on `contentCards`, so every re-source finding is a note in `terminalReason`
+  awaiting a capability this bridge does not have.
+- The off-topic-contamination sweep of the oldest `PUBLISHED` records — flagged as an open item before this
+  stretch began — was **not** run as a targeted sweep. It was partly overtaken by events (the per-domain
+  sweep surfaced contamination incidentally), but it remains a distinct, unexecuted recommendation.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -3714,3 +3773,17 @@ two "looks wrong, isn't" cases sit together.
   "PS 29 Brooklyn", i.e. named after someone else's building), and a second B2B-training-organization
   quarantine (Bent on Learning) on the same school-yoga subject matter as Little Flower Yoga, suggesting a
   small recurring cluster rather than a one-off. See "Batch 45/27..." above.
+- v91 (2026-08-08): **cards 201-500 continuation COMPLETE** -- 581 card records resolved across batches
+  21-45, target passed during batch 42 and the sweep run to the end of batch 45 rather than stopped
+  mid-host. Retrospective added above. Headline: the unit of work changed from the card to the DOMAIN, and
+  that is what made duplicate structure visible at all -- an oldest-first queue reviews one card at a time
+  and nothing on a card reveals that its business has six siblings. Batches 21-39 averaged 10 cards;
+  40-45 averaged 31, because the sweep pulls siblings in. Six mechanical rules now do most of the deciding
+  (program-not-a-location; per-location source beats root; program test first; blocker-premise not
+  card-reality; retitle over split; retitle only onto an identified location). Reality-check grounds grew a
+  tier: no-fixed-venue went from one case to five clusters and spawned the stricter B2B-training ground.
+  Four wrong-domain shapes are now distinguished with two negative controls, and the deciding move in all of
+  them is the same -- search the card's named ENTITY before ruling on its domain. Limits recorded honestly:
+  the counter's unit changed mid-run, six businesses were left with recorded location gaps rather than
+  guesses, two blockers deliberately kept, `sourceUrl` remains unwritable so re-source findings are notes
+  only, and the targeted off-topic sweep of the oldest PUBLISHED records was NOT run and remains open.
