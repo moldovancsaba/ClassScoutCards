@@ -245,3 +245,32 @@ Sources for the standards referenced: [schema.org/Schedule](https://schema.org/S
 [OpenActive SessionSeries](https://developer.openactive.io/data-model/types/sessionseries) ·
 [OpenActive ScheduledSession](https://developer.openactive.io/data-model/types/scheduledsession) ·
 [OpenActive Offer](https://developer.openactive.io/data-model/types/offer)
+
+---
+
+## 9. Status — the bridge half is built and migrated (2026-08-08)
+
+**Built:** `src/lib/delivery/programSchema.ts` (schema, vocabularies, validator, month↔bucket conversion,
+a conservative `parseTimeRange`), wired into `validateWriteRequest` so `recurringPrograms` is no longer a
+bare passthrough, plus derivation of the display age buckets from the numeric months on every write. 34
+tests; 263 in the suite.
+
+**Migrated, from facts already on the records — nothing researched, nothing invented:**
+
+| | before | after |
+| --- | ---: | ---: |
+| programs with a structured `schedule{}` | 0 | **512** of 830 |
+| …`precision: "exact"` (day + session time) | 0 | **121** |
+| …`precision: "day_only"` | 0 | **390** |
+| programs with numeric `ageMinMonths/MaxMonths` | 0 | **434** |
+
+**The migration's most important decision was to assert LESS than it could.** A naive pass produced 223
+"exact" windows. Measuring them showed 73 were longer than eight hours — `"8:30 AM-9:00 PM"`, `"9am-9pm"` —
+which are the building's door hours scraped into the field a parent reads as *when is my child's class*.
+The rule now caps a plausible session at 4 hours (8 for camps, which really do run that long), and above
+that keeps the DAY while refusing to assert a time, flagged `timeTextLooksLikeVenueHours` for a research
+pass. **103 programs were flagged rather than converted.** Precision the data has not earned is worse than
+the prose it replaced, because it is queryable.
+
+Ages were derived from the existing buckets to their widest honest span and marked
+`ageDerivedFromBuckets: true`, so a later research pass can tell a derived range from a verified one.
