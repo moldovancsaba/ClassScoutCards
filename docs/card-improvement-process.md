@@ -6042,9 +6042,19 @@ only place it can go.
      bookkeeping**, and those stubs were the source of both the "no category" bucket and most of the
      "(none)" bucket. `fetchRawRecords` now filters `kind: "content"`. A page that aggregates a collection
      must state which documents in it are cards.
-  4. **`providers.primaryActivityType` — the field the lead chip renders — was write-only through this
-     bridge.** The one value a family sees first could not be audited, only overwritten blind. Added to
-     the read projection. Worth asking of any field a defect report points at: can I actually READ it?
+  4. **A breakdown must exclude what the catalogue has retired.** With the stubs gone, the top activities
+     in a children's catalogue were "Italian" (147) and "American" (141) — cuisines from the 795
+     `letsgobaby.co` restaurant cards retired as `BLOCKED_TERMINAL` in an earlier pass. QUARANTINED and
+     BLOCKED_TERMINAL are now excluded from every breakdown and reported as a separate `retired` count.
+     A record the catalogue has given up on should not shape what the catalogue looks like.
+
+  **A correction, recorded because the reasoning error is the reusable part.** Mid-task I concluded that
+  `providers.primaryActivityType` was unreadable through this bridge and began widening the read
+  projection to "fix" it. It was already in the projection, and had been printing real values minutes
+  earlier. The evidence I acted on was the key list of `docs[0]` — ONE record that happened not to carry
+  the field — which I read as the shape of the collection. `tsc` caught it only because the duplicate key
+  was a compile error; a projection is a plain object and a semantically identical mistake elsewhere would
+  have compiled. **To ask whether a field is readable, read the registry, not one document.**
 
   **A response echo is not proof a write landed.** One of the 15 `categoryHint` writes returned no error
   and a truthy `found`, and did not change the field; three more showed the same shape in the dry run. Only

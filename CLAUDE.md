@@ -1178,11 +1178,18 @@ Three lessons from implementing it, each of which cost something:
 - **A response echo is not proof a write landed.** One write returned no error and a truthy `found` and
   changed nothing; only reading the record back caught it. Verify by re-reading.
 
-Two things the same work exposed, both worth checking elsewhere: the stats page was counting **7,570
-`kind: "repair"` stubs against 5,056 real cards** (a page that aggregates a collection must say which of
-its documents are cards), and **`providers.primaryActivityType` — the field the lead chip renders — was
-write-only through this bridge**, so the first value a family sees could not be audited. Ask of any field
-a defect report points at: can I actually READ it?
+Two things the same work exposed, both worth checking elsewhere. The stats page was counting **7,570
+`kind: "repair"` stubs against 5,056 real cards** — a page that aggregates a collection must say which of
+its documents are cards. And the breakdowns were shaped by records the catalogue had already given up on:
+the 795 retired restaurant cards from `letsgobaby.co` put **"Italian" and "American" among the top
+activities in a children's catalogue**. QUARANTINED and BLOCKED_TERMINAL are now excluded from every
+breakdown and reported as a separate `retired` count, so nothing is hidden.
+
+**A one-record sample is not a schema check.** Mid-task I concluded `providers.primaryActivityType` was
+unreadable through this bridge, and started widening the read projection — it was already there, and had
+been printing values minutes earlier. The evidence was the key list of `docs[0]`, a single record that
+happened not to carry the field. `tsc` caught it as a duplicate key. To ask whether a field is readable,
+read the registry, not one document.
 
 ## Before you write anything real
 

@@ -39,6 +39,10 @@ export interface CollectionStats {
   byActivity: CountBucket[];
   /** HOW/WHEN it is delivered -- "Classes", "Camps". A different axis of the same matrix. */
   byFormat: CountBucket[];
+  /** Records excluded from every breakdown because the catalogue has retired them: QUARANTINED
+   *  (content forbidden) and BLOCKED_TERMINAL (no entity). Reported so nothing is silently dropped --
+   *  795 restaurant cards from one retired directory were ranking "Italian" as a top child activity. */
+  retired: number;
 }
 
 interface RawRecord {
@@ -47,7 +51,14 @@ interface RawRecord {
   /** Raw stored labels, still mixing both dimensions -- split at tally time, not here. */
   activities: (string | null | undefined)[];
   published: boolean;
+  /** False for records the catalogue has retired: QUARANTINED (content forbidden) and
+   *  BLOCKED_TERMINAL (no entity to maintain). Counted, but kept out of every breakdown. */
+  maintainable: boolean;
 }
+
+/** States whose records are still part of the catalogue. Mirrors MAINTAINABLE_STATES in
+ *  src/scripts/defect-cohorts.ts -- QUARANTINED and BLOCKED_TERMINAL are the only exclusions. */
+const RETIRED_CONTENT_CARD_STATES = new Set(["QUARANTINED", "BLOCKED_TERMINAL"]);
 
 /** contentCards: state === "PUBLISHED" is the real gate (this bridge can never set it, but it's the
  *  real published signal). providers: publishedAt is stamped once and only once the record is live. */
@@ -76,17 +87,20 @@ async function fetchRawRecords(collection: StatsCollectionKey): Promise<RawRecor
       neighborhood: d.neighborhoodGuess,
       activities: [d.categoryHint],
       published: isContentCardPublished(d as { state?: string }),
+      maintainable: !RETIRED_CONTENT_CARD_STATES.has(String(d.state ?? "")),
     }));
   }
   const docs = await db
     .collection(config.mongoCollection)
-    .find({}, { projection: { borough: 1, neighborhood: 1, activityTypes: 1, publishedAt: 1 } })
+    .find({}, { projection: { borough: 1, neighborhood: 1, activityTypes: 1, publishedAt: 1, qualityStatus: 1 } })
     .toArray();
   return docs.map((d) => ({
     region: d.borough,
     neighborhood: d.neighborhood,
     activities: Array.isArray(d.activityTypes) && d.activityTypes.length > 0 ? d.activityTypes : [null],
     published: isProviderPublished(d as { publishedAt?: unknown }),
+    // providers has no state enum -- quarantined is expressed as qualityStatus.
+    maintainable: d.qualityStatus !== "quarantined",
   }));
 }
 
@@ -121,9 +135,17 @@ export async function getCollectionStats(collection: StatsCollectionKey): Promis
   const activityBuckets = new Map<string, CountBucket>();
   const formatBuckets = new Map<string, CountBucket>();
 
+  let retired = 0;
   for (const record of records) {
     if (record.published) published += 1;
     else notPublished += 1;
+
+    // Retired records still count toward the collection total, and are excluded from every breakdown:
+    // a card the catalogue has given up on should not shape what the catalogue looks like.
+    if (!record.maintainable) {
+      retired += 1;
+      continue;
+    }
 
     if (record.activities.some((a) => isSportActivity(a))) {
       sportCardsAll += 1;
@@ -188,6 +210,7 @@ export async function getCollectionStats(collection: StatsCollectionKey): Promis
     byNeighborhood,
     byActivity,
     byFormat,
+    retired,
   };
 }
 

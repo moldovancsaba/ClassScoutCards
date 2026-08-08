@@ -128,11 +128,6 @@ export const BRIDGE_REGISTRY: Record<BridgeCollectionKey, BridgeCollectionConfig
       category: 1,
       categoryConfidence: 1,
       activityTypes: 1,
-      // (2026-08-08) This is the field the card's LEAD chip renders, and it was not readable through
-      // this bridge at all -- so the one value a family sees first could not be audited, only written
-      // blind. Found while cleaning the "Preschool / Multi-enrichment" leak the owner reported, whose
-      // whole visible symptom was this field's value.
-      primaryActivityType: 1,
       programType: 1,
       borough: 1,
       neighborhood: 1,
