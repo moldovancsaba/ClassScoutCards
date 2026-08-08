@@ -1117,6 +1117,59 @@ in a comment when you add one, the way the existing ports do.
   answers both mean quarantine; only exactly one means correct. This keeps the real-brand-fake-location
   pattern from becoming an excuse either to guess or to discard real businesses wholesale.
 
+- **A consistency check between two fields proves nothing until you know the two were populated
+  independently — and this one was scoring the data exactly backwards.** The obvious audit of
+  `providers.neighborhood` is "does it appear in the record's own `address`?" It returned 22 agree / 44
+  disagree, and both numbers were meaningless. **288 of 1,040 live providers store the neighbourhood name
+  AS the address** (`"Downtown Brooklyn, Brooklyn, NYC"`, `"Gowanus, Brooklyn, NYC"`), so for those the test
+  is circular and can only pass; every record with a REAL street address failed it, because "Bay Ridge" is
+  not a substring of "9941 Fort Hamilton Pkwy". Placeholders scored healthy, real data scored broken.
+  `isPlaceholderAddress()` in `src/scripts/locationEvidence.ts`, with a test that asserts the circular pass
+  out loud so the shape stays visible.
+- **A random sample is the wrong instrument for a REPEATED value — count the values, don't read ten rows.**
+  A 74-card fill plan passed a ten-row random sample and died the moment all 74 were printed:
+  `"Downtown Brooklyn"` appeared 13 times and `"Harlem"` 11, across unrelated operators. Ten rows are ten
+  chances to see one instance each; repetition is only visible as a frequency. `requireSample` guards
+  against trusting a count instead of the matches — it does not guard against a sample hiding a
+  distribution. Print the plan whole whenever it is small enough, and **audit the collection a bulk fill
+  keys on before keying on it**, which no prior bulk plan in this repo had done.
+- **ZIP prefix determines borough, and that is a postal fact that outranks every field on the record —
+  but the contradiction it exposes is not always in the field you expect.** Three clusters, one inverted:
+  Rockaway YMCA ×9 (`11692`, Arverne) was filed under Brooklyn and the BOROUGH was wrong; Imagine
+  Skateboarding's borough was the literal compound `"Manhattan or Brooklyn"` and `10013` settled it; but
+  eleven NYC Parks records whose ZIP said Manhattan were **correctly** filed under Brooklyn — there the
+  ADDRESS was wrong (the Parks Department HQ), and "fixing" the borough would have moved eleven Brooklyn
+  playgrounds to Manhattan. Deliberately **no ZIP→neighbourhood map** exists: NYC ZIP and neighbourhood
+  boundaries genuinely disagree, and the hand-built 21-entry map found in the scratchpad had 11225 as
+  "Prospect Heights" and 11206 as "Williamsburg", both wrong. A map that is 80% right writes with
+  confidence, which is worse than no map.
+- **A check keyed on a contradiction is blind wherever the wrong value happens to agree.** The ZIP/borough
+  scan found 11 of the 26 records carrying the NYC Parks HQ address — the other 15 are Manhattan parks with
+  a Manhattan HQ address, so nothing contradicted. The census came from querying the HQ string itself.
+  When a defect is found via a contradiction, follow up by querying the defective VALUE directly.
+- **Resolve each member of a same-shaped cluster individually — two of nine "Brooklyn" parks were not in
+  Brooklyn.** All eleven Parks records shared one HQ address and one borough, which invites one lookup and
+  a bulk write. The Big Park is in Mariners Harbor, **Staten Island**; Lawrence Virgilio Playground is in
+  Woodside, **Queens** (and was additionally labelled Williamsburg). Sharing a defect is not sharing a fix.
+- **Address beats name beats stored field — and the exception is why it is a function, not a convention.**
+  Fifteen records were corrected from their own name plus address (Asphalt Green Battery Park City filed
+  under Financial District; The Little Gym Dumbo under Brooklyn Heights). But *Williamsburg Soccer Club* is
+  filed under **Greenpoint and that is correct** — the WSC Clubhouse at 33 Nassau Ave is in Greenpoint, and
+  "Williamsburg" is the club's brand. A name-wins rule would have broken a right answer. So the name is
+  consulted only when the address cannot answer, and when a street address and a name disagree outright
+  **neither wins** — an address can be a head office exactly as a name can be a brand. `judgeLocation()`
+  encodes it with the Williamsburg case as its regression test.
+- **What makes a repeated value a pipeline default is the FIELD it sits in, not how many times it appears.**
+  `address: "Manhattanville, Manhattan, NYC"` + `neighborhood: "Harlem"` sat byte-identical on **18
+  unrelated live providers** and is provably false for at least one (Broadway Dance Center Children & Teens
+  is at 37 W 65th St, Lincoln Square). Meanwhile `"Upper West Side, Manhattan, NYC"` appears 33 times and
+  proves nothing, because thirty children's businesses really are on the Upper West Side. A full ADDRESS
+  should be near-unique; a neighbourhood should not. `sharedDefaults()` takes a threshold for that reason.
+  Seventeen were cleared rather than replaced. A pattern worth checking next: a striking share of that
+  cohort are in-home or in-school operators with **no venue of their own**, which is plausibly why the
+  extractor had nothing to read and reached for a default — check the no-fixed-venue prohibition before
+  hunting for an address that may not exist.
+
 ## The core system's listing-maintenance spec is now part of the requirements (2026-08-08)
 
 The core system handed this repo a listing-maintenance specification — what a reviewer looks for, and what
