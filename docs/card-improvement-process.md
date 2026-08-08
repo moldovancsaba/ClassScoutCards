@@ -6320,3 +6320,45 @@ only place it can go.
      of which 2 still differed from their recorded target. That is a permanent maintenance move: every time
      a field becomes writable or a validator is relaxed, the notes that were written *because it wasn't*
      become an actionable work-list. Research already paid for should not be re-paid.
+
+- v140 (2026-08-08): **the "Family Events" cohort — 52 cultural institutions, all missing a neighbourhood,
+  most carrying IRS-registry names.** With the seed stubs gone, the oldest-first queue surfaced the
+  correctly-sourced SIBLINGS of those stubs: real museums and historic houses on their own domains, from the
+  same nonprofit-registry backfill. Every one of the 52 had `categoryHint: "Family Events"` and **no
+  `neighborhoodGuess` at all**, so none could be found by anyone browsing a part of the city. 32 actioned.
+
+  **Four failed the reality check, and the shape of each is different:**
+
+  - **Museum of Comic and Cartoon Art** — permanently closed since July 2012; its collection went to the
+    Society of Illustrators, which is already carded correctly. Confirmed-closed, like City Treehouse.
+  - **Museum for African Art** — sourced to `africa.si.edu`, the **Smithsonian's** museum in **Washington
+    DC**: a different institution in a different city. The New York one closed its LIC space in 2006,
+    renamed itself The Africa Center, and its Fifth Avenue home is still under construction. Defunct
+    identity + out-of-state source + no visitable venue.
+  - **Chelsea Art Museum** — closed 2011, AND its domain `newyork.artemuseum.com` now serves "Arte Museum
+    New York", an unrelated Korean immersive-media attraction. Two independent failures on one card. (Noted
+    for a future pass: Arte Museum is itself real and could merit its OWN card — a new record, not this one
+    repaired.)
+  - **Contemporary Art For America, Inc.** — sourced to `moma.org`, which is a different institution
+    entirely. Left `BLOCKED_REPAIRABLE` as `needs_human`: the entity is unproven, not disproven.
+
+  **13 real institutions were enriched from their OWN sites rather than from memory** — addresses scraped
+  from each museum's own pages, then mapped to canonical neighbourhoods: The Drawing Center → 35 Wooster
+  St → SoHo; MOCA → 215 Centre St → Chinatown; Skyscraper Museum → 39 Battery Pl → Battery Park City;
+  Waterfront Museum → 290 Conover St → Red Hook; Dyckman Farmhouse → 4881 Broadway → Inwood; and so on.
+  Titles were corrected in the same write, because **this cohort's names are the defect that hides the
+  rest**: "Colonial Dames Of America/mount Vernon Hotel Museum & Garden", "Sons Of The Revolution In The
+  State Of New York, Inc.", "Drawing Center, Inc." — IRS legal names with broken Title Case, none of them
+  what a family would type. Renamed to the public identity (the Sons of the Revolution card is the
+  **Fraunces Tavern Museum**, which is the name anyone actually knows it by).
+
+  **15 City of Los Angeles facilities were unlocatable and are now placed** — Cabrillo Marine Aquarium and
+  Fort MacArthur (Harbor / San Pedro), the Drum Barracks and Banning Residence (Harbor / Wilmington), four
+  Griffith Park sites incl. Travel Town and the Autry (Central LA / Los Feliz), Campo de Cahuenga (SFV /
+  Studio City), Heritage Square (Eastside / Montecito Heights), Olvera Street and the Keck Children's
+  Amphitheatre (Central LA / Downtown).
+
+  **A vocabulary gap, recorded rather than papered over:** Bolton Hall Museum is at 10110 Commerce Ave,
+  **Tujunga** — a real Los Angeles district absent from this platform's San Fernando Valley neighbourhood
+  list. Region set, neighbourhood left ABSENT rather than coerced into a listed neighbour. Same discipline
+  as Camp Seely, one level down: a missing vocabulary entry is not licence to write the nearest wrong one.
