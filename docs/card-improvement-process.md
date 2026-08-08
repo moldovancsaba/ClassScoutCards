@@ -2569,6 +2569,38 @@ structure obvious, including the two-real-branches-in-Park-Slope subtlety that c
 very likely have flattened. **For any domain with a known duplicate, sweep the domain instead of waiting
 for the queue.**
 
+### Batch 38/10 (cards 378-387)
+
+| Card | Finding | Action |
+|---|---|---|
+| Yombu New York | **Kids-party booking MARKETPLACE** — matches parents with balloon artists/magicians who travel to the family's event | → `QUARANTINED` |
+| Kids at Work | **3rd instance** of `"Near Manhattan priority zones"` internal jargon in the location field | Corrected to Chelsea (147 W 24th St) |
+| Launch Math "Upper East/West Side" | Card mashing **both** real Launch Math centres, each of which already has its own card | → `BLOCKED_TERMINAL` |
+| Launch Math (UWS) | Real UWS centre, genuinely distinct from the UES one | Kept canonical, blocker cleared |
+| Manhattan Kickers Soccer Club | **34th duplicate** — differs from its sibling only in phrasing ("Manhattan-wide" vs "Multiple Manhattan locations") | → `BLOCKED_TERMINAL` |
+| Manhattan Kickers FC | Real club, host-site model | Kept canonical, blocker cleared |
+| Broadway Bound Kids, Soccer Stars NYC, Greenwich Village Little League, Kings Bay Y Volleyball | Real | Blockers cleared |
+
+**Yombu is a new shape of physical-only failure: the intermediary.** Every prohibited case so far was either
+not a real business (off-topic, fabricated) or a real business without a fixed venue (Blue Balloon's
+in-home teachers). Yombu is a real, funded company doing real business — but it is a *marketplace*, a
+booking layer between parents and entertainers who then travel to the family's own party. It fails on both
+documented grounds at once: intermediary-not-provider (the aggregator rule) and no-venue-of-its-own (the
+no-fixed-venue rule). Worth stating explicitly because the entertainers Yombu books may well be real,
+listable providers — **the marketplace is not a card; the businesses on it might be.**
+
+**The internal-jargon leak is now systematic, not incidental.** `"Near Manhattan priority zones"` has
+appeared on three unrelated cards (City Treehouse b14, apple seeds b36, Kids at Work b38). Three is enough
+to stop treating it as a stray value: some code path writes the pipeline's targeting vocabulary into
+`neighborhoodGuess` when it cannot resolve a real neighborhood. **Recommendation (main app, read-only):
+worth a targeted grep for this literal string and for whatever produces it — and, as with `"no category"`,
+absence would be better than a placeholder that reaches families.**
+
+**Mashup cards keep resolving by deletion, not split.** Launch Math "Upper East/West Side" is the second
+case in two batches (after the YMCA Park Slope mashup) where a card covering N real locations needed no
+`POST /split` because all N children already existed independently. **Check for existing children before
+reaching for the split tool** — the expensive operation is often unnecessary.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -3208,3 +3240,14 @@ for the queue.**
   Conclusion recorded: for any domain with a known duplicate, sweep the domain rather than waiting for the
   oldest-first queue, which would have taken ~11 more batches and likely mis-assigned canonical along the
   way. See "Batch 37/16..." above.
+- v83 (2026-08-07): batch 38/10 (cards 378-387) complete. 6 real entities corrected, 2 mashup/duplicate
+  cards terminal-ed (Launch Math "Upper East/West Side" -- both real centres already had their own cards;
+  Manhattan Kickers, 34th duplicate), and Yombu New York quarantined as a NEW shape of physical-only
+  failure: a real, funded kids-party booking MARKETPLACE whose entertainers travel to the family's own
+  event -- failing both the aggregator/intermediary rule and the no-fixed-venue rule at once (the
+  entertainers it books may be real and listable; the marketplace is not). Also the 3rd instance of the
+  `"Near Manhattan priority zones"` internal-jargon leak in `neighborhoodGuess` (after City Treehouse b14
+  and apple seeds b36) -- now systematic enough to warrant a targeted grep in the main app. Second
+  consecutive batch where a multi-location mashup resolved by DELETION rather than `POST /split`, because
+  the children already existed: check for existing children before reaching for the split tool.
+  See "Batch 38/10..." above.
