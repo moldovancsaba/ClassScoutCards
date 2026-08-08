@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { validateWriteRequest } from "./cardBridgeWrite";
+import { parseSourceUrl, validateWriteRequest } from "./cardBridgeWrite";
 
 const validProviderBody = {
   collection: "providers",
@@ -303,5 +303,71 @@ describe("validateWriteRequest", () => {
       expect(validateWriteRequest({ ...leadBody, updates: { visibility: "public_support" } }).ok).toBe(false);
       expect(validateWriteRequest({ ...leadBody, updates: { blockers: [] } }).ok).toBe(false);
     });
+  });
+});
+
+describe("contentCards sourceUrl re-sourcing (2026-08-08)", () => {
+  const base = { collection: "contentCards", id: "cc-1", reason: "re-source to the branch's own page", source: "test" };
+
+  it("accepts a real https source URL", () => {
+    const result = validateWriteRequest({ ...base, updates: { sourceUrl: "https://www.codeninjas.com/ny-gowanus" } });
+    expect(result.ok).toBe(true);
+  });
+
+  it("rejects a non-https URL", () => {
+    const result = validateWriteRequest({ ...base, updates: { sourceUrl: "http://example.com/page" } });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toContain("parseable https");
+  });
+
+  it("rejects an unparseable value", () => {
+    const result = validateWriteRequest({ ...base, updates: { sourceUrl: "https://" } });
+    expect(result.ok).toBe(false);
+  });
+
+  it("rejects a hostname with no dot, which is never a real public source page", () => {
+    const result = validateWriteRequest({ ...base, updates: { sourceUrl: "https://localhost/page" } });
+    expect(result.ok).toBe(false);
+  });
+
+  it("rejects a non-string", () => {
+    const result = validateWriteRequest({ ...base, updates: { sourceUrl: 42 } });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toContain("must be a string");
+  });
+
+  it("is not writable on providers — sourceUrl belongs to contentCards only", () => {
+    const result = validateWriteRequest({ collection: "providers", id: "prov-1", reason: "attempt", source: "test", updates: { sourceUrl: "https://example.com/x" } });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toContain("not writable");
+  });
+
+  it("sourceHost is NOT writable — it is derived, so it can never drift from sourceUrl", () => {
+    const result = validateWriteRequest({ ...base, updates: { sourceHost: "example.com" } });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toContain("not writable");
+  });
+});
+
+describe("parseSourceUrl", () => {
+  it("strips www. so a re-sourced card stays in its own per-domain cluster", () => {
+    // Real shape from live data: sourceHost "streb.org" alongside sourceUrl "https://www.streb.org/".
+    expect(parseSourceUrl("https://www.streb.org/")?.host).toBe("streb.org");
+    expect(parseSourceUrl("https://streb.org/")?.host).toBe("streb.org");
+  });
+
+  it("lowercases the host", () => {
+    expect(parseSourceUrl("https://WWW.SwimJim.COM/locations")?.host).toBe("swimjim.com");
+  });
+
+  it("keeps subdomains other than www, which are real distinct sources", () => {
+    // Color Me Mine gives each studio its own subdomain -- collapsing these would merge two real studios.
+    expect(parseSourceUrl("https://tribeca.colormemine.com/")?.host).toBe("tribeca.colormemine.com");
+  });
+
+  it("returns null for the values validation rejects", () => {
+    expect(parseSourceUrl("http://example.com")).toBeNull();
+    expect(parseSourceUrl("not a url")).toBeNull();
+    expect(parseSourceUrl("https://localhost/x")).toBeNull();
   });
 });
