@@ -3363,6 +3363,59 @@ retired: both sat on the department's own homepage rather than any facility. **C
 evidence of a defect** — a genuine multi-site operator produces a large, correct cluster, and the letsgobaby
 lesson must not turn into "big cluster, retire it."
 
+### Cluster backlog, tranche 5: five clusters that were all live (2026-08-08)
+
+Every cluster in this tranche had cards at `PUBLISHED`, so every defect here was one a family could hit.
+**33 cards, 33 live cards reduced to 10, 6 repurposed onto real uncarded locations, and 7 quarantined for
+being in another state.**
+
+| Host | Cards before | Real locations | After |
+| --- | --- | --- | --- |
+| `goldfishswimschool.com` | 10 (3 live) | Gowanus, UES, Astoria; 3 on Long Island; 1 pre-opening | 3 canonical, 4 terminal, 3 blocked (LI) |
+| `takemetothewater.com` | 6 (3 live) | 8 pools: 2 Manhattan, 3 Brooklyn, 3 Queens | 5 canonical, 1 terminal |
+| `hoopheaven.com` | 7 (2 live) | **3, all in New Jersey** | **7 quarantined** |
+| `dusc.net` | 5 (3 live) | 1: 527 Hudson St, West Village | 1 canonical, 4 terminal |
+| `parkslopeunited.com` | 5 (3 live) | 1: 339 8th St, Park Slope | 1 canonical, 4 terminal |
+
+**Hoop Heaven is the worst card in this tranche and the reason to prioritise live clusters.** Its own
+homepage title reads *"New Jersey's Premier Basketball Facilities"*; its three sites are Whippany,
+Bridgewater and Waldwick. All seven cards claim Brooklyn or Manhattan, and **two were live** — one titled
+"Hoop Heaven **NYC** Manhattan", putting "NYC" in the name of a New Jersey business. A parent clicking it
+would have been sent an hour's drive into another state. This is the out-of-market pattern (previously: a
+Georgia camp company given an NYC borough) at seven cards and, for the first time, on the public site.
+
+**The one-real-answer test decided Goldfish Swim School's live card, and it decided it the other way from
+Take Me To The Water's.** Goldfish's card claimed Brooklyn Heights; the operator has exactly one Brooklyn
+school, in Gowanus — one unambiguous answer, so the neighbourhood was **corrected**. Take Me To The Water's
+live card also claimed a neighbourhood the operator does not serve (Park Slope), but it has *three* Brooklyn
+pools — so the card could not simply be "corrected" to the right one. It was instead **repurposed onto a
+specific uncarded address** (228 Duffield St, Downtown Brooklyn), which is a different move: not "this card
+was always about Downtown Brooklyn", but "this surplus card now represents a real location that had none".
+The distinction is worth keeping straight, because the first is a correction and the second is a
+reassignment.
+
+**Take Me To The Water shows repurposing at its most productive**: one correct card in, five correct cards
+out, covering the Upper East Side, Upper West Side, Downtown Brooklyn, Williamsburg and Midwood. Its three
+Queens pools were deliberately left uncarded and recorded for a future pass — two of the three sit on the
+same street in Forest Hills, and picking between them would be a guess. **Repurpose onto an address the
+evidence names; stop when it stops naming one.**
+
+**The fashionable-core bias, a third and fourth time.** Goldfish's Astoria school (Queens) had no card among
+ten. Take Me To The Water's Midwood pool had none among six. Both were found only by reading the operator's
+own list.
+
+**The Borough-taxonomy gap, confirmed a fourth time — and the data has already worked around it badly.**
+Goldfish's Centereach, Farmingdale and Garden City schools are on Long Island, outside anything the
+five-borough `Borough` type can express. They were set `BLOCKED_REPAIRABLE` rather than retired, so they can
+be revived if a greater-metro value is ever added. Worth noting for the product decision: **the field is
+already carrying values that are not boroughs** — those three cards read `boroughGuess: "Long Island"`, and
+the chain-level card reads `"NYC / Long Island"`. The taxonomy is being violated in the data whether or not
+it is extended in the type.
+
+**A pre-opening location is not a location.** Goldfish's UWS Broadway school is in pre-registration and was
+deliberately not carded — listing it would send families to a pool that has not opened. Same family of
+judgement as the confirmed-permanently-closed case (City Treehouse), at the other end of the lifecycle.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -4243,3 +4296,19 @@ lesson must not turn into "big cluster, retire it."
   one card per real LA Parks facility on a legitimate LA-tenant source -- the one-card-per-location rule
   working correctly at scale. Only the two cards sitting on the department's own homepage were retired.
   **Cluster size alone is not evidence of a defect.**
+- v98 (2026-08-08): cluster tranche 5 -- five clusters, every one with cards live at PUBLISHED. **33 cards,
+  33 live down to 10, 6 repurposed onto real uncarded locations, 7 quarantined for being in another state.**
+  Worst find: **`hoopheaven.com` is a NEW JERSEY business** -- its own homepage title says "New Jersey's
+  Premier Basketball Facilities", its three sites are Whippany, Bridgewater and Waldwick -- and all seven
+  cards claimed Brooklyn or Manhattan, **two of them live**, one titled "Hoop Heaven NYC Manhattan". The
+  out-of-market pattern at seven cards and, for the first time, on the public site. **The one-real-answer
+  test split two superficially identical live cards**: Goldfish's wrong "Brooklyn Heights" was CORRECTED to
+  Gowanus (exactly one real Brooklyn school), while Take Me To The Water's wrong "Park Slope" was REPURPOSED
+  onto 228 Duffield St (three real Brooklyn pools, so no single correction existed) -- a correction and a
+  reassignment are different moves and worth keeping straight. Take Me To The Water is repurposing at its
+  most productive: one correct card in, five out. Its three Queens pools were deliberately left uncarded
+  because two share a street and choosing would be a guess. Fashionable-core bias a third and fourth time
+  (Goldfish's Astoria school uncarded among ten; TMTTW's Midwood pool uncarded among six). Borough-taxonomy
+  gap confirmed a fourth time, and **the data is already violating the type** -- three cards carry
+  `boroughGuess: "Long Island"` and one carries `"NYC / Long Island"`. Also: **a pre-opening location is not
+  a location** -- Goldfish's UWS Broadway school is in pre-registration and was deliberately not carded.
