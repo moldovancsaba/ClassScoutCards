@@ -547,6 +547,21 @@ in a comment when you add one, the way the existing ports do.
   token-match cluster above. The original note was not deleted; it was marked superseded in place, because
   the useful lesson is that **50 was too small a sample to generalise from and the write-up did not say so
   loudly enough**, not that recording a negative result was wrong.
+- **The physical-only prohibition is triggered by the ENTITY, never by the source domain — and it is easy to
+  write down backwards even while acting on it correctly.** Caught 2026-08-08 by self-audit: six cards were
+  correctly handled (real operators sourced to `youtubekids.com` by the token-match bug were set
+  `BLOCKED_REPAIRABLE` for re-sourcing, which is right), but the recorded `terminalReason` said
+  *"youtubekids.com is a categorically prohibited source type under the physical-only rule"* — which inverts
+  the rule. `terminalReason` is the durable record the next pass reads, so **a wrong rule statement
+  propagates even when the disposition was right**; a future reviewer following that text would start
+  quarantining real businesses for having a social-media source. Corrected in place on both cards with the
+  inversion named. The working test, stated once: *would this still be prohibited if the same business were
+  described on its own website?* If yes, it's the entity (Outschool, an app's own store listing, a
+  marketplace) → quarantine. If no, it's a bad source pick (Léman Manhattan sourced to an Amazon video
+  storefront; Kids in Sports sourced to YouTube Kids) → re-source. Out-of-market is a separate ground and
+  should be cited as such rather than smuggled in via the host — two Long Island cards on a `facebook.com`
+  source were quarantined for being on Long Island, and their `terminalReason` says the Facebook host was
+  explicitly *not* the reason.
 - **A sweep must GROUP BY DOMAIN before it judges, not screen a page and move on.** Found the hard way
   2026-08-08 during the PUBLISHED sweep: page 1 recorded "Koko NYC Brooklyn" and "Brooklyn City FC Academy"
   as clean, and both turned out to have duplicate twins — sitting on page 2. Nothing on either card reveals
