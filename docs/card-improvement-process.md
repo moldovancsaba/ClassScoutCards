@@ -3120,6 +3120,88 @@ and cards titled after publications rather than providers ("Mommy Poppins -- New
 Angeles -- Kids"). Several were already quarantined by earlier passes, including a genuinely striking one:
 "Chatgpt - Apps on Google Play".
 
+### Working the duplicate backlog by cluster, largest first (2026-08-08)
+
+The full-pool cluster scan (556 hosts, 0 failures) measured the backlog the reference-host audit had only
+gestured at: **199 hosts carry more than one live card, covering 684 live cards between them, and 87 of
+those hosts have two or more cards live at `PUBLISHED`.** That is the size of the duplicate problem, and it
+is now a countable work queue rather than something stumbled into. Working it largest-first, seven clusters
+were resolved in this pass: **43 cards audited, 27 live cards reduced to 7 canonical ones in the second
+tranche alone.**
+
+The method is the same each time and takes about five minutes per cluster: fetch the operator's OWN site,
+read its location list, count the real locations, then match cards to locations. Nothing else is needed —
+in all seven clusters the operator's own homepage or footer settled it outright.
+
+| Host | Cards before | Real locations (per the operator) | After |
+| --- | --- | --- | --- |
+| `nycelite.com` | 9 (9 published) | 3 gyms: UWS 200 Riverside Blvd, Tribeca 44 Worth St, UES 421 E 91st St | 3 canonical, 5 terminal, 1 quarantined |
+| `penguincityswim.com` | 8 (7 published) | 4 pools: Midtown 132 E 45th, UWS 524 W 59th, UES 130 E 82nd, **Riverdale 3220 Arlington Ave** | 4 canonical, 0 terminal, 3 quarantined |
+| `prospectgymnastics.com` | 5 (5 published) | 2 gyms: Ditmas Park 1023 Church Ave, Bed-Stuy 1230 Bedford Ave | 2 canonical, 2 terminal, 1 quarantined |
+| `theartfarms.com` | 5 (5 published) | 1 venue: 431 E 91st St (UES) | 1 canonical, 4 terminal |
+| `feroxathletics.com` | 5 (5 published) | 2 parks: Greenpoint 72 Noble St, **DUMBO 65 Jay St** | 2 canonical, 3 terminal |
+| `gjoa.org` | 6 (5 published) | 1 clubhouse: 850 62nd St, **Sunset Park** | 1 canonical, 5 terminal |
+| `brooklynayso.org` | 6 (6 published) | 1 region (473), playing at the Prospect Park Parade Ground | 1 canonical, 4 terminal, 1 quarantined |
+
+**Four cards were repurposed onto real locations that had no card at all** — Penguin City's Upper East Side,
+Midtown and Riverdale pools, and Ferox's DUMBO playground. This keeps paying off: a cluster with more cards
+than canonical slots is very often also a cluster with a real location going unrepresented, and editing an
+existing surplus card is cheaper and safer than `POST /split`.
+
+**Every card in all seven clusters that guessed a location wrongly guessed it in the same direction: toward
+the fashionable core.** Penguin City has a pool in Riverdale, the Bronx; eight cards existed and every one
+of them said Manhattan or Brooklyn. Gjøa's clubhouse is in Sunset Park; six cards existed and every one said
+Bay Ridge, Dyker Heights or "South Brooklyn". Ferox has a park in DUMBO; five cards existed and none found
+it. This is not random error — a wrong guess distributed at random would sometimes land on the outer
+borough. Its practical consequence is that **the locations a cluster is missing are predictable**: check the
+operator's outer-borough and less-central sites first, because those are the ones no card will have found.
+
+**A per-location-looking path can point at a venue the operator merely rents.** The Art Farm cluster is the
+sharpest case yet for running the program test before the path-depth tie-breaker. Three of its five cards
+carry deeper paths than the canonical one, and `/summer-camp-uws/` even gives a real street address on the
+page — "UWS CAMP LOCATION: Calhoun Lower School, 325 W 85th St". That address is genuine and the camp
+genuinely happens there; the building is the Calhoun School's, rented for eight weeks. The Art Farm's own
+venue is 431 E 91st Street and there is exactly one of it. Same for its after-school clubs, which run inside
+PS 6 and PS 171. **A real address on the page is not evidence of a location belonging to the business** —
+ask whose building it is.
+
+**Two clusters are leagues that play on public fields, and both were kept.** Brooklyn AYSO plays every fall
+game at the Prospect Park Parade Ground; Gjøa's matches are spread across the Parade Ground, Pier 5,
+Socceroof, J.J. Byrne and Red Hook. Neither owns its pitches, which brushes against the no-fixed-venue
+prohibition — but that rule exists for businesses with no location of their own *at all* (the in-home tutor
+network), and both of these have one: a region playing every game at one identified public field, and a club
+with its own clubhouse at 850 62nd St. Both were kept at neighbourhood grain. For the Parade Ground the
+neighbourhood was taken from NYC Parks' own filing (Park Slope) rather than guessed.
+
+**A fabricated identifier is worse than a vague one.** "Brooklyn AYSO Region 702" was quarantined rather
+than retired as a duplicate. The other four surplus AYSO cards are merely vague — "Brooklyn AYSO",
+"Brooklyn AYSO Region 473" at borough grain — and a vague card wastes a family's time. "Region 702" is a
+specific, checkable-looking fact that is not one: the source site is Region 473's own and says so in its
+footer, and no AYSO Region 702 could be found anywhere. The same logic put "Coney Island Gymnastics" into
+quarantine while its two equally-surplus siblings got `BLOCKED_TERMINAL` — it names a gym the operator does
+not have. **Precision in a wrong claim is an aggravating factor, not a mitigating one.**
+
+**The neighbourhood can be derived from the brand's own name.** A surplus Prospect Gymnastics card carried
+`neighborhoodGuess: "Prospect Heights / Brooklyn"`. The operator has no Prospect Heights gym; its two gyms
+are in Ditmas Park and Bed-Stuy. "Prospect" is in the company's name. This is the token-match bug from the
+reference-host audit — first word of the name resolved to whatever matches it — reappearing in the
+*neighbourhood* field rather than the sourceUrl, and it is worth checking for by name whenever a brand name
+happens to contain a place word.
+
+**The literal token "prospect" is leaking into public titles.** Four live cards carry it as a trailing word:
+"Ninja Parc Brooklyn prospect", "Coney Island Gymnastics prospect", "Movement LIC/Brooklyn climbing
+prospect", "Gotham Girls FC youth clinics prospect" — plus "Liberated Movement Kids prospect" recorded in an
+earlier pass, making five. Two of the four were `PUBLISHED` with zero blockers. This is pipeline vocabulary
+("prospect" as in a lead) reaching the field a family reads first, and it belongs with the internal-jargon
+item already in `docs/classscout-core-recommendations.md`. The Ferox one is doubly corrupted — the business
+name is also misspelled, "Parc" for "Park".
+
+**Remaining backlog after this pass: 192 clustered hosts, 80 of them with 2+ published cards.** Named large
+ones still open: `nypl.org` (17 live), `goldfishswimschool.com` (10), `physiqueswimming.com` (7),
+`hoopheaven.com` (7), `takemetothewater.com` (6), `joinplaygroupnyc.com` (5, three cards titled "Social"),
+`dusc.net` (5), `parkslopeunited.com` (5), `theartfarms.com` is done but `brooklynunitedacademy.com` (4/4),
+`fit4dancenyc.com` (4/4), `kidville.com` (4/4) and `thecodingspace.com` (4/4) are not.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -3930,3 +4012,22 @@ Angeles -- Kids"). Several were already quarantined by earlier passes, including
   PUBLISHED, one per NY county search page, all titled after the directory itself. When a defect is
   structural to a source, query the host rather than fixing the one card you found. See "The reference-host
   audit..." above.
+- v94 (2026-08-08): the duplicate backlog is now measured and being worked largest-first. The full-pool
+  cluster scan (556 hosts, 0 failures) found **199 hosts with more than one live card, covering 684 live
+  cards, 87 of them with 2+ cards at `PUBLISHED`** -- a countable queue, not an anecdote. Seven clusters
+  resolved: **43 cards audited, 27 live cards reduced to 7 canonical**, with **4 cards repurposed onto real
+  locations that had no card at all** (Penguin City's UES/Midtown/Riverdale pools, Ferox's DUMBO park).
+  Method: fetch the operator's own site, read its location list, match cards to locations -- all seven were
+  settled by the homepage or footer alone. New findings: **every wrong location guess in all seven clusters
+  erred toward the fashionable core** (a Bronx pool, a Sunset Park clubhouse and a DUMBO park were each
+  missed by every card in their cluster), so the locations a cluster is missing are predictable; **a
+  per-location-looking path can point at a rented venue** (`/summer-camp-uws/` names a real address that
+  belongs to the Calhoun School, not to The Art Farm) -- run the program test before the path-depth
+  tie-breaker and ask whose building it is; **precision in a wrong claim is an aggravating factor** ("Region
+  702" and "Coney Island Gymnastics" were quarantined while their merely-vague siblings were retired); **the
+  neighbourhood can be derived from the brand's own name** ("Prospect Gymnastics" -> "Prospect Heights"),
+  the token-match bug reappearing outside the sourceUrl field; and **the literal pipeline token "prospect"
+  is leaking into public titles** on five known cards, two of them PUBLISHED with zero blockers. Also
+  resolved: leagues playing on public fields (Brooklyn AYSO, Gjoa) are kept, not caught by the
+  no-fixed-venue prohibition, which exists for businesses with no location of their own at all. Remaining:
+  192 clustered hosts, 80 with 2+ published. See "Working the duplicate backlog by cluster" above.

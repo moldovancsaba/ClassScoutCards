@@ -569,6 +569,43 @@ in a comment when you add one, the way the existing ports do.
   card forever.** Both hits in that scan were the correction text quoting the error in order to name it. The
   quote is still worth keeping — a correction that doesn't say what it is correcting is much weaker — but any
   future grep for this phrasing must read the surrounding sentence before concluding a card is unfixed.
+- **Wrong location guesses are not randomly distributed — they err toward the fashionable core, so the
+  location a duplicate cluster is MISSING is predictable.** Measured 2026-08-08 across seven clusters
+  resolved in one pass, and it held in every one. Penguin City Swim has a pool in Riverdale, the Bronx;
+  eight cards existed and all eight said Manhattan or Brooklyn. Gjøa's clubhouse is at 850 62nd St in Sunset
+  Park; six cards existed and all six said Bay Ridge, Dyker Heights or "South Brooklyn". Ferox has a park in
+  DUMBO; five cards existed and none found it. Random error would sometimes land on the outer borough — this
+  never does. Practical use: when reconciling a cluster against an operator's location list, **check the
+  outer-borough and less-central sites first**, because those are the ones no card will have found and
+  therefore the ones a surplus card should be repurposed onto.
+- **A per-location-looking PATH can point at a venue the operator merely rents — a real address on the page
+  is not evidence of a location belonging to the business.** Found 2026-08-08 (The Art Farm). Three of five
+  cards carried deeper paths than the canonical root-domain card, and `/summer-camp-uws/` even printed a real
+  street address: "UWS CAMP LOCATION: Calhoun Lower School, 325 W 85th St". The address is genuine and the
+  camp genuinely runs there — the building is the Calhoun School's, rented for eight weeks. Same for the
+  after-school clubs inside PS 6 and PS 171. The Art Farm has exactly one venue of its own, 431 E 91st St.
+  This is the sharpest case yet for **running the program test BEFORE the path-depth tie-breaker**: ask whose
+  building it is, not how deep the URL goes.
+- **Precision in a wrong claim is an aggravating factor, not a mitigating one.** Named 2026-08-08 after a
+  batch where surplus cards in the same cluster took two different outcomes for exactly this reason.
+  "Brooklyn AYSO Region 702" was QUARANTINED while four equally-surplus siblings ("Brooklyn AYSO", "Brooklyn
+  AYSO Region 473" at borough grain) were merely retired: a vague card wastes a family's time, but "Region
+  702" is a specific, checkable-looking fact that is not one — the source is Region 473's own site and no
+  Region 702 exists. Same call put "Coney Island Gymnastics" in quarantine while its two vague siblings got
+  `BLOCKED_TERMINAL`. Don't let a card's confident specificity read as credibility.
+- **A wrong `neighborhoodGuess` can be derived from the BRAND'S OWN NAME.** Found 2026-08-08: a surplus
+  Prospect Gymnastics card carried `neighborhoodGuess: "Prospect Heights / Brooklyn"`, but the operator's two
+  gyms are in Ditmas Park and Bed-Stuy — "Prospect" is in the company name, not on a map of its locations.
+  This is the token-match bug (first word of the business name resolved to whatever matches it, the
+  merriam-webster/Wikipedia sourceUrl mechanism) surfacing in a DIFFERENT FIELD. Check for it by name
+  whenever a brand name happens to contain a place word.
+- **A league that plays on public fields is NOT caught by the no-fixed-venue prohibition.** Resolved
+  2026-08-08 for Brooklyn AYSO (every fall game at the Prospect Park Parade Ground) and Gjøa Youth Soccer
+  (matches spread across the Parade Ground, Pier 5, Socceroof, J.J. Byrne, Red Hook, plus its own clubhouse
+  at 850 62nd St). Neither owns its pitches. The prohibition exists for a business with no location of its
+  own *at all* — the in-home tutor network — not for one whose children reliably attend one identified
+  place. Both were kept at neighbourhood grain; for the Parade Ground the neighbourhood was taken from NYC
+  Parks' own filing (Park Slope) rather than guessed.
 - **A sweep must GROUP BY DOMAIN before it judges, not screen a page and move on.** Found the hard way
   2026-08-08 during the PUBLISHED sweep: page 1 recorded "Koko NYC Brooklyn" and "Brooklyn City FC Academy"
   as clean, and both turned out to have duplicate twins — sitting on page 2. Nothing on either card reveals
