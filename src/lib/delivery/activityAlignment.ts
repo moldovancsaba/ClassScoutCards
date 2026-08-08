@@ -67,9 +67,21 @@ const NON_ANSWER_LABELS = new Set([
   "miscellaneous",
 ]);
 
+/**
+ * True for a value that is syntactically a category but semantically the absence of one. Exported so
+ * `validateWriteRequest` can enforce the same boundary on every category field of every collection --
+ * `alignActivityTypes` only covers `providers.activityTypes`, and this leak arrived via `categoryHint`.
+ */
+export function isNonAnswerCategoryValue(value: string): boolean {
+  const cleaned = value.trim().toLowerCase();
+  if (cleaned === NO_CATEGORY_PLACEHOLDER || NON_ANSWER_LABELS.has(cleaned)) return true;
+  // Compound forms: "Preschool / Multi-enrichment" is a non-answer wearing a real word as a prefix.
+  const parts = cleaned.split("/").map((p) => p.trim()).filter(Boolean);
+  return parts.length > 1 && parts.some((part) => NON_ANSWER_LABELS.has(part));
+}
+
 function isPlaceholder(activity: string): boolean {
-  const cleaned = activity.trim().toLowerCase();
-  return cleaned === NO_CATEGORY_PLACEHOLDER || NON_ANSWER_LABELS.has(cleaned);
+  return isNonAnswerCategoryValue(activity);
 }
 
 /**
