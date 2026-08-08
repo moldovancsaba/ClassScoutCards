@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { parseSourceUrl, validateWriteRequest } from "./cardBridgeWrite";
 import { computeContentCardIdentity } from "./cardBridgeSplit";
+import { alignActivityTypes } from "./activityAlignment";
 
 const validProviderBody = {
   collection: "providers",
@@ -480,5 +481,32 @@ describe("place fields must name one place, not a compound or a delivery model",
     expect(validateWriteRequest({ ...p, updates: { borough: "NYC / Long Island" } }).ok).toBe(false);
     expect(validateWriteRequest({ ...p, updates: { neighborhood: "Mobile / Brooklyn" } }).ok).toBe(false);
     expect(validateWriteRequest({ ...p, updates: { neighborhood: "Gowanus" } }).ok).toBe(true);
+  });
+});
+
+describe("recurringPrograms[].activityTypes (owner-reported 2026-08-08)", () => {
+  it("is a second activity list and gets the same taxonomy rules as the first", () => {
+    // "Recurring programs shows much more sports than the main part." The Flatbush YMCA card's
+    // top-level chip read SPORTS while the block below still showed nine tags including the compound
+    // "Sports / Camp" -- and 184 live programs still carried the banned "no category" placeholder.
+    const aligned = alignActivityTypes({
+      activityTypes: ["Sports / Camp", "Sports", "Dance", "Art", "Music", "Martial Arts", "Swimming", "Yoga", "Basketball", "no category"],
+      title: "Flatbush Ymca",
+    });
+    expect(aligned.activityTypes).not.toContain("no category");
+    expect(aligned.activityTypes).not.toContain("Sports / Camp");
+    expect(aligned.activityTypes.length).toBeLessThanOrEqual(3);
+    expect(aligned.activityTypes).toContain("Sports");
+    for (const nonSport of ["Dance", "Art", "Music"]) {
+      expect(aligned.activityTypes).not.toContain(nonSport);
+    }
+  });
+
+  it("a program's own title is better evidence of what it is than the provider's", () => {
+    const aligned = alignActivityTypes({
+      activityTypes: ["Sports", "Swimming", "Art"],
+      title: "Saturday Swim Lessons",
+    });
+    expect(aligned.activityTypes[0]).toBe("Swimming");
   });
 });
