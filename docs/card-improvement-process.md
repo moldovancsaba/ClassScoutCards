@@ -5325,3 +5325,55 @@ only place it can go.
   tells the reader to confirm it rather than inventing one; and Yorkville leads on its SCHOLARSHIP programme
   because **price is the field this platform cannot store at all**, so the description is the only place the
   deciding fact can live. 26 leaked prompts remain.
+- v116 (2026-08-08): **the remaining 26 leaked-prompt records resolved, and the defect turned out to be
+  bigger than the scan that found it.** All 26 are done — 17 corrected/enriched, 6 retired as duplicates or
+  franchisor-root-domain cards, 3 quarantined — and the pool now reads **0 occurrences of the leaked prompt
+  in any field of any of the 1,087 live provider records**. Four things are worth carrying forward.
+
+  **(a) The "35 records" figure was an undercount, and the reason generalises.** The original scan looked
+  only at `shortDescription`/`longDescription`. The same leaked string was ALSO the entire value of
+  `recurringPrograms[].timeText` on **48 further records** — including two whose descriptions had already
+  been rewritten in the v115 pass, so they read as fixed while still showing a family the pipeline's own
+  instruction where the class time belongs. Cleared pool-wide in one scripted sweep (48/48 applied), field
+  emptied rather than invented, everything else in each program entry untouched. **A defect found in one
+  field is a defect to look for in every field of the same shape** — the scan defines the finding, so a
+  narrow scan produces a confidently wrong count.
+
+  **(b) A parent organisation's HEADQUARTERS can overwrite a venue's own address — a new shape.** Prospect
+  Park Zoo was filed under *Fordham, the Bronx*. That is not a random miss: 2300 Southern Boulevard, Bronx is
+  the Wildlife Conservation Society's organisation headquarters, printed in the footer of every WCS site
+  page, and the extraction took the footer instead of the venue. Distinct from the catalogued
+  administrative-office rule, which is one business's own back office; here a multi-site parent's HQ
+  relocated a completely different site to another borough. Corrected to 450 Flatbush Ave, Prospect Park,
+  Brooklyn. Worth checking wherever one parent runs several venues.
+
+  **(c) Exactly-one-real-answer decided three cards two different ways in one batch, as designed.** Sylvan's
+  card claimed the Upper East Side; Sylvan has exactly one Manhattan centre (200 W 86th St) — one answer, so
+  it was CORRECTED. Eye Level's card claimed Harlem; Eye Level has three real Manhattan centres (East
+  Village, Tribeca, UES) and none in Harlem — several answers, so it was QUARANTINED with all three recorded.
+  Karate City's card claimed the UES; the dojo is at 525A W 52nd St and a correctly-located sibling card
+  already existed — so it was RETIRED as a duplicate rather than corrected, which would have produced two
+  cards for one dojo. **Checking for a sibling BEFORE ruling is what turned the third from a correction into
+  a retirement.**
+
+  **(d) Two deferred split candidates closed by retitling, no split call.** Treasure Trunk's surplus card was
+  moved onto its uncarded South Slope studio (408 7th Ave) and Ferox's onto its uncarded DUMBO playground
+  (65 Jay St) — in both cases the operator's remaining locations already had cards and only one was missing.
+
+  Also this pass: `providers.website` made writable (see below); a wrong-area-code phone CLEARED not replaced
+  on Irish Arts Center (202/Washington DC on a New York arts centre) while a wrong-area-code phone KEPT on
+  Doc's NYC Lacrosse (617/Boston, but published on the operator's own site as its hotline — **a non-local
+  area code is not by itself evidence of a wrong number**); a self-contradicting record caught for free
+  (Irish Arts Center's `address` said Hell's Kitchen while `neighborhood` said Midtown); and 92NY's four
+  program-not-a-location cards reduced toward one canonical venue record at 1395 Lexington Ave, with the two
+  outside this batch flagged rather than swept up unchecked.
+- v117 (2026-08-08): **`providers.website` is now writable** — the one field on a live record that a family
+  literally clicks, and it could be flatly dead while everything else was right. Barking Cat Studio is a real,
+  currently operating art studio at 219 Greenwood Ave; its record pointed at `barkingcatstudio.com`, a parked
+  "Coming Soon / under construction" page, while the studio is at `barkingcatstudio.net`. Same defect class
+  that made `sourceUrl` writable on `contentCards` (real entity, wrong or dead domain), on the collection
+  where the consequence is public rather than internal. `sourceUrls` stays read-only — it is the discovery
+  pipeline's provenance trail, not a field to curate. Two tests that had used `website` as their canonical
+  "not writable" example now use `sourceUrls`, and a new test pins `website` as writable so any future
+  narrowing has to be deliberate. **Judge the value by whether it reaches the operator's own site**: never
+  rewrite it to a directory listing or aggregator page standing in for the business.
