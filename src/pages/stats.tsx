@@ -89,6 +89,7 @@ const CollectionSection: React.FC<{ stats: CollectionStats }> = ({ stats }) => (
     </h2>
     <p style={{ margin: "0 0 0.35rem", color: "#6b7280", fontSize: "0.9rem" }}>
       {stats.total} total &middot; <PubCell published={stats.published} alt={stats.notPublished} /> published (not published)
+      {stats.retired > 0 && ` · ${stats.retired} retired (quarantined / terminal), excluded from the breakdowns below`}
     </p>
     <p style={{ margin: "0 0 1rem", color: "#6b7280", fontSize: "0.9rem" }}>
       Sport Cards: <PubCell published={stats.sportCards.published} alt={stats.sportCards.all} /> published (all) — one card
