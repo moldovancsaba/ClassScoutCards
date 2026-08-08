@@ -2506,6 +2506,36 @@ re-source plan, query `filter={"normalizedTitle":"..."}`; it costs one request a
 `normalizedTitle` first. If a correctly-sourced sibling exists, the right action is `BLOCKED_TERMINAL`
 (duplicate), not `BLOCKED_REPAIRABLE` (re-source).
 
+### Batch 36/10 (cards 352-361)
+
+6 stale `low_source_trust` blockers cleared (Battery Park City Authority, Commonpoint, Brooklyn Brazilian
+Jiu-Jitsu, Goethe-Institut New York, Chelsea Greyhounds, New York Empire Baseball), 2 already-correct cards
+touched, plus:
+
+- **24th duplicate** — "Greenpoint YMCA" vs "Greenpoint YMCA Youth Programs" (batch 23). This is the
+  **fourth** ymcanyc.org duplication after Bedford-Stuyvesant (batch 24) and the "New York City's Ymca"
+  umbrella (batch 26). The shape is consistent: one card per branch *and* one per branch-plus-"Youth
+  Programs", from the same domain. A per-domain sweep of `ymcanyc.org` would likely clear the rest in one
+  pass rather than one branch at a time.
+- **apple seeds** — `neighborhoodGuess` was **"Near Manhattan priority zones"**.
+
+**New defect: internal pipeline jargon leaking into a family-facing location field.** "Near Manhattan
+priority zones" is not a neighborhood; it is the discovery pipeline's own targeting vocabulary, shown to
+families as if it were a place. The same string appeared on City Treehouse in batch 14, so this is at least
+the second instance. It is a close cousin of the metadata-pollution defect already documented (scraper
+metadata in a schedule field) and of the `"no category"` placeholder — **three separate cases now of
+internal machinery surfacing verbatim in user-facing fields.** Corrected here to the confirmed real
+location (10 West 25th Street, Flatiron/Chelsea).
+
+One honest limitation recorded rather than papered over: listings disagree about whether apple seeds' 10 W
+25th St site is currently open, and other NYC locations (UWS, Peter Cooper Village) appear in some sources.
+Rather than assert one, the uncertainty is written into `terminalReason` for a future pass to resolve.
+
+Also worth noting as a negative control: **Goethe-Institut's source is `goethe.de` — a foreign TLD that is
+nonetheless the institute's own first-party domain.** A `.de` domain is not evidence of off-topic
+contamination the way the batch-29 German travel site was; what matters is whether the domain belongs to
+the entity, not which country it is registered in.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -3123,3 +3153,14 @@ re-source plan, query `filter={"normalizedTitle":"..."}`; it costs one request a
   four batches. Added a process amendment: when a card is real but mis-sourced, look the business up by
   `normalizedTitle` BEFORE prescribing a re-source; if a correctly-sourced sibling exists the right action
   is `BLOCKED_TERMINAL`, not `BLOCKED_REPAIRABLE`. See "Batch 35/10..." above.
+- v81 (2026-08-07): batch 36/10 (cards 352-361) complete. 7 real entities corrected, 2 already-correct
+  cards touched, 24th duplicate marked terminal (Greenpoint YMCA -- the FOURTH ymcanyc.org duplication,
+  suggesting a per-domain sweep would clear the rest in one pass). New defect: internal pipeline jargon in
+  a family-facing location field -- apple seeds carried `neighborhoodGuess: "Near Manhattan priority
+  zones"`, the pipeline's own targeting vocabulary shown as if it were a place (2nd instance; also seen on
+  City Treehouse in batch 14). That makes three separate cases of internal machinery surfacing verbatim to
+  families, alongside scraper metadata in schedule fields and the `"no category"` placeholder. Corrected to
+  the confirmed real location, with genuine uncertainty about which apple seeds sites are currently open
+  written into `terminalReason` rather than guessed. Negative control recorded: Goethe-Institut's
+  `goethe.de` source is a foreign TLD but the entity's OWN domain -- country of registration is not
+  evidence of off-topic contamination. See "Batch 36/10..." above.
