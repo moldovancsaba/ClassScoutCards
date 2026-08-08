@@ -578,6 +578,26 @@ in a comment when you add one, the way the existing ports do.
   never does. Practical use: when reconciling a cluster against an operator's location list, **check the
   outer-borough and less-central sites first**, because those are the ones no card will have found and
   therefore the ones a surplus card should be repurposed onto.
+- **A whole directory site can be ingested wholesale — check the SIZE of a suspicious host's cluster before
+  assuming it is a handful of cards.** Found 2026-08-08: `letsgobaby.co` (Let's Go Baby, a directory of
+  family-friendly NYC restaurants) had **795 content cards**, one per restaurant, bar, brewery, beer garden,
+  steakhouse or cinema, all from one backfill run. The `categoryHint` field held the proof — 51 of its 53
+  distinct values are cuisines (Bar, Brewery, Steakhouse, Diner, Ethiopian…), so a family filtering by
+  category would have been offered a brewery. All 795 went to `BLOCKED_TERMINAL`, not per-card quarantine:
+  every page on the host is a restaurant, so the defect is structural to the source and no re-research
+  changes it. **Owner directive on the right outcome for a directory like this (2026-08-08): register it as a
+  DISCOVERY SOURCE — a place to look for candidates — not as a host whose pages become cards.** That is the
+  general answer for a curated directory whose listings are real but are not themselves activities.
+- **Partition-based enumeration silently UNDERCOUNTS: any partition returning exactly 25 rows has hit the
+  `limit` cap and been truncated.** Learned the hard way 2026-08-08 on the cluster above. Four levels of
+  partitioning (`state` × `boroughGuess` × `neighborhoodGuess` × `categoryHint`) reported **706 cards with
+  zero remaining capped partitions** — which reads as complete, and was not. Retiring those 706 and
+  re-querying returned 25 more, and it took four further rounds of loop-until-nothing-new to reach 795.
+  **Partitioning tells you a cluster is AT LEAST this big; only the seen-set loop tells you it is empty.**
+  Two figures already written down are therefore lower bounds: the reference-host audit's "980 cards / 557
+  hosts", and the cluster scan's "199 hosts / 684 live cards" (its per-host counts capped at 25, so a
+  795-card host read as "25"). The `offset` parameter added to the rows endpoint fixes this properly but is
+  **inert until the branch merges**, since production deploys from `main`.
 - **The rented-venue test is about the PROGRAMME, not the freehold: does the operator run an ongoing
   programme at this address?** Sharpened 2026-08-08 after two clusters took opposite outcomes for the right
   reason. The Art Farm's `/summer-camp-uws/` was retired — the Calhoun School's building, rented for eight
