@@ -3455,6 +3455,52 @@ lifecycle judgements now seen at three points — **pre-opening** (Goldfish's UW
 Kew Gardens Hills, is operating from a *temporary* location, so it was kept with that fact moved out of the
 title and into the record.
 
+### Cluster backlog, tranche 7: six more live clusters (2026-08-08)
+
+**22 cards, 22 live cards reduced to 7, one repurposed.** Every cluster had cards at `PUBLISHED`.
+
+| Host | Cards | Real location(s) | After |
+| --- | --- | --- | --- |
+| `brooklynbridgefencing.com` | 3 | 1: 295 Front St, **DUMBO** | 1 canonical, 2 terminal |
+| `brooklynsportsclub.com` | 4 | 1: 1540 Van Siclen Ave, East New York | 1 canonical, 3 terminal |
+| `manhattankickers.org` | 4 | 1 club, Manhattan fields | 1 canonical, 3 terminal |
+| `riversidehawks.org` | 4 | 1: the Stone Gym, Claremont Ave, **Morningside Heights** | 1 canonical, 3 terminal |
+| `craftstudionyc.com` | 3 | 2: 1657 Third Ave (UES), **176 Duane St (Tribeca)** | 2 canonical, 1 terminal |
+| `brooklynrobotfoundry.com` | 4 | 1: 98 4th St, Gowanus | 1 canonical, 3 terminal |
+
+**A second cluster carrying a different real company's name.** `manhattankickers.org` had a live card titled
+**"Lil' Kickers Manhattan"** — Lil' Kickers is a national youth-soccer franchise with no connection to
+Manhattan Kickers Soccer Club. This is the same shape as "United Soccer Academy Brooklyn" on
+`brooklynunitedacademy.com` two tranches ago, and it is now a pattern rather than an anecdote: **when a
+cluster carries several names for one operator, check whether any of them belongs to somebody else.** The
+failure mode is worse than a duplicate — a family searching for one provider is handed another.
+
+**Brooklyn Robot Foundry is the hybrid rule working as intended.** Two of its four cards carried the literal
+word **"mobile"** in their `neighborhoodGuess` ("Park Slope / mobile", "Mobile / Brooklyn"), which reads like
+the prohibited no-fixed-venue case. It is not: the operator has a real studio at 98 4th Street, Suite 106 in
+Gowanus, open 10am–7pm weekdays, *and* runs mobile STEAM programmes into schools and libraries. Real fixed
+venue plus an outreach model is the documented hybrid — keep the card, drop the mobile framing. The surplus
+cards were deliberately **not** repurposed onto the operator's Manhattan presence: its own site lists "NY –
+Manhattan East" and "NY – Manhattan Downtown" as franchise **territories**, and a territory is not a
+confirmed address.
+
+**A "delivery model" can occupy the neighbourhood field.** "mobile" is not a place, and neither is
+"NYC-wide" (The Craft Studio's birthday-parties card) or "Multiple Brooklyn". Worth naming alongside the
+compound-neighbourhood pattern: the field sometimes holds a *category of answer* rather than a wrong answer.
+
+**Two more program-not-a-location clusters, one of them total.** All four `brooklynsportsclub.com` cards are
+named after programmes — "Youth Program" ×2, "Swim Academy" ×2 — and **not one of the four names the
+business**. The canonical card had to be retitled to "Brooklyn Sports Club" from scratch. The Craft Studio's
+"Birthday Parties" card is the same shape.
+
+**Morningside Heights vs Harlem, and why the gym won.** Every Riverside Hawks card said "Upper West Side /
+Harlem", and the organisation genuinely does describe itself as a Harlem community programme — but the Stone
+Gym a child actually walks into is on Claremont Avenue, in Morningside Heights. The community a programme
+serves and the address it operates from are different facts; `neighborhoodGuess` is the second one.
+
+**The Craft Studio's Tribeca studio had no card** until a "Brooklyn Pop-Ups" card — pop-ups being by
+definition not a fixed location, for an operator with no Brooklyn studio — was repurposed onto it.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -4366,3 +4412,19 @@ title and into the record.
   at three points -- pre-opening (Goldfish UWS), temporarily closed (these), permanently closed (City
   Treehouse). The third is operating from a temporary location and was kept with that fact moved out of the
   title into the record.
+- v100 (2026-08-08): cluster tranche 7 -- six more live clusters, **22 cards, 22 live down to 7**, one
+  repurposed (The Craft Studio's real Tribeca studio at 176 Duane St, which had no card, taking over from a
+  "Brooklyn Pop-Ups" card for an operator with no Brooklyn studio). **Second confirmed instance of a cluster
+  carrying a DIFFERENT REAL COMPANY'S name**: `manhattankickers.org` had a live card titled "Lil' Kickers
+  Manhattan", a national franchise unconnected to Manhattan Kickers Soccer Club -- same shape as "United
+  Soccer Academy Brooklyn", so it is now a pattern: when a cluster carries several names for one operator,
+  check whether any of them is somebody else's. **Brooklyn Robot Foundry is the hybrid rule working as
+  intended** -- two cards had the literal word "mobile" in `neighborhoodGuess`, which reads like the
+  prohibited no-fixed-venue case, but the operator has a real Gowanus studio (98 4th St) plus an outreach
+  model, so the card stays and the mobile framing goes; its Manhattan franchise TERRITORIES were explicitly
+  not treated as addresses. New small observation: **a delivery model can occupy the neighbourhood field** --
+  "mobile", "NYC-wide", "Multiple Brooklyn" are categories of answer rather than wrong answers. Also: all
+  four `brooklynsportsclub.com` cards are named after programmes and **not one names the business**, so the
+  canonical had to be retitled from scratch; and Riverside Hawks moved from "Upper West Side / Harlem" to
+  Morningside Heights, where the Stone Gym actually is -- **the community a programme serves and the address
+  it operates from are different facts.**
