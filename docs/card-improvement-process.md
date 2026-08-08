@@ -1162,6 +1162,18 @@ worth checking each one independently rather than assuming they're all fine (bec
 up first) or all wrong (because a fake one showed up first).** Confirm per-card, every time, regardless
 of pattern-matching against neighbors in the same batch.
 
+**Update after cards 21-30 (11 total instances checked so far)**: the single most common specific outcome
+turned out to be neither "genuinely accurate" nor "flatly wrong" — it's **undersold scope**: NYJTL
+Community Tennis (really all 5 boroughs, 116 sites), NYC Volleyball Academy (really all 5 boroughs), and
+CityParks Track & Field (really 4+ boroughs) all had the real, genuinely-citywide program narrowed down
+to just "Manhattan/Brooklyn," which undersells rather than fabricates. Physique Swimming and SocRoc were
+similar but at 3 real boroughs each (corrected to `"Multiple"` rather than `"Citywide"`, since not all 5
+were confirmed). Sports United NY was flatly wrong the other direction — a real Brooklyn-only org (per
+its own site's title tag) had a fabricated Manhattan claim added. **Practical rule of thumb**: when you
+find a real, multi-location org, don't stop at confirming *some* multi-borough presence — try to find
+the *complete* real footprint before deciding whether the stored value undersells, overclaims, or is
+accurate, since two of those three outcomes look identical to a quick single-source check.
+
 ## Wrong-source contamination with no real underlying entity found, twice more (found 2026-08-08)
 
 Two more confirmed instances of "the sourceUrl points to a real, unrelated big-name entity that happens
@@ -1472,3 +1484,14 @@ for" independently** — a real, legitimate, well-run organization can still fai
   simply not the kind of thing this catalog is for (The Mom Club — a national parent community, not a
   local kids' activity) alongside another aggregator/directory-as-single-entity case (a NYC government
   press release about a citywide summer-activities portal, not a bookable activity).
+- v37 (2026-08-08): cards 21-30 of the second mass-enrichment run. With 11 total instances of the
+  `"Manhattan/Brooklyn"` boroughGuess pattern now checked, the single most common specific outcome is
+  neither "accurate" nor "flatly fabricated" — it's **undersold scope**: three genuinely-citywide
+  programs (NYJTL Community Tennis, NYC Volleyball Academy, CityParks Track & Field) had their real
+  5-borough footprint narrowed to just two boroughs. Corrected all three to `"Citywide"`. Two more
+  3-borough programs (Physique Swimming, SocRoc) got the more conservative `"Multiple"` correction since
+  a full 5-borough footprint wasn't confirmed. One flatly-wrong case in the opposite direction (Sports
+  United NY — a real Brooklyn-only org per its own site, with a fabricated Manhattan claim added).
+  Practical takeaway added to the SOP: confirm a multi-location org's *complete* real footprint, not just
+  *some* real presence, since undersold/overclaimed/accurate can otherwise look identical from a single
+  quick source check.
