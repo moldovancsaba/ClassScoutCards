@@ -4108,6 +4108,47 @@ This is the difference the retrospective bought: **the derivation logic already 
 tested; what was missing was anyone invoking it.** Ten hand-edits fixed ten records. One scripted pass over
 the same logic fixed 924.
 
+### The mechanical sweep: five pool-wide defects, 1,122 record-fixes, no invented facts (2026-08-08)
+
+Following the retrospective's rule — *learn the shapes by hand, then query the shapes at scale* — five
+defects were fixed across the whole `providers` pool. The discipline throughout: **only corrections that
+introduce no new fact.** Every value written was either already in the record, derived by code that already
+existed, or removed because it was unusable.
+
+| Defect | Before | After | How |
+| --- | --- | --- | --- |
+| No `primaryActivityType` | 921 | **0** | Existing tags re-derived through `alignActivityTypes()` |
+| More than 3 `activityTypes` | 284 | **0** | Same write |
+| HTML entities in copy | 87 | **1** | `html.unescape` in place |
+| Undialable phone number | 42 | **0** | Cleared, never replaced |
+| `neighborhood` empty | 399 | **312** | Filled from the record's own `address` field |
+
+**The phone field contained Unix timestamps.** Nineteen live records carried a 10-digit string beginning
+with `1` in `phone`: `1742850639`, `1672214040`, `1763730031`, `1015711542`… Decoded as epoch seconds those
+are 2025-03-24, 2022-12-28, 2025-11-21, 2002-03-09 — **real dates, written into the field a parent dials.**
+A separate 18 carried `311`, New York City's government switchboard. All 42 undialable numbers were
+**cleared rather than replaced**: a field a parent cannot dial has no value, and inventing a replacement
+would be worse.
+
+**Validity was tested by rule, not by area code.** An earlier pass of the classifier flagged
+`212-569-6200 ext. 2274` as broken — it is perfectly dialable, it just has an extension. The rule now
+strips a trailing extension, then applies NANP structure (ten digits; neither the area code nor the
+exchange may begin 0 or 1). That change alone rescued five legitimate numbers from being cleared. **Test
+the shape of the thing, not a denylist of prefixes.**
+
+**The copy-quality gate blocked one write, and was right to.** `prov-doc-s-nyc-lacrosse`'s description
+decodes cleanly but still contains `skip navigation` — scraped chrome. Rather than let one bad field abort
+that record's other fixes, the sweep now **retries without the copy fields and records why**, so the phone
+and neighbourhood corrections land while the description is explicitly left for a real rewrite. One record
+finished as copy-only-skipped; 197 applied in full.
+
+**Why `neighborhood` only went 399 → 312.** The 87 filled were the ones whose *own address field* already
+named a neighbourhood — restating the record's own data. The remaining 312 have no neighbourhood anywhere
+in the record, so filling them means research, one at a time. **That distinction is the whole point of this
+sweep: mechanical where the answer is already present, manual where it is not.** The 338 records whose
+`address` is a neighbourhood rather than a street are the same problem from the other side and are
+similarly not mechanical.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -5224,3 +5265,16 @@ the same logic fixed 924.
   run of the scan reported 125 of 1,087 and looked clean**, because it did `except: break` on a transient
   error -- the exact silent-truncation failure this document warns about. A scan needs retries and an
   explicit failed-page list.
+- v114 (2026-08-08): **the mechanical sweep -- 1,122 record-fixes across the providers pool, no invented
+  facts.** Five defects: no `primaryActivityType` **921 -> 0**, over the 3-tag cap **284 -> 0**, HTML
+  entities in copy **87 -> 1**, undialable phone **42 -> 0**, empty `neighborhood` **399 -> 312**. Every
+  value written was already in the record, derived by existing code, or removed as unusable. **The phone
+  field contained UNIX TIMESTAMPS** -- nineteen records held 10-digit epoch seconds (`1742850639` =
+  2025-03-24, `1672214040` = 2022-12-28) in the field a parent dials, plus 18 holding `311`, the city
+  switchboard; all 42 CLEARED rather than replaced. **Validity tested by rule, not by denylist**: an earlier
+  classifier flagged `212-569-6200 ext. 2274` as broken when it is merely extension-suffixed -- stripping
+  extensions then applying NANP structure rescued five real numbers. **The copy gate blocked one write and
+  was right to** (a description that decodes cleanly but still contains "skip navigation"), so the sweep now
+  retries without the copy fields and records why, letting the other corrections land. `neighborhood` only
+  reached 312 because the 87 fixed were those whose OWN address field already named a neighbourhood -- the
+  rest need research, which is exactly the mechanical/manual line this sweep exists to draw.
