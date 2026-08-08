@@ -93,3 +93,18 @@ describe("activityDimension", () => {
     }
   });
 });
+
+describe("regression: a format is not a source of bogus activities", () => {
+  it("does not manufacture 'Birthday' out of 'Birthday Parties'", () => {
+    // Caught by the activityAlignment suite: stripping the trailing format noun from a value that is
+    // ALREADY a known format in its own right invents an activity the label never named.
+    expect(splitDimensions("Birthday Parties")).toEqual({ activities: [], formats: ["Birthday Parties"] });
+    expect(splitDimensions("Classes")).toEqual({ activities: [], formats: ["Classes"] });
+    expect(splitDimensions("Camps")).toEqual({ activities: [], formats: ["Camps"] });
+  });
+
+  it("still recovers the activity from a suffix-only format", () => {
+    expect(splitDimensions("Baseball Camp").activities).toEqual(["Baseball"]);
+    expect(splitDimensions("Cooking Classes").activities).toEqual(["Cooking"]);
+  });
+});
