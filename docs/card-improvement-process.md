@@ -5633,3 +5633,45 @@ only place it can go.
   venue (mobile, in schools, multiple locations), 2 are unreachable, and 73 have an address their site shows
   in a form no safe pattern can extract. **The 30 no-fixed-venue ones are not defects** — they are the
   `venueModel` gap in the wild, and the right answer for them is a schema field, not a street line.
+- v124 (2026-08-08): **five-card sovereign loop run end to end, and its outcome turned into a code rule.**
+  Queue taken oldest-first from `contentCards` with the `kind: "content"` filter. All five were from the same
+  2026-06-28 discovery run, and every one had a real defect — a 5/5 hit rate that says more about the run than
+  about the sampling.
+
+  | card | verdict | why |
+  | --- | --- | --- |
+  | British Swim School | `corrected` | franchisor root domain + compound borough hiding **two separate franchises** |
+  | Fantasy Puppet Theater | `should_not_exist` | token-matched to **fantasy.premierleague.com**; real entity, but a touring company with no venue |
+  | Swim Easy New York | `should_not_exist` | **adults-only** swim school |
+  | Gotham Tennis Academy | `corrected` | sourced to its **Montauk** club, ~110 miles away, for a Manhattan claim |
+  | Magic Evan | `should_not_exist` | real NYC magician who **travels to the party** — no venue |
+
+  **The most consequential finding came through a pre-publish card, not from reviewing the live pool.**
+  Checking Gotham Tennis surfaced `prov-gotham-tennis-academy-manhattan`, a PUBLISHED listing telling families
+  a *Harlem* tennis academy is at **91 South Fulton Street on 631-668-8241** — the address and phone of the
+  operator's **Montauk** club, area code 631 (Suffolk County). The whole record was Montauk data wearing a
+  Manhattan label. Corrected to 160 Columbus Ave, Upper West Side (exactly one real Manhattan answer, which is
+  the condition for correcting); phone cleared rather than replaced. **Working a pre-publish card is a route
+  into the live pool that the live-pool sweeps do not reach** — worth doing deliberately, not only when a
+  content card happens to be next in the queue.
+
+  **Two cards needed BOTH checks, in the right order, to land correctly.** Fantasy Puppet Theater's source was
+  the official Fantasy Premier League football game — judging by the domain would have quarantined it as
+  contamination, for the wrong reason. Entity-before-domain showed the company is real and re-sourceable; it
+  is quarantined anyway, on the *second* check, because it tours. Getting the right answer for the wrong
+  reason still poisons the `terminalReason` a future pass reads.
+
+  **Swim Easy is the subtlest adult-business case yet** — third after CompleteBody (fabricated "Kids" title)
+  and Equinox (a members' crèche). Here nothing in the title, category or domain is wrong; it is an ordinary
+  swim school whose own mission statement says *"the best swimming lessons for **adults** in NYC. Not everyone
+  had a chance to learn as a child."* Only reading what the operator says it does catches it.
+
+  **System improvement: place fields are now validated in code.** All five cards carried
+  `boroughGuess: "Manhattan/Brooklyn"` and `neighborhoodGuess: "NYC-wide"`. `validateWriteRequest` now
+  **rejects compound values and delivery models** in `borough`/`boroughGuess`/`neighborhood`/
+  `neighborhoodGuess` — same class of rule as the "no category" placeholder, a value that is syntactically a
+  string but semantically not an answer. A compound usually hides a split candidate (British Swim School's
+  concealed two franchises); a delivery model launders the no-fixed-venue prohibition into a location. **An
+  empty value is deliberately still allowed** — clearing a place field is how a reviewer records an honest
+  absence, and that must stay available. Checked against the platform's own canonical vocabulary: **zero** of
+  the 340 real borough/neighbourhood names would be rejected. Six tests added, 182 passing.
