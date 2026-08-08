@@ -172,6 +172,88 @@ function applyStaticAlias(borough: Borough, cleanedKey: string): string {
   return target ? normalizePlaceLabel(target) : cleanedKey;
 }
 
+// ---- Real neighbourhood vs display group (owner directive, 2026-08-08) ----
+//
+// "I want the real neighbourhoods and boroughs for every single listing, there is a grouping rule how
+// the page shows it but we have to use the real neighbourhoods on the cards."
+//
+// `STATIC_NEIGHBORHOOD_ALIASES` above IS that grouping rule, and it was already here -- East Harlem,
+// Central Harlem, West Harlem, Sugar Hill, Manhattanville, Hamilton Heights and Morningside Heights all
+// roll up to "Harlem"; Yorkville, Carnegie Hill, Lenox Hill and Sutton Place to "Upper East Side";
+// Battery Park City to "Financial District"; West Village to "Greenwich Village".
+//
+// The defect was that `findCanonicalNeighborhood` is the ONLY canonicalizer, and it always folds. So a
+// reviewer who established that a listing is in Carnegie Hill had nowhere to put that: canonicalizing it
+// returned "Upper East Side", and writing the folded value threw the finding away. A family looking at
+// the card then reads a neighbourhood a full mile from the door they are walking to.
+//
+// So the two operations are now separate. `findRealNeighborhood` canonicalizes SPELLING without folding
+// -- that is what a card stores. `neighborhoodGroup` folds -- that is how the page groups. The page's
+// behaviour is unchanged; what changes is that the precise answer survives being written down.
+
+/**
+ * Real neighbourhood names that the main app's group vocabulary does not carry.
+ *
+ * Deliberately kept OUT of `NEIGHBORHOODS`, which is a faithful port and must stay one: mixing this
+ * repo's additions into the ported array is exactly how a hand-synced copy goes stale invisibly. These
+ * are additive and each already has a fold target in `STATIC_NEIGHBORHOOD_ALIASES`, so the page groups
+ * them correctly the moment a card starts carrying one.
+ */
+export const REAL_NEIGHBORHOODS_EXTRA: Partial<Record<Borough, string[]>> = {
+  Manhattan: ["East Harlem", "Central Harlem", "West Harlem", "Yorkville"],
+  // A large park is not usually a neighbourhood, and most (Central Park, Brooklyn Bridge Park, Floyd
+  // Bennett Field) are deliberately NOT here -- they straddle several and have no fold target, so storing
+  // one would be a precise-sounding answer to a question the data cannot settle. Prospect Park is the
+  // exception the alias table already made: it folds to Prospect Heights. For the LeFrak Center at
+  // Lakeside, which is physically inside the park, "Prospect Park" is the real answer AND groups
+  // correctly -- strictly better for a family than the fold target it used to store.
+  Brooklyn: ["Prospect Park"],
+};
+
+/** Every name a card may legitimately store: the ported group vocabulary plus the real names above. */
+export const REAL_NEIGHBORHOODS: Record<Borough, string[]> = BOROUGHS.reduce((acc, b) => {
+  acc[b] = [...(NEIGHBORHOODS[b] ?? []), ...(REAL_NEIGHBORHOODS_EXTRA[b] ?? [])];
+  return acc;
+}, {} as Record<Borough, string[]>);
+
+/**
+ * Canonicalize a neighbourhood's SPELLING without rolling it up to its display group.
+ *
+ * This is what belongs in `providers.neighborhood` / `contentCards.neighborhoodGuess`: the place the
+ * child actually goes. "carnegie hill" -> "Carnegie Hill", not "Upper East Side".
+ *
+ * Returns null for anything not recognised, including a compound -- a compound is rejected at write time
+ * anyway and usually hides a split candidate, so quietly resolving it to its first segment (which
+ * `findCanonicalNeighborhood` does, correctly, for GROUPING a legacy value) would launder it here.
+ */
+export function findRealNeighborhood(
+  borough: Borough | null | undefined,
+  value: string | null | undefined,
+): string | null {
+  if (!borough) return null;
+  const raw = String(value ?? "").trim();
+  if (!raw || /[/;|]/.test(raw)) return null;
+  const list = REAL_NEIGHBORHOODS[borough] ?? [];
+  return matchCanonicalPlaceLabel(raw, list) ?? matchCanonicalPlaceLabel(normalizePlaceLabel(raw), list);
+}
+
+/**
+ * The label the page groups a real neighbourhood under — the fold, made explicit and callable.
+ *
+ * Falls back to the neighbourhood itself when it is not an alias, because most neighbourhoods are their
+ * own group. Returns null only when the value is not a recognised place at all.
+ */
+export function neighborhoodGroup(
+  borough: Borough | null | undefined,
+  value: string | null | undefined,
+): string | null {
+  if (!borough) return null;
+  const real = findRealNeighborhood(borough, value);
+  if (!real) return findCanonicalNeighborhood(borough, value);
+  const folded = applyStaticAlias(borough, normalizePlaceLabel(real));
+  return matchCanonicalPlaceLabel(folded, NEIGHBORHOODS[borough] ?? []) ?? real;
+}
+
 /**
  * Resolve a free-text borough label to its canonical `Borough`, or null.
  * Rules: exact (case-insensitive) -> compact match -> county aliases -> edit distance <= 2 against the

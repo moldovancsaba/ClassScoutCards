@@ -1170,6 +1170,55 @@ in a comment when you add one, the way the existing ports do.
   extractor had nothing to read and reached for a default — check the no-fixed-venue prohibition before
   hunting for an address that may not exist.
 
+## Store the REAL neighbourhood; the page's grouping rule handles display (owner directive, 2026-08-08)
+
+**"I want the real neighbourhoods and boroughs for every single listing, there is a grouping rule how the
+page shows it but we have to use the real neighbourhoods on the cards." / "Store the real name! The
+grouping will handle the rest."**
+
+The grouping rule already existed and nobody had noticed it was one: `STATIC_NEIGHBORHOOD_ALIASES` in
+`src/lib/delivery/locations.ts` folds East Harlem, Central Harlem, West Harlem, Sugar Hill, Manhattanville,
+Hamilton Heights and Morningside Heights into **Harlem**; Yorkville, Carnegie Hill, Lenox Hill and Sutton
+Place into **Upper East Side**; Battery Park City into **Financial District**; West Village into
+**Greenwich Village**; Prospect Park into **Prospect Heights**.
+
+**The defect was that `findCanonicalNeighborhood` was the only canonicalizer and it always folds.** A
+reviewer who established that a listing is in Carnegie Hill had nowhere to put that — canonicalizing
+returned "Upper East Side", so writing the canonical value threw the finding away, and the family read a
+neighbourhood a mile from the door they were walking to. **345 live providers store a display group.**
+
+The two operations are now separate, and the page is unchanged:
+- **`findRealNeighborhood(borough, value)`** — canonicalizes SPELLING without folding. This is what a card
+  stores. It also **refuses a compound** rather than silently taking its first segment, which
+  `findCanonicalNeighborhood` does (correctly, for grouping a legacy value, wrong for deciding what to
+  store).
+- **`neighborhoodGroup(borough, value)`** — the fold, made explicit and callable. This is what the page
+  groups by.
+- **`REAL_NEIGHBORHOODS_EXTRA`** — real names the main app's group vocabulary omits (East Harlem, Central
+  Harlem, West Harlem, Yorkville, Prospect Park). Deliberately kept OUT of `NEIGHBORHOODS`, which is a
+  faithful port and must stay one; mixing additions into a ported array is how a hand-synced copy goes
+  stale invisibly. A test asserts every added name has a fold target, so nothing can land outside a group.
+
+Three things this changes in day-to-day judgement:
+
+- **Several "both values are defensible, escalate" calls are no longer escalations.** Sugar Hill vs Harlem
+  was recorded as `needs_human` earlier in the very session that received this directive; the answer is
+  Sugar Hill, because the grouping keeps Harlem too. **When the two candidates are a real neighbourhood and
+  its own display group, that is not a tie — write the real one.** (It remains a genuine escalation when
+  the candidates are *sibling* neighbourhoods, e.g. Riverdale vs Kingsbridge.)
+- **A large park is still not a neighbourhood, with one narrow exception.** Central Park, Brooklyn Bridge
+  Park and Floyd Bennett Field straddle several neighbourhoods and have no fold target — storing one would
+  be a precise-sounding answer to a question the data cannot settle. Prospect Park is the exception the
+  alias table already made: the LeFrak Center at Lakeside is physically inside it, so "Prospect Park" is
+  both the real answer and correctly grouped. Five records were moved onto it — and note they had been
+  stored as *Prospect Heights*, which is simply wrong: 11225 is Prospect Lefferts Gardens/Crown Heights,
+  and Prospect Heights is 11238.
+- **Refine from ZIP only where the ZIP does not straddle.** 24 records were refined from their own address
+  (10014 → West Village, 10029/10035 → East Harlem, 10031 → Hamilton Heights, 10280/10282 → Battery Park
+  City). **10023, 10025, 10027, 10128 and 10007 were deliberately left coarse** — they genuinely span two
+  real neighbourhoods, and a precise wrong answer is worse than a coarse right one. That is the
+  precision-in-a-wrong-claim rule applied to the very sweep meant to increase precision.
+
 ## The core system's listing-maintenance spec is now part of the requirements (2026-08-08)
 
 The core system handed this repo a listing-maintenance specification — what a reviewer looks for, and what
