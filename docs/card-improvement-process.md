@@ -3070,6 +3070,56 @@ endpoint in this same session. That capability is committed but **inert until th
 production deploys from `main`. The remainder of this sweep should be run read-only against `offset` once
 merged, grouping by `sourceHost` per the finding above, rather than continuing to touch-paginate.
 
+### The reference-host audit, and a read-only way to enumerate the pool (2026-08-08)
+
+**A method finding first, because it is the reusable part.** The `/rows` endpoint has no `offset` in
+production, so the pool looked unreadable without touch-paginating ~900 records. It isn't: `filter`
+accepts **multiple keys**, and each distinct filter combination returns its own oldest-25 window. Running
+~120 combinations of `state` x `boroughGuess` x `categoryHint` harvested **980 distinct cards and 557
+distinct sourceHosts, entirely read-only, in one pass.**
+
+That is the instrument the sweep needed. Guessing ~85 likely-bad hostnames by hand found 9; enumerating
+557 real ones found the rest and needed no guessing at all. **Partition by filter to read the pool; don't
+guess at what might be in it.**
+
+**What the audit found: 40 cards from a single root cause.** The `sourceUrl` had been chosen by resolving
+the FIRST WORD of the business name to whatever site ranks for that word. The `merriam-webster.com` cluster
+proves the mechanism outright -- seven cards sourced to dictionary definitions (`/dictionary/sweet` for
+"**Sweet** Displays", `/dictionary/prospect` for "**Prospect** Gymnastics", `/dictionary/field` for
+"**Field** House at Chelsea Piers", `/dictionary/super`, `/dictionary/little`, `/dictionary/modern` x2).
+Wikipedia took the proper nouns (`/wiki/Tiger` for Tiger Schulmann's, `/wiki/Manhattan` for six
+Manhattan-named orgs, `/wiki/Marlene_Dietrich` for the JCC, `/wiki/Saint_Peter`, `/wiki/Asphalt_concrete`,
+`/wiki/West`, `/wiki/Downtown` x2, `/wiki/Dance`); `youtubekids.com` took "Kids" x6; `nytimes.com` took
+"NY" x3.
+
+The self-referential one is "Browse": title scraped from dictionary.com's own navigation chrome, source
+`dictionary.com/browse/upper` -- the entry for "upper", reached from the *neighborhood string* "Upper West
+Side". Both halves of that card are artifacts of the same lookup.
+
+**Why it defeats every other check:** the fields all read as plausible, and the host looks authoritative.
+One of these was graded `sourceAuthorityGrade: "authoritative"`. The only tell is reading the URL.
+
+Resolved 40: **15 terminal** (duplicates of correctly-sourced canonicals, programme cards, or entities that
+could not be identified at all), **12 repairable** with the re-source target written into `terminalReason`,
+**8 quarantined** (out-of-market, retail, online-only platform), and **5 more** below.
+
+**A batch-19 fix turned out to have addressed one instance of a systematic pattern.** Batch 19 terminated a
+card titled literally "Psychology Today" -- the directory's own brand name, sourced to a category search
+page. The audit found **five more, all live and PUBLISHED**, one per New York county search page (Queens,
+Jamaica, Flushing, Bronx, Brooklyn). All terminated on the batch-19 grounds. **When a defect's cause is
+structural to a source, fixing the one card you found is not fixing the defect -- query the host.**
+
+The distinction that keeps this from over-firing is recorded on each card: a `psychologytoday.com` page for
+ONE named practitioner is a real entity behind a bad source pick and should be *re-sourced*; a category
+search listing names nobody and is terminal. The URL shape decides it.
+
+**Lower-volume finds from the same audit:** a Target retail store in **Chicago** carrying an Upper West Side
+neighborhood; Outschool (an online-only marketplace) ingested as a venue; `amazon.com/gp/video/storefront/`
+for a Manhattan camp; a `youtube.com/watch?v=` video; two `facebook.com` pages for Long Island businesses;
+and cards titled after publications rather than providers ("Mommy Poppins -- New York City", "Time Out Los
+Angeles -- Kids"). Several were already quarantined by earlier passes, including a genuinely striking one:
+"Chatgpt - Apps on Google Play".
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -3866,3 +3916,17 @@ merged, grouping by `sourceHost` per the finding above, rather than continuing t
   `sourceHost` before judging. Also a new tension resolved: a program-not-a-location card whose only
   sibling was already quarantined would have stranded a real business at zero cards, so it was retitled
   onto its one confirmed address instead of retired. See "Targeted sweep of PUBLISHED content cards" above.
+- v93 (2026-08-08): reference-host audit. **NOTE: this supersedes v92's "zero off-topic contamination
+  found" -- that held for 50 cards and did not survive contact with the rest of the pool.** Method first:
+  **`filter` accepts MULTIPLE keys, so partitioning by `state` x `boroughGuess` x `categoryHint` reads the
+  pool without writing** -- ~120 combinations harvested 980 distinct cards and 557 distinct hosts
+  read-only, where hand-guessing ~85 hostnames had found 9. Partition to enumerate; do not guess. **40
+  cards resolved from one root cause**, now precisely diagnosed: the first word of the business name was
+  resolved to whatever site ranks for that word. merriam-webster.com proves it -- seven cards sourced to
+  dictionary DEFINITIONS ("Sweet" -> /dictionary/sweet, "Prospect" -> /dictionary/prospect, "Field" ->
+  /dictionary/field). Wikipedia took proper nouns, youtubekids.com took "Kids", nytimes.com took "NY". 15
+  terminal, 12 repairable with re-source targets, 8 quarantined. Separately: **the batch-19 "Psychology
+  Today" fix had addressed one instance of a systematic pattern** -- five more identical cards were live and
+  PUBLISHED, one per NY county search page, all titled after the directory itself. When a defect is
+  structural to a source, query the host rather than fixing the one card you found. See "The reference-host
+  audit..." above.
