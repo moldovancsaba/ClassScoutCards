@@ -707,6 +707,24 @@ in a comment when you add one, the way the existing ports do.
   on the front page) while the card is titled "NYC Footy Kids Clinics". The entity is real, the category is
   right, the location is vague-but-not-wrong — and the children's claim is simply unevidenced. Block rather
   than quarantine (the clinic may exist), but do it BEFORE the card is live, not after.
+- **The token-match bug can reach a FOREIGN-LANGUAGE site in another country — and the entity is still
+  usually real.** Found 2026-08-08: "Zing! Kids Fitness", claiming Manhattan, was sourced to `zing.cz`, a
+  Czech-language VIDEO GAMES website (PlayStation, Xbox, Nintendo). The first word of the business name
+  resolved to whatever ranks for it. Entity-before-domain is what stopped this being a quarantine: Zing! for
+  Kids is a genuine NYC children's fitness business at 1732 1st Ave, its real site being `zing-kids.com`.
+  **However absurd the host, search the named entity before ruling** — and since `sourceUrl` is writable
+  now, these are fixable rather than merely documentable.
+- **A discovery run can have a signature, and "scraped the programme hub instead of the venue" is one of
+  them.** The 2026-06-28 run produced three programme-index cards in two consecutive batches — the NYC Parks
+  youth-sports index, a CityParks registration page, and NYCFC's `/youth/programs` — plus a franchise
+  territory page. When several cards from ONE `latestRunId` share a defect *shape* rather than a defect
+  *value*, that is a run-level signal worth naming; check the rest of the run for the same shape rather than
+  handling each as its own finding.
+- **An administrative office is not a location, and writing it is worse than leaving the field vague.**
+  Sharpened 2026-08-08 on NYC Impact Volleyball: the only findable address is 6029 Putnam Ave, Ridgewood — a
+  back office — while its actual sessions are open gyms in rented school and community halls. Putting
+  "Ridgewood" in `neighborhoodGuess` would send a family to a door they cannot use. Fourth deliberate
+  non-action of the sweep, alongside City Parks Foundation, Five Points Academy and Fit Soccer Kids.
 - **Cluster size alone is not evidence of a defect — a genuine multi-site operator produces a large, CORRECT
   cluster.** The necessary counterweight to the letsgobaby finding above, established the same session
   (2026-08-08). `laparks.org` carries 30 cards on a municipal `.org` domain, which looks like exactly the same
