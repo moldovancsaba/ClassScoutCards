@@ -146,6 +146,42 @@ export function validateWriteRequest(body: unknown): WriteValidationResult {
     }
   }
 
+  // (2026-08-08) A place field must name ONE PLACE. This is the same class of rule as the "no category"
+  // placeholder above -- a value that is syntactically a string but semantically not an answer -- and it
+  // was added after the five-card sovereign loop found `boroughGuess: "Manhattan/Brooklyn"` on every card
+  // of one discovery run. Two distinct shapes recur, both documented across dozens of real records:
+  //
+  //   COMPOUND -- "Manhattan/Brooklyn", "Coney Island / Bensonhurst", "Upper West Side / Harlem",
+  //   "NYC / Long Island", "Multiple". Naming two places is not narrowing to one; it hides a SPLIT (British
+  //   Swim School's "Manhattan/Brooklyn" was concealing two separate franchises) and it reads to a family
+  //   as though the business is in both.
+  //
+  //   DELIVERY MODEL -- "NYC-wide", "Citywide", "Mobile / Brooklyn", "Park Slope / mobile", "Multiple
+  //   locations", "Virtual", "Online". These answer "how is it delivered", not "where is it". A business
+  //   with no fixed venue is prohibited outright by the physical-only rule, so writing its delivery model
+  //   into a place field launders a prohibition into a location.
+  //
+  // Deliberately NOT rejected: an EMPTY value. Clearing a place field is how a reviewer records an honest
+  // absence when no single answer exists, and that must stay available -- an empty field is better than a
+  // wrong one, which is the whole reason this check exists.
+  const placeFields = ["borough", "boroughGuess", "neighborhood", "neighborhoodGuess"] as const;
+  const COMPOUND = /\s*(?:\/|\band\b|&|\+)\s*/i;
+  const NOT_A_PLACE = /^(?:multiple\b|various\b|citywide$|nyc-?wide$|city-?wide$|mobile$|virtual$|online$|tbd$|n\/?a$)/i;
+  const DELIVERY_TOKEN = /\b(?:mobile|virtual|online|citywide|nyc-?wide|multiple locations?)\b/i;
+  for (const field of placeFields) {
+    if (!(field in updates)) continue;
+    const value = updates[field];
+    if (typeof value !== "string" || value.trim() === "") continue; // empty = honest absence, allowed
+    const v = value.trim();
+    if (COMPOUND.test(v) || NOT_A_PLACE.test(v) || DELIVERY_TOKEN.test(v)) {
+      return {
+        ok: false,
+        status: 400,
+        error: `${field} must name ONE place, not a compound or a delivery model (got "${v}"). A compound like "Manhattan/Brooklyn" usually hides a split candidate — card each real location separately. A delivery model like "NYC-wide" or "mobile" answers how the programme is delivered, not where a child goes; if the operator has no fixed venue it is out of scope entirely. If no single place is evidenced, write an empty string — an honest absence is better than a wrong or vague answer.`,
+      };
+    }
+  }
+
   if ((collection === "providers" || collection === "meetupGroups") && "qualityStatus" in updates && updates.qualityStatus !== "quarantined") {
     return { ok: false, status: 400, error: 'qualityStatus can only be set to "quarantined" (the only real value the main app defines) — omit the field entirely rather than trying to clear it through this bridge' };
   }

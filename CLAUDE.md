@@ -862,6 +862,20 @@ in a comment when you add one, the way the existing ports do.
 - **"No street address" is often the correct answer, not a gap.** Of 198 listings no probe could resolve, 30
   say in their own words that they are mobile, run in schools, or have multiple locations. Those are the
   `venueModel` gap in the wild — the fix is a schema field, not a street line.
+- **A place field must name ONE place — now enforced in `validateWriteRequest`, not just conventional.**
+  Compound values ("Manhattan/Brooklyn", "Coney Island / Bensonhurst") and delivery models ("NYC-wide",
+  "mobile", "Multiple") are rejected on `borough`/`boroughGuess`/`neighborhood`/`neighborhoodGuess`. A
+  compound usually hides a SPLIT candidate; a delivery model launders the no-fixed-venue prohibition into a
+  location. **An empty value is still allowed** — clearing the field is how an honest absence is recorded.
+  Zero of the 340 canonical place names trip it.
+- **Working a PRE-PUBLISH card is a route into the live pool that live-pool sweeps do not reach.** The
+  five-card loop's biggest find was not a card: checking a Gotham Tennis content card surfaced a PUBLISHED
+  listing placing a "Harlem" tennis academy at 91 South Fulton Street on 631-668-8241 — the address and area
+  code of the operator's Montauk club, 110 miles away. Do it deliberately, not only when a card is next.
+- **Getting the right answer for the wrong reason still poisons the record a future pass reads.** Fantasy
+  Puppet Theater was sourced to the official Fantasy Premier League football game. Judging the domain would
+  have quarantined it as contamination — the correct disposition, the wrong ground. Entity-before-domain
+  showed the company is real; it is quarantined on the SECOND check, because it tours and has no venue.
 - **The `providers.phone` field has held Unix timestamps and the city switchboard.** Found 2026-08-08 in a
   pool-wide scan: nineteen live records carried 10-digit epoch seconds (`1742850639` = 2025-03-24,
   `1672214040` = 2022-12-28) where the phone number should be, and eighteen carried `311`, New York City's

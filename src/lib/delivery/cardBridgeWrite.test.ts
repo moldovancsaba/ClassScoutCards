@@ -412,3 +412,48 @@ describe("content-card fingerprint stays in step with its basis fields (PR revie
     expect(identity.contentCardId).toBe(`cc-${identity.fingerprint}`);
   });
 });
+
+// (2026-08-08) A place field must name ONE place. Added after the five-card sovereign loop found
+// `boroughGuess: "Manhattan/Brooklyn"` on every card of one discovery run — a compound that was hiding
+// two separate British Swim School franchises. Same class as the "no category" placeholder rule: a value
+// that is syntactically a string but semantically not an answer.
+describe("place fields must name one place, not a compound or a delivery model", () => {
+  const base = { collection: "contentCards", id: "cc-1", reason: "checking place values", source: "test" };
+
+  it("rejects a compound borough that hides a split candidate", () => {
+    const r = validateWriteRequest({ ...base, updates: { boroughGuess: "Manhattan/Brooklyn" } });
+    expect(r.ok).toBe(false);
+    expect(!r.ok && r.error).toMatch(/must name ONE place/);
+  });
+
+  it("rejects compound neighbourhoods written with a slash, 'and', or '&'", () => {
+    for (const v of ["Coney Island / Bensonhurst", "Upper West Side and Harlem", "Fort Greene & Park Slope"]) {
+      expect(validateWriteRequest({ ...base, updates: { neighborhoodGuess: v } }).ok).toBe(false);
+    }
+  });
+
+  it("rejects a delivery model standing in for a location", () => {
+    for (const v of ["NYC-wide", "Citywide", "Mobile", "Virtual", "Multiple", "Multiple locations", "Park Slope / mobile"]) {
+      expect(validateWriteRequest({ ...base, updates: { neighborhoodGuess: v } }).ok).toBe(false);
+    }
+  });
+
+  it("ALLOWS an empty value — clearing a place field is how an honest absence is recorded", () => {
+    const r = validateWriteRequest({ ...base, updates: { neighborhoodGuess: "" } });
+    expect(r.ok).toBe(true);
+  });
+
+  it("allows ordinary single place names, including ones containing 'and' inside a word", () => {
+    for (const v of ["Upper West Side", "Bedford-Stuyvesant", "DUMBO", "Hell's Kitchen", "Highbridge"]) {
+      const r = validateWriteRequest({ ...base, updates: { neighborhoodGuess: v } });
+      expect(r.ok, `${v} should be allowed`).toBe(true);
+    }
+  });
+
+  it("applies to providers' borough/neighborhood too, not just the contentCards guess fields", () => {
+    const p = { collection: "providers", id: "prov-1", reason: "checking place values", source: "test" };
+    expect(validateWriteRequest({ ...p, updates: { borough: "NYC / Long Island" } }).ok).toBe(false);
+    expect(validateWriteRequest({ ...p, updates: { neighborhood: "Mobile / Brooklyn" } }).ok).toBe(false);
+    expect(validateWriteRequest({ ...p, updates: { neighborhood: "Gowanus" } }).ok).toBe(true);
+  });
+});
