@@ -3662,6 +3662,153 @@ This is the second time this tranche pair that a vague value was left alone on p
 Points Academy's borough grain) — **a vague value is sometimes the honest one, and the fix is a split into
 per-park cards, not a better guess.**
 
+
+---
+
+## Two lineages of this document were merged on 2026-08-08 — read this before trusting a version number
+
+This file was edited concurrently by two sessions working the same queue, which both branched from the
+same base at **v34** and both then used **v35, v36 and v37** for entirely different content. Neither was
+wrong; they simply could not see each other. The merge keeps both:
+
+- **v35–v104** are this branch's lineage: the 2026-08-07 loop iteration, the children's-safety and
+  quarantine directives, the 100-card and 101-200 and 201-500 passes, and the eleven cluster tranches.
+- **v105–v107** are the OTHER session's second 100-card mass-enrichment run (cards 1–30), renumbered from
+  its original v35–v37 so the collision does not silently overwrite either side. Its own text still says
+  "cards 1-10 / 11-20 / 21-30 of the second mass-enrichment run", which is accurate — only the version
+  number moved.
+
+That session independently noticed the same thing from the other side: its v105 entry records that
+"another agent is already concurrently working this same queue", naming `cc-854c0e40e153afb2891ec461` —
+the same card this document analyses under "A third confirmed instance of the zero-blocker
+off-topic-contamination gap". **Two independent reviewers reaching the same record is a useful signal, but
+a shared, non-locking document is not a safe coordination mechanism** — the numbering collision is the
+proof. A future concurrent pass should claim a version range up front, or timestamp entries instead of
+numbering them.
+
+The other session's findings that are NOT duplicated in this branch's lineage, kept in full below:
+
+## Skip `kind: "repair"` cards when selecting the oldest record (found 2026-08-08)
+
+Once the mass-run's oldest-first queue reached cards from `content-card-backfill-2026-06-16`, the
+globally-oldest record started resolving to auto-generated `kind: "repair"` documents (id pattern
+`repair-<parentFingerprint>-<blockerCode>`, e.g. `repair-000c63bc045b31050c61b84c-missing_source_url`)
+instead of real candidate listings. These are the main app's own retry-tracking artifacts — one gets
+created whenever a parent card hits a retryable blocker — and by the time they surface as "oldest" they
+are typically already `state: "BLOCKED_TERMINAL"` / `operationalVisibility: "parked"`, `sourceUrl` is
+`internal://classscout/...` (not a real external source), and there is no live-visibility risk and
+nothing meaningful to fix. Reviewing them one at a time burns review budget on pipeline bookkeeping
+rather than real defects.
+
+**Fix**: filter them out of selection entirely — `GET /api/card-bridge/rows` already supports
+`&filter={"kind":"content"}`, which is an allowed field in `contentCards`' read projection. Use this
+filter for every content-card fetch in the loop from now on rather than hitting `kind: "repair"` records
+and having to decide, one at a time, that there's nothing to do.
+
+## A `local_ai_enrichment_failed` blocker can be systemic, not per-card (found 2026-08-08)
+
+A run of consecutive cards from the `2026-06-24` to `2026-06-27` discovery window all shared the exact
+same `enrichmentSummary.localAiError`: `"Available memory <N>MB is below 2000MB for llama3.2:3b"` — the
+local AI enrichment step failing due to host memory pressure at extraction time, not any per-card content
+problem. The visible symptom on nearly every affected card is `categoryHint: null` (the categorization
+step never ran) despite `extractedFacts`/`evidenceSources` containing perfectly good real content that a
+human (or a re-run once memory is available) could categorize correctly. **This is a real, useful
+signal to recognize as a batch**: when several consecutive cards share the identical `localAiError`
+memory-pressure message, don't treat each `categoryHint: null` as a one-off gap — categorize it manually
+from the already-fetched `extractedFacts` (as done throughout this batch) and note the shared root cause
+rather than writing an unrelated-sounding fix for each card. Recommend the core team check whether the
+enrichment host's memory allocation should be raised, or whether these cards should be flagged for an
+automatic re-run once memory is confirmed available, rather than staying permanently `categoryHint: null`.
+
+## A `sourceUrl` can be mangled to point at the wrong page entirely, with the correct target still visible in `evidenceSources` (found 2026-08-08)
+
+`cc-014d407a5eb131ad8b62ba44` ("West Side YMCA") had `sourceUrl: https://en.wikipedia.org/wiki/West` —
+Wikipedia's disambiguation article for the cardinal direction "West," not anything about the YMCA. The
+card's own `evidenceSources` array still contained the two URLs that were clearly actually meant
+(`/wiki/5_West_63rd_Street`, `/wiki/YMCA_of_Greater_New_York`), pointing to a likely title-truncated-at-
+the-first-word URL-construction bug rather than a bad source *choice*. The real entity was easy to
+confirm as genuine and well-documented (search for the name directly) — the org's own official site
+(`ymcanyc.org/locations/west-side-ymca`) is a far better source than either the broken `sourceUrl` or the
+Wikipedia pages. **Fix pattern**: same as other "real entity, bad/failed source" cases — move to
+`BLOCKED_REPAIRABLE`, name the real recommended source in `terminalReason`. Recommend the core team also
+check the specific URL-construction step that produced `/wiki/West` from (presumably) "West Side YMCA."
+
+## A real entity can still be out of scope for this catalog — school/interscholastic teams tied to enrollment, not open registration (found 2026-08-08)
+
+`cc-01415a8e61ba68190e4d9289` ("Park Slope Baseball") was a real PSAL (NYC public schools athletic
+league) varsity baseball team at a specific public high school, sourced from `nfhsnetwork.com` — a
+paywalled game-broadcast subscription service with no real program/age/schedule content at all. Even a
+better source for the same team wouldn't fix the actual problem: membership on a school's own varsity
+team requires enrollment at that specific school, not open community registration, so it isn't a
+"sign your kid up" activity the way every other card in this catalog is. **This is a new, distinct
+pattern from off-topic contamination** — the entity is real and the general subject (baseball) is real,
+but the specific thing described isn't bookable by a family browsing the catalog. **Fix pattern**:
+`QUARANTINED` with a `terminalReason` naming the scope problem explicitly (`not_an_open_enrollment_
+activity`) rather than trying to re-source it — a better source for the same school team doesn't change
+whether it belongs in the catalog at all.
+
+## When you can't confirm a fix, say so and leave the field alone — don't force a guess either direction (found 2026-08-08)
+
+`cc-078ea2ef92e1fbbff0a7fb7b` ("Kano Martial Arts Kids Brooklyn") had `boroughGuess: "Brooklyn"`, but the
+only "Kano Martial Arts" independent search could confirm is a Judo studio in Chelsea, Manhattan — with
+no way to resolve the card's own Google Maps `place_id` sourceUrl (needs JS rendering or a Places API key,
+neither available) to check whether it's the same Manhattan studio or a genuinely distinct Brooklyn
+location under a similar name. Rather than confidently "fixing" `boroughGuess` to Manhattan on
+inconclusive evidence, or leaving it uncorrected while implying it was verified, the honest move is a
+touch-only review that states exactly what was and wasn't confirmed, so the next reviewer (human or
+agent) knows this one still needs the place_id resolved rather than assuming it's already been checked.
+The no-fabrication rule cuts both ways: don't invent a fix, but don't silently pass over uncertainty
+either — write it down.
+
+## `"Manhattan/Brooklyn"` + `"Multiple"` is not a reliable signal either way — verify each instance independently (found 2026-08-08)
+
+Cards 15-20 of this run kept surfacing the exact same `boroughGuess: "Manhattan/Brooklyn"` /
+`neighborhoodGuess: "Multiple"` pair, all from the same `content-card-backfill-2026-06-18` batch. At
+first this looked like it might be a hardcoded fallback default — but verification went both ways:
+NORY and Lil' Kickers genuinely do have real, confirmed multi-borough locations (left unchanged), while
+NY Gauchos (really Bronx-only, Mott Haven) and NYC Cyclones (really Manhattan-only, Chelsea) had the
+exact same pair applied despite being real single-location entities. **The lesson isn't "this value is
+always wrong" — it's that a suspiciously repeated exact-same pair across several consecutive cards is
+worth checking each one independently rather than assuming they're all fine (because a real one showed
+up first) or all wrong (because a fake one showed up first).** Confirm per-card, every time, regardless
+of pattern-matching against neighbors in the same batch.
+
+**Update after cards 21-30 (11 total instances checked so far)**: the single most common specific outcome
+turned out to be neither "genuinely accurate" nor "flatly wrong" — it's **undersold scope**: NYJTL
+Community Tennis (really all 5 boroughs, 116 sites), NYC Volleyball Academy (really all 5 boroughs), and
+CityParks Track & Field (really 4+ boroughs) all had the real, genuinely-citywide program narrowed down
+to just "Manhattan/Brooklyn," which undersells rather than fabricates. Physique Swimming and SocRoc were
+similar but at 3 real boroughs each (corrected to `"Multiple"` rather than `"Citywide"`, since not all 5
+were confirmed). Sports United NY was flatly wrong the other direction — a real Brooklyn-only org (per
+its own site's title tag) had a fabricated Manhattan claim added. **Practical rule of thumb**: when you
+find a real, multi-location org, don't stop at confirming *some* multi-borough presence — try to find
+the *complete* real footprint before deciding whether the stored value undersells, overclaims, or is
+accurate, since two of those three outcomes look identical to a quick single-source check.
+
+## Wrong-source contamination with no real underlying entity found, twice more (found 2026-08-08)
+
+Two more confirmed instances of "the sourceUrl points to a real, unrelated big-name entity that happens
+to share a word with the card's title, and no real distinct organization with that title could be found
+despite searching": `cc-0b06c1cae0b5c90ddda217a7` ("Eleven United NYC" → elevenmadisonpark.com, a famous
+restaurant) and `cc-18c64b345e0c779dea03eee2` ("SABA NYC Basketball" → nba.com/knicks, the NBA's own
+team page). Both quarantined the same way as the earlier unsalvageable cases this session — cleared the
+fabricated location fields, named the wrong source and the fact that no real alternative was found. A
+third case in the same batch (`cc-71a4f103f99480cee821955b`, "The Jam Cats" → thejamcats.com, an
+unrelated cover band) DID have a real alternative found (`thejamcatsmusic.com`) but with unconfirmed NYC
+presence — worth remembering these aren't always the same outcome: sometimes a real alt-org exists to
+recommend, sometimes none does, and the write-up should say which case it is rather than treating "wrong
+source" as a single uniform finding.
+
+## A real entity can be genuinely wrong-kind for reasons other than off-topic content (found 2026-08-08)
+
+`cc-156b062b211b517cf9901dbc` ("The Mom Club") was a real, genuine organization — but a national,
+digital-first online community for mothers, not a local NYC children's activity at all, with a
+fabricated NYC borough on top. Distinct from the school-team out-of-scope pattern (also found this
+batch, "Park Slope Baseball") and distinct from off-topic contamination (the content is real and on-topic
+for *parents*, just not for a children's-activity catalog, and not local to begin with). **Recommend
+checking new discoveries against both "is this real" and "is this the kind of thing this catalog is
+for" independently** — a real, legitimate, well-run organization can still fail the second test.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -4645,3 +4792,41 @@ per-park cards, not a better guess.**
   non-sharpening**: City Parks Foundation keeps `neighborhoodGuess: "NYC-wide"` because its office is not
   where children go and the programmes really are citywide -- **a vague value is sometimes the honest one,
   and the fix is a per-park split, not a better guess.**
+- v105 (2026-08-08): started a second 100-card mass-enrichment pass. Cards 1-10 found that another agent
+  is already concurrently working this same queue (confirmed: `cc-854c0e40e153afb2891ec461`,
+  "Replacement Parts - Step2," and its sibling provider record were already correctly fixed under a
+  different `lastReviewedBy` before this pass reached them) — expected and fine given the deterministic
+  oldest-first selection re-checks live state before every write. Four new findings: `kind: "repair"`
+  cards should be filtered out of selection entirely (`&filter={"kind":"content"}`) rather than reviewed
+  one at a time, since they're the pipeline's own retry-bookkeeping, already terminal, never live; a
+  `local_ai_enrichment_failed` blocker can be a systemic memory-pressure issue shared across many
+  consecutive cards, not a per-card problem (visible as a run of `categoryHint: null` cards from the
+  same discovery window); a `sourceUrl` can be mangled to the wrong page entirely while the intended
+  target is still visible in the card's own `evidenceSources` (West Side YMCA → Wikipedia's
+  disambiguation page for "West"); and a real entity can be genuinely out of scope for this catalog when
+  it's tied to school enrollment rather than open registration (a PSAL varsity team). Also documented
+  the discipline of saying "not confirmed" and leaving a field alone rather than guessing either
+  direction, when independent verification is genuinely inconclusive (Kano Martial Arts's Brooklyn claim,
+  which could not be confirmed OR refuted with the tools available).
+- v106 (2026-08-08): cards 11-20 of the second mass-enrichment run. Two more wrong-borough hallucinations
+  confirmed and fixed (NY Gauchos: fabricated "Manhattan/Brooklyn" → really Bronx-only, Mott Haven; City
+  Ice Pavilion: fabricated "Brooklyn/Queens" hedge → really Queens-only, Long Island City), alongside two
+  cards where the exact same suspicious `"Manhattan/Brooklyn"`/`"Multiple"` pair turned out to be
+  genuinely accurate (NORY, Lil' Kickers) — the pair itself isn't a reliable tell either way, verify each
+  instance. Two more confirmed wrong-source-no-real-org-found cases (Eleven United NYC → a restaurant;
+  SABA NYC Basketball → the NBA's own Knicks page), a third wrong-source case with a real alternative
+  found but unconfirmed NYC presence (The Jam Cats), and a new wrong-kind variant: a real entity that's
+  simply not the kind of thing this catalog is for (The Mom Club — a national parent community, not a
+  local kids' activity) alongside another aggregator/directory-as-single-entity case (a NYC government
+  press release about a citywide summer-activities portal, not a bookable activity).
+- v107 (2026-08-08): cards 21-30 of the second mass-enrichment run. With 11 total instances of the
+  `"Manhattan/Brooklyn"` boroughGuess pattern now checked, the single most common specific outcome is
+  neither "accurate" nor "flatly fabricated" — it's **undersold scope**: three genuinely-citywide
+  programs (NYJTL Community Tennis, NYC Volleyball Academy, CityParks Track & Field) had their real
+  5-borough footprint narrowed to just two boroughs. Corrected all three to `"Citywide"`. Two more
+  3-borough programs (Physique Swimming, SocRoc) got the more conservative `"Multiple"` correction since
+  a full 5-borough footprint wasn't confirmed. One flatly-wrong case in the opposite direction (Sports
+  United NY — a real Brooklyn-only org per its own site, with a fabricated Manhattan claim added).
+  Practical takeaway added to the SOP: confirm a multi-location org's *complete* real footprint, not just
+  *some* real presence, since undersold/overclaimed/accurate can otherwise look identical from a single
+  quick source check.
