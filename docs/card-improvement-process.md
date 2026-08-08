@@ -6089,3 +6089,21 @@ only place it can go.
   The stats page's own numbers moved accordingly: `contentCards` 12,626 → **5,056** (repair stubs excluded)
   with **2,595 retired** reported separately, and the `providers` FORMAT breakdown is now a single
   `(none)` bucket of 1,043 — no format value remains in any activity list.
+
+  **`contentCards` completed too, and the completeness check mattered more than the fix.** `categoryHint`
+  holds ONE value, so the two-level "<sport>, Sports" form cannot be expressed there; the ordering rule
+  still decides which value survives — the specific sport leads, so it is the one kept, and the bare parent
+  is kept only where no specific sport is named. 48 cards rewritten (`Multi-Sport` → `Sports`,
+  `Sports / Soccer` → `Soccer`, `Baseball / Softball` → `Baseball`…), 46 applied, 2 correctly refused by
+  the collision guard.
+
+  **A census without the `kind` filter reported 218 remaining and was wrong in two independent ways at
+  once** — several values returned exactly 25 (the `limit` cap, the already-documented partition-truncation
+  trap), AND the whole set was dominated by `kind: "repair"` stubs. A proper loop-until-empty enumeration
+  restricted to `kind: "content"` gives the real answer: **0 maintainable content cards still carry a
+  pipeline non-answer, and 1 still carries a compound sport hint** — Fit Soccer Kids, the collision case
+  above, whose only correct value is held by its retired twin. Every other remaining instance sits on a
+  `BLOCKED_TERMINAL` repair stub, which is out of scope by the owner's own scope rule.
+
+  Two traps fired in one query here, which is the point: a count is only as good as the scope statement
+  attached to it. Say which `kind`, say whether it was capped, and prefer loop-until-empty to a single page.
