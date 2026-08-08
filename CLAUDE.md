@@ -520,6 +520,20 @@ in a comment when you add one, the way the existing ports do.
   per-location cards on those same hosts (`codeninjas.com/ny-gowanus`, `camp.com/locations/fifth-ave-nyc`)
   were correct. Fetching each brand's own location directory resolved five cards in five requests — do that
   before accepting any root-domain card's borough.
+- **A sweep must GROUP BY DOMAIN before it judges, not screen a page and move on.** Found the hard way
+  2026-08-08 during the PUBLISHED sweep: page 1 recorded "Koko NYC Brooklyn" and "Brooklyn City FC Academy"
+  as clean, and both turned out to have duplicate twins — sitting on page 2. Nothing on either card reveals
+  a sibling exists, so a page-scoped screen *cannot* catch them however carefully it is done; only a
+  `filter={"sourceHost":...}` lookup can. This is the same order-dependence the per-domain sweep was
+  invented to remove, quietly reintroduced by screening in page order. Both misses were corrected in the
+  same session and their `terminalReason` entries say so.
+- **When the program-not-a-location test would strand a real business at zero live cards, retitle onto its
+  confirmed address instead of retiring it.** New tension, resolved 2026-08-08: "Fastbreak Sports Flag
+  Football" is a textbook program card, but its only sibling had already been quarantined as a fabricated
+  location, so retiring it would have removed a real operating business from the pool entirely. Its own
+  contact page gives exactly one address (1629 1st Ave, Upper East Side), so the card was retitled onto
+  that. **The escape hatch requires an identified location** — with none, keep the card and flag it rather
+  than retire it into a gap.
 - **Within a duplicate cluster, the card whose `sourceUrl` is a per-location path is canonical and the
   root-domain copies are the duplicates — a mechanical tie-breaker, no judgement needed.** The corollary of
   the root-domain rule above, confirmed 2026-08-08 (batch 41) on five hosts at once. SwimJim is the clean

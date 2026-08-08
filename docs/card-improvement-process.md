@@ -3008,6 +3008,53 @@ real operating business at least once.
   stretch began — was **not** run as a targeted sweep. It was partly overtaken by events (the per-domain
   sweep surfaced contamination incidentally), but it remains a distinct, unexecuted recommendation.
 
+### Targeted sweep of PUBLISHED content cards (2026-08-08) — the standing open item, started
+
+The oldest-`PUBLISHED` off-topic sweep had been an open recommendation since before the cards 201-500
+run. Started here. **Pool size: 908 published content cards** (of 12,626 total). Two pages, 50 cards
+screened, 12 defects resolved.
+
+**Headline: the sweep did NOT find what it was looking for.** Not one instance of off-topic contamination
+— no e-commerce checkout pages, no app-store listings, no reference articles, no foreign university LMS —
+appeared in 50 cards. Every card was a plausible NYC children's activity business on its own domain. On
+this evidence the published pool is *not* where that defect concentrates, which is worth knowing: the five
+historical instances were all found in the unpublished/oldest-updated end of the pool, and the standing
+recommendation implicitly assumed they would generalise to published cards. They did not.
+
+**What it found instead — the same two shapes the last six batches have been finding:**
+
+| Card | Finding |
+| --- | --- |
+| Togetherhood Manhattan | Marketplace intermediary — "connects **schools** with vetted independent instructors" |
+| CodeAdvantage Manhattan / NYC | No fixed venue — in-school and online delivery |
+| Axiom Learning NYC | Could not confirm a physical children's centre; site is now B2B software + PD |
+| Koko NYC ×2, Brooklyn City FC ×3, 92NY ×2 | Duplicate clusters |
+| Fastbreak Sports Flag Football | Program card, retitled onto the real UES location |
+| CityParks Track & Field | Real, kept — but "NYC parks" is a catchment, recorded as a split candidate |
+
+**The methodological finding, which matters more than the individual cards: screening the sweep
+page-by-page reproduced the exact order-dependence the per-domain sweep exists to remove.** Page 1 of this
+sweep recorded "Koko NYC Brooklyn" and "Brooklyn City FC Academy" as clean. Both have duplicate twins —
+which sat on page 2. Nothing on either card revealed a sibling existed, so a page-scoped screen could not
+possibly have caught them; only grouping by `sourceHost` did. **A sweep must group by domain before it
+judges, not screen a page and move on.** The two misses were caught and corrected within the same session,
+and both `terminalReason` entries say so rather than quietly fixing it.
+
+**One genuinely new tension, and how it resolved.** Fastbreak Sports Flag Football is a textbook
+program-not-a-location card, so the rule said retire it. But its only sibling — "Fastbreak Kids Downtown"
+— had been quarantined in batch 40 as a fabricated location, so retiring this one would have left a **real
+operating business with zero live cards**. The company's own contact page gives exactly one address (1629
+1st Ave, 212.724.3278, Upper East Side), so the card was *retitled onto that confirmed location* instead.
+**When the program test and "don't strand a real business" pull in opposite directions, an identified real
+location resolves both; without one, the tension would have been real and the card should be kept and
+flagged rather than retired into a gap.**
+
+**Coverage is partial and the honest number is 50 of 908 (~5.5%).** Paging further currently costs a write
+per card, because advancing the queue means touching records — which is why `offset` was added to the rows
+endpoint in this same session. That capability is committed but **inert until the branch merges**, since
+production deploys from `main`. The remainder of this sweep should be run read-only against `offset` once
+merged, grouping by `sourceHost` per the finding above, rather than continuing to touch-paginate.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -3787,3 +3834,20 @@ real operating business at least once.
   the counter's unit changed mid-run, six businesses were left with recorded location gaps rather than
   guesses, two blockers deliberately kept, `sourceUrl` remains unwritable so re-source findings are notes
   only, and the targeted off-topic sweep of the oldest PUBLISHED records was NOT run and remains open.
+- v92 (2026-08-08): two bridge capabilities added, and the standing PUBLISHED sweep started.
+  **`contentCards.sourceUrl` is now writable**, with `sourceHost` DERIVED from it rather than settable --
+  the derivation is the point, since the per-domain sweep groups clusters by host and a card whose host
+  disagreed with its URL would vanish from its own cluster. This turns every "real entity, wrong source"
+  note recorded across batches 40-45 from prose into an applyable fix. **`offset` added to the rows
+  endpoint** so a full-pool sweep can read WITHOUT writing; previously the only way past the oldest N rows
+  was to touch them. Both are committed but INERT until the branch merges, because production deploys from
+  `main` -- verified by probing the deployed bridge, which still rejects `sourceUrl`. 167 tests passing.
+  **The targeted off-topic sweep of PUBLISHED cards was then started** (pool: 908): 50 cards screened, 12
+  defects resolved, and **zero off-topic contamination found** -- the defect the sweep was created to hunt
+  does not appear to concentrate in the published pool, which contradicts the assumption behind the
+  original recommendation. It found marketplace/no-fixed-venue providers and duplicate clusters instead.
+  Key methodological finding: **screening page-by-page reproduced the order-dependence the per-domain sweep
+  exists to remove** -- page 1 marked two cards clean whose duplicate twins sat on page 2; group by
+  `sourceHost` before judging. Also a new tension resolved: a program-not-a-location card whose only
+  sibling was already quarantined would have stranded a real business at zero cards, so it was retitled
+  onto its one confirmed address instead of retired. See "Targeted sweep of PUBLISHED content cards" above.
