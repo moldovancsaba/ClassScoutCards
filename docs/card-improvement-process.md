@@ -5377,3 +5377,47 @@ only place it can go.
   "not writable" example now use `sourceUrls`, and a new test pins `website` as writable so any future
   narrowing has to be deliberate. **Judge the value by whether it reaches the operator's own site**: never
   rewrite it to a directory listing or aggregator page standing in for the business.
+- v118 (2026-08-08): **scraped page chrome cleared pool-wide (10 records), and the sweep for it turned up
+  three records that should not be live at all.** With the leaked prompt at zero, the same scan was widened
+  to other scraper signatures. Both are now zero across all 1,087 live provider records.
+
+  **The chrome itself** — descriptions that were the source page's own navigation, verbatim: *"Brooklyn
+  Botanic Garden Skip to main content Open/Close Menu Visit…"*, *"Breakaway Hoops 4:36 tag --> skip
+  navigation"*, *"Color Me Mine Skip to main navigation Skip to main content Skip to footer ---------->"*.
+  Rewritten from source, and along the way three duplicate clusters were resolved (Park Slope Day Camp 3→1,
+  Breakaway Hoops 3→1, MatchPoint's two records repointed at its two actual clubs).
+
+  **The Long Beach Public Library case is the sharpest instance of a general mechanism.** Its `address` read
+  `"570-6685 Send Email Dr."` and its `phone` was `562-570-6801`. Neither is a mangling of a real library
+  value: longbeach.gov renders the city's full **elected-officials directory** — every councilmember with
+  their phone — on every page. The "address" is the tail of councilmember Tunua Thrash-Ntuk's number
+  (562-570-**6685**) with the adjacent words "Send Email" and a street suffix bolted on; the "phone" is the
+  **Mayor's office**. Confirmed by fetching a URL that 404s and finding the same directory rendered on the
+  error page. **A site-wide navigation block is a field-filling hazard for every record scraped from that
+  site**, and the confirmation trick is cheap: if the value still appears on the site's 404 page, it came
+  from the furniture, not the content. Both fields cleared, not replaced — the library's own locations page
+  404s, so no verified branch address existed to write. Region also corrected from Central LA to Harbor
+  (a legitimate LA-tenant record, wrong LA region).
+
+  **Three quarantines came out of the same scan, none of which a chrome sweep was looking for:**
+  - **Masttro** — enterprise wealth-management software, live with no blocker, reached this catalogue on the
+    token "family" from the industry term FAMILY OFFICE, then given a fabricated Upper West Side location and
+    the activity types "Art" and "Music". Found by a scan for descriptions ending in a doubled full stop.
+    **Live off-topic contamination is still being found by accident rather than by sweep** — third time now.
+  - **Equinox Sports Club "Kids Programs"** — a NEW sub-shape of the adults-only-gym fabrication. CompleteBody
+    had nothing child-related at all; this club really does have a "Kids Club", and it is **drop-off childcare
+    for members while they train**, listed in the amenities between the spa and the coat check. Searching the
+    club's own page for "youth", "junior", "teen", "camp" and "family" returns nothing. **The word "Kids" in
+    an amenity name is not evidence of a children's programme.**
+  - **Color Me Mine Bay Ridge** — three tells stacked: franchisor root domain, an 818 (California) franchisor
+    phone, and real per-studio subdomains (upperwestside/tribeca/newcity.colormemine.com) with no Bay Ridge.
+
+  **Kidville Upper East Side retired, with a caution attached.** A web search asserted Kidville has "Upper
+  East Side, Upper West Side, Chelsea, TriBeCa and Park Slope" locations. The operator's OWN location finder
+  lists exactly two in North America: Upper West Side (205 W 88th St) and Montclair NJ. **The operator's own
+  location list beats a search summary** — the summary was stale marketing copy, and acting on it would have
+  kept a fabricated location live.
+
+  **One cheap mechanical duplicate test discovered here:** two Breakaway Hoops records shared an identical
+  name and an identical phone number differing only in punctuation (`6467762021` against `646-776-2021`).
+  Comparing phone numbers *normalised to digits* would find that whole class of duplicate without research.

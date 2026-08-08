@@ -762,6 +762,26 @@ in a comment when you add one, the way the existing ports do.
   that dojo correctly, so correcting this one would have produced two cards for one dojo; it was RETIRED as a
   duplicate instead. The exactly-one-real-answer rule tells you whether to correct or quarantine; the sibling
   check tells you whether "correct" was ever the right verb.
+- **A site-wide navigation block is a field-filling hazard for every record scraped from that site — and the
+  confirmation trick is free.** Long Beach Public Library's `address` read `"570-6685 Send Email Dr."` and its
+  `phone` was the MAYOR's office. longbeach.gov renders the city's full elected-officials directory on every
+  page, so the "street" is the tail of a councilmember's phone number (562-570-**6685**) with the adjacent
+  words "Send Email" and a suffix bolted on. **If a suspect value still appears on the site's 404 page, it
+  came from the furniture, not the content** — that is how this was confirmed. Both fields cleared, since the
+  library's own locations page 404s and no verified address existed to write.
+- **"Kids" in an AMENITY name is not evidence of a children's programme.** Equinox Sports Club's card was
+  titled "Kids Programs"; the club's only child-related offering is a "Kids Club", which is drop-off childcare
+  for adult members while they train, listed between the spa and the coat check. Searching its own page for
+  youth/junior/teen/camp/family returns nothing. Subtler than the catalogued CompleteBody case, which had
+  nothing child-related at all — here the word really is on the page, attached to the wrong kind of thing.
+- **An operator's own location finder beats a search summary, and the gap between them is where fabricated
+  locations survive.** A web search asserted Kidville runs UES, UWS, Chelsea, TriBeCa and Park Slope studios;
+  Kidville's own finder lists exactly two in North America (205 W 88th St and Montclair NJ). The summary was
+  stale marketing copy, and believing it would have kept a fabricated Upper East Side card live.
+- **Two records differing only in phone-number PUNCTUATION are the same record twice — and that is a
+  mechanical test nobody has run.** Breakaway Hoops had two records with an identical name and the numbers
+  `6467762021` and `646-776-2021`. Comparing phones normalised to digits would find this whole class of
+  duplicate across the pool with no research at all.
 - **The `providers.phone` field has held Unix timestamps and the city switchboard.** Found 2026-08-08 in a
   pool-wide scan: nineteen live records carried 10-digit epoch seconds (`1742850639` = 2025-03-24,
   `1672214040` = 2022-12-28) where the phone number should be, and eighteen carried `311`, New York City's
