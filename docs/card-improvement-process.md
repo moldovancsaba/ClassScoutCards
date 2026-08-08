@@ -6362,3 +6362,47 @@ only place it can go.
   **Tujunga** — a real Los Angeles district absent from this platform's San Fernando Valley neighbourhood
   list. Region set, neighbourhood left ABSENT rather than coerced into a listed neighbour. Same discipline
   as Camp Seely, one level down: a missing vocabulary entry is not licence to write the nearest wrong one.
+
+- v141 (2026-08-08): **50 more cards — the Family Events cohort finished, plus the oldest live listings.**
+  54 records actioned across this continuation. The bulk was enrichment rather than triage, which is what
+  the queue looks like once the structural junk is gone.
+
+  **23 institutions enriched from their own sites** (addresses scraped from each museum's own pages, then
+  mapped to canonical neighbourhoods): 9/11 Memorial & Museum → Financial District; Cultural Museum of
+  African Art → 1360 Fulton St → Bedford-Stuyvesant; The City Reliquary → 370 Metropolitan Ave →
+  Williamsburg; Onderdonk House → Ridgewood; Queens County Farm → Floral Park; Conference House →
+  Tottenville; Noble Maritime → New Brighton; Museum of Maritime Navigation → 1208 Bay St → Rosebank;
+  Prospect Park Alliance → Park Slope — plus the 13 recorded in v140.
+
+  **Titles were the defect hiding the rest.** This whole cohort came from a nonprofit-registry backfill and
+  carried IRS filing names with broken Title Case: "Sons Of The Revolution In The State Of New York, Inc."
+  (which is the **Fraunces Tavern Museum**), "Staten Island Institute Of Arts And Sciences" (the **Staten
+  Island Museum**), "Morris-jumel Mansion, Inc.", "Colonial Dames Of America/mount Vernon Hotel Museum &
+  Garden". None is what a parent would type. Also cleaned: `"Queens County Farm — Events Calendar"`, where
+  the page-title artefact had become the museum's name.
+
+  **Three findings from the live-listing half of the batch:**
+
+  1. **"North Brooklyn YMCA" is not in north Brooklyn.** Stored as `"Williamsburg / Greenpoint"` — which is
+     what the phrase means colloquially and what the branch's NAME implies. Its own page gives 570 Jamaica
+     Avenue, 11208: **Cypress Hills**, six miles east. The neighbourhood had been inferred from the brand
+     name rather than read from the source — the Prospect Gymnastics mechanism — and it errs toward the
+     fashionable core exactly as the measured pattern predicts. Two documented patterns intersecting on one
+     card.
+  2. **Camp Settoga: the defect I expected was the opposite of the real one.** The card read "Camp Settoga
+     NYC / 14th Street Y" sourced to `mmjccm.org`, which looks like a source pointing at the wrong
+     organisation. In fact Camp Settoga is operated BY the Marlene Meyerson JCC Manhattan — the source was
+     right and the TITLE had welded in an unrelated organisation. Its real defect is location: **127 Call
+     Hollow Road, Pomona, NY**, in Rockland County, stored as "Manhattan / Downtown / Regional". Cleared
+     rather than coerced. **Seventh confirmation of the out-of-market gap, and the strongest case yet** —
+     a real NYC institution's real camp that NYC families reach on its own buses, which no borough value
+     can honestly express.
+  3. **Two more vocabulary gaps**, both handled by leaving the field absent: Lighthouse Hill (Jacques
+     Marchais Museum of Tibetan Art, Staten Island) and Tujunga (Bolton Hall, LA). With Camp Seely and
+     Camp Settoga that is four location values in two rounds that the taxonomy cannot express.
+
+  **A note on what "reviewed" should mean when nothing improves.** South Street Seaport Museum's name was
+  already right and no address could be extracted from its own visit or contact pages. Rather than touch it
+  silently, the remaining gap is written into `terminalReason` — so when it resurfaces in the oldest-first
+  queue, the next pass starts from "the site does not publish a parseable address" instead of re-running
+  the same failed extraction.
