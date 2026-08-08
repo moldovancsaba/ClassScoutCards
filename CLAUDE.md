@@ -578,6 +578,24 @@ in a comment when you add one, the way the existing ports do.
   never does. Practical use: when reconciling a cluster against an operator's location list, **check the
   outer-borough and less-central sites first**, because those are the ones no card will have found and
   therefore the ones a surplus card should be repurposed onto.
+- **CORRECTING a location and REPURPOSING a card are different moves — keep them straight.** Sharpened
+  2026-08-08 on two superficially identical live cards. Goldfish Swim School's card claimed Brooklyn Heights;
+  the operator has exactly ONE Brooklyn school (Gowanus), so the neighbourhood was **corrected** — the card
+  was always about that school and merely said the wrong name. Take Me To The Water's card also claimed a
+  neighbourhood the operator does not serve (Park Slope), but it has THREE Brooklyn pools, so no single
+  correction existed; the card was **repurposed** onto a specific uncarded address (228 Duffield St). The
+  claim in the `terminalReason` differs accordingly: "this was always X and was mislabelled" versus "this
+  surplus card now represents X, which had no card". Writing the second as if it were the first would be a
+  small fabrication.
+- **`boroughGuess` is already carrying values that are not boroughs.** Found 2026-08-08 while blocking
+  Goldfish's Long Island schools: three cards read `boroughGuess: "Long Island"` and a chain-level card reads
+  `"NYC / Long Island"`. The Borough-taxonomy gap (Fort Lee NJ, Huntington LI, Westchester/New Canaan, now
+  Centereach/Farmingdale/Garden City — four confirmations) is therefore not just a missing product decision;
+  the field is being violated in the data today. Worth stating that way when the decision is finally made.
+- **A pre-opening location is not a location.** Goldfish Swim School's UWS Broadway school is in
+  pre-registration; it was deliberately NOT carded, because listing it sends families to a pool that has not
+  opened. Same family of judgement as the confirmed-permanently-closed case (City Treehouse), at the other
+  end of the lifecycle — a real brand's real future site is still not somewhere a child can go this week.
 - **Cluster size alone is not evidence of a defect — a genuine multi-site operator produces a large, CORRECT
   cluster.** The necessary counterweight to the letsgobaby finding above, established the same session
   (2026-08-08). `laparks.org` carries 30 cards on a municipal `.org` domain, which looks like exactly the same
