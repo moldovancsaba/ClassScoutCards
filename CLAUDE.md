@@ -562,6 +562,13 @@ in a comment when you add one, the way the existing ports do.
   should be cited as such rather than smuggled in via the host — two Long Island cards on a `facebook.com`
   source were quarantined for being on Long Island, and their `terminalReason` says the Facebook host was
   explicitly *not* the reason.
+  Two follow-on notes from auditing that fix, both cheap and both easy to get wrong. **(a) Check the whole
+  pattern, not the instances you noticed** — a `sourceHost` scan across 28 platform/reference hosts confirmed
+  only the two known cards carried the inversion, which is a real negative result rather than an assumption.
+  **(b) Quoting a wrong statement verbatim inside its own correction makes future audits flag the CORRECTED
+  card forever.** Both hits in that scan were the correction text quoting the error in order to name it. The
+  quote is still worth keeping — a correction that doesn't say what it is correcting is much weaker — but any
+  future grep for this phrasing must read the surrounding sentence before concluding a card is unfixed.
 - **A sweep must GROUP BY DOMAIN before it judges, not screen a page and move on.** Found the hard way
   2026-08-08 during the PUBLISHED sweep: page 1 recorded "Koko NYC Brooklyn" and "Brooklyn City FC Academy"
   as clean, and both turned out to have duplicate twins — sitting on page 2. Nothing on either card reveals
