@@ -689,6 +689,24 @@ in a comment when you add one, the way the existing ports do.
   Treasure Trunk Theatre has four locations and three cards, all three correct. Almost every other cluster in
   this sweep had surplus cards, which is why retitling kept beating splitting; this is the shape where it
   does not. Recognise it by counting before reaching for either tool.
+- **Step 1 of the loop must filter `kind: "content"` — the oldest-first queue is choked with `repair`
+  stubs.** Confirmed 2026-08-08: ALL 16 globally-oldest records are auto-generated `kind: "repair"`
+  documents (`repair-<hash>-<blockercode>` ids, `internal://classscout/source-seed/…` URLs, already
+  `BLOCKED_TERMINAL`). Independently found by a concurrent session too. Without the filter the loop spends
+  its entire budget on machine-generated stubs and never reaches a real card.
+- **The bridge REJECTS `state: "PUBLISHED"`, and it is right to — even when you are undoing your own
+  restriction.** Hit 2026-08-08. SpeakItaly NYC was pulled off PUBLISHED by this loop earlier the same day
+  purely because it was sourced to somebody else's directory listing; once re-sourced to the provider's own
+  site, restoring it felt like completing a repair rather than new exposure. The bridge refused: publishing
+  requires the main app's full gate (dedupe, schema validation, image pipeline, safe-publish flags), which
+  this bridge deliberately does not replicate. **Set `REVIEW_READY` and let the gate decide.** The rule is
+  not "don't increase exposure on balance" — it is that the publish judgement isn't this bridge's to make.
+- **A card can assert a children's offering that its own source does not support — a distinct shape from
+  contamination, wrong location, or fabrication.** Named 2026-08-08: NYC Footy is a real organisation and it
+  really is soccer, but it presents as an ADULT social league (leagues by borough, no children's programming
+  on the front page) while the card is titled "NYC Footy Kids Clinics". The entity is real, the category is
+  right, the location is vague-but-not-wrong — and the children's claim is simply unevidenced. Block rather
+  than quarantine (the clinic may exist), but do it BEFORE the card is live, not after.
 - **Cluster size alone is not evidence of a defect — a genuine multi-site operator produces a large, CORRECT
   cluster.** The necessary counterweight to the letsgobaby finding above, established the same session
   (2026-08-08). `laparks.org` carries 30 cards on a municipal `.org` domain, which looks like exactly the same

@@ -3809,6 +3809,69 @@ for *parents*, just not for a children's-activity catalog, and not local to begi
 checking new discoveries against both "is this real" and "is this the kind of thing this catalog is
 for" independently** — a real, legitimate, well-run organization can still fail the second test.
 
+### The maintenance flow resumes, with re-sourcing actually working (2026-08-08)
+
+PR #2 merged to `main` and deployed, so `contentCards.sourceUrl` is writable in production for the first
+time and `offset` is live on the rows endpoint. Verified against the deployed bridge before use: a dry-run
+re-source returned the new URL **plus** a derived `sourceHost` **plus** a recomputed `fingerprint` and
+`normalizedTitle` — the review fix working end to end.
+
+**Two guardrails fired immediately, and both were right.**
+
+First, `state: "PUBLISHED"` is rejected: *"publishing requires the main app's full gate (dedupe, schema
+validation, image pipeline, safe-publish flags), which this bridge does not replicate. Set state to
+`REVIEW_READY` instead."* This caught a genuine over-reach. SpeakItaly NYC had been pulled off `PUBLISHED`
+earlier the same day *by this loop* purely because its source was somebody else's directory listing; once
+re-sourced to `speakitalynyc.com`, restoring it felt like completing a repair rather than new exposure. The
+bridge's position is better: **that judgement is not this bridge's to make, even when it is undoing its own
+restriction.** Set `REVIEW_READY`; the main app's gate decides.
+
+Second, the oldest-first queue is still full of `kind: "repair"` cards — **all 16 of the globally-oldest
+records** are auto-generated repair documents on `internal://classscout/source-seed/…` URLs, already
+`BLOCKED_TERMINAL`. That is the other session's v105 finding reproduced exactly. Step 1 of this SOP should
+filter `kind: "content"`; without it the loop spends its whole budget on machine-generated stubs.
+
+#### The 10 oldest real content cards
+
+All ten come from **one 2026-06-28 discovery run**, all still `DISCOVERED` with zero blockers, all with
+`categoryHint: null`, and all with a "NYC-wide" / "Multiple" / compound-borough location. The run appears to
+have targeted **multi-site and itinerant youth sports programmes specifically**, which is why so few have a
+single address. Result: 4 sharpened onto real locations, 4 retired, 1 blocked pending a check, 1
+deliberately left alone.
+
+| Card | Finding | Action |
+| --- | --- | --- |
+| Gotham Girls FC | Piers 40/25/26, JJ Walker Park, four PS gyms — all Lower Manhattan | → West Village |
+| Circus Warehouse | **Four defects on one card** | → LIC, Queens, retitled, re-sourced |
+| Tennis Innovators NYC | Second chain-level parent; the first was already split | terminal |
+| Fit Soccer Kids | Bronx-first, Manhattan classes page 404s | **left unchanged** |
+| NYC Parks Youth Sports | The Parks Department's citywide programme index | terminal |
+| Soccer Shots NYC Central | A franchise *territory* on the franchisor's site | terminal |
+| Kids of Summer | Riverside Park at W 103rd, Field House, W 108th courts | → Upper West Side |
+| NYC Footy Kids Clinics | Presents as an **adult** league; kids clinic unconfirmed | repairable |
+| Gotham Tennis Academy | 160 Columbus Ave; also a Bronx site and Montauk | → Upper West Side |
+| Jesse Owens Track & Field | CityParks programme registration page | terminal |
+
+**Circus Warehouse is the best single demonstration of the merged capability**: one card carrying four
+independent defects — the trailing `" prospect"` token in its title (seventh instance), a `sourceUrl`
+pointing at `/pro-program` rather than the business, `neighborhoodGuess: "Multiple"` for an operator with
+exactly one venue, and a Manhattan/Brooklyn borough for a Queens address (53-21 Vernon Blvd, Long Island
+City). Before today the source defect could only be described in prose. All four are now fixed on the record.
+
+**Fit Soccer Kids is the deliberate non-action, and it belongs in the count.** Its own title reads "Bronx,
+Manhattan & Westchester", it delivers largely through schools, and its Manhattan classes page 404s. The card
+says Manhattan, which is at best half right for a Bronx-first business — but **replacing one unverified
+value with another is not a fix**, so it was left as it stands with the next step recorded (its Bronx
+classes page, the half most likely to yield a real address). Third time this sweep that the honest move was
+to leave a vague or doubtful value alone.
+
+**NYC Footy is a new shape worth naming: a card that asserts a children's offering its own source does not
+support.** The organisation is real, but it presents as an *adult* social soccer league — leagues by
+borough, no children's programming on the front page — while the card is titled "NYC Footy Kids Clinics".
+Not contamination (the entity is real and it is soccer), not a wrong location, and not confidently
+fabricated either. Blocked rather than quarantined, because the clinic may exist; the point is that **the
+check belongs before a family sees it, not after.**
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -4830,3 +4893,21 @@ for" independently** — a real, legitimate, well-run organization can still fai
   Practical takeaway added to the SOP: confirm a multi-location org's *complete* real footprint, not just
   *some* real presence, since undersold/overclaimed/accurate can otherwise look identical from a single
   quick source check.
+- v108 (2026-08-08): **PR #2 merged and deployed — the maintenance flow resumes with re-sourcing actually
+  working.** `contentCards.sourceUrl` is writable in production and `offset` is live; verified against the
+  deployed bridge, a re-source returns the new URL plus a derived `sourceHost` plus a recomputed
+  `fingerprint`/`normalizedTitle`. **Two guardrails fired and both were right.** The bridge REJECTS
+  `state: "PUBLISHED"` -- which caught a real over-reach: SpeakItaly NYC had been pulled off PUBLISHED by
+  this loop earlier the same day purely for its source, and once re-sourced, restoring it felt like
+  completing a repair; the bridge's position that publishing goes through the main app's gate is better,
+  **even when the loop is undoing its own restriction**. Set REVIEW_READY instead. And **all 16
+  globally-oldest records are `kind: "repair"` stubs** on `internal://` URLs -- the other session's v105
+  finding reproduced exactly; step 1 must filter `kind: "content"`. **The 10 oldest real cards** all come
+  from one 2026-06-28 run targeting multi-site and itinerant youth sports: 4 sharpened onto real locations,
+  4 retired (a Parks Department programme index, a franchise territory, a CityParks registration page, a
+  duplicate chain parent whose sibling was already split), 1 blocked, 1 deliberately left alone. Circus
+  Warehouse carried **four defects on one card** (the seventh `" prospect"` token, a `/pro-program` source,
+  "Multiple" for a single venue, and a Manhattan borough for a Queens address) and is the best demonstration
+  of the merged capability. New shape named: **a card asserting a children's offering its own source does
+  not support** (NYC Footy presents as an adult league; the card claims "Kids Clinics") -- blocked, not
+  quarantined, because the check belongs before a family sees it.
