@@ -20,7 +20,8 @@ describe("alignActivityTypes", () => {
       title: "Brooklyn Nets Basketball Academy",
     });
     expect(result.primaryActivityType).toBe("Basketball");
-    expect(result.activityTypes).toEqual(["Basketball"]);
+    // The parent is ADDED even though the source never carried it -- every sport listing gets it.
+    expect(result.activityTypes).toEqual(["Basketball", "Sports"]);
     expect(result.dropped).toEqual(["Art"]);
   });
 
@@ -48,11 +49,22 @@ describe("alignActivityTypes", () => {
 
   it("preserves original order (capped at 3) for an unrecognized/custom primary activity label", () => {
     const result = alignActivityTypes({
-      activityTypes: ["Custom Enrichment Tag", "Music", "Art", "Soccer"],
+      activityTypes: ["Custom Enrichment Tag", "Music", "Art", "Theater"],
       title: "Custom Enrichment Tag Studio",
     });
     expect(result.primaryActivityType).toBe("Custom Enrichment Tag");
     expect(result.activityTypes).toEqual(["Custom Enrichment Tag", "Music", "Art"]);
+  });
+
+  it("a sport anywhere in the list outranks even a custom label the title names exactly", () => {
+    // Same input as above with one sport added. The sport-dominant rule is checked BEFORE the
+    // title match, so the custom tag loses -- that is the point of the rule, not a side effect.
+    const result = alignActivityTypes({
+      activityTypes: ["Custom Enrichment Tag", "Music", "Art", "Soccer"],
+      title: "Custom Enrichment Tag Studio",
+    });
+    expect(result.activityTypes).toEqual(["Soccer", "Sports"]);
+    expect(result.dropped).toContain("Custom Enrichment Tag");
   });
 
   it("deduplicates candidates before aligning", () => {
@@ -135,7 +147,7 @@ describe("alignActivityTypes", () => {
 
     it("is case/whitespace tolerant", () => {
       const result = alignActivityTypes({ activityTypes: ["  No Category  ", "Soccer"], title: "Soccer Club" });
-      expect(result.activityTypes).toEqual(["Soccer"]);
+      expect(result.activityTypes).toEqual(["Soccer", "Sports"]);
     });
 
     it("returns an empty result when the placeholder was the ONLY entry", () => {
@@ -190,6 +202,108 @@ describe("alignActivityTypes", () => {
         title: "Park Slope Academy Jiu Jitsu Kids",
       });
       expect(result.primaryActivityType).toBe("Martial Arts");
+    });
+  });
+
+  describe("the Sports parent taxonomy (owner directive, 2026-08-08)", () => {
+    it("the exact card the owner sent: 'start with yoga than comes the sport'", () => {
+      // Screenshot of a live card, "Movement Gowanus Youth Programs", whose chips read
+      // SPORTS, YOGA -- the parent first and the discipline second, which is backwards, plus four
+      // unrelated tags. Both faults are asserted here because they were reported together.
+      const result = alignActivityTypes({
+        activityTypes: ["Sports", "Yoga", "Art", "Music", "Outdoor Activities", "Birthday Entertainment"],
+        title: "Movement Gowanus Youth Programs",
+      });
+      expect(result.activityTypes).toEqual(["Yoga", "Sports"]);
+      expect(result.primaryActivityType).toBe("Yoga");
+    });
+
+    it("the specific sport always leads and the parent always sits second", () => {
+      for (const sport of ["Lacrosse", "Soccer", "Baseball", "Fencing"]) {
+        const result = alignActivityTypes({ activityTypes: [sport], title: `${sport} Academy` });
+        expect(result.activityTypes).toEqual([sport, "Sports"]);
+        expect(result.primaryActivityType).toBe(sport);
+      }
+    });
+
+    it("adds the parent even when the source listing never carried it", () => {
+      const result = alignActivityTypes({ activityTypes: ["Lacrosse"], title: "Brooklyn Lacrosse Club" });
+      expect(result.activityTypes).toEqual(["Lacrosse", "Sports"]);
+    });
+
+    it("retires 'Multi-Sport' onto the parent rather than keeping it as a sport in its own right", () => {
+      const result = alignActivityTypes({ activityTypes: ["Multi-Sport"], title: "Kids in the Game" });
+      expect(result.activityTypes).toEqual(["Sports"]);
+      expect(result.primaryActivityType).toBe("Sports");
+    });
+
+    it("collapses Multi-Sport and Sports together instead of listing one concept twice", () => {
+      const result = alignActivityTypes({
+        activityTypes: ["Multi-Sport", "Sports", "Soccer"],
+        title: "Downtown Soccer Club",
+      });
+      expect(result.activityTypes).toEqual(["Soccer", "Sports"]);
+    });
+
+    it("leaves the bare parent when the listing names no specific sport", () => {
+      const result = alignActivityTypes({ activityTypes: ["Sports", "Art"], title: "Aviator Sports Complex" });
+      expect(result.activityTypes).toEqual(["Sports"]);
+      expect(result.dropped).toContain("Art");
+    });
+
+    it("caps at 3, so at most two specific sports survive alongside the parent", () => {
+      const result = alignActivityTypes({
+        activityTypes: ["Soccer", "Basketball", "Baseball", "Tennis"],
+        title: "Chelsea Piers Soccer",
+      });
+      expect(result.activityTypes).toEqual(["Soccer", "Sports", "Basketball"]);
+      expect(result.dropped).toEqual(expect.arrayContaining(["Baseball", "Tennis"]));
+    });
+  });
+
+  describe("the sport-dominant rule (owner directive, 2026-08-08)", () => {
+    it("drops music, art and STEM outright when any sport is present", () => {
+      const result = alignActivityTypes({
+        activityTypes: ["Music", "Art", "STEM", "Science", "Swimming"],
+        title: "Asphalt Green",
+      });
+      expect(result.activityTypes).toEqual(["Swimming", "Sports"]);
+      expect(result.dropped).toEqual(expect.arrayContaining(["Music", "Art", "STEM", "Science"]));
+    });
+
+    it("leaves a listing with no sport at all to the pre-existing cluster rule", () => {
+      // STEM is dropped here by the ORIGINAL same-cluster rule (academicAndSTEM vs artsAndPerformance),
+      // not by anything the sport work added -- asserted so a future change to the sport branch that
+      // accidentally starts touching non-sport listings shows up as a failure here.
+      const result = alignActivityTypes({
+        activityTypes: ["Music", "Art", "Theater", "STEM"],
+        title: "Brooklyn Music Factory",
+      });
+      expect(result.activityTypes).toEqual(["Music", "Art", "Theater"]);
+      expect(result.primaryActivityType).toBe("Music");
+      expect(result.activityTypes).not.toContain("Sports");
+    });
+
+    it("does not delete a real sport whose exact spelling is missing from the vocabulary", () => {
+      // The hazard the containment match exists for: under a rule that drops every non-sport tag,
+      // failing to RECOGNISE a sport means DELETING it. "Swimming Lessons" is the case that caught it.
+      const result = alignActivityTypes({
+        activityTypes: ["Swimming Lessons", "Music"],
+        title: "Take Me to the Water",
+      });
+      expect(result.activityTypes).toContain("Swimming Lessons");
+      expect(result.dropped).toContain("Music");
+    });
+
+    it("a sport in a different cluster is still kept -- the rule is sport-vs-not, not cluster matching", () => {
+      // Yoga clusters with sportsAndFitness, but the guard that matters is that a discipline the
+      // cluster map might file elsewhere is not silently dropped from a sport listing.
+      const result = alignActivityTypes({
+        activityTypes: ["Soccer", "Yoga", "Dance"],
+        title: "Brooklyn Soccer Club",
+      });
+      expect(result.activityTypes).toEqual(["Soccer", "Sports", "Yoga"]);
+      expect(result.dropped).toContain("Dance");
     });
   });
 

@@ -97,7 +97,10 @@ const CollectionSection: React.FC<{ stats: CollectionStats }> = ({ stats }) => (
     <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
       <BucketTable title="By Borough / Area" buckets={stats.byRegion} altLabel="not published" />
       <NeighborhoodTable groups={stats.byNeighborhood} />
-      <BucketTable title="By Activity" buckets={stats.byActivity} altLabel="not published" />
+      {/* Two dimensions, two tables. They were one table until 2026-08-08, which ranked "Classes"
+          above every real activity -- see activityDimension.ts. */}
+      <BucketTable title="By Activity (what)" buckets={stats.byActivity} altLabel="not published" />
+      <BucketTable title="By Format (how)" buckets={stats.byFormat} altLabel="not published" />
     </div>
   </section>
 );

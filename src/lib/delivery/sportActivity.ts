@@ -72,11 +72,85 @@ const SPORT_ACTIVITY_VALUES = [
   "surfing",
   "cheerleading",
   "cheer",
+  // Movement/fitness disciplines. Added 2026-08-08 from a live card the owner sent: "Movement Gowanus
+  // Youth Programs" displayed chips "SPORTS, YOGA", so the catalogue already treats yoga as belonging to
+  // the sport family. Without these, the sport-dominant rule would DROP the specific label and leave the
+  // bare parent -- the opposite of the intent, which is that the specific discipline leads.
+  "yoga",
+  "pilates",
+  "fitness",
+  "parkour",
+  "ninja",
+  "ninja warrior",
+  "tumbling",
+  "acro",
+  "acrobatics",
+  "circus arts",
+  "capoeira",
+  "kickboxing",
+  "aikido",
+  "kung fu",
+  "self defense",
+  "sailing",
+  "kayaking",
+  "canoeing",
+  "scooter",
+  "bmx",
+  "chess boxing",
+  "multi-sport",
+  "athletics",
+  "triathlon",
+  "pickleball",
+  "table tennis",
+  "ping pong",
+  "dodgeball",
+  "flag rugby",
+  "netball",
+  "hurling",
+  "gaelic football",
 ];
 const SPORT_ACTIVITY_SET = new Set(SPORT_ACTIVITY_VALUES);
 
+/**
+ * Matches an exact label OR a label that CONTAINS a sport term as whole words -- "Swimming Lessons",
+ * "Youth Soccer", "Girls Flag Football" are all sports.
+ *
+ * Exact matching alone was actively dangerous once the sport-dominant rule landed: that rule drops every
+ * non-sport tag from a sport listing, so any real sport label missing from the list above would have been
+ * DELETED rather than merely unrecognised. "Swimming Lessons" is the case that caught it. Containment
+ * fails safe in the right direction -- an unlisted variant is still recognised as a sport and kept.
+ */
 export function isSportActivity(value: string | null | undefined): boolean {
   const cleaned = normalizePlaceLabel(String(value ?? ""));
   if (!cleaned) return false;
-  return SPORT_ACTIVITY_SET.has(cleaned);
+  if (SPORT_ACTIVITY_SET.has(cleaned)) return true;
+  return SPORT_ACTIVITY_VALUES.some((term) =>
+    new RegExp(`(^|[^a-z0-9])${term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}($|[^a-z0-9])`).test(cleaned),
+  );
+}
+
+/**
+ * The PARENT category every sport listing carries (owner directive, 2026-08-08). The taxonomy is two
+ * levels: a specific sport ("Soccer", "Lacrosse") plus this parent, so that
+ *   - a parent scanning a card sees the sport first and the family it belongs to second,
+ *   - analytics can collect every sport listing with one equality check instead of maintaining a list
+ *     of sport names at every call site.
+ */
+export const SPORTS_PARENT = "Sports";
+
+/**
+ * Labels that mean "sport, unspecified" and must all collapse to the single parent value. "Multi-Sport"
+ * was the stored form on 39 live listings and is being retired: it reads to a parent as though it were a
+ * DIFFERENT sport sitting alongside Soccer and Basketball, when it is the same idea as the parent
+ * category. Keeping two spellings of one concept also breaks the analytics case this taxonomy exists for.
+ */
+const GENERIC_SPORT_LABELS = new Set(["sports", "sport", "multi-sport", "multi sport", "multisport"]);
+
+export function isGenericSportLabel(value: string | null | undefined): boolean {
+  return GENERIC_SPORT_LABELS.has(normalizePlaceLabel(String(value ?? "")));
+}
+
+/** A sport that is NOT the parent — "Soccer", "Lacrosse". These lead; the parent follows. */
+export function isSpecificSport(value: string | null | undefined): boolean {
+  return isSportActivity(value) && !isGenericSportLabel(value);
 }
