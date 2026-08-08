@@ -739,6 +739,24 @@ in a comment when you add one, the way the existing ports do.
 - **Check a record against ITSELF before opening a browser.** Ballet Tech's `address` field said "Flatiron"
   and its `neighborhood` field said "Midtown". Two fields of one record contradicting each other is a defect
   resolvable with no research at all, and it is free to look for.
+- **Walk the queue to learn the defect SHAPES, then query the shapes to fix them at scale.** Established
+  2026-08-08 after ten hand-worked `providers` records against a pool of 1,087 — roughly 217 batches at that
+  rate. Ten records bought a catalogue of signatures; a single scan then counted every one of them across the
+  whole pool, and **one scripted pass fixed 924 records** (missing `primaryActivityType`: 921 → 0; over the
+  3-tag cap: 284 → 0) by passing each record's existing tags back through `alignActivityTypes()`. No new
+  facts, no per-record judgement — the derivation already existed and was tested; nobody had invoked it.
+  Hand-walking is for learning, not for volume.
+- **A scan needs per-page retries and an explicit failed-page list — `except: break` produces a partial scan
+  that reads as a complete one.** Did this to myself 2026-08-08: the first providers scan reported 125 of
+  1,087 with tidy-looking counts, having swallowed a transient error at offset 125. This is the same
+  silent-truncation failure already written down for partition-based enumeration, which is the point —
+  **writing the rule down is not the same as following it**, so build the retry into the scan rather than
+  relying on remembering.
+- **The internal-jargon leak has a worst case: an LLM prompt published as the description.** 35 live
+  `providers` records read, in full, *"Extract age or grade evidence from the official program page.."* — the
+  pipeline's instruction to itself, in the field a parent reads. Related, same scan: **18 live records give
+  `311`, New York City's government switchboard, as the provider's phone.** When auditing copy, grep for
+  instruction-shaped text (`Extract …`, `Summarise …`, trailing `..`), not just for known bad strings.
 - **Cluster size alone is not evidence of a defect — a genuine multi-site operator produces a large, CORRECT
   cluster.** The necessary counterweight to the letsgobaby finding above, established the same session
   (2026-08-08). `laparks.org` carries 30 cards on a municipal `.org` domain, which looks like exactly the same

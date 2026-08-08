@@ -4045,6 +4045,69 @@ record's copy does not re-run its derivations.**
 "Flatiron" while its `neighborhood` field said "Midtown". Two fields of one record disagreeing is a defect
 you can resolve from the record alone — worth checking for before opening a browser.
 
+### Ten providers in: the retrospective that changed the method (2026-08-08)
+
+After ten `providers` records reviewed one at a time, the instruction was to learn and improve the process.
+The lesson is blunt: **at 1,087 providers, hand-walking the queue is the wrong method.** Ten records took
+substantial research each; the pool is ~217 batches deep at that rate. What ten records *did* buy was a
+catalogue of defect **signatures** — and signatures can be queried across the whole pool at once.
+
+So the process change is: **walk the queue to learn the shapes, then query the shapes to fix them at
+scale.** That is the same "query the host, don't fix the one card you tripped over" rule, moved up a level
+from host to defect-shape.
+
+#### The pool-wide scan
+
+Now possible because `offset` is live. All 1,087 providers harvested, 1,066 not hidden:
+
+| Defect | Count | Share |
+| --- | --- | --- |
+| No `primaryActivityType` | **921** | 86.4% |
+| `neighborhood` empty | 399 | 37.4% |
+| `address` is a neighbourhood, not a street | 338 | 31.7% |
+| More than 3 `activityTypes` | 284 | 26.6% |
+| **No phone AND no email** | 213 | 20.0% |
+| `shortDescription` identical to `longDescription` | 99 | 9.3% |
+| Phone with a non-NY area code | 90 | 8.4% |
+| Scraped chrome in a description | 78 | 7.3% |
+| Un-decoded HTML entity in copy | 76 | 7.1% |
+| Phone too short to dial | 18 | 1.7% |
+
+**A methodological failure worth recording, because it was mine and it was the exact thing I had written
+down.** The first run of this scan reported 125 providers and a clean set of counts. It had hit a transient
+error at offset 125 and my loop did `except: break` — a partial scan presenting as a complete one, which is
+the silent-truncation failure this document already warns about. Re-run with per-page retries and an
+explicit record of failed pages: 1,087 rows, zero failures. **A scan needs retries and a failure list, not
+a `break`** — and writing the rule down is evidently not the same as following it.
+
+#### The two worst findings
+
+**35 live provider records have an LLM prompt as their public description.** The entire `shortDescription`
+on each reads:
+
+> *"Extract age or grade evidence from the official program page.."*
+
+That is an instruction to the enrichment pipeline, published verbatim as the description of a children's
+activity business — Brooklyn Force Soccer, Doc's NYC Lacrosse, Music Together NYC UWS and 32 more. This is
+the internal-vocabulary leak already catalogued, but in its most severe form yet: not a stray token in a
+title, an entire field replaced by the machinery's own instruction to itself.
+
+**18 live records give `311` as the provider's phone number.** 311 is New York City's government services
+line. All 18 are NYC Parks "Kids in Motion" sites. A parent calling gets the city switchboard, not the
+programme.
+
+#### The fix that scaled
+
+**One bulk operation cleared the two largest defects at once: 924 records re-derived, 921 missing primaries
+and 284 over-cap tag lists both to zero.** It introduced no new facts — each record's *existing* tags were
+passed back through the write path so `alignActivityTypes()` could derive the primary from the provider's
+own name and keep only same-cluster tags, capped at 3. Bija Kids → Yoga. Breakaway Hoops → Basketball.
+Brooklyn Aikikai Kids → Martial Arts.
+
+This is the difference the retrospective bought: **the derivation logic already existed and was already
+tested; what was missing was anyone invoking it.** Ten hand-edits fixed ten records. One scripted pass over
+the same logic fixed 924.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -5145,3 +5208,19 @@ you can resolve from the record alone — worth checking for before opening a br
   still had nine activityTypes after the enrichment write because `alignActivityTypes()` only fires when
   that field is touched; and **an internal contradiction is fixable with no research** -- Ballet Tech's
   address field said Flatiron while its neighbourhood field said Midtown.
+- v113 (2026-08-08): **ten-provider retrospective, and it changed the method.** At 1,087 providers,
+  hand-walking is the wrong tool -- ten records bought a catalogue of defect SIGNATURES, and signatures can
+  be queried pool-wide. New rule: **walk the queue to learn the shapes, then query the shapes to fix them at
+  scale.** Full scan (now possible because `offset` is live): **921 records with no `primaryActivityType`
+  (86.4%), 399 with an empty `neighborhood`, 338 whose `address` is a neighbourhood rather than a street,
+  284 over the 3-tag cap, 213 with NO phone AND no email, 90 with a non-NY area code, 78 with scraped chrome
+  in a description.** Two findings stand out: **35 live records carry an LLM PROMPT as their public
+  description** -- *"Extract age or grade evidence from the official program page.."* -- the internal-leak
+  pattern in its most severe form yet, an entire field replaced by the pipeline's instruction to itself; and
+  **18 give `311`, New York City's government switchboard, as the provider's phone.** The scaled fix: **924
+  records re-derived in one pass, taking both the missing-primary and over-cap counts to ZERO**, introducing
+  no new facts -- each record's existing tags passed back through `alignActivityTypes()`. The derivation
+  already existed and was already tested; what was missing was anyone invoking it. Also recorded: **my first
+  run of the scan reported 125 of 1,087 and looked clean**, because it did `except: break` on a transient
+  error -- the exact silent-truncation failure this document warns about. A scan needs retries and an
+  explicit failed-page list.
