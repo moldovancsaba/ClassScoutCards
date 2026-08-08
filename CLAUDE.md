@@ -611,6 +611,31 @@ in a comment when you add one, the way the existing ports do.
   branch to Brooklyn or Queens is wrong on its face, no research needed. (Both of NYPL's only live cards were
   also sourced to `/events/programs/childrens`, the system-wide programme index — a programme, not a branch —
   while 61 correct per-branch cards sat unpublished behind them.)
+- **A substring match on an activity label finds tags inside other words — "Art" lives inside
+  "mARTial".** Found by PR review 2026-08-08 and reproducible with one title: `alignActivityTypes` step 1
+  used `title.toLowerCase().includes(label)` and returned the FIRST matching candidate in array order, so
+  "Brooklyn Martial Arts Academy" with candidates `["Art", "Martial Arts"]` picked **Art** — and then
+  dropped the real "Martial Arts" tag, because Art is in a different cluster. Two independent faults:
+  substring instead of whole-word, and first-match instead of most-specific. Fixed with a
+  boundary-aware match plus longest-label-first. **The length tie-break is right in step 1 and WRONG in
+  step 2** — sorting the keyword-pattern matches by label length made "Park Slope Academy Jiu Jitsu Kids"
+  resolve to "Outdoor Activities" (the `park` keyword firing on the neighbourhood name) over "Martial
+  Arts". Label length proxies for specificity only when the title literally contains the label. Both
+  cases are now regression-tested.
+- **`fingerprint`, not `contentCardId`, is what the dedupe index is on — and every field it hashes is
+  writable through this bridge.** Raised in PR review 2026-08-08. `computeContentCardIdentity` hashes
+  title + sourceUrl + categoryHint + boroughGuess + neighborhoodGuess, and the real collection's unique
+  index is `{fingerprint, kind}`. All five are writable, so editing ANY of them left the stored
+  fingerprint describing a card that no longer exists: discovery re-encounters the corrected page,
+  computes a different hash, matches nothing, inserts a duplicate. Re-sourcing made it easy to notice
+  but it was already true of the other four before `sourceUrl` became writable. `applyCardBridgeWrite`
+  now recomputes `fingerprint`/`normalizedTitle` whenever a basis field changes, and **blocks the write
+  with a named collision** when the new fingerprint already belongs to another card — that collision
+  means the two records are the same card, which is worth surfacing rather than letting the unique index
+  reject it at driver level. **`contentCardId` is deliberately left stale** even though it is literally
+  `cc-${fingerprint}`: it is the primary key, referenced from the audit log and from anything already
+  linked to the card, so recomputing it would be a delete-and-recreate — which this bridge does not do.
+  Don't "fix" that mismatch later by mutating the key.
 - **Cluster size alone is not evidence of a defect — a genuine multi-site operator produces a large, CORRECT
   cluster.** The necessary counterweight to the letsgobaby finding above, established the same session
   (2026-08-08). `laparks.org` carries 30 cards on a municipal `.org` domain, which looks like exactly the same

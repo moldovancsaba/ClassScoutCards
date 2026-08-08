@@ -117,6 +117,19 @@ const ACTIVITY_TITLE_PATTERNS: ReadonlyArray<readonly [string, RegExp]> = [
   ["Birthday Entertainment", /\bbirthday\b/i],
 ];
 
+/**
+ * Whole-word containment: does `title` name `activity` as words rather than as a substring buried in a
+ * longer word? "Brooklyn Martial Arts Academy" names "Martial Arts" but does NOT name "Art", even
+ * though "martial" contains the letters a-r-t. Boundaries are non-letter/digit rather than `\b` on the
+ * raw label, so multi-word labels and labels with punctuation ("Arts & Crafts") behave the same way.
+ */
+function titleNamesActivity(title: string, activity: string): boolean {
+  const label = activity.trim();
+  if (!label) return false;
+  const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`(^|[^\\p{L}\\p{N}])${escaped}($|[^\\p{L}\\p{N}])`, "iu").test(title);
+}
+
 function derivePrimary(input: AlignActivityTypesInput): string | undefined {
   const candidates = input.activityTypes;
   if (candidates.length === 0) return undefined;
@@ -126,13 +139,30 @@ function derivePrimary(input: AlignActivityTypesInput): string | undefined {
   const title = input.title ?? "";
   if (title) {
     // 1. The title literally names one of the candidate activities ("Basketball School").
-    const lower = title.toLowerCase();
-    const exact = candidates.find((activity) => lower.includes(activity.toLowerCase()));
-    if (exact) return exact;
+    //    Two things this must NOT do, both found by review on 2026-08-08 and both reproducible with
+    //    the single title "Brooklyn Martial Arts Academy" against candidates ["Art", "Martial Arts"]:
+    //      (a) match on a bare substring -- "mARTial" contains "art", so a naive `includes` finds the
+    //          "Art" tag inside the word "martial"; and
+    //      (b) return the FIRST candidate that matches in raw array order -- discovery-scan order, the
+    //          very ordering this module exists to distrust.
+    //    Together those made a martial-arts academy an Art card AND then dropped its real "Martial
+    //    Arts" tag, because Art sits in a different cluster. Fixed by requiring a whole-word match and
+    //    preferring the LONGEST matching label, so a compound name always outranks a word inside it.
+    const matches = candidates
+      .filter((activity) => titleNamesActivity(title, activity))
+      .sort((a, b) => b.length - a.length);
+    if (matches.length > 0) return matches[0];
 
     // 2. The title names it the way people actually write it ("Jiu Jitsu" -> Martial Arts). Only
     //    activities the listing ALREADY carries are eligible -- this never invents a new tag.
-    //    Most specific wins: a specific sport outranks the generic "Sports" bucket.
+    //    Most specific wins: a specific sport outranks the generic "Sports" bucket. Order here is the
+    //    hand-tuned order of ACTIVITY_TITLE_PATTERNS, NOT longest-label-first as in step 1 -- label
+    //    length is a fair proxy for specificity when the title literally contains the label, and a bad
+    //    one when it does not. Sorting this list by length was tried and regressed a real test case:
+    //    "Park Slope Academy Jiu Jitsu Kids" matches both "Martial Arts" (jiu jitsu) and "Outdoor
+    //    Activities" (the "park" keyword, firing on "Park Slope" the PLACE), and the longer label is
+    //    the wrong one. Step 1's whole-word check is what resolves the Art/Martial Arts case; this step
+    //    only runs when the title names no candidate outright.
     const keywordMatches = ACTIVITY_TITLE_PATTERNS
       .filter(([activity, pattern]) => candidates.includes(activity) && pattern.test(title))
       .map(([activity]) => activity);

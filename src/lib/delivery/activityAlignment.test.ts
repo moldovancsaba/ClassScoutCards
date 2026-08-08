@@ -146,6 +146,53 @@ describe("alignActivityTypes", () => {
     });
   });
 
+  describe("a candidate label buried inside a longer word (found in PR review, 2026-08-08)", () => {
+    it("does not let 'Art' inside 'mARTial' beat the real 'Martial Arts' tag", () => {
+      // The exact reported case: a bare `includes` finds "art" inside "martial", and returning the
+      // FIRST matching candidate in discovery-scan order then picks Art -- which, being in a different
+      // cluster, also drops the real Martial Arts tag. Both halves are asserted below.
+      const result = alignActivityTypes({
+        activityTypes: ["Art", "Martial Arts", "Sports"],
+        title: "Brooklyn Martial Arts Academy",
+      });
+      expect(result.primaryActivityType).toBe("Martial Arts");
+      expect(result.activityTypes).toContain("Martial Arts");
+      expect(result.activityTypes[0]).toBe("Martial Arts");
+    });
+
+    it("is not order-dependent -- the same title wins whichever way the candidates are listed", () => {
+      const forwards = alignActivityTypes({ activityTypes: ["Art", "Martial Arts"], title: "Brooklyn Martial Arts Academy" });
+      const backwards = alignActivityTypes({ activityTypes: ["Martial Arts", "Art"], title: "Brooklyn Martial Arts Academy" });
+      expect(forwards.primaryActivityType).toBe("Martial Arts");
+      expect(backwards.primaryActivityType).toBe("Martial Arts");
+    });
+
+    it("still matches a label the title really does name", () => {
+      expect(alignActivityTypes({ activityTypes: ["Art", "Music"], title: "The Art Studio NY" }).primaryActivityType).toBe("Art");
+      expect(alignActivityTypes({ activityTypes: ["Music", "Art"], title: "Brooklyn Music Factory" }).primaryActivityType).toBe("Music");
+    });
+
+    it("prefers the longest label the title names, not the first one", () => {
+      // "Swimming" is named too, but "Swimming Lessons" is the more specific thing the title says.
+      const result = alignActivityTypes({
+        activityTypes: ["Swimming", "Swimming Lessons"],
+        title: "Gowanus Swimming Lessons for Kids",
+      });
+      expect(result.primaryActivityType).toBe("Swimming Lessons");
+    });
+
+    it("keyword fallback still resolves 'Park Slope' to the activity, not the place", () => {
+      // Regression guard: sorting the KEYWORD matches by label length (as opposed to the literal
+      // matches in step 1) makes "Outdoor Activities" beat "Martial Arts" here, because the pattern
+      // for Outdoor Activities fires on the word "Park" in the neighbourhood name.
+      const result = alignActivityTypes({
+        activityTypes: ["Outdoor Activities", "Martial Arts"],
+        title: "Park Slope Academy Jiu Jitsu Kids",
+      });
+      expect(result.primaryActivityType).toBe("Martial Arts");
+    });
+  });
+
   it("clusterFor recognizes every canonical activity label from the main app's own keyword vocabulary", () => {
     for (const activity of ["Sports", "Soccer", "Basketball", "Gymnastics", "Martial Arts", "Swimming", "Yoga", "Dance", "Art", "Music", "Theater", "STEM", "Science", "Language", "Tutoring", "Indoor Play", "Outdoor Activities", "Birthday Entertainment"]) {
       expect(clusterFor(activity)).toBeDefined();
