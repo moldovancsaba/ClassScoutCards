@@ -6285,3 +6285,38 @@ only place it can go.
   "**ebay**" is a substring of "heal-**thebay**" — the exact `Art`-inside-`mARTial` bug already recorded
   twice in this document, reproduced a third time in a throwaway scan. It surfaced a real defect by
   accident, which is luck, not method. **Anchor host patterns on a dot or string boundary.**
+
+- v139 (2026-08-08): **auditing the documentation against live data — because "documented" had been
+  mistaken for "fixed" three times in one day.** Extracted all 99 record ids named anywhere in `CLAUDE.md`
+  and `docs/`, and read every one of them from the database. 27 content cards and 34 providers named in the
+  docs are still maintainable; 17 of the content cards are `PUBLISHED`.
+
+  Most were correctly live — they are the cards that WON their clusters. Three were not:
+
+  - **Equinox Sports Club "Kids Programs"** (v138) — defect written up verbatim in `CLAUDE.md`, still
+    PUBLISHED with zero blockers.
+  - **Marlene Meyerson JCC Manhattan ×2**, both PUBLISHED on `mmjccm.org`, differing only by the day-camp
+    page versus the root. One institution, one address, two cards distinguished by a format qualifier —
+    the program-not-a-location rule. Programme card retired; the venue card stays.
+  - **Two `camp.com` cards whose own `terminalReason` recorded the fix but whose data never received it.**
+
+  **The `camp.com` pair is the most useful finding, and it is not dishonesty in the record — it is a
+  capability that arrived after the research.** Both entries end with the words *"(sourceUrl is not
+  writable through this bridge)"* and then give the correct URL. That was true when they were written.
+  `sourceUrl` became writable later, and nobody went back. Applying the two recorded URLs took one write
+  each and no research at all:
+  `camp.com/` → `kidville.com/westside/our-services/camp-kidville/` (a token collision: CAMP the retailer
+  is not Kidville) and `camp.com/` → `camp.com/locations/fifth-ave-nyc` (root domain → the real store page).
+
+  **Two lessons, and the second generalises well beyond this repo.**
+
+  1. **A label that asserts a completed action on a record where it was only RECOMMENDED is its own
+     defect.** The Kidville entry is prefixed `token_collision_wrong_source_domain_corrected`. It was not
+     corrected; the body says so plainly. Anyone skimming labels — or grepping — would have believed it.
+     Prefer a label that names the STATE (`..._recommended`, `..._blocked_on_capability`) over one that
+     names the intent.
+  2. **When a capability is added, sweep the records that were blocked on its absence.** A query for
+     `terminalReason` containing "not writable through this bridge" / "re-source target" returned 10 cards,
+     of which 2 still differed from their recorded target. That is a permanent maintenance move: every time
+     a field becomes writable or a validator is relaxed, the notes that were written *because it wasn't*
+     become an actionable work-list. Research already paid for should not be re-paid.
