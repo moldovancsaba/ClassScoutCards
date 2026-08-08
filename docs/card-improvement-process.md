@@ -2867,6 +2867,47 @@ blocker intact: the domain is genuinely the chain's own, but the Brooklyn locati
 and the location claim is exactly what is in doubt — clearing the blocker would have asserted more than was
 checked.
 
+### Batch 44/25 (cards 530-554)
+
+12 queue cards, 13 siblings, 11 hosts. 10 canonical or corrected, 9 terminal, 6 quarantined.
+
+**Ordering the two rules mattered, and Riverside Park Conservancy is the proof.** Five cards for one
+organization; one of the program cards (`/sport-camp/riverside-pa...`) carried a *deeper* source path than
+the card that won. Applying the per-location tie-breaker first would have crowned "Riverside Park
+Conservancy **Youth Soccer**" canonical purely because its URL was longer. **A deeper path to a PROGRAM page
+is still a program.** The batch-43 sequencing holds: run the program test first to remove program pages from
+contention, *then* use per-location depth to choose among what remains.
+
+**Retitle-over-split ran twice more, and the "fewer cards than locations" precondition did real work.**
+- SKATEYOGI: two confirmed schools (58 N. 9th St, Williamsburg; 140 Empire Blvd, Prospect Lefferts
+  Gardens), three cards — one vague "Brooklyn" and two identical PLG copies, so Williamsburg had no card.
+  The vague card was retitled onto it and the surplus PLG copy retired. Net: two real locations, two cards.
+- Treasure Trunk Theatre: **four** confirmed locations (141 Atlantic Ave, 179 4th Ave Park Slope, 700
+  Washington Ave Prospect Heights, 408 7th Ave South Slope) and only **three** cards. One card claimed
+  Carroll Gardens, which is not among them. Because the cluster was *smaller* than the real location count,
+  that card was repurposed onto Park Slope rather than quarantined as an unsupported neighborhood — the
+  opposite call to Color Me Mine below, and the precondition is exactly what separates them. South Slope
+  still has no card and is recorded as the remaining split candidate.
+
+**The contrast case, same batch:** Color Me Mine Park Slope was **quarantined**, not repurposed. The brand
+has two confirmed NYC studios (Tribeca, 92 Reade St; Upper West Side, 177 Amsterdam Ave), both Manhattan,
+both with their own subdomains — so there was no unrepresented *Brooklyn* location to repurpose onto, and
+the card's whole claim is Brooklyn. This is the **second fabricated Brooklyn location on this one host**
+(Bay Ridge was already quarantined), both sourced to the bare root. The rule that decides between the two
+outcomes: *repurpose when the cluster is short of real locations in the same area; quarantine when the
+claimed area has no real location at all.*
+
+**A new quarantine ground, one step beyond no-fixed-venue: the B2B training organization.** Little Flower
+Yoga's site is Training / Schools / Books / Articles, with a mission of certifying "Educators and
+Clinicians". It teaches adults to bring yoga into schools. The no-fixed-venue providers quarantined in
+batch 43 (Brains & Motion, Bricks 4 Kidz here) at least deliver to children directly and merely lack a venue
+of their own; this one has **no children's offering at all**. A family-facing directory should not carry it
+under any location. Worth keeping distinct so the reason recorded is the true one.
+
+Bricks 4 Kidz (3 cards) was the batch's straightforward no-fixed-venue cluster — programs, parties, camps
+and field trips delivered at host sites, all three cards on the bare brand root with no located NYC
+franchise behind them.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -3599,3 +3640,19 @@ checked.
   its JS location finder could not be enumerated, so the canonical pick rests on specificity alone; Taste
   Buds Kitchen Brooklyn left blocked because the location claim is exactly what could not be confirmed).
   See "Batch 43/32..." above.
+- v89 (2026-08-08): batch 44/25 (cards 530-554) -- 12 queue cards, 13 siblings, 11 hosts. 10 canonical or
+  corrected, 9 terminal, 6 quarantined. **Rule ORDER proved load-bearing**: Riverside Park Conservancy had
+  five cards for one organization, and one PROGRAM card carried a deeper source path than the winner --
+  applying the per-location tie-breaker first would have crowned "Youth Soccer" canonical for having a
+  longer URL. A deeper path to a program page is still a program; run the program test first, then use path
+  depth among what remains. Retitle-over-split ran twice more, and its **"fewer cards than locations"
+  precondition did real work**: Treasure Trunk Theatre has four confirmed locations and only three cards, so
+  a card claiming the unsupported "Carroll Gardens" was repurposed onto the real, uncarded Park Slope site
+  (179 4th Ave) -- while in the same batch Color Me Mine Park Slope was QUARANTINED instead, because that
+  brand's two real NYC studios are both in Manhattan and there was no unrepresented Brooklyn location to
+  repurpose onto. **Repurpose when the cluster is short of real locations in the same area; quarantine when
+  the claimed area has no real location at all.** New quarantine ground one step beyond no-fixed-venue: the
+  **B2B training organization** (Little Flower Yoga certifies educators and clinicians to bring yoga into
+  schools -- no children's offering at all, as against Brains & Motion or Bricks 4 Kidz which do teach
+  children but lack a venue). Second fabricated Brooklyn location on the colormemine.com host, both on the
+  bare root. See "Batch 44/25..." above.
