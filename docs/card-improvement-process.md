@@ -6492,3 +6492,59 @@ only place it can go.
   `schedule{}`, 121 of them `precision: "exact"`; 434 carry numeric ages; **0 carry a `price{}` — and that
   is the correct number.** Price is the one field this loop should not automate, and the attempt above is
   the evidence.
+
+- v143 (2026-08-08): **the 1,000-card pass, worked by defect cohort — 603 records — plus the process
+  change that the previous pass's mistakes earned.** The maintainable content-card pool is 1,885, so
+  "the oldest 1,000" is most of it; and because earlier bulk sweeps compressed `updatedAt`, oldest-first no
+  longer discriminates. Profiled all 1,885 by defect SHAPE instead and worked the largest cohorts.
+
+  ### The process change: `src/scripts/scanGuards.ts`
+
+  Four naive matches in one pass on the previous day produced plausible garbage — `ebay` in
+  `heal-thebay`, `Art` in `mARTial`, `Richmond` in `Richmond Terrace`, `$90 per person` from "$450 per
+  camper per week". **The shared cause is not any one regex: a scan reports a NUMBER, and a number looks
+  equally trustworthy whether or not the rows beneath it are real.** So the lessons are now tested code:
+  `matchesWholeWord`, `hostMatches` (anchored on a label boundary, and a bare label like `ebay` now matches
+  NOTHING so writing one in a denylist fails loudly), `addressNamesPlace` (comma component, not substring),
+  `isPlausibleNanpPhone`, `repeatedValues`, and `requireSample`, which renders a scan's own output so it
+  must be read before it can be acted on. 12 tests; two of my own test expectations were wrong and were
+  corrected rather than the code.
+
+  **It paid for itself immediately.** A matcher pairing the 111 Google-sourced cards with correctly-sourced
+  siblings reported **82 duplicates**; the sample showed "City Ice Pavilion" matched "Karate City" on the
+  word *city*, and "Brains & Motion" matched "Kids N Motion" on *motion*. **82 real cards would have been
+  retired on a word.** Nothing was written; the finding was recorded on each card instead.
+
+  ### What was fixed
+
+  | cohort | count | action |
+  | --- | ---: | --- |
+  | `neighborhoodGuess` == `boroughGuess` | 189 | cleared — a non-answer |
+  | `neighborhoodGuess` is a delivery model | 198 | cleared — "Brooklyn-wide" is not a place |
+  | compound with exactly ONE canonical part | 43 | resolved to that part |
+  | source is a Google search query or Maps link | 111 | finding recorded; NOT bulk-retired |
+  | false-premise source-trust blockers on institutional domains | 55 | cleared |
+  | off-topic contamination | 6 | quarantined |
+  | cross-borough neighbourhood mismatch | 2 | corrected / cleared |
+
+  Verified against a fresh read: neighbourhood-equals-borough **189 → 1**, delivery models **198 → 0**.
+
+  ### Three findings
+
+  1. **The pipeline stores its own SEARCH QUERY as a source.** 111 maintainable cards are sourced to
+     `google.com` — 87 to `/search?q=<business name>+kids+classes`, the literal query the pipeline ran, and
+     24 to a Maps `place_id` deep link. That is a working step leaked into the data, the same family as the
+     LLM prompt published as a description. All are `BLOCKED_REPAIRABLE`, none published, and the entities
+     are real — so what each card now carries is the instruction that only a domain lookup is needed, plus
+     the explicit warning not to bulk-retire the cohort on a title match.
+  2. **A new contamination cluster, found by querying for IMPOSSIBLE borough/neighbourhood pairs.** Three
+     cards shared `Staten Island / Upper West Side` — a pairing that cannot exist — and all three were
+     off-topic: a Cleveland Clinic breastfeeding article, an American Academy of Pediatrics page, and
+     **monthlycalendar.net's list of Memorial Day dates to 2045**. Querying for a *structurally impossible*
+     value is a cheap contamination detector that needs no entity knowledge at all. Also caught: `Manhattan
+     / Allerton` (a Bronx neighbourhood) and `Brooklyn / Astoria` (a Queens one).
+  3. **A retired duplicate's fingerprint can block the survivor from being corrected — now seen twice.**
+     Clearing the PUBLISHED "Manhattan Soccer Club" card's non-answer neighbourhood was refused, because it
+     would have made it identical to one of its two already-`BLOCKED_TERMINAL` twins. The guard is right,
+     and the card keeps a slightly worse value as a result. Same wrinkle as the Fit Soccer Kids collision;
+     worth a product decision rather than a third rediscovery.
