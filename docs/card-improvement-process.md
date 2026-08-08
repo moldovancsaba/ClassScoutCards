@@ -4149,6 +4149,41 @@ sweep: mechanical where the answer is already present, manual where it is not.**
 `address` is a neighbourhood rather than a street are the same problem from the other side and are
 similarly not mechanical.
 
+### Rewriting the leaked prompts: 9 of 35 done by hand (2026-08-08)
+
+The 35 records publishing *"Extract age or grade evidence from the official program page.."* as their
+description are the one finding from the pool scan that **cannot be fixed mechanically** — each needs a real
+description written from a real source. Nine were done in this pass; the remaining 26 are listed in the scan
+output for the next.
+
+Sites read 2026-08-08. What the rewrites recovered beyond the copy itself:
+
+- **Brooklyn Force Soccer** — the site states "AGES 3 – 14"; the record held one bucket. Corrected to the
+  real span, and the 2026-27 integration of the Brooklyn City FC girls programme with Met Oval noted.
+- **NYC Lions** — the site states the age range in words: *"young people ages seven to seventeen"*.
+  Corrected from a single bucket to 6–8 through Teens, with the note that the 6–8 bucket appears only
+  because it is the only one containing age seven.
+- **Brooklyn Brainery** (190 Underhill Ave), **UrbanGlass** (647 Fulton St, nonprofit since 1977) and
+  **Brooklyn Craft Company** (165 Greenpoint Ave) all gained real street addresses in place of
+  neighbourhood-only ones.
+
+**Three of the nine were deliberately written short and cautious, and that is the interesting part.**
+
+*Big Apple Tutoring* publishes marketing about tutor quality and no premises at all. The description says
+so: tutoring is arranged around the student rather than at a teaching centre, and families should confirm
+where sessions happen. Its stored Harlem neighbourhood is a **catchment claim, not an address** — the core
+spec's `venueModel` gap, met in the wild.
+
+*NYC Cyclones Hockey* has a front page dominated by a cancer-fundraising story and almost no programme
+detail, and publishes no rink. The copy states what is evidenced and tells the reader to confirm the home
+rink, rather than inventing one. **An ice hockey listing with no rink is a real gap; papering over it with
+plausible prose would hide it.**
+
+*Yorkville Youth Athletic Association* — the fact given most prominence is the **scholarship programme**,
+because it is the one most likely to change a family's decision and because **price is the field this
+platform cannot store at all**. Where the schema has no home for the deciding fact, the description is the
+only place it can go.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -5278,3 +5313,15 @@ similarly not mechanical.
   retries without the copy fields and records why, letting the other corrections land. `neighborhood` only
   reached 312 because the 87 fixed were those whose OWN address field already named a neighbourhood -- the
   rest need research, which is exactly the mechanical/manual line this sweep exists to draw.
+- v115 (2026-08-08): **9 of the 35 leaked-prompt descriptions rewritten by hand** -- the one pool-scan
+  finding that cannot be fixed mechanically, since each needs real copy from a real source. Beyond the copy,
+  the rewrites recovered: two explicit age ranges stated in words on the operators' own sites (Brooklyn Force
+  "AGES 3-14"; NYC Lions "young people ages seven to seventeen"), both previously stored as a single bucket;
+  and three real street addresses replacing neighbourhood-only ones (Brooklyn Brainery 190 Underhill Ave,
+  UrbanGlass 647 Fulton St, Brooklyn Craft Company 165 Greenpoint Ave). **Three of the nine were written
+  deliberately short and cautious**, and that is the point: Big Apple Tutoring publishes no premises, so the
+  copy says tutoring is arranged around the student and its stored Harlem neighbourhood is a catchment claim
+  rather than an address -- the `venueModel` gap met in the wild; NYC Cyclones publishes no rink, so the copy
+  tells the reader to confirm it rather than inventing one; and Yorkville leads on its SCHOLARSHIP programme
+  because **price is the field this platform cannot store at all**, so the description is the only place the
+  deciding fact can live. 26 leaked prompts remain.
