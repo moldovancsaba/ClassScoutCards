@@ -3998,6 +3998,53 @@ this reason. Both are real, both have decades of history, and neither publishes 
 school gyms and their sites are organised around tryout dates. That is a recognisable shape worth expecting
 rather than re-diagnosing: **for this sport, expect to find the club and not the venue.**
 
+### First `providers` enrichment pass under the new spec (2026-08-08)
+
+**The first run of this loop that touched `providers` at all** — the collection where `address`, `phone`,
+`email`, descriptions, `ageRanges`, `recurringPrograms` and `image` actually live, and therefore the first
+run capable of doing the content-quality and contact-data mandate rather than working around it. Five
+oldest records, verdicts assigned per the core spec.
+
+| Record | Verdict | What was wrong |
+| --- | --- | --- |
+| Brooklyn Preschool of Science | `corrected` | Copy said "**two** locations" then named **three**, one of them wrong |
+| Brooklyn Bridge Parents | `should_not_exist` | A directory page carrying **three different businesses' identities** |
+| Ballet Tech | `corrected` | Age range off by a whole childhood; address and neighbourhood contradicted each other |
+| Kinder Prep Montessori | `corrected` + open | Phone number was a **Nashville area code** |
+| Mark Morris | `corrected` | Named after a programme; ages `["Teens"]` for a school serving 4–18 |
+
+**The worst single defect was a phone number.** Kinder Prep Montessori's live record carried
+`6158583658` — **615 is Nashville, Tennessee**. It matches none of the three numbers the operator
+publishes. A parent calling that listing reached a stranger in another state. Because the site runs five
+Brooklyn locations and maps no number to the Brooklyn Heights site, there was no evidenced replacement, so
+**the field was cleared rather than swapped for a guess**: an empty phone is an honest absence, a wrong
+phone is an active harm. The three real numbers went into the record so the next pass can match one instead
+of re-researching.
+
+**Brooklyn Bridge Parents is the spec's §1.2 pattern in its purest form — three identities in one record.**
+It is *named* after a directory (`brooklynbridgeparents.com`, a Brooklyn parenting news site), *sourced* to
+that site's `/listing-camps/summer-camps/` index page, *described* as World Explorers (one business listed
+on that page), and reachable at `brooklyn@makeinspires.com` — Make Inspires, a third company. A family
+contacting this listing would email one business about a second's camp, found on a third party's directory.
+Hidden and quarantined; no per-field fix exists.
+
+**Two age ranges were wrong in the direction that sends a child to the wrong room.** Ballet Tech was stored
+`["6–8"]` for a school its own page says serves "students in grades 4 through 8" — roughly ages 9–14. Mark
+Morris was stored `["Teens"]` alone for a school serving **ages 4 to 18**. Both are the spec's §2.3 point
+made concrete: the bucket vocabulary cannot say "from age 4", so the closest honest span was used and the
+`ageMinMonths` gap recorded.
+
+**A defect only visible after the first write.** Kinder Prep still carried **nine** `activityTypes` — three
+times the cap — because `alignActivityTypes()` only fires when a write touches that field, and the
+enrichment write hadn't. Passing the existing array back through the write path resolved it to
+`Preschool / Multi-enrichment · Dance · Gymnastics`, dropping six, with the primary set to the tag that
+actually describes the business rather than whichever sat at index 0. **Worth remembering: fixing a
+record's copy does not re-run its derivations.**
+
+**One internal contradiction was fixable with no research at all.** Ballet Tech's `address` field said
+"Flatiron" while its `neighborhood` field said "Midtown". Two fields of one record disagreeing is a defect
+you can resolve from the record alone — worth checking for before opening a browser.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -5082,3 +5129,19 @@ rather than re-diagnosing: **for this sport, expect to find the club and not the
   `providers` once**, and every contact-data and content-quality field the spec cares about exists ONLY on
   `providers`. Also backfilled `categoryHint` on 10 maintenance-run cards after finding it left null on all
   20 despite being writable and named in the standing directive.
+- v112 (2026-08-08): **first `providers` enrichment pass** -- the first run of this loop to touch the
+  collection where address, phone, email, descriptions and ageRanges actually live, closing the gap recorded
+  in v111. Five oldest records, verdicts per the core spec: 4 `corrected`, 1 `should_not_exist`. **Worst
+  defect was a phone number**: Kinder Prep Montessori's live record carried a **Nashville, Tennessee area
+  code** matching none of the operator's three published numbers -- CLEARED rather than swapped, because an
+  empty phone is an honest absence and a wrong phone is an active harm. **Brooklyn Bridge Parents is the
+  spec's 1.2 pattern in its purest form -- three identities in one record**: named after a directory,
+  sourced to that directory's camps index, described as World Explorers, and reachable at an @makeinspires
+  address; hidden and quarantined. **Two age ranges were wrong in the direction that sends a child to the
+  wrong room** (Ballet Tech `["6-8"]` for grades 4-8; Mark Morris `["Teens"]` for a school serving ages
+  4-18). Brooklyn Preschool of Science's copy said "two locations" and then named three, one of them wrong;
+  rewritten and located to the Cobble Hill school, with Park Slope and Brooklyn Heights recorded as split
+  candidates. Two process notes: **fixing a record's copy does not re-run its derivations** -- Kinder Prep
+  still had nine activityTypes after the enrichment write because `alignActivityTypes()` only fires when
+  that field is touched; and **an internal contradiction is fixable with no research** -- Ballet Tech's
+  address field said Flatiron while its neighbourhood field said Midtown.
