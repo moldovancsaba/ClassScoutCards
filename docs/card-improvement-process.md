@@ -5902,3 +5902,39 @@ only place it can go.
   Brooklyn", "Manhattan-wide", "Brooklyn schools", "Upper East/West Side". Each was emptied with a location
   blocker set, because an empty field is an honest absence while a vague one implies knowledge the record
   does not have.
+- v131 (2026-08-08): **oldest-first continued, batches I and J.** Two findings worth carrying forward.
+
+  **A new adults-only variant: the parent support group.** Two PUBLISHED cards —
+  NewYork-Presbyterian Parent Support Groups and The Motherhood Center Support Groups — were live under the
+  category "Classes". Both are clinical or peer support for ADULTS in a healthcare setting. Unlike an
+  adults-only gym or swim school, these are genuinely FOR parents of young children, which is why they read
+  as plausible and survived to publication. **The test that settles it is who attends and does what**: a
+  parent support group is a service for the adult, not an activity a child takes part in. Recorded rather
+  than hedged, because peer support for new parents is genuinely valuable and the ground for exclusion is
+  scope, not quality.
+
+  **URL depth separated a confirmed card from a terminal one, in the same batch, for the same operator.**
+  `ymcanyc.org/locations/prospect-park-ymca` is a per-branch page and its card confirmed cleanly, correctly
+  located in Park Slope. `ymcanyc.org/` — the homepage — was PUBLISHED as an organisation-level card with the
+  neighbourhood "Lincoln Square", which is where the YMCA's head office sits rather than any branch. That is
+  the headquarters defect appearing in a PLACE field rather than an address field, the sixth instance of the
+  shape. Terminal, since 24 per-branch venue records already exist from the earlier consolidation.
+
+  **An out-of-market fabrication invisible from the card.** Bubbles Academy NYC had a plausible name,
+  category and Manhattan borough. One fetch of its own homepage settles it: the title tag reads "Child
+  Development Classes & Preschool In **CHICAGO, IL**". Same shape as Saf-T-Swim and Clay Art Center — an
+  out-of-market business given a New York presence by appending "NYC" to its name.
+
+  **The delivery-model value still cannot be swept automatically, and this batch shows why.** Nine of ten
+  cards stored one, and eight were genuine no-fixed-venue operators — but **Brooklyn Nature Days** carried
+  "Brooklyn-wide" and turned out to run its forest-school days in Prospect Park. That satisfies the Brooklyn
+  AYSO test: an organisation without premises of its own is in scope when children reliably attend ONE
+  identified place. Corrected and kept. One fetch is the difference between excluding a real programme and
+  locating it.
+
+  **Split-candidate versus prohibition, sharpened.** Within the same batch, four operators were quarantined
+  (a clown, a school-based sports franchise, two programmes in rented rooms) and three were held as DRAFTS
+  (NYCFC, New York Red Bulls, NYC Juniors Volleyball). The difference is not whether the operator owns a
+  venue — none of the seven does — but whether children attend **identified physical sites**. NYCFC runs real
+  programmes at real partner facilities and simply names none on the card; that is repairable. A clown who
+  comes to your house is not.
