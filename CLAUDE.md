@@ -895,6 +895,34 @@ in a comment when you add one, the way the existing ports do.
   answers both mean quarantine; only exactly one means correct. This keeps the real-brand-fake-location
   pattern from becoming an excuse either to guess or to discard real businesses wholesale.
 
+## The core system's listing-maintenance spec is now part of the requirements (2026-08-08)
+
+The core system handed this repo a listing-maintenance specification — what a reviewer looks for, and what
+they collect. It lives in **`docs/listing-maintenance-requirements.md`**, recorded in full with a
+field-by-field map of what this bridge can persist, what it can only note in prose, and what needs schema
+work in the read-only main app. Read it with `docs/card-improvement-process.md`.
+
+Four things from it that change day-to-day behaviour:
+
+- **Adopt its four verdicts**: `confirmed` / `corrected` / `needs_human` / `should_not_exist`. **`needs_human`
+  is the one this repo was missing** — it is what every "deliberate non-action" here actually was. Use it
+  freely: *a listing correctly escalated costs minutes; a listing confidently rewritten wrong costs a family.*
+- **`confirmed` must name the fields checked.** A confirmation of nothing in particular is not a confirmation.
+- **Never treat a missing price as free.** The spec's headline finding is that **97.3% of the catalog is
+  priced at zero** because the field defaults to `0` and cannot distinguish "free" from "not found". This
+  bridge has no price field at all, so price findings go in `terminalReason` — but never write or infer one.
+- **Its top rule is one this repo reached independently**: search for the ENTITY, not the domain. Its worked
+  example is Camp Kidville on `camp.com`; this repo's is Zing! for Kids on `zing.cz`, a Czech video-games
+  magazine. Both businesses are real and both would have been deleted by judging the domain.
+
+**The gap the spec exposed in this repo's own practice, recorded because it was real:** an entire session ran
+239 writes to `contentCards` and **zero to `providers`** — and `address`, `phone`, `email`,
+`shortDescription`, `longDescription`, `recurringPrograms`, `ageRanges` and `image` exist ONLY on `providers`.
+A loop that stays in `contentCards` can fix identity, location and source, and cannot do the enrichment
+mandate at all. **If a run has not written to `providers`, step 1 of the loop was not followed.** The same
+session also left `categoryHint` null on every card of three maintenance runs despite it being writable and
+explicitly named in the content-quality directive.
+
 ## Before you write anything real
 
 1. Read `docs/card-improvement-process.md` in full — it is the binding process spec (selection order,

@@ -37,7 +37,7 @@ the benefit of the doubt.
 
 1. **Pull the GLOBALLY oldest-updated record**, across ALL THREE card-bearing collections — not just
    `contentCards`. Fetch the single oldest row from `contentCards`, `providers`, and `meetupGroups`
-   independently (`GET /api/card-bridge/rows?collection=X&limit=1` for each, no other filter), then
+   independently (`GET /api/card-bridge/rows?collection=X&limit=1` for each), then
    compare their three `updatedAt` values and take the smallest. Do not process a whole collection to
    exhaustion before checking the others — the three queues interleave by age, and skipping straight to
    "whichever collection I was already in" is exactly the kind of implicit exemption this rule exists to
@@ -52,6 +52,17 @@ the benefit of the doubt.
    when "ambiguous."** A tie is not an invitation to pick arbitrarily; it just means the tie-break rule
    above decides it instead of `updatedAt` alone (owner directive, 2026-08-07, after a random pick was
    used here in error).
+   **Two corrections to this step, both from real drift (2026-08-08):**
+   **(a) `contentCards` MUST be filtered `kind: "content"`.** All 16 globally-oldest `contentCards` are
+   auto-generated `kind: "repair"` stubs (`repair-<hash>-<blockercode>` ids, `internal://` URLs, already
+   `BLOCKED_TERMINAL`). Without the filter the loop burns its whole budget on machine-generated records and
+   never reaches a real card. Independently confirmed by a concurrent session.
+   **(b) The cross-collection rule above is the part that actually drifts, and it drifted badly.** One
+   session ran 239 writes without touching `providers` even once. That matters more than a queue-ordering
+   nicety: **every contact-data and content-quality field — `address`, `phone`, `email`,
+   `shortDescription`, `longDescription`, `recurringPrograms`, `ageRanges`, `image` — exists ONLY on
+   `providers`.** A loop that stays in `contentCards` can fix identity, location and source, and cannot
+   perform the enrichment mandate at all. If a run has not written to `providers`, step 1 was not followed.
 2. **Learn** the card's current stored state: every field the bridge's read projection exposes,
    including `enrichmentSummary` (what the pipeline already extracted) and, for family-service cards,
    the linked `serviceLeads`/`servicePlaceFacts`/`serviceTasks` records (see "Cross-collection lookups"
@@ -82,6 +93,32 @@ the benefit of the doubt.
    (touch or content change) is recorded in `cardBridgeAuditLog` with the pre-image, `reason`, and
    `source` — this is the only audit trail; there is no way to write through this bridge without one.
 8. **Go to 1.**
+
+## The core system's listing-maintenance spec (adopted 2026-08-08)
+
+The core system handed this repo a listing-maintenance specification: what a reviewer should look for and
+what they should collect. **It is recorded in full, with a field-by-field map of what this bridge can
+actually persist, in `docs/listing-maintenance-requirements.md`.** Read it with this document.
+
+Three things from it change how this loop runs, so they are stated here rather than only there:
+
+1. **Adopt its four verdicts** — `confirmed` / `corrected` / `needs_human` / `should_not_exist`. The
+   valuable addition is **`needs_human`**, which this repo has been expressing as an unnamed "deliberate
+   non-action" (five so far). Map it to `BLOCKED_REPAIRABLE` with the open question stated. *"A listing
+   correctly escalated costs minutes; a listing confidently rewritten wrong costs a family."*
+2. **`confirmed` must name the fields checked.** "A confirmation of nothing in particular is not a
+   confirmation", and "a listing that has not changed is a result" — which is exactly what the `touch`
+   write already exists for, now with an obligation to list what was verified in `reason`.
+3. **Every factual claim carries the URL it was read on and the date.** Until a `fieldVerifications`
+   structure exists in the schema, that goes verbatim into `terminalReason`.
+
+**What the spec asks for that this bridge structurally cannot store**: `sessions[]` with registration
+windows, `price{}` with its evidence enum, `ageMinMonths`/`ageMaxMonths`, `venueModel`, `inclusion{}`,
+`trialPolicy{}`, `fieldVerifications[]`, `outOfMarketLocation`. Those are core-app schema work and are
+written up as recommendations. The spec's own headline finding — **97.3% of the catalog priced at zero,
+because the price field defaults to `0` and cannot distinguish "free" from "never found"** — is the single
+highest-value item in it and the one this bridge can do least about. Record price findings in
+`terminalReason` and never treat a missing price as free.
 
 ## Verification checklist (step 2/4 — run this explicitly, every time)
 
@@ -5029,3 +5066,19 @@ rather than re-diagnosing: **for this sport, expect to find the club and not the
   sport-level pattern worth expecting rather than re-diagnosing: **volleyball clubs in this pool publish
   tryouts and no venue** -- NYC Juniors is the second in two batches left deliberately unchanged for that
   reason, after NYC Impact.
+- v111 (2026-08-08): **the core system's listing-maintenance spec is adopted into the process.** Recorded in
+  full at `docs/listing-maintenance-requirements.md`, with a field-by-field map of what this bridge can
+  persist, what it can only note in prose, and what needs core-app schema work (written up as
+  recommendation 0b). Adopted from it: the **four verdicts** -- and `needs_human` is the one this repo was
+  missing, since every "deliberate non-action" here (five so far) was really an escalation with no name;
+  **`confirmed` must name the fields checked**; and **every factual claim carries the URL and date it was
+  read on**. Its headline finding is one this bridge cannot fix and must not paper over: **97.3% of the
+  catalog is priced at zero** because the field defaults to `0` and cannot distinguish "free" from "not
+  found" -- never infer a price, record it in `terminalReason`. Its top rule, search the ENTITY not the
+  domain, is one this repo reached independently; the two worked examples now sit side by side (Camp
+  Kidville on `camp.com`, Zing! for Kids on `zing.cz`). **Two corrections to step 1 of the loop, both from
+  real drift**: `contentCards` must be filtered `kind: "content"` (all 16 globally-oldest are repair stubs),
+  and the cross-collection rule must actually be followed -- one session ran **239 writes without touching
+  `providers` once**, and every contact-data and content-quality field the spec cares about exists ONLY on
+  `providers`. Also backfilled `categoryHint` on 10 maintenance-run cards after finding it left null on all
+  20 despite being writable and named in the standing directive.
