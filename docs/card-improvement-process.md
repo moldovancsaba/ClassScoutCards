@@ -3872,6 +3872,51 @@ Not contamination (the entity is real and it is soccer), not a wrong location, a
 fabricated either. Blocked rather than quarantined, because the clinic may exist; the point is that **the
 check belongs before a family sees it, not after.**
 
+### Sovereign maintenance run, 5 cards: the token-match bug becomes repairable (2026-08-08)
+
+Cards 11–15 of the same 2026-06-28 discovery run. Same signature throughout — `DISCOVERED`, zero blockers,
+`categoryHint: null`, "NYC-wide", a compound `Manhattan/Brooklyn` borough, `sourceAuthorityGrade: "unknown"`
+— and again every one a youth sports or music programme with no single address. **2 fixed, 2 blocked, 1
+terminal, 1 deliberately left alone.**
+
+**`zing.cz` is the clearest token-match case found in this entire effort, and the first one fully
+repairable.** The card "Zing! Kids Fitness", claiming Manhattan, was sourced to a **Czech-language video
+games website** — *"Hry, recenze, preview a nové konzole"*, PlayStation, Xbox, Nintendo. The pipeline
+resolved the first word of the business name, "Zing", to whatever ranks for it, and landed on a gaming site
+in another country.
+
+The entity-before-domain rule is what stopped this becoming a quarantine. **Zing! for Kids is real**: a
+genuine NYC children's fitness business at 1732 1st Avenue (1st Ave @ 90th St), whose own site
+`zing-kids.com` opens with "Upper East Side Studio" and "Join us on 1st Avenue @ 90th Street!". So: an
+ordinary wrong-domain card, not contamination — **re-sourced, retitled, and located to the Upper East
+Side**. Every earlier token-match card could only carry its target in prose; this is the first one where
+the fix was applied. The dry-run preview showed the full derived set — `sourceUrl`, `sourceHost`,
+`fingerprint`, `normalizedTitle` — which is exactly the machinery PR #2 added.
+
+**A third programme-index card from the same run.** NYCFC's `/youth/programs` joins the NYC Parks
+youth-sports index and the CityParks registration page. Three in two batches, all from one discovery run:
+this run reliably scraped *programme hubs* rather than venues, which is a run-level signature worth naming
+rather than three coincidences.
+
+**A third name-collision instance.** "Samba Soccer Schools NYC" sits on `kidsupersambaac.com` — the site is
+KidSuper Samba AC, and Samba Soccer Schools is a **separate real brand**. After "United Soccer Academy
+Brooklyn" and "Lil' Kickers Manhattan", this is now a reliable pattern rather than an oddity. That card also
+stacks two more problems: KidSuper Samba AC is chiefly an *adult* amateur club with a youth team alongside
+(the NYC Footy shape again), and three different places attach to it — Metropolitan Oval in Maspeth, a
+rooftop pitch at 158 Roebling St in Williamsburg, and a stated Harlem base. Blocked rather than corrected,
+because **fixing any one of the three without the others would leave the card wrong in a different way.**
+
+**The Jam Cats: 7 of 8 listed locations are in New Jersey.** Manhattan is the only one in scope and no
+Manhattan address is published anywhere on the site. Re-sourced off `/registration/` — a form, not a place —
+onto the site root, and blocked pending a real address. Not quarantined: the operator is real and does list
+Manhattan. But **a borough named in a menu with nothing behind it is not a location.**
+
+**NYC Impact Volleyball is the fourth deliberate non-action of the sweep, and the reasoning has sharpened.**
+The club is real and the only findable address is 6029 Putnam Avenue, Ridgewood — but that is an
+administrative office, and its actual sessions are open gyms in rented school and community halls. Writing
+"Ridgewood" would put **a back office into the field a family reads as the place to turn up**. That is a
+worse error than the vague value it would replace.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -4911,3 +4956,18 @@ check belongs before a family sees it, not after.**
   of the merged capability. New shape named: **a card asserting a children's offering its own source does
   not support** (NYC Footy presents as an adult league; the card claims "Kids Clinics") -- blocked, not
   quarantined, because the check belongs before a family sees it.
+- v109 (2026-08-08): sovereign maintenance run, 5 cards (11-15 of the 2026-06-28 discovery run). **2 fixed,
+  2 blocked, 1 terminal, 1 deliberately left alone.** Headline: **`zing.cz` -- a CZECH VIDEO GAMES SITE --
+  was the source for "Zing! Kids Fitness", the clearest token-match case yet and the FIRST ONE FULLY
+  REPAIRABLE.** Entity-before-domain stopped it becoming a quarantine: Zing! for Kids is a real NYC
+  children's fitness business at 1732 1st Ave, and its own site zing-kids.com says "Upper East Side Studio".
+  Re-sourced, retitled and located -- every earlier token-match card could only carry its target in prose.
+  Also: a **third programme-index card from this same run** (NYCFC's /youth/programs, after the NYC Parks
+  index and the CityParks registration page) -- the run reliably scraped programme hubs rather than venues,
+  which is a run-level signature, not three coincidences. A **third name-collision instance** ("Samba Soccer
+  Schools NYC" on kidsupersambaac.com, where Samba Soccer Schools is a separate real brand), now a reliable
+  pattern. The Jam Cats has **7 of 8 listed locations in New Jersey** with no published Manhattan address --
+  re-sourced off /registration/ and blocked, because a borough named in a menu with nothing behind it is not
+  a location. And a fourth deliberate non-action, with sharper reasoning: NYC Impact Volleyball's only
+  findable address is an administrative office, and **writing it would put a back office into the field a
+  family reads as the place to turn up.**
