@@ -1175,8 +1175,12 @@ Three lessons from implementing it, each of which cost something:
   vocabulary gap that was harmless before the sport-dominant rule destroys data after it.
 - **Removing a bad value can manufacture a worse one.** Stripping the trailing format noun turned
   "Birthday Parties" into a "Birthday" activity. Second instance of the already-recorded pattern.
-- **A response echo is not proof a write landed.** One write returned no error and a truthy `found` and
-  changed nothing; only reading the record back caught it. Verify by re-reading.
+- **A refusal you do not read looks exactly like a success.** Four writes returned no `error` and a
+  truthy `found` and changed nothing; read-back caught them, and the response had said why all along in a
+  field the driver never checked — `blockedReason`, the fingerprint-collision guard naming the card the
+  edit would have collided with. The guard was working; the caller was deaf. **Check every field a
+  refusal can arrive in, and verify by re-reading regardless** — read-back is what surfaced the bug in
+  the check itself.
 
 Two things the same work exposed, both worth checking elsewhere. The stats page was counting **7,570
 `kind: "repair"` stubs against 5,056 real cards** — a page that aggregates a collection must say which of

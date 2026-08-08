@@ -6056,10 +6056,27 @@ only place it can go.
   was a compile error; a projection is a plain object and a semantically identical mistake elsewhere would
   have compiled. **To ask whether a field is readable, read the registry, not one document.**
 
-  **A response echo is not proof a write landed.** One of the 15 `categoryHint` writes returned no error
-  and a truthy `found`, and did not change the field; three more showed the same shape in the dry run. Only
-  reading the records back caught it. Verify by re-reading, not by parsing the write response — this is the
-  same lesson already recorded for the silently-ignored `id` parameter, in a new place.
+  **A refusal you do not read looks exactly like a success — and the first diagnosis was wrong.** Four
+  writes returned no `error` and a truthy `found` and changed nothing. This was initially written up here
+  as "the write endpoint can return success without applying"; it cannot. The responses carried
+  `blockedReason`, the fingerprint-collision guard naming the exact card the edit would have collided
+  with — a named, deliberate refusal, in a field the driver never checked. The guard was working
+  correctly; the caller was deaf to it. Two lessons, and the second is the one that generalises:
+
+  - **A success check must enumerate every field a refusal can arrive in**, not just `error`. All the
+    drivers now treat `blockedReason` as a failure.
+  - **Read-back is what caught it, and read-back is what caught that the CHECK was wrong** — not just
+    that a write was missing. Verifying against the database rather than against the write response is
+    the only check that survives a bug in your own success criterion.
+
+  The collisions were themselves real findings: two duplicate pairs (Fit Soccer Kids, SocRoc NYC), each
+  two cards with an identical title and identical `sourceUrl` differing only in `categoryHint`. Both were
+  correctly refused. In the SocRoc pair both records are already exempt (one QUARANTINED, one
+  BLOCKED_TERMINAL), so no action is owed. The Fit Soccer Kids pair exposes a structural wrinkle worth
+  naming: **a retired duplicate still occupies its fingerprint, and can therefore block the surviving
+  maintainable card from being corrected** — the DISCOVERED card cannot take `categoryHint: "Soccer"`
+  because its BLOCKED_TERMINAL twin already holds that exact identity. Left as-is and recorded, rather
+  than resolved by editing a retired record back into service.
 
   **Result, verified by re-reading all 1,087 provider records from the database rather than by parsing
   write responses.** 640 records written, 0 failures, 0 mismatches; across the 1,043 live (non-quarantined)
