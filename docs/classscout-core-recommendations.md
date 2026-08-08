@@ -495,6 +495,16 @@ permanently, because no reviewer wants to be the one who cleared a safety flag.
 point — wrongly clearing one real safety flag is far worse than leaving several false ones in place. It has
 been removed only on cards verified individually (three so far), each with the reason recorded.
 
+**Correlation evidence added 2026-08-08, across all 3,857 cards.** The code co-occurs with COMPLETENESS
+blockers and with nothing content-related:
+- **73%** of cards carrying `weak_location_evidence` also carry `policy_or_safety_review`.
+- Of the 267 safety-flagged cards WITHOUT weak location evidence, **160 are missing an official image** and
+  **116 a schedule**.
+- One oldest-first batch of ten NYC youth leagues had the pair on **nine of ten** cards.
+
+A code meaning "this content raises a child-safety concern" should not track whether an image was found. On
+this evidence it is measuring record completeness, and inheriting the vocabulary of safety.
+
 **What is needed from the core app:** the rule that sets this code. The strong hypothesis from the TLB Music
 case is that an unreadable or non-200 source is being treated as a safety signal, which would explain why
 bot-blocked sites and out-of-market pages both attract it. If that is the rule, the fix is to distinguish
