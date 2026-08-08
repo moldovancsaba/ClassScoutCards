@@ -5421,3 +5421,52 @@ only place it can go.
   **One cheap mechanical duplicate test discovered here:** two Breakaway Hoops records shared an identical
   name and an identical phone number differing only in punctuation (`6467762021` against `646-776-2021`).
   Comparing phone numbers *normalised to digits* would find that whole class of duplicate without research.
+- v119 (2026-08-08): **a new mechanical duplicate test — group live providers on the phone number
+  NORMALISED TO DIGITS — and it exposed the largest structural finding of the effort so far.**
+
+  **Where the test came from.** Two Breakaway Hoops records had an identical name and the numbers
+  `6467762021` and `646-776-2021`. That is a duplicate no title comparison finds and no research is needed
+  to confirm. Running the same comparison across the pool: **99 clusters covering 350 of the 1,045 live
+  records — a third of the catalogue shares a phone number with another record.**
+
+  **Acted on now: 22 records, all judgement-free.**
+  - **9 pure ID-truncation duplicates** in the NYC Parks "Summer Sports Experience" set. Each pair carries a
+    byte-identical name AND the same trailing hash, differing only in the id being truncated mid-word before
+    the hash (`…-tennis-at-highbridge-recr-8679467c` against
+    `…-tennis-at-highbridge-recreation-center-8679467c`). The shared hash is proof of one source record
+    inserted twice under two id schemes.
+  - **7 same-name, same-phone duplicates** (Brooklyn Elite Volleyball, Goldfish Gowanus, Imagine Swimming
+    UWS, Uptown Soccer Academy, Marlene Meyerson JCC, Asphalt Green UES, Brooklyn Music School) — thinner
+    record retired.
+  - **Two fencing clubs corrected**, and they are a good caution against merging on name similarity: Brooklyn
+    Fencing Center (600 Degraw St, **Carroll Gardens**) and Brooklyn Bridge Fencing Club (295 Front St,
+    **DUMBO**) are DIFFERENT REAL CLUBS. Both had duplicate records, and **all three stored neighbourhoods
+    across them were wrong** — Park Slope, Gowanus and Downtown Brooklyn. Note this overrode the usual
+    richer-record tie-break: for BBFC the record kept was the one that was *right*, not the one with more
+    fields.
+  - **Gotham Gymnastics**: three records on one phone, and none of the stored neighbourhoods was right —
+    "Boerum Hill", "Williamsburg", and the gym is at 315 Douglass St in **Gowanus**. One corrected; the other
+    CLEARED to empty rather than reassigned, because the operator really does have a second Douglass Street
+    gym (opened summer 2024) whose street number was not findable, so picking between the two would be a
+    guess.
+
+  **NOT acted on, and this is the real finding: 326 records in 93 clusters remain, and the dominant cause is
+  ONE CARD PER CLASS instead of one card per location.** Sixteen clusters of five or more account for 149
+  records:
+  - **YMCA of Greater New York — 102 records naming 50 branches.** One switchboard (212-630-9600) carries 30
+    of them. They are not branches; they are individual classes: *"Greenpoint YMCA — Beginner Tennis"*,
+    *"Bedford-Stuyvesant YMCA — Water Discovery 6–18 Months"*, *"Prospect Park YMCA — Preschool Stage 1 Water
+    Acclimation"*, *"Dodge YMCA — Teen Fitness Orientation"*. A family browsing sees the same building five
+    or ten times under different class names.
+  - Same shape at smaller scale: **Aviator Sports 8** (one Marine Park venue), **Imagine Swimming 9** (two
+    pools plus Baby Splash, Synchro, Skateboarding, Splash Ball Water Polo, Intensives), **St Patrick's CYO
+    6** (one parish, six sports), **Soccer Stars 7**, **BBFC 3 program cards** on top of its venue card,
+    **Manhattan Youth Tennis 11**.
+
+  **Why this was deliberately not swept.** Retiring a YMCA's ten class cards removes that branch from the
+  pool entirely unless a branch-level venue card exists first — and for most of these branches, none does.
+  The correct fix is to create or designate one venue card per branch and fold the class list into it as
+  content, which is a build-then-retire operation, not a hide sweep. Rushing it would delete real, findable
+  places from a family's search results. **Recorded with counts so the next pass starts from the shape rather
+  than rediscovering it**, and because the program-not-a-location rule has until now been applied one cluster
+  at a time without anyone measuring how much of the catalogue it accounts for. It accounts for a third.
