@@ -9,7 +9,7 @@ import {
   type BridgeCollectionKey,
 } from "@/lib/delivery/cardBridgeRegistry";
 import { validateCopyQuality } from "@/lib/validation/copyQuality";
-import { alignActivityTypes, NO_CATEGORY_PLACEHOLDER } from "@/lib/delivery/activityAlignment";
+import { alignActivityTypes, isNonAnswerCategoryValue, NO_CATEGORY_PLACEHOLDER } from "@/lib/delivery/activityAlignment";
 import { computeContentCardIdentity } from "@/lib/delivery/cardBridgeSplit";
 import { buildFamilyServicePlaceFact, buildFamilyServiceReviewPacket, isPublicStatus, normalizeFamilyServiceLead, reviewPacketEligible } from "@/lib/familyServices/core";
 import { FAMILY_SERVICE_LEAD_STATUSES, type FamilyServiceLead } from "@/lib/familyServices/types";
@@ -142,6 +142,20 @@ export function validateWriteRequest(body: unknown): WriteValidationResult {
         ok: false,
         status: 400,
         error: `${field} must never contain the ingestion placeholder "${NO_CATEGORY_PLACEHOLDER}" (owner directive: never add "no category" even when there is no category). Omit the field instead — an absent value is correct; a placeholder string renders as a literal "NO CATEGORY" chip on a real family's card.`,
+      };
+    }
+    // (2026-08-08, owner-reported from the live Kinder Prep Montessori card) The same rule in a second
+    // vocabulary. "Multi-category", "Multi-enrichment", "Preschool / Multi-enrichment" are the pipeline
+    // recording that it could not classify the listing — in the owner's words, "a technical leak, not
+    // something informal for a parent". It reached a family's card as the LEAD chip. Blocked here rather
+    // than only in alignActivityTypes, because that only covers providers.activityTypes and this arrived
+    // through categoryHint.
+    const nonAnswer = values.find((entry) => typeof entry === "string" && isNonAnswerCategoryValue(entry));
+    if (typeof nonAnswer === "string") {
+      return {
+        ok: false,
+        status: 400,
+        error: `${field} must not contain "${nonAnswer.trim()}" — it records the pipeline's failure to classify rather than naming anything a family can act on, and it renders on the card as a chip. Omit the field, or write the real activity.`,
       };
     }
   }

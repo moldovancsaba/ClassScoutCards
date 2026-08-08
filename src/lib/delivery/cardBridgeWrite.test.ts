@@ -153,6 +153,31 @@ describe("validateWriteRequest", () => {
     });
   });
 
+  describe('the same rule in a second vocabulary: "Multi-category" and friends (owner-reported 2026-08-08)', () => {
+    it("rejects a non-answer in activityTypes", () => {
+      const result = validateWriteRequest({ ...validProviderBody, updates: { activityTypes: ["Multi-category"] } });
+      expect(result.ok).toBe(false);
+      expect(!result.ok && result.error).toMatch(/failure to classify/);
+    });
+
+    it("rejects the compound form that reached a live card as its lead chip", () => {
+      // "PRESCHOOL / MULTI-ENRICHMENT" on Kinder Prep Montessori -- the owner's report.
+      const result = validateWriteRequest({
+        collection: "contentCards",
+        id: "cc-abc123",
+        updates: { categoryHint: "Preschool / Multi-enrichment" },
+        reason: "Testing the non-answer rejection rule",
+        source: "test",
+      });
+      expect(result.ok).toBe(false);
+    });
+
+    it("does not reject a real category that merely shares a word with a non-answer", () => {
+      expect(validateWriteRequest({ ...validProviderBody, updates: { activityTypes: ["Multi-Sport"] } }).ok).toBe(true);
+      expect(validateWriteRequest({ ...validProviderBody, updates: { primaryActivityType: "Preschool" } }).ok).toBe(true);
+    });
+  });
+
   describe("geo writes (2026-08-07 owner directive: this bridge has no real geocoder)", () => {
     it("accepts geo with source=\"approximate\"", () => {
       const result = validateWriteRequest({
