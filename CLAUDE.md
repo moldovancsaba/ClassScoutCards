@@ -1145,6 +1145,45 @@ mandate at all. **If a run has not written to `providers`, step 1 of the loop wa
 session also left `categoryHint` null on every card of three maintenance runs despite it being writable and
 explicitly named in the content-quality directive.
 
+## The taxonomy has TWO dimensions and a Sports parent (owner directive, 2026-08-08)
+
+Four rules, now enforced in code (`activityDimension.ts`, `sportActivity.ts`, `activityAlignment.ts`,
+`validateWriteRequest`) rather than left to a reviewer's judgement. Read them before touching any
+category or activity field.
+
+1. **FORMAT and ACTIVITY are different axes of the same matrix.** "Classes" and "Camps" describe how and
+   when something is delivered; "Soccer" and "Art" describe what a child does. `activityTypes` holds
+   **activities only** — the format has its own field (`category`) and its own badge on the card, so a
+   "Camps" chip in the activity row is a duplicate and a category error. The stats page renders the two
+   as separate tables; one combined list ranked "Classes" above every real activity.
+2. **A sport listing reads `<specific sport>, Sports`** — the discipline first, the parent second. This
+   is what makes analytics one equality check instead of a maintained list of sport names, and it retires
+   `"Multi-Sport"`, which read as though it were a sport sitting alongside Soccer.
+3. **Sport-dominant**: if any sport is present, every non-sport tag is dropped. **This makes the sport
+   vocabulary safety-critical** — under a rule that deletes what it does not recognise, a sport missing
+   from the list is DELETED, not merely unlabelled. `isSportActivity` therefore matches whole words
+   anywhere in a label so "Swimming Lessons" survives. If you extend the rule, re-audit the list first.
+4. **A non-answer is not a category.** `Multi-category`, `Multi-enrichment`, `Multi-Activity` and their
+   compound forms (`Preschool / Multi-enrichment`) are the pipeline recording that it could not classify
+   the listing. The owner's words, on finding one as a live card's LEAD chip: *"a technical leak, not
+   something informal for a parent"*. Same rule as `no category`, different vocabulary, now rejected on
+   every category field of every collection.
+
+Three lessons from implementing it, each of which cost something:
+
+- **A guard that deletes what it does not recognise inverts the cost of an incomplete list.** The same
+  vocabulary gap that was harmless before the sport-dominant rule destroys data after it.
+- **Removing a bad value can manufacture a worse one.** Stripping the trailing format noun turned
+  "Birthday Parties" into a "Birthday" activity. Second instance of the already-recorded pattern.
+- **A response echo is not proof a write landed.** One write returned no error and a truthy `found` and
+  changed nothing; only reading the record back caught it. Verify by re-reading.
+
+Two things the same work exposed, both worth checking elsewhere: the stats page was counting **7,570
+`kind: "repair"` stubs against 5,056 real cards** (a page that aggregates a collection must say which of
+its documents are cards), and **`providers.primaryActivityType` — the field the lead chip renders — was
+write-only through this bridge**, so the first value a family sees could not be audited. Ask of any field
+a defect report points at: can I actually READ it?
+
 ## Before you write anything real
 
 1. Read `docs/card-improvement-process.md` in full — it is the binding process spec (selection order,
