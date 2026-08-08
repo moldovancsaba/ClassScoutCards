@@ -3501,6 +3501,49 @@ serves and the address it operates from are different facts; `neighborhoodGuess`
 **The Craft Studio's Tribeca studio had no card** until a "Brooklyn Pop-Ups" card — pop-ups being by
 definition not a fixed location, for an operator with no Brooklyn studio — was repurposed onto it.
 
+### Cluster backlog, tranche 8: seven clusters, all cards live (2026-08-08)
+
+**21 cards, every one of them at `PUBLISHED` before this pass, reduced to 8 live. Two repurposed.**
+
+| Host | Cards | Real location(s) | After |
+| --- | --- | --- | --- |
+| `riverside.com` | 3 | **none — it is podcast software** | 2 terminal, 1 repairable |
+| `musictogether.com` | 3 | none — it is the franchisor's own site | 1 terminal, 2 repairable |
+| `discoveryprograms.com` | 3 | 1: 251 W 100th St (UWS) | 1 canonical, 2 terminal |
+| `edalliance.org` | 3 | ≥2: Manny Cantor Center, 14th Street Y | 2 canonical, 1 terminal |
+| `kaufmanmusiccenter.org` | 3 | 1: 129 W 67th St | 1 canonical, 2 terminal |
+| `kingsbayy.org` | 3 | ≥4: Sheepshead Bay, N Williamsburg, Windsor Terrace, Ave W | 3 canonical |
+| `markmorrisdancegroup.org` | 3 | 1: 3 Lafayette Ave, Fort Greene | 1 canonical, 2 terminal |
+
+**`riverside.com` is the token-match bug, and it produced a new sub-shape: cross-host duplicates.** The
+host is *Riverside*, a podcast and video recording SaaS — "Riverside: HD Podcast & Video Software" is its
+own page title. Three cards were live on it, all because the first word of each business name, "Riverside",
+resolved to whatever ranks for that word. The entities are real, so per the entity-before-domain rule these
+are wrong-domain cards rather than contamination — **but two of the three duplicate a card that already
+exists, correctly sourced, on `riversidehawks.org`**, which was made canonical in tranche 7 of this same
+sweep. That makes them terminal rather than repairable: there is nothing to re-source them *to*, because
+the correctly-sourced card is already there. **The token-match bug does not only mis-source cards; it
+manufactures duplicates of correct ones on a different host** — and a per-domain sweep will never see the
+pair, because by construction they sit on different hosts. Only searching the entity finds it.
+
+**A franchisor's own site is a root-domain card with no location, one level up from a franchise.** All three
+`musictogether.com` cards sit on the franchisor's homepage, which offers a "Class Locator" and notes that
+centres worldwide are hiring. The franchisor is not a venue; NYC classes are run by independent licensed
+centres. "Citywide NYC" is terminal (names nothing); the UES and UWS cards are repairable, with the caveat
+recorded that a licensed centre teaching in rented rooms would still fail the physical-location test on its
+own merits once identified.
+
+**Two more repurposes onto flagships nobody had found.** Educational Alliance's three cards were all named
+after *programmes* ("Athletics" ×2, "Youth Programs") and not one named a centre; they became the Manny
+Cantor Center (197 East Broadway) and the 14th Street Y (344 E 14th St). Kings Bay Y had two identical North
+Williamsburg cards and one Windsor Terrace — and no card at all for its **main site** at 3495 Nostrand
+Avenue in Sheepshead Bay. The fashionable-core bias, yet again: the satellite in Williamsburg was found
+twice, the flagship in southern Brooklyn not once.
+
+**A division is not a location.** Kaufman Music Center's Lucy Moses School and Merkin Hall are parts of one
+building at 129 W 67th St; Mark Morris's "Kids" and "Student Company" cards are programmes inside 3
+Lafayette Avenue. Same rule as the programme cards, one level of organisational structure up.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -4428,3 +4471,19 @@ definition not a fixed location, for an operator with no Brooklyn studio — was
   canonical had to be retitled from scratch; and Riverside Hawks moved from "Upper West Side / Harlem" to
   Morningside Heights, where the Stone Gym actually is -- **the community a programme serves and the address
   it operates from are different facts.**
+- v101 (2026-08-08): cluster tranche 8 -- seven clusters, **21 cards, every one live at PUBLISHED before
+  this pass, down to 8**, two repurposed. **`riverside.com` is podcast/video recording SaaS** and carried
+  three live cards, another instance of the token-match source bug ("Riverside" -> whatever ranks for it) --
+  and it surfaced a NEW SUB-SHAPE: **two of the three duplicate a card that already exists, correctly
+  sourced, on `riversidehawks.org`**. The token-match bug therefore does not only mis-source cards, it
+  manufactures CROSS-HOST duplicates of correct ones -- which a per-domain sweep structurally cannot see,
+  since the pair sits on two different hosts; only searching the entity finds it. Those two are terminal
+  rather than repairable because the correctly-sourced card already exists. **`musictogether.com` is the
+  FRANCHISOR's own site** -- a root-domain card with no location, one level up from the franchise case:
+  "Citywide NYC" terminal, UES/UWS repairable pending identification of the specific licensed centre. Two
+  more repurposes onto flagships nobody had found: Educational Alliance's three programme-named cards became
+  the Manny Cantor Center and the 14th Street Y, and Kings Bay Y's duplicate North Williamsburg card became
+  its actual MAIN SITE at 3495 Nostrand Ave, Sheepshead Bay -- fashionable-core bias again, the satellite
+  found twice and the flagship not once. Also: **a division is not a location** (Kaufman's Lucy Moses School
+  and Merkin Hall are one building; Mark Morris's "Kids" and "Student Company" are programmes inside one
+  address).

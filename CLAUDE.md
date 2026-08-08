@@ -655,6 +655,25 @@ in a comment when you add one, the way the existing ports do.
   `neighborhoodGuess` is the second one.** Riverside Hawks describes itself as a Harlem community programme
   and every one of its four cards said "Upper West Side / Harlem"; the Stone Gym a child actually walks into
   is on Claremont Avenue, in Morningside Heights. Both statements are true; only one belongs in the field.
+- **The token-match source bug manufactures CROSS-HOST duplicates, which a per-domain sweep structurally
+  cannot find.** Discovered 2026-08-08 on `riverside.com` (which is *Riverside*, podcast and video recording
+  SaaS). Two of its three live cards — "Riverside Hawks" and "Riverside Hawks Youth Basketball" — duplicate
+  a card that already exists, correctly sourced, on `riversidehawks.org`. Because the pair sits on two
+  different hosts, grouping by `sourceHost` will never put them side by side however carefully it is done;
+  only searching the ENTITY finds it. Practical consequence: a token-matched card is **terminal, not
+  repairable**, whenever the correctly-sourced card already exists — there is nothing to re-source it to.
+  Check for a correctly-sourced sibling before recording a re-source target.
+- **A FRANCHISOR's own site is a root-domain card one level up from a franchise, and it is worse.**
+  `musictogether.com` is the licensing network's homepage, offering a "Class Locator"; the NYC classes are
+  run by independent licensed centres, each its own business. A franchise's root domain at least belongs to
+  a company with branches; a franchisor's belongs to a company with no venues at all. Terminal where the
+  card names no centre ("Music Together Citywide NYC"), repairable where it names a place that a specific
+  licensed centre must then be identified for — and note that a centre teaching in rented rooms would still
+  fail the physical-location test on its own merits once found.
+- **A DIVISION is not a location.** Kaufman Music Center's Lucy Moses School and Merkin Hall are parts of
+  one building at 129 W 67th St; Mark Morris's "Dance Center Kids" and "Student Company" are programmes
+  inside 3 Lafayette Avenue. Same rule as program-not-a-location, one level of organisational structure up:
+  a named school, hall, academy or company inside a single venue does not earn its own card.
 - **Cluster size alone is not evidence of a defect — a genuine multi-site operator produces a large, CORRECT
   cluster.** The necessary counterweight to the letsgobaby finding above, established the same session
   (2026-08-08). `laparks.org` carries 30 cards on a municipal `.org` domain, which looks like exactly the same
