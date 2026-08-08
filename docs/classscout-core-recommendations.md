@@ -144,6 +144,31 @@ claim** with its `sourceText`, not an assessment.
 
 ---
 
+## 0c. An LLM prompt is published as the description of 35 live businesses  [NEW, CRITICAL]
+
+**Severity: critical — internal machinery published verbatim to families, on live records.**
+
+Thirty-five live `providers` records have this as their entire public `shortDescription`:
+
+> `Extract age or grade evidence from the official program page..`
+
+That is an instruction to the enrichment pipeline. It was written into the field instead of the result of
+following it. Affected records include Brooklyn Force Soccer, Doc's NYC Lacrosse and Music Together NYC UWS.
+The trailing `..` suggests a template that was never substituted.
+
+**Recommendation.** Two changes. First, whatever writes descriptions must never persist its own instruction
+text — a guard rejecting any description matching the instruction corpus would catch this class, not just
+this string. Second, and more general: **a description write should fail closed.** If extraction produced
+nothing, the correct outcome is an empty field, not the prompt. This is the same "absence is a value, a
+placeholder is not" principle already established for `"no category"`.
+
+**Also found in the same scan, on the same collection:** 18 live records give **`311`** — New York City's
+government services line — as the provider's phone number. All 18 are NYC Parks "Kids in Motion" sites,
+where 311 is presumably what the source page lists for the Parks Department. A city switchboard is not a
+provider's contact number.
+
+---
+
 ## 1. `"no category"` reaches families as a literal `NO CATEGORY` chip
 
 **Severity: highest — this is visible on real public cards.**
