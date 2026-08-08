@@ -739,6 +739,23 @@ in a comment when you add one, the way the existing ports do.
 - **Check a record against ITSELF before opening a browser.** Ballet Tech's `address` field said "Flatiron"
   and its `neighborhood` field said "Midtown". Two fields of one record contradicting each other is a defect
   resolvable with no research at all, and it is free to look for.
+- **The `providers.phone` field has held Unix timestamps and the city switchboard.** Found 2026-08-08 in a
+  pool-wide scan: nineteen live records carried 10-digit epoch seconds (`1742850639` = 2025-03-24,
+  `1672214040` = 2022-12-28) where the phone number should be, and eighteen carried `311`, New York City's
+  government services line. All 42 undialable numbers were **cleared, never replaced** — a field a parent
+  cannot dial has no value, and inventing a substitute is worse. **Validate a phone by SHAPE, not by a
+  denylist of area codes**: strip a trailing extension first, then apply NANP structure (ten digits; neither
+  the area code nor the exchange may start 0 or 1). A blunter rule flagged `212-569-6200 ext. 2274`, which is
+  perfectly dialable.
+- **In a bulk sweep, let one rejected field fall back rather than abort the record.** The copy-quality gate
+  refused a description that decoded cleanly but still contained "skip navigation" — correctly. Aborting
+  there would have cost that record its phone and neighbourhood fixes too. The sweep now retries without the
+  copy fields and writes the reason into `reason`, so the record is improved and the remaining problem is
+  recorded rather than hidden.
+- **Draw the mechanical/manual line explicitly, and say where it falls.** Empty `neighborhood` went 399 →
+  312 because only 87 records had the answer already sitting in their own `address` field; the other 312
+  need research. Reporting "399 → 312" with that explanation is honest. Reporting "87 fixed" alone would
+  imply the rest were fine.
 - **Walk the queue to learn the defect SHAPES, then query the shapes to fix them at scale.** Established
   2026-08-08 after ten hand-worked `providers` records against a pool of 1,087 — roughly 217 batches at that
   rate. Ten records bought a catalogue of signatures; a single scan then counted every one of them across the
