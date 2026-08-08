@@ -876,6 +876,23 @@ in a comment when you add one, the way the existing ports do.
   Puppet Theater was sourced to the official Fantasy Premier League football game. Judging the domain would
   have quarantined it as contamination — the correct disposition, the wrong ground. Entity-before-domain
   showed the company is real; it is quarantined on the SECOND check, because it tours and has no venue.
+- **Query the DEFECT COHORT and work its PUBLISHED members first — oldest-first finds cards, cohort-first
+  finds live harm.** One discovery run stamped `boroughGuess: "Manhattan/Brooklyn"` on every card it made;
+  querying that value returned 219 cards, six of them PUBLISHED and visible to families. Walking the queue
+  card-by-card would have reached them after hundreds of held ones.
+- **A compound place value is often the data telling the truth, not a guessing failure.** Music To Your Home,
+  Soccer Stars and Mozart for Munchkins all carried "Multiple"/"NYC-wide" because the operator genuinely has
+  no single place — in-home teaching, rented gyms, touring. Treat a compound as a pre-screen for the
+  no-fixed-venue prohibition and for split candidates, not just a value to tidy.
+- **A token-matched card is not automatically terminal — check what is on the other end of the wrong URL.**
+  "Bubbles and Balloons NYC" (no such business) was matched to `gazillionbubbleshow.com`; the Gazillion Bubble
+  Show is real, has a permanent venue (New World Stages, 340 W 50th St) and had no card, so the record was
+  RETITLED onto it. The structurally identical "The Party Fairy NYC" went terminal because its source (the
+  FIFA World Cup 2026 host committee) is not an in-scope business.
+- **`policy_or_safety_review` can be a 403 in disguise — but it does not generalise.** TLB Music carried the
+  most serious blocker available purely because its site refuses bots. A 25-card sample of quarantined cards
+  found ZERO others with the code, so it is an outlier, not a systemic false positive. Recorded because the
+  negative result is worth as much as the finding.
 - **The `providers.phone` field has held Unix timestamps and the city switchboard.** Found 2026-08-08 in a
   pool-wide scan: nineteen live records carried 10-digit epoch seconds (`1742850639` = 2025-03-24,
   `1672214040` = 2022-12-28) where the phone number should be, and eighteen carried `311`, New York City's
