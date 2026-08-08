@@ -726,6 +726,22 @@ in a comment when you add one, the way the existing ports do.
   hosts", and the cluster scan's "199 hosts / 684 live cards" (its per-host counts capped at 25, so a
   795-card host read as "25"). The `offset` parameter added to the rows endpoint fixes this properly but is
   **inert until the branch merges**, since production deploys from `main`.
+- **The rented-venue rule is TWO-part, and the second part is "does the operator have any other card?"**
+  Sharpened 2026-08-08 by a case that cuts the opposite way from The Art Farm. Steve & Kate's Camp runs all
+  five of its NYC campuses in school buildings rented for the summer (Trevor Day ×2, the Cathedral School,
+  Brooklyn Heights Montessori, Berkeley Carroll) — textbook seasonal rental, the exact shape that got The Art
+  Farm's `/summer-camp-uws/` card retired. It was KEPT, one card per campus. The difference is not the venue
+  but the cost of retiring: The Art Farm owns 431 E 91st St and is already carded there, so its camp cards
+  were surplus; **Steve & Kate's has no venue of its own anywhere — renting campuses for the season IS the
+  business**, and retiring these removes a real operating camp from the pool. A seasonal-only operator's
+  rented campus is its real location; a year-round operator's seasonal rental is not.
+- **A vague `neighborhoodGuess` is sometimes the honest one — don't sharpen it into a lie.** Recorded
+  2026-08-08 on two cards in one pass. City Parks Foundation keeps "NYC-wide" because its office at 830 Fifth
+  Ave is not where children go and its programmes genuinely run across dozens of parks; Five Points Academy
+  keeps borough grain because 148 Lafayette St sits on the SoHo/Little Italy/Chinatown boundary and sources
+  disagree. In both, a specific value would be *less* true than the vague one. The fix for the first is a
+  per-park split, not a better guess. Sharpening borough grain is usually right — but check that a single
+  answer exists before writing one.
 - **The rented-venue test is about the PROGRAMME, not the freehold: does the operator run an ongoing
   programme at this address?** Sharpened 2026-08-08 after two clusters took opposite outcomes for the right
   reason. The Art Farm's `/summer-camp-uws/` was retired — the Calhoun School's building, rented for eight
