@@ -139,6 +139,14 @@ Frequently several share a *byte-identical* `sourceUrl`.
 
 There appears to be no dedupe on `sourceUrl` or `normalizedTitle` at card creation.
 
+**The backlog has now been measured rather than sampled.** A full-pool scan grouping every live content
+card by `sourceHost` (556 hosts, no failures) found **199 hosts carrying more than one live card, covering
+684 live cards, and 87 of those hosts have two or more cards live at `PUBLISHED` simultaneously.** So
+roughly one live card in five is part of a duplicate cluster, and the duplicates are not confined to
+unpublished records — they are on the public site. Seven of the largest clusters have since been reconciled
+by hand against each operator's own location list, which collapsed 27 live cards to 7 correct ones; at that
+ratio the remaining 192 clusters represent several hundred cards a family could currently encounter twice.
+
 **Recommendation.** Dedupe at creation on `(sourceUrl)` first — exact-URL collisions are unambiguous and
 were the largest single group. `normalizedTitle` within a `sourceHost` is a good second key.
 
@@ -222,6 +230,14 @@ Three separate kinds observed:
   **3 confirmed instances** (City Treehouse, apple seeds, and a third).
 - Scraper/pipeline metadata inside schedule fields.
 - The `"no category"` placeholder (item 1).
+- **The literal token `prospect` appended to the `title`** — **5 confirmed instances**, and this one is in
+  the field a family reads first: `"Ninja Parc Brooklyn prospect"`, `"Coney Island Gymnastics prospect"`,
+  `"Movement LIC/Brooklyn climbing prospect"`, `"Gotham Girls FC youth clinics prospect"`, `"Liberated
+  Movement Kids prospect"`. Two were `PUBLISHED` with zero blockers. This looks like "prospect" in the
+  sales/lead sense being concatenated onto the title somewhere in card assembly. A grep for titles ending
+  in ` prospect` should find the full set quickly; the fix is presumably one line at the concatenation
+  site. (Note the first of those is also misspelled — "Parc" for "Park" — which is a separate extraction
+  problem, not part of this one.)
 
 **Recommendation.** Whatever produces `"Near Manhattan priority zones"` should never write to a displayed
 field; a targeted grep for that literal string is the fastest way in. As with `"no category"`, absence
