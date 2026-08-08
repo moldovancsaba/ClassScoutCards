@@ -3592,6 +3592,36 @@ from the site's "Summer Camp" nav item — the same defect as The Canopy NYC's "
 reading **"Programs Kids Programs in Kingsbridge Bronx"**, with the word "Programs" duplicated. Only one of
 its three live cards carried the business's actual name.
 
+### Cluster backlog, tranche 10: five clusters, three repurposes into Queens (2026-08-08)
+
+**15 cards, 10 live before, 8 correct after. Three repurposed — all three onto Queens locations.**
+
+| Host | Cards | Real locations | After |
+| --- | --- | --- | --- |
+| `academyfivepoints.com` | 2 | 1: 148 Lafayette St | 1 canonical, 1 terminal |
+| `brooklynclayindustries.com` | 3 | 1: 63 Flushing Ave, **Navy Yard** | 1 canonical, 2 terminal |
+| `movementgyms.com` | 4 | 3 NYC: Gowanus, Harlem, **LIC** | 3 canonical, 1 terminal |
+| `nymaa.com` | 3 | 4: Williamsburg, Greenpoint, **Astoria**, **Little Neck** | 3 canonical |
+| `tigerstrongnyc.com` | 3 | 1: 1521 York Ave (UES) | 1 canonical, 2 terminal |
+
+**Every repurpose in this tranche went to Queens** — Movement's Long Island City gym, NYMAA's Astoria and
+Little Neck academies. None of the three had a card; the surplus cards claimed "Brooklyn" (twice) and
+"Manhattan". This is the fashionable-core bias at its clearest so far, and NYMAA is the sharpest case: an
+operator with **four** locations, none of them in Manhattan, had a live card claiming Manhattan and two
+claiming Brooklyn at borough grain.
+
+**"Navy Yard" is in the vocabulary, and the cards were still wrong twice over.** Brooklyn Clay Industries
+has been at 63 Flushing Ave in the Brooklyn Navy Yard since 1995. Its two live cards said Gowanus and
+Bushwick. The platform's Brooklyn list carries `"Navy Yard"` — so this was a correction, not a taxonomy gap.
+Worth noting because several earlier findings blamed the vocabulary; here the vocabulary was fine and the
+guess was simply wrong.
+
+**A sixth `" prospect"` token, and a deliberate non-correction.** "Five Points Academy kids programs
+prospect" brings the trailing-token count to six. Separately, Five Points Academy's canonical card was
+retitled to the business's real name but its `neighborhoodGuess` was **deliberately left at borough grain**:
+148 Lafayette St sits on the SoHo / Little Italy / Chinatown boundary and sources place it differently, so
+sharpening it would be a guess dressed as a fix. The street address went into the record instead.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -4550,3 +4580,14 @@ its three live cards carried the business's actual name.
   and were retired, the Manhattan one is repairable pending a specific site with a continuing schedule
   (noting Asphalt Green, one of its venues, is already carded in its own right). Two more broken live titles:
   a card titled simply **"Summer"** and one reading "Programs Kids Programs in Kingsbridge Bronx".
+- v103 (2026-08-08): cluster tranche 10 -- five clusters, **15 cards, 10 live before and 8 correct after,
+  three repurposed and ALL THREE INTO QUEENS**: Movement's Long Island City gym, NYMAA's Astoria and Little
+  Neck academies, none of which had a card while the surplus cards claimed "Brooklyn" twice and "Manhattan"
+  once. **NYMAA is the sharpest fashionable-core case yet** -- four real locations, none in Manhattan, and a
+  LIVE card claiming Manhattan. **Brooklyn Clay Industries corrects a myth about the taxonomy**: its cards
+  said Gowanus and Bushwick, the studio has been in the Brooklyn Navy Yard since 1995, and `"Navy Yard"` IS
+  in this platform's Brooklyn vocabulary -- the vocabulary was fine, the guess was just wrong. Sixth card
+  found carrying the trailing `" prospect"` pipeline token. One deliberate NON-correction recorded: Five
+  Points Academy's neighbourhood was left at borough grain because 148 Lafayette St sits on the
+  SoHo/Little Italy/Chinatown boundary and sources disagree -- sharpening it would be a guess dressed as a
+  fix, so the street address went into the record instead.
