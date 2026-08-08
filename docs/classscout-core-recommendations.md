@@ -179,6 +179,35 @@ location list resolved five cards in five requests.
 
 ---
 
+## 3b. An entire directory site was ingested as 795 cards — directories need to be sources, not card hosts  [NEW, HIGHEST BY VOLUME]
+
+**Severity: highest by volume — one run created 795 bad cards.**
+
+`letsgobaby.co` is Let's Go Baby, a curated directory of **family-friendly restaurants in NYC**. The run
+`content-card-backfill-2026-06-13-prod-001` turned its entire listing into content cards: **795 of them**,
+one per restaurant, bar, brewery, beer garden, steakhouse, oyster bar or cinema — Gjelina, Benihana, talea
+beer co, Queue Beer Bar, Bohemian Hall Beer Garden, Pig Beach BBQ, Nitehawk Cinema.
+
+The clearest evidence is `categoryHint`: across the cluster it holds **53 distinct values and 51 of them are
+cuisines** — American, Bakery, **Bar**, **Brewery**, Chinese, Coffee Shop, Diner, Ethiopian, Georgian, Halal,
+Ice Cream, Nepalese, Persian, Soul Food, **Steakhouse**, Sushi, Vegan. A family filtering by category would
+have been offered a brewery. None reached `PUBLISHED`, but 684 sat in `DISCOVERED` with the pipeline working
+toward publishing them.
+
+**Recommendation.** This is a source-classification gap, not a per-card one. Discovery needs a notion of a
+host that is a **candidate source** rather than a **card source**: somewhere to find real businesses worth
+investigating, whose own pages never become cards directly. Let's Go Baby is genuinely useful in that role —
+it is a curated list of NYC venues that welcome children. It is simply not a list of children's activities.
+A first cut could be as simple as a host allow/deny list feeding card creation, plus a guard that refuses to
+create a card whose `categoryHint` is outside the platform's own activity vocabulary — "Brewery" and
+"Steakhouse" are not values this product should ever store.
+
+**Related:** 11 cards in this cluster have the literal token `: family_service_review_required` appended to
+their public `title` (the `kind: "repair"` cards), and several are titled just "Brooklyn" or "Manhattan".
+See items 5 and 6.
+
+---
+
 ## 4. Aggregator and directory index pages are scraped as if they were single businesses
 
 **Severity: high — the resulting card describes no real entity.**

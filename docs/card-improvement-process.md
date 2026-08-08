@@ -3262,6 +3262,69 @@ over-represented. Same direction every time.
 
 **Remaining backlog: 186 clustered hosts, 74 with 2+ published cards.**
 
+### The letsgobaby.co cluster: 795 restaurants ingested as children's activity cards (2026-08-08)
+
+**The largest single defect found in this repo's history, by an order of magnitude.** `letsgobaby.co` is
+Let's Go Baby, a directory of **family-friendly restaurants in NYC** — that is its own strapline. One
+backfill run, `content-card-backfill-2026-06-13-prod-001`, turned its entire listing into content cards:
+**795 of them**, one per restaurant, bar, brewery, beer garden, steakhouse, oyster bar or cinema. Gjelina,
+Benihana, Café Mogador, talea beer co, Queue Beer Bar, Bohemian Hall Beer Garden, Pig Beach BBQ, Nitehawk
+Cinema.
+
+The `categoryHint` field is the giveaway and the proof at once. Across the cluster it holds **53 distinct
+values, and 51 of them are cuisines**: American, Bakery, **Bar**, **Brewery**, Caribbean, Chinese, Coffee
+Shop, Creole, Diner, Ethiopian, Georgian, Halal, Ice Cream, Nepalese, Palestinian, Persian, Soul Food,
+**Steakhouse**, Sushi, Ukrainian, Vegan. A family filtering this platform by category would have been
+offered a brewery. The only two non-cuisine values, "Birthday Parties" and "Drop-In Activities", sit on
+taverns and a beer garden.
+
+**Owner directive, 2026-08-08, and it is the right frame:** *"Let's Go Baby is a directory and we can use it
+as source for family activities as a discovery source instead of a content card."* The site is genuinely
+useful — it is a curated list of places in NYC that welcome children — but its use is as a **place to look
+for candidates**, not as a host whose pages become cards. A restaurant is not a children's activity, class,
+camp or programme, however welcome children are there.
+
+Disposition: **`BLOCKED_TERMINAL` for all 795**, not a per-card quarantine. The defect is structural to the
+source — every page on this host is a restaurant, so there is no per-card fix and no re-research that
+changes the answer. This follows the Psychology Today search-page precedent, applied at cluster scale. 784
+were retired in this pass (695 in the first bulk run, 89 more in the loop below); the 11 that an earlier
+pass had already retired had **empty `terminalReason` fields**, and were backfilled so the whole cluster
+carries the same explanation.
+
+**None of the 795 was ever `PUBLISHED`** — so no family saw a brewery on a card. But 684 sat in `DISCOVERED`,
+which is to say the pipeline was actively working toward publishing them.
+
+#### The methodological correction: partition-based enumeration silently UNDERCOUNTS
+
+This is the important part for anyone using the read-only enumeration technique from the reference-host
+audit. **Every count produced that way is a lower bound, because any partition that returns exactly 25 rows
+has hit the `limit` cap and has been silently truncated.**
+
+Enumerating this cluster took four levels of partitioning — `state`, then `× boroughGuess`, then
+`× neighborhoodGuess`, then `× categoryHint` — and reported **706 cards with zero remaining capped
+partitions**, which read as complete. It was not: retiring those 706 and re-querying returned **25 more**,
+and it took **four further rounds of loop-until-nothing-new to reach 795**. Partitioning tells you a
+cluster is *at least* this big. Only the seen-set loop tells you it is empty.
+
+Two figures already recorded in this document are therefore lower bounds and should be read that way:
+- the reference-host audit's "**980 distinct cards, 557 distinct hosts**";
+- the cluster scan's "**199 hosts, 684 live cards**" — its per-host counts were capped at 25, so
+  `laparks.org` and `letsgobaby.co` both read as "25" when one of them was 795.
+
+The fix in the bridge already exists — `offset` was added to the rows endpoint for exactly this — but it is
+**inert until the branch merges**, because production deploys from `main`. Until then, partition to find
+clusters, and **loop-until-nothing-new to finish them**.
+
+#### Two other defects visible in the same cluster
+
+- **Internal pipeline jargon in the title, 11 instances**: `"casa restaurant: family_service_review_required"`,
+  `"nitehawk cinema: family_service_review_required"`, and nine more. The `kind: "repair"` cards append a
+  machine token to the public title. This is the same family as the trailing `" prospect"` token, in the same
+  field.
+- **Single-word garbage titles**: several cards are titled just `"Brooklyn"` or `"Manhattan"` —
+  `letsgobaby.co/location/franklin-park` became a card called "Brooklyn", and
+  `/location/docks-oyster-bar-midtown-east` became one called "Manhattan".
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -4110,3 +4173,20 @@ over-represented. Same direction every time.
   shallowest of four, the other three being programme pages under the same `/westside/` branch); and the
   fashionable-core bias again, twice (Fit4Dance's Flatbush studio labelled Crown Heights on all four cards;
   Physique's two Bronx pools uncarded until now). Remaining: 186 clustered hosts, 74 with 2+ published.
+- v96 (2026-08-08): **the letsgobaby.co cluster -- 795 restaurants ingested as children's activity cards**,
+  the largest single defect found in this repo's history. Let's Go Baby is a directory of family-friendly
+  NYC restaurants; one backfill run turned its whole listing into content cards, with the CUISINE in
+  `categoryHint` -- 51 of its 53 distinct values are cuisines, including Bar, Brewery, Steakhouse and Diner.
+  None was ever PUBLISHED, but 684 sat in DISCOVERED with the pipeline working toward publishing them. All
+  795 set to `BLOCKED_TERMINAL` (structural to the source, per the Psychology Today precedent), including 11
+  earlier terminals whose `terminalReason` was empty and has been backfilled. Owner directive framing the
+  outcome: **the site should be registered as a DISCOVERY SOURCE, a place to look for candidates, not a host
+  whose pages become cards.** **Methodological correction, and it matters for every count in this document:
+  partition-based enumeration silently UNDERCOUNTS.** Four levels of partitioning (state x borough x
+  neighbourhood x category) reported 706 cards with zero capped partitions -- which read as complete, and was
+  not; retiring those and re-querying returned 25 more, and four further loop-until-nothing-new rounds were
+  needed to reach 795. Any partition returning exactly 25 rows has hit the limit cap and been truncated. The
+  reference-host audit's "980 cards / 557 hosts" and the cluster scan's "199 hosts / 684 live cards" are both
+  LOWER BOUNDS for this reason. Partition to find clusters; loop-until-nothing-new to finish them. Also
+  visible in the same cluster: 11 titles ending in the literal token `: family_service_review_required`, and
+  several cards titled just "Brooklyn" or "Manhattan". See "The letsgobaby.co cluster" above.
