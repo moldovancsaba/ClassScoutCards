@@ -782,6 +782,23 @@ in a comment when you add one, the way the existing ports do.
   mechanical test nobody has run.** Breakaway Hoops had two records with an identical name and the numbers
   `6467762021` and `646-776-2021`. Comparing phones normalised to digits would find this whole class of
   duplicate across the pool with no research at all.
+- **Group live providers on the phone number NORMALISED TO DIGITS — it is the cheapest duplicate test there
+  is, and a third of the catalogue fails it.** 99 clusters covering **350 of 1,045 live records**. It finds
+  three things nothing else does: punctuation-only duplicates (`6467762021` vs `646-776-2021`), ID-truncation
+  duplicates (byte-identical names sharing a trailing hash, one id cut mid-word), and — dominant by far — the
+  **program-not-a-location defect at scale**. 102 live records name 50 YMCA branches, and they are not
+  branches but individual classes ("Prospect Park YMCA — Preschool Stage 1 Water Acclimation"). **Do not
+  sweep these**: retiring a branch's class cards removes that branch from the pool unless a venue card exists
+  first, and for most it does not. The fix is build-then-retire, not hide.
+- **Two clubs with confusingly similar names can BOTH be real, and merging on name similarity would destroy
+  one.** Brooklyn Fencing Center (600 Degraw St, Carroll Gardens) and Brooklyn Bridge Fencing Club (295 Front
+  St, DUMBO) are separate businesses. Each had a duplicate record, and **all three stored neighbourhoods
+  across them were wrong**. Same caution already recorded for United Soccer Academy / Brooklyn United, now
+  seen from the other direction — there the shared name hid two businesses, here it invited a wrong merge.
+- **When choosing which duplicate to keep, "right" beats "richer".** The usual tie-break is the record with
+  more populated fields, but Brooklyn Bridge Fencing Club's fuller record said Downtown Brooklyn and the
+  thinner one said DUMBO, which is correct. Keeping the fuller record would have preserved more fields and
+  the wrong location.
 - **The `providers.phone` field has held Unix timestamps and the city switchboard.** Found 2026-08-08 in a
   pool-wide scan: nineteen live records carried 10-digit epoch seconds (`1742850639` = 2025-03-24,
   `1672214040` = 2022-12-28) where the phone number should be, and eighteen carried `311`, New York City's
