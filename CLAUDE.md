@@ -128,6 +128,12 @@ what took its place.**
 
 ## The main `classscout` repo is READ-ONLY (owner directive, 2026-08-07)
 
+**The accumulated recommendations for that repo now live in one place: `docs/classscout-core-recommendations.md`.**
+Ten items, ordered by family impact, each with what was observed, how often, and what the bridge could and
+could not do about it — plus two negative controls ("looks like a defect, isn't") that cost real
+investigation time each. Add to that file rather than scattering new core-app findings through the SOP.
+
+
 **Every commit and push you make belongs in THIS repo (`classscoutcards`), never in the main
 `classscout` repo.** You may read `classscout`'s source to understand the real schema/business logic
 you're porting or to research a bug's root cause (exactly what the "ported, not imported" table below
