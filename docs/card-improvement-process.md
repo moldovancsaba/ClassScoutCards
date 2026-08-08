@@ -2601,6 +2601,28 @@ case in two batches (after the YMCA Park Slope mashup) where a card covering N r
 `POST /split` because all N children already existed independently. **Check for existing children before
 reaching for the split tool** — the expensive operation is often unnecessary.
 
+### Batch 39/10 (cards 388-397)
+
+4 stale `low_source_trust` blockers cleared (Sweat FC, Brooklyn Children's Theatre, Team Diamondheart,
+Prospect Park Track Club) and 6 already-correct cards touched (Creative Art Works, Private Picassos,
+Brooklyn Italians SC, Cynthia King Dance Studio, SkateYogi, Manhattan Youth After-School Programs).
+
+**The batch-35 amendment earned its keep on its first real use.** Sweat FC is a real Brooklyn youth soccer
+club (est. 2017, ages 2–13, real venues at Park Slope, Carroll Gardens, Pier 5, Williamsburg, East
+Flatbush) — but its card is sourced to `prospectplaces.com`, a third-party local site rather than
+`sweatfc.com`. That is exactly the "real entity, weaker source" shape that in batch 29 led to a
+`BLOCKED_REPAIRABLE` + re-source plan, which batch 35 then had to reverse because a correctly-sourced
+sibling already existed. So this time the `normalizedTitle` lookup was run **first**: no correctly-sourced
+sibling exists, so this genuinely is a re-source opportunity rather than a duplicate, and the note recorded
+in `terminalReason` says so with the check named. One extra query, and the conclusion is now defensible
+rather than a guess.
+
+Also worth noting: three cards in this batch are the surviving halves of earlier cleanups — Brooklyn
+Italians SC (whose internal seed card was terminal-ed in batch 27) and Manhattan Youth After-School
+Programs (whose bare umbrella card was terminal-ed in batch 34) both came through the queue intact and
+correct. **The cleanups are landing the right way round: the real cards survive and the synthetic or
+umbrella ones are the ones that disappeared.**
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -3251,3 +3273,12 @@ reaching for the split tool** — the expensive operation is often unnecessary.
   consecutive batch where a multi-location mashup resolved by DELETION rather than `POST /split`, because
   the children already existed: check for existing children before reaching for the split tool.
   See "Batch 38/10..." above.
+- v84 (2026-08-07): batch 39/10 (cards 388-397) complete. 4 stale `low_source_trust` blockers cleared, 6
+  already-correct cards touched. First real use of the batch-35 amendment: Sweat FC is a real Brooklyn club
+  sourced to a third-party site (`prospectplaces.com` rather than `sweatfc.com`) -- the same "real entity,
+  weaker source" shape that caused the batch-29/35 reversal -- so the `normalizedTitle` lookup was run
+  BEFORE concluding, confirmed no correctly-sourced sibling exists, and the finding was recorded as a
+  genuine re-source opportunity rather than a duplicate. Also a useful confirmation that earlier cleanups
+  landed correctly: Brooklyn Italians SC (seed card terminal-ed in b27) and Manhattan Youth After-School
+  Programs (umbrella terminal-ed in b34) both surfaced intact and correct -- the real cards survived and
+  the synthetic/umbrella ones are what disappeared. See "Batch 39/10..." above.
