@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { parseSourceUrl, validateWriteRequest } from "./cardBridgeWrite";
+import { computeContentCardIdentity } from "./cardBridgeSplit";
 
 const validProviderBody = {
   collection: "providers",
@@ -369,5 +370,45 @@ describe("parseSourceUrl", () => {
     expect(parseSourceUrl("http://example.com")).toBeNull();
     expect(parseSourceUrl("not a url")).toBeNull();
     expect(parseSourceUrl("https://localhost/x")).toBeNull();
+  });
+});
+
+describe("content-card fingerprint stays in step with its basis fields (PR review, 2026-08-08)", () => {
+  // `applyCardBridgeWrite` needs a live DB, which this repo does not mock (a known, pre-existing gap
+  // documented in CLAUDE.md). What CAN be tested purely is the invariant the fix rests on: the
+  // fingerprint really is a function of exactly these five fields, so editing any of them through the
+  // bridge genuinely does invalidate a stored fingerprint. If this ever stops holding, the recompute in
+  // applyCardBridgeWrite is either incomplete or unnecessary, and this test says which.
+  const base = {
+    title: "Ferox Ninja Park Greenpoint",
+    sourceUrl: "https://feroxathletics.com/ninja-park/",
+    categoryHint: "Indoor Play",
+    boroughGuess: "Brooklyn",
+    neighborhoodGuess: "Greenpoint",
+  };
+
+  it("is stable for identical input", () => {
+    expect(computeContentCardIdentity(base).fingerprint).toBe(computeContentCardIdentity(base).fingerprint);
+  });
+
+  it("changes when ANY of the five basis fields changes", () => {
+    const original = computeContentCardIdentity(base).fingerprint;
+    const variants: Array<[string, typeof base]> = [
+      ["title", { ...base, title: "Ferox Ninja Playground DUMBO" }],
+      ["sourceUrl", { ...base, sourceUrl: "https://feroxathletics.com/playground/" }],
+      ["categoryHint", { ...base, categoryHint: "Sports" }],
+      ["boroughGuess", { ...base, boroughGuess: "Manhattan" }],
+      ["neighborhoodGuess", { ...base, neighborhoodGuess: "DUMBO" }],
+    ];
+    for (const [field, variant] of variants) {
+      expect(computeContentCardIdentity(variant).fingerprint, `${field} must affect the fingerprint`).not.toBe(original);
+    }
+  });
+
+  it("derives contentCardId from the fingerprint, which is why the id is deliberately left stale", () => {
+    // Recomputing the id would be a primary-key change, i.e. a delete-and-recreate. The dedupe index is
+    // {fingerprint, kind}, so the fingerprint is the part that has to stay honest.
+    const identity = computeContentCardIdentity(base);
+    expect(identity.contentCardId).toBe(`cc-${identity.fingerprint}`);
   });
 });

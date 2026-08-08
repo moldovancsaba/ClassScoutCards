@@ -10,6 +10,7 @@ import {
 } from "@/lib/delivery/cardBridgeRegistry";
 import { validateCopyQuality } from "@/lib/validation/copyQuality";
 import { alignActivityTypes, NO_CATEGORY_PLACEHOLDER } from "@/lib/delivery/activityAlignment";
+import { computeContentCardIdentity } from "@/lib/delivery/cardBridgeSplit";
 import { buildFamilyServicePlaceFact, buildFamilyServiceReviewPacket, isPublicStatus, normalizeFamilyServiceLead, reviewPacketEligible } from "@/lib/familyServices/core";
 import { FAMILY_SERVICE_LEAD_STATUSES, type FamilyServiceLead } from "@/lib/familyServices/types";
 
@@ -34,6 +35,11 @@ export type WriteValidationResult =
   | { ok: false; status: 400; error: string };
 
 const MIN_REASON_LENGTH = 5;
+
+/** The exact fields `computeContentCardIdentity` hashes into a content card's `fingerprint`. Every one
+ *  of them is writable through this bridge, so a change to any of them makes the stored fingerprint
+ *  stale — see the recompute in `applyCardBridgeWrite` for why that matters. */
+const FINGERPRINT_BASIS_FIELDS = ["title", "sourceUrl", "categoryHint", "boroughGuess", "neighborhoodGuess"] as const;
 
 /**
  * Parses a candidate `contentCards.sourceUrl` and returns its canonical host, or null if the value is
@@ -322,6 +328,54 @@ export async function applyCardBridgeWrite(request: NormalizedWriteRequest): Pro
     derivedSourceHost = parseSourceUrl(request.updates.sourceUrl)?.host;
   }
 
+  // (2026-08-08, from PR review) `fingerprint` is a hash of title + sourceUrl + categoryHint +
+  // boroughGuess + neighborhoodGuess, and the real collection's unique index is {fingerprint, kind} --
+  // that index, not contentCardId, is what stops discovery re-inserting a card it has already seen.
+  // Every one of those five basis fields is writable through this bridge, so ANY of them changing
+  // leaves the stored fingerprint describing a card that no longer exists: discovery re-encounters the
+  // corrected page, computes a different hash, matches nothing, and inserts a duplicate. Re-sourcing
+  // made this easy to notice, but it was already true of the other four fields before sourceUrl became
+  // writable -- so the fix is keyed on the basis as a whole, not on sourceUrl.
+  //
+  // `contentCardId` is deliberately NOT recomputed even though it is literally `cc-${fingerprint}`.
+  // It is the document's primary key and is referenced from the audit log and from anything that has
+  // already linked to this card; changing it would be a delete-and-recreate, which this bridge does not
+  // do (its only insert path is POST /split, with its own safety rails). The dedupe invariant lives on
+  // the index, and the index is on {fingerprint, kind}, so keeping the fingerprint honest is what
+  // actually matters. The consequence -- an id whose hash suffix no longer matches its own fingerprint
+  // -- is cosmetic and is recorded here so nobody "fixes" it later by mutating the key.
+  let derivedIdentity: { fingerprint: string; normalizedTitle: string } | undefined;
+  if (request.collection === "contentCards" && FINGERPRINT_BASIS_FIELDS.some((field) => field in request.updates)) {
+    const pick = (field: string) => String((request.updates[field] ?? current[field] ?? "") as string);
+    const identity = computeContentCardIdentity({
+      title: pick("title"),
+      sourceUrl: pick("sourceUrl"),
+      categoryHint: pick("categoryHint"),
+      boroughGuess: pick("boroughGuess"),
+      neighborhoodGuess: pick("neighborhoodGuess"),
+    });
+    if (identity.fingerprint !== current.fingerprint) {
+      // A collision here is not a hash accident: it means another card already carries exactly the
+      // identity this edit is moving toward, i.e. the two records are the same card. Surfacing that as
+      // a blocked write is strictly better than letting the unique index reject the update with a
+      // driver-level error, and better than silently skipping the recompute and leaving the index
+      // stale. The reviewer's own duplicate-on-re-source scenario ends here instead of in the data.
+      const clash = await collection.findOne({ fingerprint: identity.fingerprint, kind: current.kind ?? "content" });
+      if (clash && clash[config.idField] !== request.id) {
+        return {
+          found: true,
+          dryRun: request.dryRun,
+          touch: request.touch,
+          collection: request.collection,
+          id: request.id,
+          before,
+          blockedReason: `This edit would give ${request.id} the same {fingerprint, kind} as the existing card ${String(clash[config.idField])} — they would be the same card, and the collection's unique index would reject the write. Reconcile the two records first (keep one as canonical, mark the other BLOCKED_TERMINAL as a duplicate) rather than editing this one into a collision.`,
+        };
+      }
+      derivedIdentity = { fingerprint: identity.fingerprint, normalizedTitle: identity.normalizedTitle };
+    }
+  }
+
   let activityAlignment: ReturnType<typeof alignActivityTypes> | undefined;
   if (request.collection === "providers" && ("activityTypes" in request.updates || "primaryActivityType" in request.updates)) {
     const candidateActivityTypes = (request.updates.activityTypes as string[] | undefined) ?? (current.activityTypes as string[] | undefined) ?? [];
@@ -338,7 +392,10 @@ export async function applyCardBridgeWrite(request: NormalizedWriteRequest): Pro
     const alignmentExtra = activityAlignment
       ? { activityTypes: activityAlignment.activityTypes, primaryActivityType: activityAlignment.primaryActivityType, activityTypesDropped: activityAlignment.dropped }
       : {};
-    const sourceHostExtra = derivedSourceHost ? { sourceHost: derivedSourceHost } : {};
+    const sourceHostExtra = {
+      ...(derivedSourceHost ? { sourceHost: derivedSourceHost } : {}),
+      ...(derivedIdentity ?? {}),
+    };
     return {
       found: true,
       dryRun: true,
@@ -390,6 +447,13 @@ export async function applyCardBridgeWrite(request: NormalizedWriteRequest): Pro
   // Keep sourceHost in lockstep with sourceUrl (see parseSourceUrl). Never taken from the caller.
   if (derivedSourceHost) {
     finalUpdates.sourceHost = derivedSourceHost;
+  }
+
+  // Keep {fingerprint, kind} — the collection's real dedupe index — honest whenever a basis field
+  // changes. See the derivation above for why contentCardId is left alone.
+  if (derivedIdentity) {
+    finalUpdates.fingerprint = derivedIdentity.fingerprint;
+    finalUpdates.normalizedTitle = derivedIdentity.normalizedTitle;
   }
 
   const auditId = randomUUID();
