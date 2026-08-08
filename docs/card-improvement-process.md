@@ -6205,3 +6205,50 @@ only place it can go.
   false positives that were correctly not acted on — "Multi-activity summer camp" in a description is
   ordinary English, not the banned category value. The placeholder rules apply to CATEGORY FIELDS, not to
   prose.
+
+- v137 (2026-08-08): **oldest-first resumed, 12 cards, and the batch's biggest find came from a cohort
+  query rather than the queue.** With the 562 `source_seed` stubs retired, the oldest end of the queue
+  finally surfaces real cards. Ten worked from the queue, two from a follow-up query.
+
+  | card | outcome |
+  | --- | --- |
+  | CodeWizardsHQ NYC | QUARANTINED — online-only |
+  | Baby Buggy | QUARANTINED — goods charity, not an activity |
+  | SocRoc Soccer | BLOCKED_TERMINAL — fourth card of an already-ruled entity |
+  | L.A. Equestrian Center | re-sourced off a hijacked domain + region set |
+  | Camp Hollywoodland, Griffith Park Boys' Camp | LA region set from confirmed addresses |
+  | Camp Seely | `needs_human` — outside the LA region taxonomy |
+  | Center for Italian Modern Art | re-sourced from a news article to its own site |
+  | Brooklyn Bridge Park Conservancy | compound neighbourhood resolved; false-premise blocker cleared |
+  | STEM From Dance | located, blockers cleared, split candidate recorded |
+  | **Mail Online** | **QUARANTINED — the Daily Mail, PUBLISHED as a Bronx birthday-party listing** |
+  | Kallpachay Spanish Immersion | re-sourced off a directory browse page; venue question recorded |
+
+  **The worst card in the batch was not in the queue.** Noticing that CodeWizardsHQ's `neighborhoodGuess`
+  read `"Online / NYC"` prompted a query for place fields containing online/virtual/remote — three hits, one
+  of which was **`"Mail Online"`, sourced to `dailymail.co.uk/home/index.html`, `PUBLISHED`, `categoryHint:
+  "Birthday Parties"`, `boroughGuess: "Bronx"`, `neighborhoodGuess: "Baychester"`, zero blockers, and graded
+  `sourceAuthorityGrade: "authoritative"`.** A family browsing birthday parties in Baychester was being
+  shown a British newspaper. The authority grade is the tell worth remembering: it is a judgement about the
+  PUBLISHER, and the Daily Mail genuinely is an authoritative publisher — it says nothing about whether the
+  entity runs children's parties. **Walk the queue to learn a shape, then query the shape** — again the
+  method that finds live harm fastest, and again a `PUBLISHED` card with no blocker.
+
+  Four findings worth carrying forward:
+
+  1. **The out-of-market taxonomy gap is now confirmed on the LA side, not just NYC.** Camp Seely is a City
+     of Los Angeles-operated camp physically at 250 Highway 138, Crestline CA — San Bernardino Mountains,
+     4,200ft, **65 miles from Los Angeles**. Every LA region value would be wrong by 65 miles. Previously
+     this gap had five NYC-side confirmations (Fort Lee NJ, Huntington LI, Westchester/New Canaan, Long
+     Island, Goldfish's LI schools); it is not an NYC quirk, it is a schema gap in both tenants.
+  2. **A third confirmed domain hijack**: `la-equestriancenter.com` now serves "QQMacan", an Indonesian
+     online-gambling site, while the Los Angeles Equestrian Center operates normally at 480 W Riverside Dr,
+     Burbank on `thelaec.com`. Entity-before-domain is what saved it — judging the domain would have
+     quarantined Southern California's largest equestrian centre.
+  3. **A REBRAND is a distinct staleness pattern from a closure.** `babybuggy.org` now serves
+     Good+Foundation: the organisation still exists, under a different name, and its own description makes
+     clear it distributes goods through warehouses rather than running activities. The card was quarantined
+     for the second fact, not the first — but the stale NAME is its own signal worth checking for.
+  4. **`sourceAuthorityGrade: "authoritative"` is not evidence the card is real.** It grades the publisher,
+     not the match between publisher and entity. It has now appeared on two confirmed contamination cases
+     (a token-matched Wikipedia card, and the Daily Mail).
