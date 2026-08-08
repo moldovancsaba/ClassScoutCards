@@ -1149,6 +1149,43 @@ agent) knows this one still needs the place_id resolved rather than assuming it'
 The no-fabrication rule cuts both ways: don't invent a fix, but don't silently pass over uncertainty
 either — write it down.
 
+## `"Manhattan/Brooklyn"` + `"Multiple"` is not a reliable signal either way — verify each instance independently (found 2026-08-08)
+
+Cards 15-20 of this run kept surfacing the exact same `boroughGuess: "Manhattan/Brooklyn"` /
+`neighborhoodGuess: "Multiple"` pair, all from the same `content-card-backfill-2026-06-18` batch. At
+first this looked like it might be a hardcoded fallback default — but verification went both ways:
+NORY and Lil' Kickers genuinely do have real, confirmed multi-borough locations (left unchanged), while
+NY Gauchos (really Bronx-only, Mott Haven) and NYC Cyclones (really Manhattan-only, Chelsea) had the
+exact same pair applied despite being real single-location entities. **The lesson isn't "this value is
+always wrong" — it's that a suspiciously repeated exact-same pair across several consecutive cards is
+worth checking each one independently rather than assuming they're all fine (because a real one showed
+up first) or all wrong (because a fake one showed up first).** Confirm per-card, every time, regardless
+of pattern-matching against neighbors in the same batch.
+
+## Wrong-source contamination with no real underlying entity found, twice more (found 2026-08-08)
+
+Two more confirmed instances of "the sourceUrl points to a real, unrelated big-name entity that happens
+to share a word with the card's title, and no real distinct organization with that title could be found
+despite searching": `cc-0b06c1cae0b5c90ddda217a7` ("Eleven United NYC" → elevenmadisonpark.com, a famous
+restaurant) and `cc-18c64b345e0c779dea03eee2` ("SABA NYC Basketball" → nba.com/knicks, the NBA's own
+team page). Both quarantined the same way as the earlier unsalvageable cases this session — cleared the
+fabricated location fields, named the wrong source and the fact that no real alternative was found. A
+third case in the same batch (`cc-71a4f103f99480cee821955b`, "The Jam Cats" → thejamcats.com, an
+unrelated cover band) DID have a real alternative found (`thejamcatsmusic.com`) but with unconfirmed NYC
+presence — worth remembering these aren't always the same outcome: sometimes a real alt-org exists to
+recommend, sometimes none does, and the write-up should say which case it is rather than treating "wrong
+source" as a single uniform finding.
+
+## A real entity can be genuinely wrong-kind for reasons other than off-topic content (found 2026-08-08)
+
+`cc-156b062b211b517cf9901dbc` ("The Mom Club") was a real, genuine organization — but a national,
+digital-first online community for mothers, not a local NYC children's activity at all, with a
+fabricated NYC borough on top. Distinct from the school-team out-of-scope pattern (also found this
+batch, "Park Slope Baseball") and distinct from off-topic contamination (the content is real and on-topic
+for *parents*, just not for a children's-activity catalog, and not local to begin with). **Recommend
+checking new discoveries against both "is this real" and "is this the kind of thing this catalog is
+for" independently** — a real, legitimate, well-run organization can still fail the second test.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -1424,3 +1461,14 @@ either — write it down.
   the discipline of saying "not confirmed" and leaving a field alone rather than guessing either
   direction, when independent verification is genuinely inconclusive (Kano Martial Arts's Brooklyn claim,
   which could not be confirmed OR refuted with the tools available).
+- v36 (2026-08-08): cards 11-20 of the second mass-enrichment run. Two more wrong-borough hallucinations
+  confirmed and fixed (NY Gauchos: fabricated "Manhattan/Brooklyn" → really Bronx-only, Mott Haven; City
+  Ice Pavilion: fabricated "Brooklyn/Queens" hedge → really Queens-only, Long Island City), alongside two
+  cards where the exact same suspicious `"Manhattan/Brooklyn"`/`"Multiple"` pair turned out to be
+  genuinely accurate (NORY, Lil' Kickers) — the pair itself isn't a reliable tell either way, verify each
+  instance. Two more confirmed wrong-source-no-real-org-found cases (Eleven United NYC → a restaurant;
+  SABA NYC Basketball → the NBA's own Knicks page), a third wrong-source case with a real alternative
+  found but unconfirmed NYC presence (The Jam Cats), and a new wrong-kind variant: a real entity that's
+  simply not the kind of thing this catalog is for (The Mom Club — a national parent community, not a
+  local kids' activity) alongside another aggregator/directory-as-single-entity case (a NYC government
+  press release about a citywide summer-activities portal, not a bookable activity).
