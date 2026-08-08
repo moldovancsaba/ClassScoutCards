@@ -5938,3 +5938,30 @@ only place it can go.
   venue — none of the seven does — but whether children attend **identified physical sites**. NYCFC runs real
   programmes at real partner facilities and simply names none on the card; that is repairable. A clown who
   comes to your house is not.
+- v132 (2026-08-08): **the duplicate-`sourceUrl` cohort — 139 exact duplicates retired, and the query splits
+  three ways rather than one.** This is the loop improvement earned by three duplicate PAIRS being split
+  between different cohorts across two batches: one copy found by the parked cohort, the other by the
+  oldest-first queue. Neither method alone caught any of them.
+
+  Grouping all 2,581 maintainable cards by `sourceUrl` found **258 shared URLs covering 690 cards, 183
+  involving a PUBLISHED card**. The critical refinement is that **a shared source is not evidence of
+  duplication** — it splits into three cases that need opposite treatment:
+
+  1. **Same title, same source → a true duplicate.** 119 groups, 270 records, **139 retirable**. No judgement:
+     "Dribbl Brooklyn" twice, "Dodge YMCA" twice, "Prospect Park YMCA Youth Sports & Swim" twice. Acted on.
+  2. **Different real locations, one ROOT domain → the root-domain defect, NOT duplication.** NY Kids Club's
+     Brooklyn Heights, Chelsea, Park Slope and Upper West Side cards all sit on `nypreschoolandkidsclub.com`;
+     Soccer Stars has eight and Dribbl eight. These are separate real branches that need re-sourcing to their
+     own per-location pages. **Retiring them would delete real businesses.** Left alone.
+  3. **Different businesses, one DIRECTORY page → real entity, bad source.** Eight cards share
+     `brooklynbridgeparents.com/listing-camps/summer-camps` and each names a DIFFERENT real operator — Noel
+     Pointer Foundation, Pixie Pods, Two By Two Childcare Academy. Each needs re-sourcing to its own site.
+     Also left alone.
+
+  Keep-selection for tier 1 is mechanical — most-exposed state first, then the record with more populated
+  fields — so no card was chosen by taste.
+
+  **The general lesson, which cost three missed pairs to learn:** a duplicate detector finds only the pairs
+  its key can see. Normalised phone found punctuation and ID-truncation duplicates; shared `sourceHost` found
+  cross-title clusters; shared `sourceUrl` finds exact re-creations. Each finds pairs the others structurally
+  cannot, so running one and stopping produces a confidently incomplete answer.
