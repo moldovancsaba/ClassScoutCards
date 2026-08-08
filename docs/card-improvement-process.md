@@ -5801,3 +5801,38 @@ only place it can go.
   least one of those (TLB Music) was confirmed to be a bot-block misread as a safety concern, this is now a
   real open question rather than a closed one. **A 25-card sample is not a census, and this document should
   say which it is every time.**
+- v128 (2026-08-08): **oldest-first restored as the selection rule (owner directive), across ALL maintainable
+  states — published and draft alike. 93 cards actioned.** Selection is now: pull the oldest `updatedAt` from
+  every maintainable state and merge; state affects nothing but tie-breaking. Cohort queries stay, but as a
+  loop IMPROVEMENT discovered while walking the queue, never as the selection rule.
+
+  **Three new cohorts, each found by noticing a shape in an oldest-first batch and then querying it.**
+  - **`boroughGuess: "Long Island"` — 58 cards, all actioned.** These are SELF-EVIDENCING: the card declares
+    its own out-of-market status in a field that only accepts boroughs. Every neighbourhood value is
+    unambiguously Nassau or Suffolk (Rockville Centre, Port Jefferson, Garden City, Hempstead, Levittown,
+    Wheatley Heights), and a check for any title naming a New York City place returned **zero**, so none was
+    a mislabelled Brooklyn or Queens business. Quarantined as out-of-market. **This is now the largest single
+    piece of evidence for the unactioned taxonomy recommendation**: these are real, often excellent operators
+    — Long Island Children's Museum, Usdan Summer Camp for the Arts, Hofstra Summer Camps — excluded purely
+    because there is no way to express "real, nearby, serves NYC families, outside the five boroughs".
+  - **`neighborhoodGuess` repeating `boroughGuess` — 403 cards, 89 PUBLISHED.** A new defect shape: "Manhattan"
+    /"Manhattan", "Brooklyn"/"Brooklyn". It passes every validator including today's compound rule, because it
+    is a single legitimate place name — and it still answers nothing a family did not already know. Where a
+    real neighbourhood exists it can be corrected (Third Street Music School → East Village, from its own
+    235 E 11th St); where it does not, the honest fix is to CLEAR it, because false precision is worse than
+    an empty field (Brooklyn Lacrosse Club plays on public fields and names no home venue).
+  - **Franchisor location-finder pages — 12 cards, 3 PUBLISHED, all terminated.** Two turned up in one batch
+    (My Gym, The Little Gym), which suggested the crawler treats a location FINDER as a location; scanning all
+    2,636 maintainable cards confirmed 12, including Tiger Schulmann's, Code Ninjas and YMCA of Metropolitan
+    LA. **One card was deliberately excluded**: `britishswimschool.com/manhattan/our-locations/` is a single
+    franchise's own pool list, not the franchisor's index. The distinction is whose locations the page lists —
+    a franchisor's index spans separate companies; a franchise's own page lists its own venues.
+
+  **A core-app finding: the LA neighbourhood vocabulary has real gaps.** Two cards in one batch could not be
+  located because `locations.ts` has no entry for them — **Baldwin Hills** (Debbie Allen Dance Academy, a
+  well-known institution) and **Malibu** (Aloha Beach Camp). South LA is missing entirely. Both were held as
+  drafts rather than filled with a non-canonical value. The LA list is markedly thinner than the NYC one.
+
+  **Consistency rule learned the same batch:** Soccer Shots was quarantined in New York earlier in this effort
+  and its Los Angeles card was still live. When an operator is ruled out in one tenant, query the brand across
+  ALL tenants immediately — applying a ruling to one city and not the other is how a catalogue drifts.

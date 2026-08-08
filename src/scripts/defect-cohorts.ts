@@ -56,6 +56,16 @@ const COHORTS: { label: string; filter: Record<string, unknown>; found: string }
     found: "24 cards; 9 were real businesses wrongly QUARANTINED for a pipeline placeholder",
   },
   {
+    label: 'boroughGuess "Long Island" (self-declaring out-of-market)',
+    filter: { kind: "content", boroughGuess: "Long Island" },
+    found: "58 cards, all Nassau/Suffolk; the card declares its own out-of-market status in a borough field",
+  },
+  {
+    label: 'neighborhoodGuess repeats boroughGuess ("Manhattan"/"Manhattan")',
+    filter: { kind: "content", boroughGuess: "Brooklyn", neighborhoodGuess: "Brooklyn" },
+    found: "403 cards across Manhattan+Brooklyn, 89 PUBLISHED. Passes every validator and still answers nothing",
+  },
+  {
     label: "sourceHost classscout (internal source-seed stubs)",
     filter: { kind: "content", sourceHost: "classscout" },
     found: "47 cards with internal://classscout/source-seed/ URLs, mostly duplicates of real cards",
