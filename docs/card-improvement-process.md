@@ -2623,6 +2623,76 @@ Programs (whose bare umbrella card was terminal-ed in batch 34) both came throug
 correct. **The cleanups are landing the right way round: the real cards survive and the synthetic or
 umbrella ones are the ones that disappeared.**
 
+### Batch 40/25 (cards 398-422)
+
+The largest single batch of the run, because the per-domain sweep introduced in batch 37 was applied to
+**every** `sourceHost` in the queue rather than only to hosts with a known duplicate. Fourteen queue cards
+pulled in eleven more siblings. Outcome: 6 real entities confirmed or corrected, 13 terminal, 6
+quarantined.
+
+| Card | Decision |
+| --- | --- |
+| cc-ee0fd3f0a5e93c872dc62af5 "Camp" → **"Camp Orot at Manhattan Day School"** | title fixed, `low_source_trust` cleared — real UWS day camp, 310 W 75th St |
+| cc-8832c1c20448cb5c45a68c7a "Camp Kidville UWS" → **"Camp Kidville Upper West Side"** | real entity, wrong company's domain — see below |
+| cc-74efb0f42b141ff684c8ed1b CAMP 5th Avenue | real, confirmed 110 5th Ave / 917-997-0439; CAMP's only NYC store |
+| cc-5f4c2ced7f872716efdfd533 Code Ninjas Gowanus | canonical — 150 4th Ave Suite A, the only Brooklyn dojo |
+| cc-1b3c948f5fc7b8d1bdfeeaaf Big City Volleyball Brooklyn Youth Classes | canonical of a duplicate pair, `ripe_publish_attempted` cleared |
+| cc-a0c1a7f64ca56280a8cb1dca New Victory Theater / cc-1b7328dcc5c880abbf5ab0e6 Little Island / cc-b8f440434658308a88b1c301 Barrow Group | real, stale blockers cleared or verified unchanged |
+| 13 cards | `BLOCKED_TERMINAL` — 10 duplicates (Soccer Stars ×3, Code Ninjas ×3, Play Lab, Sylvan, Big City Volleyball, "Kate"), 2 fabricated locations (CAMP Brooklyn, C2 Brooklyn), 1 locations-index page |
+| 6 cards | `QUARANTINED` — C2 Manhattan, Code Ninjas Manhattan, Fastbreak Downtown, CompleteBody ×2 |
+
+**New pattern: token collision attaches the WRONG REAL COMPANY's domain to a real business's card.** The
+"Camp Kidville UWS" card was sourced to `camp.com` — the family-experience retailer CAMP. Kidville is an
+entirely separate company; the two share only the word "camp". Both are real, and the card names the right
+business: Camp Kidville is the genuine summer camp at Kidville Upper West Side, 205 West 88th Street,
+212-362-7792. This is a **fourth** distinct wrong-domain shape, and the only one where nothing is fake:
+- *off-topic contamination* — the card's entity was never real;
+- *pipeline-guessed-wrong-domain* — the domain never belonged to the business;
+- *domain hijacking* (Urban Dunes) — the domain WAS the business's, then changed hands;
+- *token collision* (this) — the domain belongs to a **different real company** whose name shares a word.
+
+The operational point is the near-miss. `camp.com` resolves to a real, glossy, obviously-legitimate
+children's business, so nothing about fetching it looks wrong — and CAMP's own location list has exactly
+one NYC store, in Flatiron, which makes a card claiming "Camp … UWS" look like a textbook fabricated
+location. Quarantining on that reading would have removed a real operating business. It was caught only by
+searching for the *card's own named entity* (Kidville) rather than judging the entity by what its stored
+domain serves. **Search the entity before ruling on the domain** — already the rule for hijacking, and it
+generalizes: the sourceUrl is evidence about the pipeline, not about whether the business exists.
+
+**New pattern: a franchise's BARE ROOT DOMAIN as `sourceUrl` is a reliable defect predictor.** Five cards
+in this batch had a brand homepage rather than a per-location page as their source — `sylvanlearning.com`,
+`codeninjas.com`, `c2educate.com`, `camp.com`, `completebody.com`. **All five were defective**, in one of
+exactly two ways:
+- *borough-level duplicate of one real location* — "Sylvan Learning Manhattan" and "Code Ninjas Brooklyn"
+  each describe a single real center (200 W 86th St; 150 4th Ave Gowanus) already carried by a
+  correctly-sourced sibling, just at a vaguer grain;
+- *fabricated location* — "C2 Education Manhattan", "Code Ninjas Manhattan", "CAMP Brooklyn" name
+  franchises with no branch in the claimed borough at all.
+
+That is not a coincidence: a root-domain source carries **no location evidence whatsoever**, so whatever
+borough ended up on the card was inferred rather than read. Contrast the per-location cards on the same
+hosts (`codeninjas.com/ny-gowanus`, `camp.com/locations/fifth-ave-nyc`), which were correct. **Treat a bare
+brand root domain on a multi-location franchise as a defect signal in its own right** — check the brand's
+own location directory before accepting the card's borough, and expect either a duplicate or a fabrication.
+This is cheap and high-yield: one fetch of the franchise's location list resolved five cards.
+
+**New pattern: the card TITLE fabricating a children's offering the source never had.** CompleteBody's own
+site describes itself as "Premium Gym NYC — 5 Locations" (Union Square, Chelsea, Financial District,
+Midtown East, Grand Central) with no children's programming anywhere on it and no UWS site. The card was
+titled "CompleteBody Kids / Kids Sports NYC" — welding a real adult gym brand to a second name the source
+never mentions, prefixed "Kids", and placed in a borough neither supports. Every previously catalogued
+fabrication lived in a *location* or *category* field; this one is in the title, which is the field a family
+reads first. Both copies quarantined rather than treated as a mere duplicate pair: neither describes a real
+children's activity provider, so "which is canonical" was the wrong question.
+
+**Process note — the required write envelope.** Both `reason` (≥5 chars) and `source` are mandatory on
+every `POST /api/card-bridge/update`, in addition to `collection`/`id`/`updates`. Twenty-five payloads were
+rejected twice before this was re-derived. Also confirmed: **`sourceUrl` is NOT writable on
+`contentCards`** (allow-list is title, state, categoryHint, boroughGuess, neighborhoodGuess, blockerCodes,
+terminalReason, enrichmentStatus, incompleteFields, lastReviewedAt, lastReviewedBy). The two re-source
+findings in this batch therefore recorded the correct URL inside `terminalReason` for a future pass, per
+the standing rule that every real fact found gets written down rather than re-researched.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -3282,3 +3352,19 @@ umbrella ones are the ones that disappeared.**
   landed correctly: Brooklyn Italians SC (seed card terminal-ed in b27) and Manhattan Youth After-School
   Programs (umbrella terminal-ed in b34) both surfaced intact and correct -- the real cards survived and
   the synthetic/umbrella ones are what disappeared. See "Batch 39/10..." above.
+- v85 (2026-08-08): batch 40/25 (cards 398-422) -- the per-domain sweep generalized from "hosts with a
+  known duplicate" to EVERY host in the queue; 14 queue cards pulled in 11 siblings. 6 real entities
+  confirmed/corrected, 13 terminal, 6 quarantined. Three new patterns. (1) **Token collision**: a card
+  sourced to `camp.com` (the retailer CAMP) actually names Camp Kidville at Kidville UWS, 205 W 88th St --
+  a fourth wrong-domain shape and the only one where BOTH companies are real and the card names the right
+  one. It reads exactly like a fabricated location (CAMP's sole NYC store is in Flatiron), so quarantining
+  on the domain's content would have removed a real business; caught only by searching the card's own named
+  entity. (2) **A franchise's bare root domain as `sourceUrl` predicts a defect**: all 5 root-domain cards
+  this batch were defective, each either a borough-level duplicate of one real center or a fabricated
+  location -- unsurprising, since a root domain carries no location evidence, so the borough was inferred.
+  One fetch of each brand's own location directory resolved all five. (3) **Fabrication in the TITLE**:
+  "CompleteBody Kids / Kids Sports NYC" welds a real adults-only gym brand to a second name its source never
+  mentions and prefixes it "Kids" -- every prior catalogued fabrication was in a location or category field,
+  not the field a family reads first. Process: `reason` AND `source` are both mandatory on every update
+  call, and `sourceUrl` is not writable on `contentCards` (re-source findings recorded in `terminalReason`
+  instead). See "Batch 40/25..." above.
