@@ -434,14 +434,49 @@ export async function applyCardBridgeWrite(request: NormalizedWriteRequest): Pro
     activityAlignment = alignActivityTypes({ activityTypes: candidateActivityTypes, primaryActivityType: candidatePrimary, title });
   }
 
+  // `recurringPrograms[].activityTypes` is a SECOND, independent activity list, and it renders to
+  // families in the card's own "Recurring programs" block.
+  //
+  // (owner-reported 2026-08-08: "Recurring programs shows much more sports than the main part.") The
+  // Flatbush YMCA card's top-level chip correctly read "SPORTS" after the taxonomy pass while the block
+  // underneath still showed nine tags including the compound "SPORTS / CAMP" -- because aligning
+  // `activityTypes` never touched the sub-documents. Worse, the ingestion placeholder survived here in
+  // 184 live programs after being reported as cleared from the top-level field.
+  //
+  // Aligned whenever a providers write touches EITHER list, so the two can never drift apart again.
+  let alignedRecurringPrograms: Record<string, unknown>[] | undefined;
+  if (
+    request.collection === "providers" &&
+    ("recurringPrograms" in request.updates || activityAlignment !== undefined)
+  ) {
+    const programs = (request.updates.recurringPrograms as Record<string, unknown>[] | undefined)
+      ?? (current.recurringPrograms as Record<string, unknown>[] | undefined);
+    if (Array.isArray(programs)) {
+      const providerName = (request.updates.name as string | undefined) ?? (current.name as string | undefined);
+      alignedRecurringPrograms = programs.map((program) => {
+        if (!program || typeof program !== "object" || !Array.isArray(program.activityTypes)) return program;
+        // The program's own title is better evidence of what it is than the provider's, when present.
+        const aligned = alignActivityTypes({
+          activityTypes: program.activityTypes as string[],
+          primaryActivityType: null,
+          title: (program.title as string | undefined) || providerName,
+        });
+        return { ...program, activityTypes: aligned.activityTypes };
+      });
+    }
+  }
+
   if (request.dryRun) {
     const previewExtra =
       request.collection === "serviceLeads" && normalizedLead
         ? { visibility: normalizedLead.visibility, blockers: normalizedLead.blockers, tags: normalizedLead.tags }
         : {};
-    const alignmentExtra = activityAlignment
-      ? { activityTypes: activityAlignment.activityTypes, primaryActivityType: activityAlignment.primaryActivityType, activityTypesDropped: activityAlignment.dropped }
-      : {};
+    const alignmentExtra = {
+      ...(activityAlignment
+        ? { activityTypes: activityAlignment.activityTypes, primaryActivityType: activityAlignment.primaryActivityType, activityTypesDropped: activityAlignment.dropped }
+        : {}),
+      ...(alignedRecurringPrograms ? { recurringPrograms: alignedRecurringPrograms } : {}),
+    };
     const sourceHostExtra = {
       ...(derivedSourceHost ? { sourceHost: derivedSourceHost } : {}),
       ...(derivedIdentity ?? {}),
@@ -492,6 +527,9 @@ export async function applyCardBridgeWrite(request: NormalizedWriteRequest): Pro
   if (activityAlignment) {
     finalUpdates.activityTypes = activityAlignment.activityTypes;
     finalUpdates.primaryActivityType = activityAlignment.primaryActivityType;
+  }
+  if (alignedRecurringPrograms) {
+    finalUpdates.recurringPrograms = alignedRecurringPrograms;
   }
 
   // Keep sourceHost in lockstep with sourceUrl (see parseSourceUrl). Never taken from the caller.
