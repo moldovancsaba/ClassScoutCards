@@ -5550,3 +5550,50 @@ only place it can go.
   Gotham Gymnastics' second listing stored "123 Metropolitan Ave" (Williamsburg); the operator has exactly two
   gyms and both are on Douglass Street, 315 and 316. Confirming the value was pre-existing rather than written
   during a bulk pass is the difference between a data defect and one of mine to undo.
+- v122 (2026-08-08): **defect-first listing maintenance, run to the point where automated recovery is
+  exhausted.** Measured across the live pool, start of this run → now: live listings **1,027 → 844**;
+  placeholder addresses **294 → 203**; empty neighbourhoods **305 → 180**; single-word names **19 → 5**;
+  scraped chrome in copy **20 → 5**; phone-duplicate records **350 → 142**; leaked pipeline prompt **0**.
+
+  **The single-word-name sweep split cleanly in two, which is why it is worth running as its own pass.** Of
+  18 matches, six were real businesses with a truncated name (Spark → The Spark; Khcc → Kingsbridge Heights
+  Community Center; Billy → Billy Beez; Myb-kids → MYB Kids; Bronxworks → BronxWorks) and **eight were never
+  a business at all**: `Evite` (an invitations company's blog listicle), `Eventective` (a venue-booking
+  directory), `Health` (a NYC Department of Health page about *clinic billing and insurance*, live in the
+  Bronx), `Bronxmama` (a parenting blog), `Category` (a course platform's browse page), `Host` (a camp
+  directory's page about BronxWorks), `West` (a multi-operator camp round-up) and `Kids` (a one-word name
+  carrying an unrelated business's address). **When the extracted name is a piece of site furniture, no
+  single entity was ever identified.**
+
+  **Two closure tells, both cheap to grep for.** `prov-apple-seeds`' description was its own farewell —
+  *"It has been our greatest pleasure singing, dancing, playing… over the past 13 years"* — which reads as
+  warm marketing until you notice it is past tense with a span of years and no forward-looking offer.
+  Confirmed closed. And `hiartkids.com` now serves an **Indonesian lottery and gambling site**; a family
+  clicking through from a children's art listing landed on gambling content. Entity-before-domain still
+  applied (the domain-hijack pattern means a live domain proves nothing), but the entity check ALSO failed —
+  no evidence Hi Art! operates — so it was quarantined and the website field cleared.
+
+  **A correction to this pass's own work, recorded because the failure mode generalises.** Hi Art! and MYB
+  Kids were "fixed" earlier the same day by rewriting `shortDescription` and renaming — leaving the original
+  scraper artefact live in `longDescription`. **When replacing scraped copy, replace BOTH description
+  fields**: fixing only the short one leaves the artefact in the field read second AND makes the listing look
+  clean to the very scan that would have caught it. Two further artefact classes found this way, neither
+  matched by the first chrome sweep's patterns: **cookie-consent banners** ("Functional cookies support
+  features like content sharing…") and **login prompts** captured mid-sentence from behind a member area
+  ("to your account to view your child's schedule…", which did not even start with a capital letter).
+
+  **Where automated address recovery stops.** A second probe over the remaining 206 placeholder listings
+  yielded only **17** single-candidate results and **one** that survived the guards. The rest divide into two
+  useful buckets rather than a backlog: **36 multi-candidate listings, which is a SPLIT-CANDIDATE DETECTOR** —
+  an operator whose own site yields several addresses is by definition one whose locations need separate
+  listings (Greenwich House's four buildings, Berkeley Carroll's four, Steve & Kate's four campuses, NY
+  Martial Arts Academy's four, Little Scholars' three, Modern Martial Arts' three, all now recorded with
+  confirmed addresses so a split pass need not re-research) — and **borough contradictions** the guard caught
+  rather than wrote (Chess at Three "Manhattan" resolving to a Park Slope address already held by its
+  Brooklyn sibling; Nory "Brooklyn Heights" resolving to Manhattan's Garment District; Yombu "Manhattan"
+  resolving to Park Slope). All recorded as `needs_human` with the question stated.
+
+  **Fifth instance of the headquarters-address bug, across a fourth parent organisation**: the probe returned
+  Soccer Stars' Upper West Side office (606 Columbus Ave) for **five** listings at once, including two
+  Brooklyn ones and one named for **Nassau County**. Nothing was written — the operator teaches in rented
+  gyms and parks and has no venue of its own, so the office is not a substitute.

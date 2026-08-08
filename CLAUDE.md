@@ -830,6 +830,23 @@ in a comment when you add one, the way the existing ports do.
 - **A guard built to prevent bad writes is worth reading as a REPORT.** The address pipeline refuses to write
   a street address already held by another listing. All 41 refusals were real findings — duplicate pairs,
   program clusters, and the aquarium relocation. The refusals were more valuable than the writes.
+- **When replacing scraped copy, replace BOTH description fields.** Caught in my own work: Hi Art! and MYB
+  Kids were "fixed" by rewriting `shortDescription` and renaming, leaving the original chrome live in
+  `longDescription` — which also made them look clean to the very scan that would have caught them. Two
+  artefact classes the first chrome sweep's patterns missed: **cookie-consent banners** and **login prompts**
+  captured mid-sentence from behind a member area.
+- **A farewell message is a closure signal, and it is cheap to grep for.** apple seeds' description was
+  "It has been our greatest pleasure… over the past 13 years" — past tense, a span of years, no
+  forward-looking offer. Reads as warm marketing; is a business saying goodbye. Confirmed closed.
+- **A truncated name is evidence of a scrape defect, NOT evidence the business is real — run the entity check
+  anyway.** "Hiart!" was renamed to "Hi Art!" on the reasonable assumption a real business sat behind it.
+  Its domain now serves an Indonesian gambling site, and no evidence exists that the programme still
+  operates. Quarantined, website cleared. Sweeping a *name* defect does not discharge the reality check.
+- **The multi-candidate bucket of an address probe is a SPLIT-CANDIDATE DETECTOR.** An operator whose own site
+  yields several distinct street addresses is, almost by definition, one whose locations need separate
+  listings. 36 of them found in one probe (Greenwich House ×4, Berkeley Carroll ×4, Steve & Kate's ×4, NY
+  Martial Arts ×4, Little Scholars ×3, Modern Martial Arts ×3), each now recorded with confirmed addresses so
+  a split pass need not re-research.
 - **The `providers.phone` field has held Unix timestamps and the city switchboard.** Found 2026-08-08 in a
   pool-wide scan: nineteen live records carried 10-digit epoch seconds (`1742850639` = 2025-03-24,
   `1672214040` = 2022-12-28) where the phone number should be, and eighteen carried `311`, New York City's
