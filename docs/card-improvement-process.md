@@ -5470,3 +5470,45 @@ only place it can go.
   places from a family's search results. **Recorded with counts so the next pass starts from the shape rather
   than rediscovering it**, and because the program-not-a-location rule has until now been applied one cluster
   at a time without anyone measuring how much of the catalogue it accounts for. It accounts for a third.
+- v120 (2026-08-08): **switched the loop from oldest-first to defect-first, because the mechanical sweeps
+  destroyed the age signal — and then worked 11 listings individually.**
+
+  **The queue problem, recorded because it was self-inflicted.** Step 1 of this SOP says pull the oldest
+  `updatedAt`. After the pool-wide sweeps of v115-v119, **every one of the 1,027 live listings has an
+  `updatedAt` of 2026-08-07 or later**, so oldest-first no longer discriminates between a listing that was
+  genuinely reviewed and one that was only touched by a scripted field fix. A bulk sweep buys scale at the
+  cost of the ordering signal the manual loop depends on. Until a real `fieldVerifications`-style marker
+  exists (recommendation 0b), the queue has to be built from DEFECT SIGNAL instead of age.
+
+  **The defect inventory across 1,027 live listings**, which is now the queue:
+  `address is a neighbourhood, not a street` **303 (29.5%)** · `neighborhood empty` **305 (29.7%)** ·
+  `no phone` **322 (31.4%)** · `no phone AND no email` **229** · `short == long description` **85** ·
+  `no ageRanges` **86** · `description truncated mid-sentence` **49** · `name is a single word` **19**.
+
+  **Two negative results worth stating.** (a) All 303 placeholder-address listings DO carry a `geo` — but
+  259 are `precision: "approximate"` and seven share one Upper East Side point, so the pin is a
+  **neighbourhood centroid derived from the placeholder**, not a recoverable address. A map showing it puts
+  a confident marker on a street the business is not on, which is arguably worse than no pin. (b) Only **10
+  of the 303** name a street address anywhere in their own record, so this tier is genuinely research work,
+  not another mechanical pass. Those 10 were done, and eight of them turned out to have a second defect.
+
+  **The headline find: a live listing whose address was fictional.** `prov-jodi-s-gym`'s entire
+  `longDescription` was the **Stardew Valley wiki** entry for a video-game character named Jodi — *"Lives In
+  Pelican Town … Address 1 Willow Lane … Family Kent (Husband), Sam (Son), Vincent (Son)"* — and
+  `1 Willow Lane` was sitting in the address field of a live listing, a fictional address in a farming
+  simulator. Token-matched on the FIRST NAME "Jodi". **Entity-before-domain is what saved it from
+  quarantine**: Jodi's Gym is a real Upper East Side children's gym operating since 1982 at 244 E 84th St,
+  so the stored neighbourhood was accidentally right while every fact supporting it was invented. Rewritten,
+  not retired. A follow-up scan for wiki/fandom/dictionary/app-store markers across all live listings found
+  **no other instance**, which is a real negative result — this one was isolated.
+
+  **Also in the batch:** Laser Bounce "Brooklyn" repurposed onto its real Glendale, Queens centre (it has no
+  Brooklyn location and carried the Levittown, Long Island phone) — and its address exposed a specific
+  extraction bug, **the hyphenated Queens house number `80-28 Cooper Ave` truncated to `28 Cooper Ave`**,
+  which will not be the only listing where a Queens building number has lost its first half. Two unrelated
+  listings both carried a wrong **"Bay Ridge"** (Brooklyn Dance Conservatory, really Carroll Gardens; Max
+  Adventures, really Marine Park) — the same value-repetition-across-unrelated-records signal recorded for
+  "East New York". SwimJim's UES listing said "Upper West Side" in its own neighbourhood field, free to
+  catch. Galli Theater's source gave both a theatre address and an office address, and the theatre is the
+  one written. Two listings got `needs_human` rather than a guess: Brooklyn ARTery (sources conflict, 1004
+  against 1020 Cortelyou Rd) and SwimJim UES (two host pools, no single answer).
