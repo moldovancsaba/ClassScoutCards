@@ -3622,6 +3622,46 @@ retitled to the business's real name but its `neighborhoodGuess` was **deliberat
 148 Lafayette St sits on the SoHo / Little Italy / Chinatown boundary and sources place it differently, so
 sharpening it would be a guess dressed as a fix. The street address went into the record instead.
 
+### Cluster backlog, tranche 11: a seasonal-only operator, and the rented-venue rule cutting both ways (2026-08-08)
+
+**12 cards, three clusters. Three repurposed onto real campuses.**
+
+| Host | Cards | Real locations | After |
+| --- | --- | --- | --- |
+| `steveandkatescamp.com` | 5 | 5 NYC campuses (+ Westchester, out of taxonomy) | 4 canonical, 1 terminal |
+| `92ny.org` | 3 | 1 building: 1395 Lexington Ave | 1 canonical, 2 terminal |
+| `cityparksfoundation.org` | 4 | dozens of public parks; office at 830 Fifth Ave | 1 canonical, 3 terminal |
+
+**Steve & Kate's Camp is the case where the rented-venue rule had to cut the other way, and it is worth
+stating precisely.** All five of its NYC campuses are **school buildings rented for the summer** — Trevor
+Day School (twice), the Cathedral School of St John the Divine, Brooklyn Heights Montessori, Berkeley
+Carroll — with published dates like "Jun 15 – Aug 21". That is exactly the shape that got The Art Farm's
+`/summer-camp-uws/` card retired two tranches ago.
+
+The difference is not the venue, it is what happens to the business if you retire the card. **The Art Farm
+owns 431 E 91st Street and is already carded there** — its camp cards were surplus, and retiring them cost
+a family nothing. **Steve & Kate's has no venue of its own anywhere**; renting campuses for the season *is*
+the business. Retiring these would remove a real, operating children's camp from the pool entirely, which
+is the strand-a-real-business escape hatch already established for Fastbreak Sports. Kept, one card per
+confirmed campus.
+
+The sharpened rule, then, is two-part rather than one: *does the operator run a continuing programme at
+this address* — **and if the answer is no, does the operator have any other card?** A seasonal-only
+operator's rented campus is its real location. A year-round operator's seasonal rental is not.
+
+**Two more "programme index" clusters.** 92NY's Harkness Dance Center, basketball programme and Parenting
+Center are all divisions of 1395 Lexington Avenue — the division-not-a-location rule again, and notably
+**none of the three cards carried the institution's own name**, so the canonical had to be retitled to "92NY
+(92nd Street Y)". City Parks Foundation's four cards are two duplicate pairs of programmes ("Sports",
+"Track & Field") that run across dozens of parks.
+
+**A deliberate non-sharpening, recorded as a gap rather than a fix.** City Parks Foundation's canonical card
+keeps `neighborhoodGuess: "NYC-wide"`. Its office at 830 Fifth Avenue is not where children go, and the
+programmes genuinely are citywide, so any single neighbourhood would be *less* true than the vague value.
+This is the second time this tranche pair that a vague value was left alone on purpose (the first being Five
+Points Academy's borough grain) — **a vague value is sometimes the honest one, and the fix is a split into
+per-park cards, not a better guess.**
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -4591,3 +4631,17 @@ sharpening it would be a guess dressed as a fix. The street address went into th
   Points Academy's neighbourhood was left at borough grain because 148 Lafayette St sits on the
   SoHo/Little Italy/Chinatown boundary and sources disagree -- sharpening it would be a guess dressed as a
   fix, so the street address went into the record instead.
+- v104 (2026-08-08): cluster tranche 11 -- three clusters, 12 cards, three repurposed onto real campuses.
+  **`steveandkatescamp.com` is the case where the rented-venue rule had to cut the other way.** All five of
+  its NYC campuses are school buildings rented for the summer -- the same shape that retired The Art Farm's
+  camp card. The difference is what retiring costs: The Art Farm owns 431 E 91st St and is already carded
+  there, so its camp cards were surplus; Steve & Kate's has no venue of its own anywhere, so retiring these
+  would remove a real operating camp from the pool entirely. **The sharpened rule is two-part: does the
+  operator run a continuing programme at this address -- and if not, does the operator have any other card?**
+  A seasonal-only operator's rented campus IS its real location; a year-round operator's seasonal rental is
+  not. Also: two more division-not-a-location clusters (92NY's dance centre, basketball and Parenting Center
+  are all 1395 Lexington Ave, and none of the three cards carried the institution's own name; City Parks
+  Foundation's four cards are two duplicate pairs of citywide programmes). And a **deliberate
+  non-sharpening**: City Parks Foundation keeps `neighborhoodGuess: "NYC-wide"` because its office is not
+  where children go and the programmes really are citywide -- **a vague value is sometimes the honest one,
+  and the fix is a per-park split, not a better guess.**
