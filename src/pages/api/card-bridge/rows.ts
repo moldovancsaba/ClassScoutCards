@@ -1,12 +1,13 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { checkCardBridgeAuth } from "@/lib/auth/requireCardBridgeKey";
 import { isBridgeCollectionKey, BRIDGE_REGISTRY } from "@/lib/delivery/cardBridgeRegistry";
-import { clampLimit, getOldestRows, parseSimpleFilter } from "@/lib/delivery/cardBridgeRows";
+import { clampLimit, clampOffset, getOldestRows, parseSimpleFilter } from "@/lib/delivery/cardBridgeRows";
 
 /**
  * Read-only, generalized across every registered collection: GET /api/card-bridge/rows
  *   ?collection=contentCards|providers|meetupGroups (default contentCards)
  *   &limit=1..25 (default 5)
+ *   &offset=0.. (default 0) — read-only paging for a full-pool sweep; see getOldestRows
  *   &id=<idField value>  — look up one record by its collection-specific id (contentCardId/id/leadId/…);
  *     shorthand for &filter={"<idField>":"<value>"} so callers never need to know each collection's
  *     idField name. Combining &id with &filter is rejected rather than silently picking one.
@@ -53,9 +54,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const filter = rawId !== undefined ? { ...filterResult.filter, [idField]: rawId } : filterResult.filter;
 
   const limit = clampLimit(req.query.limit);
+  const offset = clampOffset(req.query.offset);
 
   try {
-    const result = await getOldestRows(collectionParam, filter, limit);
+    const result = await getOldestRows(collectionParam, filter, limit, offset);
     return res.status(200).json(result);
   } catch (error) {
     console.error("card-bridge/rows error:", error);

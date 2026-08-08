@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { clampLimit, parseSimpleFilter, DEFAULT_LIMIT, MAX_LIMIT } from "./cardBridgeRows";
+import { DEFAULT_LIMIT, MAX_LIMIT, clampLimit, clampOffset, parseSimpleFilter } from "./cardBridgeRows";
 
 describe("clampLimit", () => {
   it("falls back to DEFAULT_LIMIT for missing/invalid input and caps at MAX_LIMIT", () => {
@@ -47,5 +47,25 @@ describe("parseSimpleFilter", () => {
   it("works per-collection — a contentCards-only field is rejected for providers and vice versa", () => {
     expect(parseSimpleFilter("providers", JSON.stringify({ state: "PUBLISHED" })).ok).toBe(false);
     expect(parseSimpleFilter("contentCards", JSON.stringify({ state: "PUBLISHED" })).ok).toBe(true);
+  });
+});
+
+describe("clampOffset (2026-08-08, read-only sweep paging)", () => {
+  it("defaults to 0 for absent, non-numeric or negative input", () => {
+    expect(clampOffset(undefined)).toBe(0);
+    expect(clampOffset("not a number")).toBe(0);
+    expect(clampOffset(-5)).toBe(0);
+    expect(clampOffset(0)).toBe(0);
+  });
+
+  it("truncates to an integer", () => {
+    expect(clampOffset("25")).toBe(25);
+    expect(clampOffset(12.9)).toBe(12);
+  });
+
+  it("has NO upper bound, unlike limit — a sweep must be able to reach the far end of the pool", () => {
+    // ~900 published content cards, so an offset well past the limit ceiling has to survive.
+    expect(clampOffset(875)).toBe(875);
+    expect(clampOffset(100000)).toBe(100000);
   });
 });
