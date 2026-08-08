@@ -5512,3 +5512,41 @@ only place it can go.
   catch. Galli Theater's source gave both a theatre address and an office address, and the theatre is the
   one written. Two listings got `needs_human` rather than a guess: Brooklyn ARTery (sources conflict, 1004
   against 1020 Cortelyou Rd) and SwimJim UES (two host pools, no single answer).
+- v121 (2026-08-08): **the program-card cluster resolved at scale — the finding deferred in v119 as "too big
+  to sweep safely" turned out to be safe once one obstacle was removed.** Live listings 1,027 → 870;
+  placeholder addresses 294 → 217; empty neighbourhoods 305 → 184; phone-duplicate records 350 → 172;
+  clusters of three or more 27 → 11.
+
+  **What unblocked it.** v119 declined to sweep the 102 YMCA listings because retiring a branch's class cards
+  would strand the branch if no venue card existed. Two things falsified that worry. First, the
+  address-collision report showed a **branch-level venue card DOES exist** for several branches. Second,
+  **fetching the operator's own branch directory (ymcanyc.org/locations) in ONE request** yielded all 24
+  branch addresses and phones, so where no venue card existed one class card could be *promoted* — renamed to
+  the branch and given the real address — before the rest were retired. **Build-then-retire, in that order**:
+  14 venue cards created or enriched, then 56 class cards retired. YMCA-named live listings went 102 → 25.
+
+  The same shape then resolved across a dozen more operators: Manhattan Youth (120 Warren St), LeFrak
+  Center at Lakeside, Ms. J's, Fastbreak, St Patrick's CYO (six listings, one per SPORT, renamed to the
+  organisation), Imagine Swimming (nine listings for three real pools), Gymstars, Soccer Stars, DUSC, BBFC,
+  StreetSquash, Gleason's Gym, PAL, My Gym Park Slope, YM&YWHA of Washington Heights & Inwood.
+
+  **The headquarters-address bug is general, not a WCS quirk — four instances, three different parent
+  organisations.** Prospect Park Zoo and New York Aquarium were both filed at the Wildlife Conservation
+  Society's HQ (2300 Southern Blvd, which is genuinely the Bronx Zoo's address, so a sibling legitimately
+  holds it). Then **all fifteen** "Summer Sports Experience" listings were found storing *"The Arsenal,
+  Central Park, 830 Fifth Avenue"* — the NYC Parks Department's headquarters — so a family looking up the
+  Brownsville or Highbridge programme was sent to Fifth Avenue. And Kids in the Game's East Village and West
+  Village camps both store 45 East 20th Street, the operator's office, which is in neither village. The
+  fifteen Parks listings were NOT retired: unlike a program cluster at one venue, each names a genuinely
+  different park, so one card per park is correct — only the address was replaced, with the park the title
+  names, at borough grain rather than an invented street number.
+
+  **The collision guard became a duplicate detector.** The address pipeline refuses to write a street address
+  already held by, or being written to, another listing. Every one of its 41 refusals was a real finding: a
+  duplicate pair, a program cluster, or the New York Aquarium being moved to the Bronx. **A guard built to
+  prevent bad writes is worth reading as a report.**
+
+  **One wrong address corrected that was NOT the pipeline's** — checked, because it mattered whose it was.
+  Gotham Gymnastics' second listing stored "123 Metropolitan Ave" (Williamsburg); the operator has exactly two
+  gyms and both are on Douglass Street, 315 and 316. Confirming the value was pre-existing rather than written
+  during a bulk pass is the difference between a data defect and one of mine to undo.
