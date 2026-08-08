@@ -37,6 +37,8 @@
  * `["no category","Art","Music","Swimming"]` returned primary "no category" and dropped "Swimming"),
  * which is strictly worse than the mixed-category bug this module was built to fix.
  */
+import { isGenericSportLabel, isSpecificSport, isSportActivity, SPORTS_PARENT } from "@/lib/delivery/sportActivity";
+
 export const NO_CATEGORY_PLACEHOLDER = "no category";
 
 function isPlaceholder(activity: string): boolean {
@@ -185,7 +187,35 @@ export function alignActivityTypes(input: AlignActivityTypesInput): AlignActivit
   // Strip the ingestion placeholder BEFORE anything else -- it must never be eligible to become the
   // primary activity, nor occupy one of the three slots. See NO_CATEGORY_PLACEHOLDER above.
   const placeholders = [...new Set(input.activityTypes)].filter(isPlaceholder);
-  const candidates = [...new Set(input.activityTypes)].filter((activity) => !isPlaceholder(activity));
+  const deduped = [...new Set(input.activityTypes)].filter((activity) => !isPlaceholder(activity));
+
+  // Collapse every "sport, unspecified" spelling onto the single parent label before anything reasons
+  // about the list, so "Multi-Sport" can never survive as though it were a sport in its own right.
+  const normalised = deduped.map((activity) => (isGenericSportLabel(activity) ? SPORTS_PARENT : activity));
+  const candidates = [...new Set(normalised)];
+
+  // SPORT-DOMINANT RULE (owner directive, 2026-08-08). If a listing involves ANY sport, it is a sport
+  // listing: every non-sport tag is dropped, not merely deprioritised. Two reasons, both the owner's.
+  // Editorially the catalogue is focusing on sport first, so a swim school tagged "Swimming, Art, Music"
+  // should read as a swim school. Structurally it also removes the cross-cluster mixing this module was
+  // built for -- a sport listing can no longer carry an Art tag at all.
+  //
+  // Ordering is part of the directive and is not cosmetic: the SPECIFIC sport leads and the parent
+  // "Sports" sits SECOND, so a parent reads "Soccer, Sports" rather than having to infer the family, and
+  // analytics can collect every sport listing on one equality check.
+  const sportCandidates = candidates.filter((activity) => isSportActivity(activity));
+  if (sportCandidates.length > 0) {
+    const specific = sportCandidates.filter((activity) => isSpecificSport(activity));
+    const primarySport =
+      derivePrimary({ ...input, primaryActivityType: input.primaryActivityType && isSpecificSport(input.primaryActivityType) ? input.primaryActivityType : null, activityTypes: specific }) ?? SPORTS_PARENT;
+    const kept =
+      primarySport === SPORTS_PARENT
+        ? [SPORTS_PARENT]
+        : [primarySport, SPORTS_PARENT, ...specific.filter((activity) => activity !== primarySport)].slice(0, 3);
+    const dropped = [...deduped.filter((activity) => !kept.includes(isGenericSportLabel(activity) ? SPORTS_PARENT : activity)), ...placeholders];
+    return { activityTypes: kept, primaryActivityType: kept[0], dropped: [...new Set(dropped)] };
+  }
+
   const primaryInput = input.primaryActivityType && isPlaceholder(input.primaryActivityType) ? null : input.primaryActivityType;
   const primary = derivePrimary({ ...input, primaryActivityType: primaryInput, activityTypes: candidates });
   if (!primary) return { activityTypes: [], primaryActivityType: undefined, dropped: placeholders };
