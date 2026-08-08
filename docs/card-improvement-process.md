@@ -6060,3 +6060,15 @@ only place it can go.
   and a truthy `found`, and did not change the field; three more showed the same shape in the dry run. Only
   reading the records back caught it. Verify by re-reading, not by parsing the write response — this is the
   same lesson already recorded for the silently-ignored `id` parameter, in a new place.
+
+  **Result, verified by re-reading all 1,087 provider records from the database rather than by parsing
+  write responses.** 640 records written, 0 failures, 0 mismatches; across the 1,043 live (non-quarantined)
+  listings: 0 format values in `activityTypes`, 0 non-answers, 0 surviving generic sport spellings, 0 over
+  the 3-tag cap, 0 compound values, 0 sport listings with the parent out of second place, 0 bad or
+  out-of-order `primaryActivityType`. The analytics guarantee the parent category exists for now holds
+  exactly: `Sports` appears on **693** listings and the independently-computed card-level `sportCards.all`
+  is **693** — one equality check collects every sport listing, with nothing over- or under-counted.
+
+  The stats page's own numbers moved accordingly: `contentCards` 12,626 → **5,056** (repair stubs excluded)
+  with **2,595 retired** reported separately, and the `providers` FORMAT breakdown is now a single
+  `(none)` bucket of 1,043 — no format value remains in any activity list.
