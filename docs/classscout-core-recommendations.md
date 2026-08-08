@@ -243,6 +243,15 @@ Three separate kinds observed:
 field; a targeted grep for that literal string is the fastest way in. As with `"no category"`, absence
 beats a placeholder.
 
+**Related, and probably a bigger fish: `neighborhoodGuess` does not appear to be derived from the source
+page at all.** Three PlayGroup NYC cards share a byte-identical `title` AND a byte-identical `sourceUrl`
+(`/social-skills-groups`) and differ in exactly one field — they claim **Allerton**, **Bedford Park** and
+**Baychester**, three unrelated Bronx neighbourhoods, for an operator whose only two locations are 540
+President St in Brooklyn and 412 6th Ave in Manhattan. Identical input cannot yield three different correct
+answers. This is a sharper signal than the "East New York" repetition in item 7: that showed unrelated cards
+*sharing* a wrong default; this shows identical cards *diverging*. Whatever assigns the neighbourhood is
+worth tracing on its own.
+
 ---
 
 ## 7. Byte-identical wrong default values across unrelated records suggest a run-level bug

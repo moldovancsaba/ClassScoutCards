@@ -578,6 +578,29 @@ in a comment when you add one, the way the existing ports do.
   never does. Practical use: when reconciling a cluster against an operator's location list, **check the
   outer-borough and less-central sites first**, because those are the ones no card will have found and
   therefore the ones a surplus card should be repurposed onto.
+- **The rented-venue test is about the PROGRAMME, not the freehold: does the operator run an ongoing
+  programme at this address?** Sharpened 2026-08-08 after two clusters took opposite outcomes for the right
+  reason. The Art Farm's `/summer-camp-uws/` was retired — the Calhoun School's building, rented for eight
+  weeks. Physique Swimming's SEVEN pools are all in other people's buildings too (Léman Prep ×2, Dunlevy
+  Milbank Center, Yorkshire Towers, Congregation Beth Elohim, BronxWorks CMCC, Riverdale Neighborhood House)
+  and every one was KEPT, because Physique publishes a year-round weekly schedule at each and a swim school
+  without its own pool is the ordinary model for the trade. Ownership is not the question; a continuing
+  programme at a fixed address is.
+- **Three byte-identical cards can carry three DIFFERENT fabricated neighbourhoods — `neighborhoodGuess` is
+  not derived from the source page.** Found 2026-08-08 (PlayGroup NYC): three cards with the same title
+  ("Social", truncated from "Social Skills Groups") and the same `sourceUrl` (`/social-skills-groups`)
+  claimed **Allerton, Bedford Park and Baychester** — three unrelated Bronx neighbourhoods, for an operator
+  whose only two locations are in Park Slope and Greenwich Village. This is a stronger signal than the
+  earlier "East New York" finding: that was unrelated cards *sharing* one wrong default, this is identical
+  cards *diverging*. Identical input cannot produce three different correct answers, so the field is being
+  generated rather than read. Treat a neighbourhood value as unverified by default, however specific it looks.
+- **A cluster can misname the business on most of its cards, and one of those names can belong to a
+  DIFFERENT REAL COMPANY.** Found 2026-08-08: Brooklyn United Academy's four cards were titled "Brooklyn
+  Soccer Academy", "Brooklyn United Youth Soccer Club", "United Soccer Academy Brooklyn" and the correct
+  "Brooklyn United Academy". The third is the dangerous one — United Soccer Academy is a real, separate
+  provider, so that card silently redirects a family from one business to another. Earlier name fabrication
+  (CompleteBody Kids) was a single title; when the MAJORITY of a cluster misnames the operator, pick the
+  card carrying the real name as canonical and check whether any of the wrong names is somebody else's.
 - **A per-location-looking PATH can point at a venue the operator merely rents — a real address on the page
   is not evidence of a location belonging to the business.** Found 2026-08-08 (The Art Farm). Three of five
   cards carried deeper paths than the canonical root-domain card, and `/summer-camp-uws/` even printed a real
