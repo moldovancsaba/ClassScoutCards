@@ -5870,3 +5870,35 @@ only place it can go.
   **Consistency across tenants:** Soccer Shots was quarantined in New York earlier in this effort and its
   Los Angeles card was still live until this run. When an operator is ruled out in one tenant, query the
   brand across all of them immediately.
+- v130 (2026-08-08): **the `ripe_publish_attempted` cohort — 52 real cards parked behind a blocker that
+  describes the pipeline, not the listing.** Found by noticing BAMkids, the Brooklyn Academy of Music's
+  children's programme, correctly located in Fort Greene and sourced to its own site, sitting
+  PARKED_COOLDOWN on it. The code records that publication was ATTEMPTED. That is pipeline history; it says
+  nothing about the card.
+
+  Most of the cohort is the same: German-American School Manhattan, TADA! Youth Theater, Randall's Island
+  Park Alliance, Beam Center, Gibney, Steps on Broadway, Goethe-Institut, Streb, Dancewave, Cynthia King
+  Dance Studio. All unparked, each with the fields checked named in its reason.
+
+  **Three things were hiding inside it, and only working DRAFTS would have found them:**
+  - **Off-topic contamination one publish attempt from going live.** `Samsung Find` — Samsung's
+    device-location service — was parked with an Upper West Side neighbourhood attached, ready to publish.
+    Quarantined. Nothing in a published-only queue would ever have reached it.
+  - **Internal pipeline jargon in a public place field.** TADA! Youth Theater's neighbourhood read *"Near
+    Manhattan priority zones"* — the discovery system's own targeting vocabulary. Corrected to NoMad from its
+    real address, 15 West 28th Street.
+  - **Three duplicate PAIRS** (Manhattan Soccer Club, Fastbreak Sports, Cynthia King Dance Studio). That is a
+    consequence of how the cohort forms: a card the pipeline repeatedly tries to publish is exactly the kind
+    that gets re-discovered and re-created.
+
+  **Blockers were assessed individually, never cleared as a group.** On Baby Fingers, three codes got three
+  different answers: the safety flag removed on the correlation evidence, `low_source_trust` removed because
+  its premise is false (the source IS the operator's own domain), and the missing image and schedule kept
+  because their premises are true. **Clearing a blocker requires its PREMISE to be false, not merely the
+  business to be real** — the rule holds even when it would be quicker to clear the lot.
+
+  **Where a place value could not be salvaged it was cleared, not softened.** Roughly a third of the cohort
+  carried a compound, a delivery model, or the borough repeated as its neighbourhood — "Gowanus / Downtown
+  Brooklyn", "Manhattan-wide", "Brooklyn schools", "Upper East/West Side". Each was emptied with a location
+  blocker set, because an empty field is an honest absence while a vague one implies knowledge the record
+  does not have.
