@@ -5717,3 +5717,38 @@ only place it can go.
   **Category signal**: three of four "Birthday Entertainment" cards across the two batches were travelling
   performers. For that category, check the DELIVERY MODEL first — it is the fastest disqualifier and saves a
   full research pass.
+- v126 (2026-08-08): **batch 3 (24 cards) plus the cohort method turned into committed tooling.**
+
+  **Batch 3 was the `sourceHost: "google.com"` cohort — 24 content cards storing a GOOGLE SEARCH URL as
+  their source** (`google.com/search?q=<business>+kids+classes`), a placeholder discovery wrote when it
+  found no real page. Twenty-one were already QUARANTINED. **The key distinction: a search URL is not a
+  source, but the card's TITLE names a specific business**, so an entity exists to go and find — unlike a
+  directory browse page, which names nobody. Entity-before-domain therefore applies, and the cohort split
+  three ways:
+  - **12 prohibited by delivery model** (8 travelling party entertainers, 4 online/in-home tutor networks:
+    Varsity Tutors, Wyzant, Prep Academy Tutors, Tutor Doctor). Left quarantined, **ground corrected**.
+  - **2 out of market** (Saf-T-Swim is a Long Island chain; Clay Art Center is in Port Chester,
+    Westchester). Both had "NYC" appended to the operator's name — fabricated city presence.
+  - **9 moved QUARANTINED → BLOCKED_REPAIRABLE**, i.e. rescued. Best of them: **Circus Warehouse**, a
+    genuine Long Island City circus school at 53-21 Vernon Blvd with published hours and age-banded
+    children's classes, buried purely because the pipeline stored a search URL instead of its website.
+
+  **Correcting the GROUND without changing the state is a real outcome, not paperwork.** `terminalReason`
+  is what the next pass reads. A card retired for "bad source" invites someone to re-source it; one retired
+  for "the teacher travels to your home" does not. Twelve cards keep their disposition and get an accurate
+  reason.
+
+  **Tooling: `npm run cohorts` (`src/scripts/defect-cohorts.ts`).** The cohort method is now committed
+  rather than re-derived each session. It enumerates the five cohorts that have already produced findings,
+  dedupes across them, and prints the queue **worst-exposure first** — PUBLISHED before QUARANTINED, because
+  a published card carrying a known defect is doing harm now. Three deliberate choices, each from a mistake
+  in this repo's history: it is **read-only** (a script that both selects and mutates is how a bad rule
+  reaches 219 records at once); it **retries each page and throws rather than returning short** (a silent
+  partial scan reads as a complete one); and it stops only when a page adds **nothing new** to a seen-set
+  (offset paging undercounts). `prioritise()` is exported and unit-tested — an unrecognised state sorts
+  LAST, since a state the script has not heard of is not evidence of urgency.
+
+  **Known limitation, stated rather than hidden:** the script could not be executed end-to-end from this
+  sandbox — Node's fetch uses a different egress allowlist than curl and gets a 403 for the bridge host, so
+  only its pure logic is verified by tests. It needs one live run in an environment that can reach the
+  bridge before being trusted for enumeration counts.
