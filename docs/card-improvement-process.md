@@ -3202,6 +3202,66 @@ ones still open: `nypl.org` (17 live), `goldfishswimschool.com` (10), `physiques
 `dusc.net` (5), `parkslopeunited.com` (5), `theartfarms.com` is done but `brooklynunitedacademy.com` (4/4),
 `fit4dancenyc.com` (4/4), `kidville.com` (4/4) and `thecodingspace.com` (4/4) are not.
 
+### Cluster backlog, tranche 3: six more clusters, and the largest single repurpose yet (2026-08-08)
+
+Six more clusters, **28 cards audited, 28 live cards reduced to 15 correct ones**, and **11 cards
+repurposed onto real locations that had no card at all** — nearly as many repurposes as retirements. The
+running total across both tranches is **13 clusters, 71 cards, 55 live cards down to 22**.
+
+| Host | Cards before | Real locations (per the operator) | After |
+| --- | --- | --- | --- |
+| `physiqueswimming.com` | 7 | 7 NYC pools, each in a host venue | **7 canonical — one per pool** |
+| `joinplaygroupnyc.com` | 5 | 2: 540 President St (Brooklyn), 412 6th Ave (Manhattan) | 2 canonical, 3 terminal |
+| `brooklynunitedacademy.com` | 4 | 1 office, ~10 public training parks | 1 canonical, 3 terminal |
+| `fit4dancenyc.com` | 4 | 1 studio: 21 Snyder Ave, **Flatbush** | 1 canonical, 3 terminal |
+| `kidville.com` | 4 | 1 NY branch: 205 W 88th St (UWS) | 1 canonical, 3 terminal |
+| `thecodingspace.com` | 4 | 2 in-borough: 201 E 83rd St, 461 6th St (Park Slope) | 2 canonical, 1 terminal, 1 quarantined |
+
+**Physique Swimming is the largest repurpose so far: seven cards, seven real pools, nothing retired.** Its
+locations page names each site by its host venue — Bowling Green (Léman Prep Upper School), Financial
+District (Léman Prep Lower School), Harlem (Dunlevy Milbank Center), Upper East Side (Yorkshire Towers),
+Park Slope (Congregation Beth Elohim), Grand Concourse (BronxWorks CMCC), Riverdale (Riverdale Neighborhood
+House) — and the seven existing cards covered only two of them, with three parked at "NYC-wide" or
+"Brooklyn-wide". Every card was generic enough to reassign, and the operator's own page identified each
+target unambiguously, so the whole cluster resolved by editing rather than splitting or retiring.
+
+**The rented-venue test is about the programme, not the freehold.** The Art Farm's `/summer-camp-uws/` was
+retired last tranche because the Calhoun School's building is rented for eight weeks. Physique's pools are
+also in other people's buildings, and were all *kept*. The difference is not ownership — it is whether the
+operator runs a continuing programme at that address. Physique publishes a weekly year-round schedule for
+each of the seven; a swim school without its own pool is the ordinary model for the trade. **Ask "does this
+operator run an ongoing programme at this address", not "does this operator own this address."**
+
+**Three byte-identical cards, three different fabricated neighbourhoods — the sharpest evidence yet that
+`neighborhoodGuess` is generated independently of the source.** PlayGroup NYC had three cards with the same
+title ("Social", itself truncated from "Social Skills Groups") and the same `sourceUrl`
+(`/social-skills-groups`), differing in exactly one field: they claimed **Allerton, Bedford Park and
+Baychester** — three different Bronx neighbourhoods, for an operator whose two locations are in Park Slope
+and Greenwich Village. Identical input, three different outputs, none of them right. This is a stronger
+signal than the earlier "East New York" repetition: that showed unrelated cards *sharing* a wrong default,
+this shows identical cards *diverging*. Whatever produces the neighbourhood is not reading the page.
+
+**Three of four cards presented a real club under names it does not use — and one of those names belongs to
+a different real company.** Brooklyn United Academy's cluster carried "Brooklyn Soccer Academy", "Brooklyn
+United Youth Soccer Club", "United Soccer Academy Brooklyn" and the correct "Brooklyn United Academy". The
+third is the dangerous one: United Soccer Academy is a real, separate provider, so that card would have
+sent a family looking for one business to another. Name fabrication has appeared before in a single title
+(CompleteBody Kids); a cluster where the *majority* of cards misname the business is new, and the
+name-collision case is worth its own flag.
+
+**A second confirmation that the program test overrides the path-depth tie-breaker.** All four Kidville
+cards sit on `/westside/` paths; the canonical one is `/westside/` itself and the three duplicates are
+`/westside/our-services/classes-and-programs/`, `/…/birthday-parties/` and `/…/camp-kidville/`. The correct
+card is the *shallowest* of the four. Path depth is a tie-breaker between location candidates, never a
+reason to prefer a programme page.
+
+**The fashionable-core bias held again, twice.** Fit4Dance's one studio is at 21 Snyder Ave in **Flatbush**;
+all four cards said Crown Heights, the better-known name two miles north. Physique's two Bronx pools —
+Riverdale and Grand Concourse — had no card between them until this pass, while Manhattan was
+over-represented. Same direction every time.
+
+**Remaining backlog: 186 clustered hosts, 74 with 2+ published cards.**
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -4031,3 +4091,22 @@ ones still open: `nypl.org` (17 live), `goldfishswimschool.com` (10), `physiques
   resolved: leagues playing on public fields (Brooklyn AYSO, Gjoa) are kept, not caught by the
   no-fixed-venue prohibition, which exists for businesses with no location of their own at all. Remaining:
   192 clustered hosts, 80 with 2+ published. See "Working the duplicate backlog by cluster" above.
+- v95 (2026-08-08): cluster backlog tranche 3 -- six more clusters, **28 cards audited, 28 live cards
+  reduced to 15**, and **11 repurposed onto real uncarded locations**, nearly as many as were retired.
+  Running total: **13 clusters, 71 cards, 55 live cards down to 22**. Headline: **Physique Swimming resolved
+  7 cards onto 7 real pools with nothing retired** -- the largest single repurpose yet, possible because the
+  operator names every site by its host venue and the existing cards covered only two of the seven. That
+  cluster also sharpened the rented-venue rule from last tranche into a usable test: **ask whether the
+  operator runs an ONGOING PROGRAMME at the address, not whether it owns the building** -- The Art Farm's
+  eight-week camp rental was retired, Physique's year-round host pools were all kept, and a swim school
+  without its own pool is the normal model for the trade. New evidence on the neighbourhood field:
+  **PlayGroup NYC had three byte-identical cards -- same title, same sourceUrl -- differing only in claiming
+  three DIFFERENT fabricated Bronx neighbourhoods** (Allerton, Bedford Park, Baychester) for an operator
+  located in Park Slope and Greenwich Village. Identical input, three divergent outputs: stronger than the
+  earlier shared-wrong-default signal, and evidence the neighbourhood is not derived from the page at all.
+  Also: **three of four Brooklyn United Academy cards misname the club, one of them with a different real
+  company's name** ("United Soccer Academy"), which would misdirect a family to the wrong provider; a
+  **second confirmation that the program test overrides path depth** (Kidville's correct card is the
+  shallowest of four, the other three being programme pages under the same `/westside/` branch); and the
+  fashionable-core bias again, twice (Fit4Dance's Flatbush studio labelled Crown Heights on all four cards;
+  Physique's two Bronx pools uncarded until now). Remaining: 186 clustered hosts, 74 with 2+ published.
