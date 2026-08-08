@@ -2908,6 +2908,47 @@ Bricks 4 Kidz (3 cards) was the batch's straightforward no-fixed-venue cluster �
 and field trips delivered at host sites, all three cards on the bare brand root with no located NYC
 franchise behind them.
 
+### Batch 45/27 (cards 555-581)
+
+12 queue cards, 15 siblings, 12 hosts. 11 canonical or verified, 10 terminal, 6 quarantined.
+
+**An open item from batch 42 closed itself.** Brooklyn Crescents Lacrosse Club was left blocked three
+batches ago with the note "the fix is a re-source to the club's own domain, not a clearance" — the club's
+own domain being unknown at the time. It surfaced in this batch's queue as `brooklyncrescents.com`, with
+three cards on it. So the directory-sourced card is no longer a re-source opportunity at all; it is simply a
+duplicate of a correctly-sourced sibling, and was terminal-ed as one. **A "re-source opportunity" recorded
+in `terminalReason` is a bet that the better source exists somewhere in the pool — and the per-domain sweep
+is what collects the winnings.** Worth doing deliberately: when a card is left blocked for want of a better
+source, the entity's own domain is worth a `sourceHost` probe on the spot.
+
+**The program-before-path ordering from batch 44 applied cleanly on its first re-use.** Movement's Gowanus
+climbing gym had three cards: two on `/gowanus/climbing/youth-...` and one on `/gowanus/`. Path depth alone
+would have picked a youth-program page over the location page. Program test first, then depth — canonical is
+`/gowanus/`, and the two deeper program cards are duplicates. The verify pass then caught a leftover: the
+canonical still carried the title "Movement Gowanus Youth **Programs**", which is the program name on what is
+now the location card. Retitled. **Same lesson as batch 43's Kensington case, in the opposite direction:
+when a card's ROLE changes, re-read its title.**
+
+**A domain/subject mismatch that is NOT a defect — the negative control for token collision.** "NYC Skyline
+Flag Football" sits on `nycskylinebasketball.com`, which reads exactly like the camp.com/Kidville token
+collision from batch 40. It isn't: NYC Skyline is one real organization running several sports, and the
+card's source is its own flag-football program path, not the bare root. **A sport-versus-domain mismatch is
+only a defect when the ENTITIES differ.** Recorded alongside the Goethe-Institut foreign-TLD control so the
+two "looks wrong, isn't" cases sit together.
+
+**Third and fourth no-fixed-venue clusters, and the B2B-training ground got its second instance.**
+- *Bent on Learning* — "Yoga & Mindfulness in Schools", Programs menu consisting solely of Teacher Training
+  and Yoga for Schools. Second B2B training organization after Little Flower Yoga, **on the same subject
+  matter**, which suggests school-yoga nonprofits are a small recurring cluster of this shape rather than a
+  one-off.
+- *Prep Academy Tutors* (2 cards) — "Private & Online Tutoring", national 888 number, "find your local
+  tutor". The textbook in-home/online case.
+- *Kids in the Game* (3 cards) — school-based programs and camps at host sites. One card is titled
+  **"Kids in the Game PS 29 Brooklyn"**, which states the problem more plainly than any analysis could: PS 29
+  is a New York City public school. **A card named after someone else's building is not a card for this
+  business's location.** Its Brooklyn Heights sibling additionally claims a neighborhood absent from the
+  company's own list of camp sites.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -3656,3 +3697,20 @@ franchise behind them.
   schools -- no children's offering at all, as against Brains & Motion or Bricks 4 Kidz which do teach
   children but lack a venue). Second fabricated Brooklyn location on the colormemine.com host, both on the
   bare root. See "Batch 44/25..." above.
+- v90 (2026-08-08): batch 45/27 (cards 555-581) -- 12 queue cards, 15 siblings, 12 hosts. 11 canonical or
+  verified, 10 terminal, 6 quarantined. **A batch-42 open item closed itself**: Brooklyn Crescents was left
+  blocked with "the fix is a re-source, not a clearance" and an unknown target; the club's own domain
+  surfaced in this batch's queue, so the directory-sourced card became an ordinary duplicate. A recorded
+  re-source opportunity is a bet the better source is somewhere in the pool, and the per-domain sweep
+  collects it -- worth probing the entity's own domain by `sourceHost` on the spot when leaving a card
+  blocked for want of a source. The batch-44 **program-before-path ordering** applied cleanly on first
+  re-use (Movement Gowanus: two `/gowanus/climbing/youth-...` cards vs one `/gowanus/`; depth alone would
+  have picked a program page), and the verify pass caught the follow-on -- the new location card still
+  carried the title "Movement Gowanus Youth Programs". **When a card's ROLE changes, re-read its title**, the
+  mirror of batch 43's Kensington case. New negative control: a sport/domain mismatch ("NYC Skyline Flag
+  Football" on nycskylinebasketball.com) is NOT a token collision when the entities are the same
+  organization -- filed next to the Goethe-Institut foreign-TLD control. Third and fourth no-fixed-venue
+  clusters (Prep Academy Tutors, in-home/online; Kids in the Game, school-based -- one card literally titled
+  "PS 29 Brooklyn", i.e. named after someone else's building), and a second B2B-training-organization
+  quarantine (Bent on Learning) on the same school-yoga subject matter as Little Flower Yoga, suggesting a
+  small recurring cluster rather than a one-off. See "Batch 45/27..." above.
