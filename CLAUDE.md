@@ -816,6 +816,20 @@ in a comment when you add one, the way the existing ports do.
   but 259 are `precision: "approximate"` and seven share a single Upper East Side point — the pin is derived
   from the placeholder, so a map shows a confident marker on a street the business is not on. Don't read the
   presence of `geo` as evidence the address is known.
+- **BUILD-THEN-RETIRE is what makes the program-card sweep safe, and the operator's own branch directory is
+  what makes it cheap.** The 102-listing YMCA cluster was declined once as unsweepable — retiring a branch's
+  class cards strands the branch if no venue card exists. Both halves of that worry dissolve in one step:
+  fetch the operator's location directory (ymcanyc.org/locations gave all 24 branch addresses and phones in a
+  single request), PROMOTE one class card per branch to be the venue record, and only then retire the rest.
+  102 → 25 listings, no branch lost. Never retire first.
+- **A parent organisation's HQ address in a page footer or header is a GENERAL extraction failure, not one
+  organisation's quirk — four instances, three different parents.** WCS's HQ put Prospect Park Zoo in the
+  Bronx and nearly moved the New York Aquarium there too; the NYC Parks Department's HQ ("The Arsenal, Central
+  Park, 830 Fifth Avenue") was on ALL FIFTEEN Summer Sports Experience listings; Kids in the Game's office
+  address sits on camps in two other neighbourhoods. Check it wherever one parent runs several sites.
+- **A guard built to prevent bad writes is worth reading as a REPORT.** The address pipeline refuses to write
+  a street address already held by another listing. All 41 refusals were real findings — duplicate pairs,
+  program clusters, and the aquarium relocation. The refusals were more valuable than the writes.
 - **The `providers.phone` field has held Unix timestamps and the city switchboard.** Found 2026-08-08 in a
   pool-wide scan: nineteen live records carried 10-digit epoch seconds (`1742850639` = 2025-03-24,
   `1672214040` = 2022-12-28) where the phone number should be, and eighteen carried `311`, New York City's
