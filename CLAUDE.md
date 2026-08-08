@@ -799,6 +799,23 @@ in a comment when you add one, the way the existing ports do.
   more populated fields, but Brooklyn Bridge Fencing Club's fuller record said Downtown Brooklyn and the
   thinner one said DUMBO, which is correct. Keeping the fuller record would have preserved more fields and
   the wrong location.
+- **A bulk sweep buys scale at the cost of the oldest-first queue.** After the pool-wide provider sweeps,
+  all 1,027 live listings had an `updatedAt` of the same day, so step 1's "pull the oldest" could no longer
+  tell a genuinely reviewed listing from one a script had touched. Build the queue from DEFECT SIGNAL
+  instead, and note that this is exactly what a `fieldVerifications` marker would fix.
+- **A live listing's address was a FICTIONAL address in a video game.** `prov-jodi-s-gym` stored
+  `1 Willow Lane` and its whole description was the Stardew Valley wiki entry for a character named Jodi
+  ("Lives In Pelican Town"), token-matched on a FIRST NAME. Entity-before-domain saved it: Jodi's Gym is a
+  real UES children's gym at 244 E 84th St since 1982, so the neighbourhood was accidentally right while
+  everything supporting it was invented. A follow-up scan for wiki/fandom/dictionary markers across all live
+  listings found no second instance — worth recording as a genuine negative result.
+- **Hyphenated Queens house numbers lose their first half.** Laser Bounce's real address is `80-28 Cooper
+  Ave`; the extracted value was `28 Cooper Ave`. Queens addresses are routinely hyphenated, so any Queens
+  listing whose building number looks implausibly low is worth re-checking against the operator's own site.
+- **A neighbourhood-centroid `geo` is worse than no pin.** All 303 placeholder-address listings carry a geo,
+  but 259 are `precision: "approximate"` and seven share a single Upper East Side point — the pin is derived
+  from the placeholder, so a map shows a confident marker on a street the business is not on. Don't read the
+  presence of `geo` as evidence the address is known.
 - **The `providers.phone` field has held Unix timestamps and the city switchboard.** Found 2026-08-08 in a
   pool-wide scan: nineteen live records carried 10-digit epoch seconds (`1742850639` = 2025-03-24,
   `1672214040` = 2022-12-28) where the phone number should be, and eighteen carried `311`, New York City's
