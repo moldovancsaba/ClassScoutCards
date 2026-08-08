@@ -147,8 +147,9 @@ export const BRIDGE_REGISTRY: Record<BridgeCollectionKey, BridgeCollectionConfig
       // Research fields (2026-08-07 finding, same class of gap as meetupGroups.website): the real
       // Provider type has address/website/phone/email/sourceUrls, but none were exposed here, forcing a
       // review to guess an org's identity from garbage scraped copy instead of going straight to its own
-      // source/contact info. address/phone/activityTypes are now also writable (see below); website/
-      // email/sourceUrls stay read-only — this bridge doesn't touch a provider's own contact links.
+      // source/contact info. address/phone/activityTypes are now also writable (see below), and so are
+      // email (placeholder values) and website (dead/wrong domains, see below); sourceUrls stays
+      // read-only — it is the discovery pipeline's own provenance trail, not a field to curate.
       address: 1,
       website: 1,
       phone: 1,
@@ -199,6 +200,16 @@ export const BRIDGE_REGISTRY: Record<BridgeCollectionKey, BridgeCollectionConfig
       // (e.g. "555-555-5555", "mymail@mailservice.com") rather than real scraped data -- phone was
       // already writable to fix this; email was not, blocking the same fix for the sibling field.
       "email",
+      // (2026-08-08 finding) `website` is the link a family actually clicks, and it can be flatly dead
+      // while every other field on the record is correct. Barking Cat Studio is a real, currently
+      // operating art studio at 219 Greenwood Ave -- its record's website was `barkingcatstudio.com`,
+      // which serves a parked "Coming Soon / under construction" page, while the business itself is at
+      // `barkingcatstudio.net`. Same defect class that made `sourceUrl` writable on contentCards (real
+      // entity, wrong/dead domain), on the collection where it is a public-facing link rather than an
+      // internal provenance note -- so a family clicking through from a live card lands on nothing.
+      // Note this is the ENTITY's own link: judge it by whether it reaches the business, and never
+      // rewrite it to a directory listing or an aggregator page standing in for the operator's own site.
+      "website",
       "activityTypes",
       "primaryActivityType",
       "primaryActivityTypeConfidence",

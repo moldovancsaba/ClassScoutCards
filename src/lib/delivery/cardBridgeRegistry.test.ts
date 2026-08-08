@@ -24,9 +24,17 @@ describe("rejectedFields", () => {
     expect(rejectedFields("providers", { shortDescription: "x", category: "Classes" })).toEqual([]);
   });
 
-  it("flags any key outside the allow-list, e.g. an attempt to overwrite id/website/email", () => {
+  it("flags any key outside the allow-list, e.g. an attempt to overwrite id/sourceUrls", () => {
     expect(rejectedFields("providers", { id: "hijack", shortDescription: "x" })).toEqual(["id"]);
-    expect(rejectedFields("providers", { website: "https://evil.example" })).toEqual(["website"]);
+    // sourceUrls is the discovery pipeline's own provenance trail — readable, never writable.
+    expect(rejectedFields("providers", { sourceUrls: ["https://evil.example"] })).toEqual(["sourceUrls"]);
+  });
+
+  // (2026-08-08) `website` moved from read-only to writable — a live provider's public link can be
+  // flatly dead (Barking Cat Studio's .com is a parked page; the studio is at .net) and there was no
+  // way to fix it. Pinned so a future narrowing of the allow-list has to be deliberate.
+  it("providers.website is writable, so a dead public link can be corrected", () => {
+    expect(rejectedFields("providers", { website: "https://www.barkingcatstudio.net/" })).toEqual([]);
   });
 
   it("every WRITABLE collection's writableFields is non-empty and copyFields is a subset of it", () => {
