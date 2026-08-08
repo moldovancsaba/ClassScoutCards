@@ -1,6 +1,7 @@
 # Structured opening hours, programs and sessions — recommendation
 
-**Status: recommendation, not implemented.** Owner-requested 2026-08-08: *"I would like to store them in
+**Status: the bridge half is BUILT and migrated (see §9); the core-app half is a recommendation.**
+Owner-requested 2026-08-08: *"I would like to store them in
 structured format to be able to have a kind of menu for the listings and also can be used to find
 activities better for actual days."*
 
