@@ -36,10 +36,36 @@ export type WriteValidationResult =
 const MIN_REASON_LENGTH = 5;
 
 /**
+ * Parses a candidate `contentCards.sourceUrl` and returns its canonical host, or null if the value is
+ * not a usable source. Shared by validation (reject early) and the apply path (derive `sourceHost`), so
+ * the two can never disagree about what counts as valid.
+ *
+ * The host is lowercased and `www.`-stripped to match how `sourceHost` is already stored on real
+ * records -- live data has `sourceHost: "streb.org"` next to `sourceUrl: "https://www.streb.org/"`, so
+ * keeping the `www.` here would silently split one duplicate cluster into two under the per-domain
+ * sweep.
+ */
+export function parseSourceUrl(value: string): { host: string } | null {
+  const trimmed = value.trim();
+  if (!trimmed.startsWith("https://")) return null;
+  let url: URL;
+  try {
+    url = new URL(trimmed);
+  } catch {
+    return null;
+  }
+  const host = url.hostname.toLowerCase().replace(/^www\./, "");
+  // A hostname with no dot ("localhost", "internal") is never a real public source page.
+  if (!host.includes(".")) return null;
+  return { host };
+}
+
+/**
  * Pure validation of an incoming write request body — no I/O. Every rejection path here is a 400: bad
  * shape, an unregistered collection, a field outside that collection's writable allow-list, a category
- * outside the real enum, an image field that isn't a plausible https URL, or copy that fails the
- * ported public-description quality gate. Nothing here ever contacts the database.
+ * outside the real enum, an image field that isn't a plausible https URL, a sourceUrl that isn't a
+ * parseable https URL, or copy that fails the ported public-description quality gate. Nothing here ever
+ * contacts the database.
  */
 export function validateWriteRequest(body: unknown): WriteValidationResult {
   if (typeof body !== "object" || body === null) {
@@ -182,6 +208,25 @@ export function validateWriteRequest(body: unknown): WriteValidationResult {
     }
   }
 
+  // (2026-08-08) Re-sourcing a content card. Stricter than the image check above, because sourceUrl is
+  // the EVIDENCE a card is judged against: every later reality check reads it, and the per-domain sweep
+  // groups duplicate clusters by the host derived from it. A malformed value would not just look wrong,
+  // it would quietly remove the card from its own cluster.
+  if (collection === "contentCards" && "sourceUrl" in updates) {
+    const value = updates.sourceUrl;
+    if (typeof value !== "string") {
+      return { ok: false, status: 400, error: "sourceUrl must be a string" };
+    }
+    const parsed = parseSourceUrl(value);
+    if (!parsed) {
+      return {
+        ok: false,
+        status: 400,
+        error: `sourceUrl must be a parseable https:// URL with a real hostname — got ${JSON.stringify(value)}. Re-source to a page that actually evidences THIS specific location (a branch page, not a franchise root domain and not a third-party directory listing).`,
+      };
+    }
+  }
+
   // dryRun defaults to true — a write only actually applies when the caller explicitly passes false.
   const dryRun = b.dryRun !== false;
 
@@ -268,6 +313,15 @@ export async function applyCardBridgeWrite(request: NormalizedWriteRequest): Pro
   // stale primaryActivityType — see activityAlignment.ts for the real reasoning (primary activity
   // first, only same-cluster activities kept, capped at 3). Checked in BOTH dry-run and apply, same
   // convention as the serviceLeads/geo guards above, so the realigned result is visible before commit.
+  // (2026-08-08) Re-sourcing derives sourceHost rather than trusting/accepting it from the caller, so a
+  // card can never end up with a host that disagrees with its own URL. Computed here (not in
+  // validation) so it shows up in the dry-run preview alongside every other derived field -- the loop's
+  // convention is that a dry-run shows exactly what an apply would write.
+  let derivedSourceHost: string | undefined;
+  if (request.collection === "contentCards" && typeof request.updates.sourceUrl === "string") {
+    derivedSourceHost = parseSourceUrl(request.updates.sourceUrl)?.host;
+  }
+
   let activityAlignment: ReturnType<typeof alignActivityTypes> | undefined;
   if (request.collection === "providers" && ("activityTypes" in request.updates || "primaryActivityType" in request.updates)) {
     const candidateActivityTypes = (request.updates.activityTypes as string[] | undefined) ?? (current.activityTypes as string[] | undefined) ?? [];
@@ -284,6 +338,7 @@ export async function applyCardBridgeWrite(request: NormalizedWriteRequest): Pro
     const alignmentExtra = activityAlignment
       ? { activityTypes: activityAlignment.activityTypes, primaryActivityType: activityAlignment.primaryActivityType, activityTypesDropped: activityAlignment.dropped }
       : {};
+    const sourceHostExtra = derivedSourceHost ? { sourceHost: derivedSourceHost } : {};
     return {
       found: true,
       dryRun: true,
@@ -294,8 +349,8 @@ export async function applyCardBridgeWrite(request: NormalizedWriteRequest): Pro
       // Even in dry-run, show what a touch would actually stamp — so the caller can verify the
       // no-op-content path before committing to it, same as any other write.
       applied: request.touch
-        ? { ...request.updates, ...previewExtra, ...alignmentExtra, updatedAt: "<now>", lastReviewedAt: "<now>", lastReviewedBy: request.source }
-        : { ...request.updates, ...previewExtra, ...alignmentExtra },
+        ? { ...request.updates, ...previewExtra, ...alignmentExtra, ...sourceHostExtra, updatedAt: "<now>", lastReviewedAt: "<now>", lastReviewedBy: request.source }
+        : { ...request.updates, ...previewExtra, ...alignmentExtra, ...sourceHostExtra },
     };
   }
 
@@ -330,6 +385,11 @@ export async function applyCardBridgeWrite(request: NormalizedWriteRequest): Pro
   if (activityAlignment) {
     finalUpdates.activityTypes = activityAlignment.activityTypes;
     finalUpdates.primaryActivityType = activityAlignment.primaryActivityType;
+  }
+
+  // Keep sourceHost in lockstep with sourceUrl (see parseSourceUrl). Never taken from the caller.
+  if (derivedSourceHost) {
+    finalUpdates.sourceHost = derivedSourceHost;
   }
 
   const auditId = randomUUID();

@@ -99,6 +99,21 @@ export const BRIDGE_REGISTRY: Record<BridgeCollectionKey, BridgeCollectionConfig
       "terminalReason",
       "enrichmentStatus",
       "incompleteFields",
+      // (2026-08-08) Re-sourcing. Across batches 40-45 of the review loop, the single most common
+      // finding this bridge could NOT act on was "real entity, wrong source": a card correctly naming a
+      // real business but pointing at a third-party directory listing (activityhero.com/biz/...), at a
+      // multi-location franchise's bare root domain instead of the branch's own page, or at a different
+      // real company that merely shares a word with it (camp.com serving the CAMP retailer on a card
+      // about Camp Kidville). Every one of those was written down as prose in `terminalReason` and left
+      // unfixed, because sourceUrl was not writable. Making it writable turns those recorded notes into
+      // applyable fixes.
+      //
+      // `sourceHost` is deliberately NOT writable alongside it: it is DERIVED from sourceUrl in
+      // applyCardBridgeWrite. Letting a caller set both invites exactly the drift that would break the
+      // per-domain sweep (`filter={"sourceHost":...}`), which is now the loop's primary way of finding
+      // duplicate clusters -- a card whose host disagreed with its URL would simply vanish from its own
+      // cluster.
+      "sourceUrl",
       ...REVIEW_PROVENANCE_FIELDS,
     ],
     copyFields: [],
