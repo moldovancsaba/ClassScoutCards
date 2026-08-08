@@ -520,6 +520,39 @@ in a comment when you add one, the way the existing ports do.
   per-location cards on those same hosts (`codeninjas.com/ny-gowanus`, `camp.com/locations/fifth-ave-nyc`)
   were correct. Fetching each brand's own location directory resolved five cards in five requests — do that
   before accepting any root-domain card's borough.
+- **Within a duplicate cluster, the card whose `sourceUrl` is a per-location path is canonical and the
+  root-domain copies are the duplicates — a mechanical tie-breaker, no judgement needed.** The corollary of
+  the root-domain rule above, confirmed 2026-08-08 (batch 41) on five hosts at once. SwimJim is the clean
+  experiment: 8 cards, 4 carrying a real per-location path and 4 carrying the bare root; every per-location
+  card was correct and every root-domain one was a duplicate or a location-less chain card. Use this before
+  spending research on "which of these is the real one."
+- **A "program" is not a location — a card differentiated only by an activity or audience qualifier is a
+  duplicate.** Found 2026-08-08 (batch 41), 7 instances in one batch: "JCC Manhattan children's birthday
+  parties", "Textile Arts Center **Kids**", "Brooklyn Brazilian Jiu Jitsu **Kids**", "Private Picassos
+  **Birthday Parties**", "Asphalt Green **Basketball Foundations**". Each reads like a legitimate distinct
+  offering, which is what makes it slip through. The tell: the token distinguishing it from its sibling names
+  an activity or an audience, **not a place**. One card per real physical location means a venue's program
+  menu is card content, not more cards.
+- **Before reaching for `POST /split`, check whether the cluster already has enough cards to cover the real
+  locations — if it does, RETITLE the surplus onto the missing location instead.** Sharpened 2026-08-08
+  (batch 41), extending the batch-37/38 "check for existing children first" note. Three clusters had both
+  surplus vague cards and real locations with no card at all, and were fixed by editing existing documents:
+  MatchPoint NYC's two compound "Coney Island / Bensonhurst" cards became the two real clubs (2781 Shell
+  Road; 9000 Bay Parkway), closing a split candidate deferred in an earlier pass **without a single split
+  call**; Private Picassos' borough-level card became the real Clinton Hill studio (293 Grand Ave); Asphalt
+  Green's compound card became the Battery Park City center (212 North End Ave). Split only when there are
+  genuinely fewer cards than confirmed locations. **The limit matters as much as the technique: retitle only
+  onto a location the evidence actually identifies.** It was deliberately NOT applied to SwimJim (two real
+  UWS pools, but the surplus card says nothing about which) or Brooklyn BJJ (four real schools, seven cards,
+  none location-specific) — inventing the assignment would be fabrication dressed as a fix, so those were
+  recorded as split candidates instead.
+- **Clearing a blocker needs the blocker's PREMISE to be false, not merely the card to be real.** Named
+  2026-08-08 (batch 41) after a batch where 12 blockers were cleared and one was deliberately kept. The
+  clearances were all `low_source_trust` sitting on an institution's own official domain — the premise
+  ("this source is untrustworthy") was simply wrong. DNA Learning Center's `missing_schedule` was left in
+  place even though the camp is real and correctly located, because the schedule genuinely is not on the
+  source page: the premise is true. "The card turned out to be real" is not by itself a reason to clear
+  anything.
 - **Fabrication can live in the TITLE, not just in a location or category field.** Found 2026-08-08 (batch
   40): "CompleteBody Kids / Kids Sports NYC" welds a real **adults-only** gym brand (its own site: "Premium
   Gym NYC — 5 Locations", none on the UWS, no children's programming anywhere) to a second name the source

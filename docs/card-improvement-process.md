@@ -2693,6 +2693,73 @@ terminalReason, enrichmentStatus, incompleteFields, lastReviewedAt, lastReviewed
 findings in this batch therefore recorded the correct URL inside `terminalReason` for a future pass, per
 the standing rule that every real fact found gets written down rather than re-researched.
 
+### Batch 41/46 (cards 423-468)
+
+The batch-40 all-hosts sweep run again, and it compounded: **16 queue cards pulled in 30 siblings** across
+16 domains. Only two of the sixteen hosts (`camphalfbloodbklyn.com`, `wearedream.org`, plus
+`summercamps.dnalc.org`) had a single card. Outcome: 17 canonical/corrected, 24 terminal, 3 quarantined,
+1 blocker deliberately left in place.
+
+| Host | Real locations | Cards | Resolution |
+| --- | --- | --- | --- |
+| swimjim.com | 5 (2 UWS, 2 UES, 1 Brooklyn) | 8 | 3 per-location canonical, 5 terminal |
+| brooklynbjj.com | 4 (Gravesend, Bay Pkwy, Clinton Hill, Cobble Hill) | 7 | 1 canonical + split candidate, 4 terminal, 2 quarantined (Williamsburg) |
+| matchpoint.nyc | 2 (Coney Island, Bensonhurst) | 4 | 2 **retitled** to the real clubs, 2 terminal |
+| asphaltgreen.org | 3 (UES, Battery Park City, Bedford Ave) | 3 | 1 canonical, 1 **retitled** to BPC, 1 terminal |
+| privatepicassos.com | 2 (Park Slope, Clinton Hill) | 3 | 1 canonical, 1 **repurposed** to Clinton Hill, 1 terminal |
+| mmjccm.org / childsplayny.com / manhattansc.org | 1 each | 3 each | 1 canonical each; 5 terminal, 1 quarantined |
+| urbanglass.org / textileartscenter.com / bkprovolleyball.com | 1 each | 2 each | 1 canonical + 1 terminal each |
+
+**The strongest confirmation yet of the batch-40 root-domain rule — and now a canonical-selection rule.**
+SwimJim is the clean experiment: eight cards, four carrying a real per-location path
+(`/locations/new-york/nyc/upper-west-side-west-end-ave...`) and four carrying the bare root. Every
+per-location card was correct; every root-domain card was a duplicate or a location-less chain card. The
+same pattern held on `urbanglass.org`, `mmjccm.org`, `asphaltgreen.org` and `imac-nyc.com`. So the sweep now
+has a mechanical tie-breaker: **when a cluster contains both, the card with the per-location source path is
+canonical and the root-domain copies are the duplicates.** No judgement call, no research needed to pick.
+
+**New pattern: the PROGRAM-not-a-location duplicate.** A recurring cluster member is a card describing a
+*program* of a venue rather than a second venue — "JCC Manhattan children's birthday parties", "Textile Arts
+Center **Kids**", "Brooklyn Brazilian Jiu Jitsu **Kids**", "Private Picassos **Birthday Parties**", "Asphalt
+Green **Basketball Foundations**". Seven of the 24 terminal cards this batch were this shape. It is distinct
+from a borough-level duplicate (which at least tries to name a place) and reads on the surface like a
+legitimate distinct offering. The tell is that the differentiating token is an *activity or audience*
+qualifier, not a *place*. One card per real physical location means a venue's program menu is card content,
+not additional cards.
+
+**Repurposing beats terminal-ing when the cluster is smaller than the real location count.** Three clusters
+had surplus vague cards AND real locations with no card at all, so the surplus was **retitled onto the
+missing real location** instead of retired: MatchPoint's two "Coney Island / Bensonhurst" compound cards
+became the Coney Island club (2781 Shell Road) and the Bensonhurst club (9000 Bay Parkway); Private
+Picassos' borough-level card became the real Clinton Hill studio (293 Grand Ave); Asphalt Green's compound
+"Battery Park City / UES" card became the Battery Park City center (212 North End Ave). This closes the
+MatchPoint split candidate deferred in an earlier pass **without calling `POST /split` at all** — the third
+consecutive precedent for resolving a multi-location mashup by editing existing documents. Generalizing the
+batch-37/38 note: *check whether the cluster already contains enough cards to cover the real locations
+before reaching for the split tool* — if it does, retitle; only split when there are genuinely fewer cards
+than locations.
+
+**The limit of repurposing, stated explicitly.** It was NOT applied where the surplus card carries no
+evidence of which site it means. SwimJim has two real UWS pools (808 Columbus Ave, West End Ave) and two
+real UES pools (Two Sutton Place North, Yorkshire Towers); the root-domain "SwimJim Upper West Side" card
+could have been declared the missing 808 Columbus card, but nothing on it says so, and that would be
+fabrication dressed as a fix. Same for Brooklyn BJJ: four real schools, seven cards, none location-specific
+— so one canonical borough-level card was kept and the four locations recorded as a split candidate rather
+than four cards invented from nothing. **Retitle only onto a location the evidence actually identifies.**
+
+**A blocker was deliberately left in place** — a first for this run's tables, worth naming so the pattern
+isn't read as "clear every blocker". DNA Learning Center's `missing_schedule` is not stale: the camp is real
+and correctly located in Downtown Brooklyn, but the dates genuinely are not exposed on the source page. The
+clearances elsewhere in this batch were justified by *the blocker's premise being false*
+(`low_source_trust` on an institution's own official domain), not by the card turning out to be real.
+
+**Two more real-brand-fake-location instances** (Brooklyn BJJ Williamsburg ×2 — its own site lists four
+Brooklyn schools and Williamsburg is not among them), and **one unsupported-location quarantine** where the
+batch-21 exactly-one-answer rule bit: Child's Play NY is a real Brooklyn theater org, but its confirmed
+venues span Brooklyn Heights, Carroll Gardens, Fort Greene, Park Slope, Union Square, West Village, DUMBO
+and Cobble Hill — *several* real answers, not one — so the card's unsupported Upper West Side claim was
+quarantined rather than corrected to a pick among them.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -3368,3 +3435,18 @@ the standing rule that every real fact found gets written down rather than re-re
   not the field a family reads first. Process: `reason` AND `source` are both mandatory on every update
   call, and `sourceUrl` is not writable on `contentCards` (re-source findings recorded in `terminalReason`
   instead). See "Batch 40/25..." above.
+- v86 (2026-08-08): batch 41/46 (cards 423-468) -- the all-hosts sweep compounded: 16 queue cards pulled in
+  30 siblings across 16 domains, only 3 hosts had a single card. 17 canonical/corrected, 24 terminal, 3
+  quarantined. The batch-40 root-domain rule is now also a **canonical-selection rule**: SwimJim's 8 cards
+  split cleanly into 4 with a real per-location path (all correct) and 4 with the bare root (all duplicates
+  or location-less chain cards), and the same held on four other hosts -- so when a cluster contains both,
+  the per-location card is canonical, no judgement needed. New pattern: the **program-not-a-location
+  duplicate** ("...Kids", "...Birthday Parties", "Basketball Foundations"), 7 of the 24 terminals, whose
+  tell is that the differentiating token is an activity/audience qualifier rather than a place. Also
+  generalized the split guidance: three clusters had surplus vague cards AND real locations with no card, so
+  the surplus was **retitled onto the missing location** (MatchPoint → Coney Island 2781 Shell Rd +
+  Bensonhurst 9000 Bay Pkwy, closing a deferred split candidate with no `POST /split` call; Private Picassos
+  → Clinton Hill 293 Grand Ave; Asphalt Green → Battery Park City 212 North End Ave). Its limit stated
+  explicitly: NOT applied to SwimJim's or Brooklyn BJJ's surplus, where no card identifies which real site it
+  means -- retitle only onto a location the evidence names. One blocker deliberately left in place (DNA
+  Learning Center's `missing_schedule` is a real gap, not a stale premise). See "Batch 41/46..." above.
