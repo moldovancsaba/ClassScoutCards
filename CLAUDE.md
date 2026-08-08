@@ -526,6 +526,27 @@ in a comment when you add one, the way the existing ports do.
   per-location cards on those same hosts (`codeninjas.com/ny-gowanus`, `camp.com/locations/fifth-ave-nyc`)
   were correct. Fetching each brand's own location directory resolved five cards in five requests — do that
   before accepting any root-domain card's borough.
+- **A card's `sourceUrl` can be a famous page reached by TOKEN-MATCHING one word of the business name — and
+  because the host looks authoritative, every other heuristic passes it.** Found 2026-08-08; **25 cards**,
+  most `PUBLISHED` with zero blockers. `en.wikipedia.org/wiki/Tiger` (the animal) for Tiger Schulmann's,
+  `/wiki/Manhattan` for six Manhattan-named orgs, `/wiki/Downtown` for two Downtown-named ones, `/wiki/Dance`
+  for a dance studio, `/wiki/West` for the West Side YMCA, `/wiki/Marlene_Dietrich` for the Marlene Meyerson
+  JCC, `/wiki/Saint_Peter` for Peter Stuyvesant Little League, `/wiki/Asphalt_concrete` for Asphalt Green;
+  `youtubekids.com` for six cards containing "Kids"; `nytimes.com` for three containing "NY". A family
+  clicking "Asphalt Green Youth Tennis" landed on the article about road surfacing. **The reason this
+  survives every other check is that the fields all look fine and the host looks authoritative** — one was
+  even graded `sourceAuthorityGrade: "authoritative"`. The only tell is reading the actual URL. Most of the
+  entities are REAL, so per the entity-before-domain rule these are wrong-domain cards, not contamination:
+  block as `BLOCKED_REPAIRABLE` with the re-source target recorded, and terminate only where the entity
+  itself cannot be identified. **The count grew every time another reference host was queried (3 → 15 → 25),
+  so treat a `sourceHost` denylist query as the audit, not a spot check.** Root cause is in the read-only
+  main app — written up as item 0 of `docs/classscout-core-recommendations.md`.
+- **A negative result from a small sample is worth recording, but say the sample size loudly.** The same
+  sweep's first 50 cards found zero off-topic contamination, and that was written up as a headline negative
+  result — "the published pool is not where this defect concentrates". Continuing past 50 found the 25-card
+  token-match cluster above. The original note was not deleted; it was marked superseded in place, because
+  the useful lesson is that **50 was too small a sample to generalise from and the write-up did not say so
+  loudly enough**, not that recording a negative result was wrong.
 - **A sweep must GROUP BY DOMAIN before it judges, not screen a page and move on.** Found the hard way
   2026-08-08 during the PUBLISHED sweep: page 1 recorded "Koko NYC Brooklyn" and "Brooklyn City FC Academy"
   as clean, and both turned out to have duplicate twins — sitting on page 2. Nothing on either card reveals

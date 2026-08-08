@@ -13,6 +13,70 @@ Ordered by family impact, worst first.
 
 ---
 
+## 0. Discovery picks a source by TOKEN-MATCHING the business name to an unrelated famous page  [NEW, HIGHEST]
+
+**Found 2026-08-08 during the published-card sweep. 25 cards resolved, most of them `PUBLISHED` with zero
+blockers, across three host families and one root cause.** This is the worst defect found in the entire
+review effort, and the count kept growing every time another reference host was checked.
+
+The pipeline appears to take a *word* from the business name and resolve it to a well-known page, rather
+than finding the business. The results are self-evidently absurd once you look at the URL:
+
+| Card title (all PUBLISHED, no blockers) | `sourceUrl` it was given | Matched on |
+| --- | --- | --- |
+| Tiger Schulmann's UWS / UES / Tiger Strong NYC | `en.wikipedia.org/wiki/Tiger` — **the animal** | "Tiger" |
+| Marlene Meyerson JCC Manhattan Sports | `en.wikipedia.org/wiki/Marlene_Dietrich` — **the actress** | "Marlene" |
+| Peter Stuyvesant Little League | `en.wikipedia.org/wiki/Saint_Peter` — **the apostle** | "Peter" |
+| Asphalt Green Youth Tennis | `en.wikipedia.org/wiki/Asphalt_concrete` — **road surfacing** | "Asphalt" |
+| Manhattan Soccer Club ×2, Manhattan Youth Tennis / Aquatics / Beach Volleyball / Downtown Community | `en.wikipedia.org/wiki/Manhattan` — **the borough article** | "Manhattan" |
+| Downtown United Soccer Club, Downtown Little League | `en.wikipedia.org/wiki/Downtown` — **the concept** | "Downtown" |
+| Dance Workshop NY | `en.wikipedia.org/wiki/Dance` — **the art form** | "Dance" |
+| West Side YMCA | `en.wikipedia.org/wiki/West` — **the compass direction** | "West" |
+| British Swim School Manhattan | `en.wikipedia.org/wiki/United_Kingdom` — **the country** | "British" |
+| Kids in Sports UES / UWS, Kids Basketball NYC, Kids in the Game ×3 | `youtubekids.com` — **a video platform** | "Kids" |
+| NY Sports 4 Kids, NY Kids Club UES / Chelsea | `nytimes.com` — **the newspaper homepage** | "NY" |
+
+A family clicking "Asphalt Green Youth Tennis" today lands on the Wikipedia article for asphalt concrete.
+A family clicking "Kids in Sports UES" lands on YouTube Kids.
+
+**Why this is worse than it looks.** Most of these are *real businesses* — Tiger Schulmann's, the JCC,
+Asphalt Green, Peter Stuyvesant Little League, Kids in Sports all exist. So nothing about the card's title,
+category or borough looks wrong; every field reads as plausible. The only tell is the `sourceUrl`, which
+nothing in the pipeline validates against the entity. And because the source is garbage, **every downstream
+fact on the card is unevidenced** — the borough, the neighborhood, the category were all inferred from
+nothing.
+
+It also silently defeats the one heuristic that catches most other source defects. A reviewer checking
+"is this host plausible?" sees `en.wikipedia.org` and `nytimes.com` — highly authoritative domains. One of
+these cards was even graded `sourceAuthorityGrade: "authoritative"`.
+
+**Recommendation.**
+1. **Validate that the resolved source actually mentions the entity** before attaching it. A source page
+   that does not contain the business name is not that business's source.
+2. **Never resolve to a generic reference/platform host.** `en.wikipedia.org`, `youtubekids.com`,
+   `nytimes.com` and equivalents should be hard-denied as `sourceUrl` for a local business card,
+   independent of the token match — none of them is ever a children's activity provider's own site.
+3. **A bare homepage of a national site is never valid evidence for a neighborhood-level claim.** Two of
+   these were literally `https://www.nytimes.com/` and `https://www.youtubekids.com/`.
+4. Audit for more — **the count grew every time another host was checked.** It went 3 (nytimes.com) → 15
+   (+ wikipedia, youtubekids) → 25 once `en.wikipedia.org` was queried exhaustively rather than sampled.
+   The sweep covered ~150 of 908 published cards, so there are very likely more in the unswept remainder
+   and across the ~11,700 unpublished cards. Querying `sourceHost` against a denylist of reference and
+   platform domains finds them in minutes — that query is the audit.
+
+Also found live on the same principle, lower volume but same class: `amazon.com/gp/video/storefront/` for
+"Léman Manhattan / Camp Léman"; a `youtube.com/watch?v=...` video for "Swim Urban Manhattan"; two
+`facebook.com` pages for Long Island businesses; and — a different shape worth its own note — cards whose
+title is *the directory's own brand name*, e.g. "Mommy Poppins — New York City" and "Time Out Los Angeles —
+Kids". Those last two are the publication being ingested as if it were an activity provider.
+
+**Bridge side already done:** all 15 resolved — real entities moved to `BLOCKED_REPAIRABLE` with the
+correct re-source target recorded, duplicates and unidentifiable entities terminated. Note the bridge could
+not actually *fix* them, only block them: `contentCards.sourceUrl` only became writable on 2026-08-08 and
+is not yet deployed.
+
+---
+
 ## 1. `"no category"` reaches families as a literal `NO CATEGORY` chip
 
 **Severity: highest — this is visible on real public cards.**
