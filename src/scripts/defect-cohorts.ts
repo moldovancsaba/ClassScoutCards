@@ -62,26 +62,83 @@ const COHORTS: { label: string; filter: Record<string, unknown>; found: string }
   },
 ];
 
-/** Ordered by how much harm a defect in that state is doing right now. PUBLISHED is what families see. */
-export const STATE_PRIORITY = ["PUBLISHED", "REVIEW_READY", "DISCOVERED", "PREPARING", "EXTRACTED", "EXTRACTING", "BLOCKED_REPAIRABLE", "PARKED_COOLDOWN", "QUARANTINED", "BLOCKED_TERMINAL"];
+/**
+ * SCOPE — which cards are in the maintenance mandate (owner directive, 2026-08-08).
+ *
+ * **Every card is maintained: published AND draft. The only cards exempt are the ones whose CONTENT is
+ * forbidden.** A draft is not a lower class of card, it is a listing that has not been published yet —
+ * the entire future catalogue passes through these states, so an unmaintained draft pool means an
+ * unmaintained catalogue tomorrow.
+ *
+ * This is written down because it was got wrong. An earlier version of this file ranked states purely
+ * by exposure and the accompanying process note said, of 1,317 unpublished cards, "none are PUBLISHED,
+ * so don't spend the batch here." That confused PRIORITY with SCOPE. Priority orders the queue;
+ * scope decides what is in it. Drafts are always in it.
+ *
+ * Census at the time of writing: 779 PUBLISHED + 1,847 draft = 2,626 maintainable, against 1,221
+ * quarantined and 1,186 terminal. Treating only the published cards as the queue covered 30% of it.
+ */
+export const MAINTAINABLE_STATES = ["PUBLISHED", "REVIEW_READY", "DISCOVERED", "PREPARING", "EXTRACTED", "EXTRACTING", "BLOCKED_REPAIRABLE", "PARKED_COOLDOWN"] as const;
+
+/**
+ * EXEMPT, and the two reasons are NOT interchangeable — conflating them is the mistake this block
+ * exists to prevent.
+ *
+ * QUARANTINED means the CONTENT is forbidden: off-topic, not a children's activity, no fixed venue,
+ * out of market, adults-only, fabricated, or confirmed closed. Nothing about the card can be repaired
+ * because the thing it describes should not be listed at all.
+ *
+ * BLOCKED_TERMINAL means there is no entity to maintain: a directory browse page, a duplicate of
+ * another card, a title that is site furniture. The content is not forbidden — there simply isn't any.
+ *
+ * The practical difference: a QUARANTINED card must never be revived by a future pass, while a
+ * BLOCKED_TERMINAL duplicate becomes irrelevant the moment its canonical sibling is fixed. Recording a
+ * card in the wrong one of these buries a repairable business or resurrects a prohibited one.
+ */
+export const CONTENT_FORBIDDEN_STATES = ["QUARANTINED"] as const;
+export const NO_ENTITY_STATES = ["BLOCKED_TERMINAL"] as const;
+
+/** Urgency ordering WITHIN the maintainable set. Never a filter — see MAINTAINABLE_STATES. */
+export const STATE_PRIORITY = [...MAINTAINABLE_STATES, ...CONTENT_FORBIDDEN_STATES, ...NO_ENTITY_STATES] as readonly string[];
 
 export type Card = { contentCardId?: string; title?: string; state?: string; sourceUrl?: string; sourceHost?: string };
+
+export function isMaintainable(state?: string): boolean {
+  return (MAINTAINABLE_STATES as readonly string[]).includes(state ?? "");
+}
+
+/**
+ * Split a set of cards into the maintenance queue and the two exempt buckets. Callers should work
+ * `maintain` — all of it, published first — and use the exempt counts only as a report.
+ */
+export function partitionByScope(cards: Card[]): { maintain: Card[]; contentForbidden: Card[]; noEntity: Card[] } {
+  const deduped = dedupe(cards);
+  return {
+    maintain: prioritise(deduped.filter((c) => isMaintainable(c.state))),
+    contentForbidden: deduped.filter((c) => (CONTENT_FORBIDDEN_STATES as readonly string[]).includes(c.state ?? "")),
+    noEntity: deduped.filter((c) => (NO_ENTITY_STATES as readonly string[]).includes(c.state ?? "")),
+  };
+}
+
+function dedupe(cards: Card[]): Card[] {
+  const seen = new Map<string, Card>();
+  for (const c of cards) if (c.contentCardId) seen.set(c.contentCardId, c);
+  return [...seen.values()];
+}
 
 /**
  * Dedupe across cohorts (a card can match several) and order by exposure. Exported and unit-tested
  * because it encodes the actual judgement — which card a reviewer opens first — while the fetching
  * around it is plumbing. An unknown state sorts LAST rather than first: a state this script has not
  * heard of is not evidence of urgency, and guessing it is urgent would push real PUBLISHED harm down
- * the queue.
+ * the queue. NOTE this only ORDERS; it never drops a draft.
  */
 export function prioritise(cards: Card[]): Card[] {
-  const seen = new Map<string, Card>();
-  for (const c of cards) if (c.contentCardId) seen.set(c.contentCardId, c);
   const rank = (s?: string) => {
     const i = STATE_PRIORITY.indexOf(s ?? "");
     return i === -1 ? STATE_PRIORITY.length : i;
   };
-  return [...seen.values()].sort((a, b) => rank(a.state) - rank(b.state));
+  return dedupe(cards).sort((a, b) => rank(a.state) - rank(b.state));
 }
 
 async function fetchPage(filter: Record<string, unknown>, offset: number): Promise<Card[]> {
@@ -138,12 +195,14 @@ async function main() {
     }
   }
 
-  // The actual queue: everything in any cohort, worst-exposure first. A PUBLISHED card carrying a
-  // known defect is doing harm now; a QUARANTINED one is not.
-  const queue = prioritise([...everySeen.values()]);
-  const live = queue.filter((r) => r.state === "PUBLISHED" || r.state === "REVIEW_READY");
-  console.log(`\n=== QUEUE: ${queue.length} distinct cards across all cohorts, ${live.length} of them live ===`);
-  for (const r of live) console.log(`  ${(r.state ?? "?").padEnd(13)} ${r.contentCardId} ${r.title ?? ""}`);
+  // The queue is EVERY maintainable card — published and draft alike. Published is ordered first
+  // because it is doing harm now, but a draft is never dropped: the whole future catalogue passes
+  // through the draft states, so skipping them means an unmaintained catalogue tomorrow.
+  const { maintain, contentForbidden, noEntity } = partitionByScope([...everySeen.values()]);
+  const live = maintain.filter((r) => r.state === "PUBLISHED" || r.state === "REVIEW_READY");
+  console.log(`\n=== QUEUE: ${maintain.length} cards to maintain (${live.length} live, ${maintain.length - live.length} draft) ===`);
+  console.log(`    exempt: ${contentForbidden.length} content-forbidden (quarantined), ${noEntity.length} no-entity (terminal)`);
+  for (const r of maintain) console.log(`  ${(r.state ?? "?").padEnd(19)} ${r.contentCardId} ${r.title ?? ""}`);
 }
 
 // Only run when invoked directly. Without this guard, importing `prioritise` for a unit test also
