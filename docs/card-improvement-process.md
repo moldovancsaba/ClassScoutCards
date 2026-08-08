@@ -2760,6 +2760,60 @@ venues span Brooklyn Heights, Carroll Gardens, Fort Greene, Park Slope, Union Sq
 and Cobble Hill — *several* real answers, not one — so the card's unsupported Upper West Side claim was
 quarantined rather than corrected to a pick among them.
 
+### Batch 42/29 (cards 469-497)
+
+14 queue cards, 15 siblings, 14 hosts. 12 canonical or corrected, 12 terminal, 5 quarantined, 2 blockers
+deliberately kept.
+
+**The blocker-premise rule from batch 41 discriminated on its first outing — inside a single batch.** Twelve
+`low_source_trust` blockers were cleared and two were deliberately left standing, and the rule sorted them
+without any further judgement:
+- *Cleared* — Jodi's Gym, Kanga's, Bryant Park, Steps on Broadway, Oasis, Lil' Kickers, Brooklyn Martial
+  Arts and the rest all sit on **the business's or institution's own official domain**. The blocker asserts
+  the source is untrustworthy; that assertion is simply false, so it goes.
+- *Kept* — Brooklyn Crescents Lacrosse Club and SpeakItaly NYC are both sourced to
+  `activityhero.com/biz/...`, a **third-party class directory**. The blocker's assertion is TRUE. The card
+  may well describe a real business, but "the entity is real" was never what `low_source_trust` was about.
+  The fix here is a re-source to the club's own domain, not a clearance.
+
+That is the whole rule in one batch: *clear a blocker when its premise is false, not when the card turns
+out to be real.* Worth stating because the tempting shortcut — "confirmed real, therefore clear everything"
+— would have silently marked two directory-sourced cards as fully trustworthy.
+
+**New detection heuristic: several cards with DIFFERENT business names sharing one identical `sourceUrl` is
+an aggregator page, and it is visible without fetching anything.** `funclubs.com/camps` carried three cards
+titled "Fun Clubs Brooklyn Camps", "Kids N Motion Dance & Gymnastics" and "Happy Kidz Yoga" — three
+unrelated business names, one byte-identical URL. Fetching confirmed both problems at once: the page is an
+aggregator listing several independent enrichment providers, **and** the operator is in East Cobb, Marietta,
+**Georgia** ("FunClubs Summer Camp at MBCA … conveniently located at Mt. Bethel Christian Academy"), not New
+York. All three are now quarantined (one had already been caught independently in an earlier pass, which is
+itself the confirmation that per-domain sweeping finds in one step what the oldest-first queue finds in
+three). This is a **second sighting of the Georgia-camp-company shape** already recorded in this doc's
+out-of-market section — out-of-market and aggregator arriving together, again.
+
+Contrast with the ordinary duplicate cluster: there, N cards share a URL and share a *name*. When the names
+differ, the shared URL is not evidence of duplication — it is evidence the page describes no single entity.
+
+**New sub-case of domain squatting: the entity cannot be confirmed still operating, so the squat decides
+it.** `hiartkids.com` now serves an Indonesian lottery-prediction site ("Angka Keramat Hari Ini: Prediksi
+Jitu SGP, HK, Sydney") — the Urban Dunes expired-domain shape. Per that precedent the entity was searched
+independently rather than judged by what the domain now serves, and HiArt! is genuinely real: a NYC
+children's arts program running since 1997, with year-round classes and a Culture Bugs! summer program. But
+the Urban Dunes case resolved the other way because the business was **confirmed still operating at a new
+TLD**; here no replacement domain exists and its third-party class listings show no upcoming schedules.
+Real once, current status unverifiable, own domain gone to a gambling squatter. Quarantined on the
+children's-safety-first default. The distinction to carry forward: *squatting tells you nothing about the
+business, but failing to find the business anywhere else does* — and a live card whose link now lands a
+family on a gambling site is not a neutral outcome while that question stays open.
+
+**Two more root-domain confirmations.** FasTracKids' real NYC franchise page (`/ftknyc/`) names exactly two
+Manhattan centers — 307 E 84th St and 150 W 72nd St — so the two `/ftknyc/`-sourced cards were canonical and
+the four root-domain ones resolved as two duplicates plus **two fabricated "FasTracKids Brooklyn" cards**
+(no Brooklyn center exists). Oasis Day Camp split the same way: one per-location card canonical, two
+root-domain copies retired. Also one clean **exactly-one-answer correction**: Brooklyn Dance Conservatory's
+card claimed Bay Ridge, research found precisely one studio — 497 Carroll Street Unit 21, Carroll Gardens —
+so the neighborhood was corrected rather than the card quarantined.
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -3450,3 +3504,23 @@ quarantined rather than corrected to a pick among them.
   explicitly: NOT applied to SwimJim's or Brooklyn BJJ's surplus, where no card identifies which real site it
   means -- retitle only onto a location the evidence names. One blocker deliberately left in place (DNA
   Learning Center's `missing_schedule` is a real gap, not a stale premise). See "Batch 41/46..." above.
+- v87 (2026-08-08): batch 42/29 (cards 469-497) -- 14 queue cards, 15 siblings, 14 hosts. 12 canonical or
+  corrected, 12 terminal, 5 quarantined, 2 blockers deliberately kept. The batch-41 blocker-premise rule
+  **discriminated on its first outing, inside a single batch**: 12 `low_source_trust` blockers cleared
+  because they sat on the business's own official domain (premise false), 2 kept because the source really
+  is a third-party class directory, `activityhero.com/biz/...` (premise true) -- the tempting shortcut
+  "confirmed real, therefore clear everything" would have marked two directory-sourced cards fully
+  trustworthy. New detection heuristic, visible without fetching anything: **several cards with DIFFERENT
+  business names sharing one identical `sourceUrl` is an aggregator page**, not a duplicate cluster (where
+  the names match too). `funclubs.com/camps` carried three unrelated names and turned out to be both an
+  aggregator of independent providers AND a Georgia operator (East Cobb, Marietta) -- a second sighting of
+  the Georgia-camp-company shape, with one of the three already caught in an earlier pass, confirming the
+  sweep finds in one step what the queue finds in three. New sub-case of domain squatting: `hiartkids.com`
+  now serves an Indonesian lottery-prediction site, and unlike Urban Dunes the business could NOT be
+  confirmed still operating anywhere else, so it was quarantined -- squatting alone says nothing about the
+  entity, but failing to find the entity elsewhere does, and a live card linking a family to a gambling site
+  is not neutral while that stays open. Also two more root-domain confirmations (FasTracKids' `/ftknyc/`
+  page names exactly two Manhattan centers, exposing two fabricated "FasTracKids Brooklyn" cards; Oasis
+  split one per-location canonical from two root copies) and one exactly-one-answer correction (Brooklyn
+  Dance Conservatory: claimed Bay Ridge, has precisely one studio at 497 Carroll St, Carroll Gardens).
+  See "Batch 42/29..." above.
