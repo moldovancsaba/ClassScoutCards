@@ -636,6 +636,25 @@ in a comment when you add one, the way the existing ports do.
   `cc-${fingerprint}`: it is the primary key, referenced from the audit log and from anything already
   linked to the card, so recomputing it would be a delete-and-recreate — which this bridge does not do.
   Don't "fix" that mismatch later by mutating the key.
+- **When a cluster carries several names for one operator, check whether any of them belongs to somebody
+  else — confirmed twice now, so treat it as routine.** "United Soccer Academy Brooklyn" on
+  `brooklynunitedacademy.com` and "Lil' Kickers Manhattan" on `manhattankickers.org` were both live, and both
+  are the real names of separate, unrelated companies. A duplicate wastes a family's time; this hands them a
+  different business than the one they searched for.
+- **A DELIVERY MODEL can occupy `neighborhoodGuess`, and it is not the same as a wrong neighbourhood.**
+  Found 2026-08-08: "Park Slope / mobile", "Mobile / Brooklyn", "NYC-wide", "Multiple Brooklyn". The field
+  holds a *category of answer* rather than an answer. Distinguish it from the compound-neighbourhood case —
+  and note that "mobile" appearing there is NOT by itself proof of the prohibited no-fixed-venue business:
+  Brooklyn Robot Foundry has a real Gowanus studio (98 4th St) *and* runs mobile programmes, which is the
+  hybrid case — keep the card, drop the mobile framing.
+- **A franchise TERRITORY is not an address.** Brooklyn Robot Foundry's own site lists "NY – Manhattan East"
+  and "NY – Manhattan Downtown" alongside its real studios. Surplus cards were deliberately not repurposed
+  onto those, because a territory names a sales area, not a place a child attends. Same discipline as the
+  retitle-only-onto-an-identified-location limit.
+- **The community a programme serves and the address it operates from are different facts, and
+  `neighborhoodGuess` is the second one.** Riverside Hawks describes itself as a Harlem community programme
+  and every one of its four cards said "Upper West Side / Harlem"; the Stone Gym a child actually walks into
+  is on Claremont Avenue, in Morningside Heights. Both statements are true; only one belongs in the field.
 - **Cluster size alone is not evidence of a defect — a genuine multi-site operator produces a large, CORRECT
   cluster.** The necessary counterweight to the letsgobaby finding above, established the same session
   (2026-08-08). `laparks.org` carries 30 cards on a municipal `.org` domain, which looks like exactly the same
