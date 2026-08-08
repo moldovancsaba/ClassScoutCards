@@ -95,6 +95,55 @@ is not yet deployed.
 
 ---
 
+## 0b. The schema cannot hold what a parent actually decides on  [NEW, from the core listing-maintenance spec]
+
+**Severity: highest by value. These are additive schema items, not bug fixes.**
+
+The core system's own listing-maintenance spec asks reviewers to collect a set of fields that **have
+nowhere to go in the current model**. Recording them here because the bridge repo can verify the demand
+side — every one of these came up repeatedly in ~1,000 card reviews — but only the core app can add them.
+
+**a) `price{}` with an evidence enum — the highest-value single item.** The spec reports **97.3% of the
+catalog priced at zero**, because the price field is required and defaults to `0`, so "genuinely free" and
+"never found" are indistinguishable. The fix is not a better default; it is `{amount?, currency, unit,
+evidence: stated | stated_free | from | unknown, sourceText, sourceUrl, observedAt}` with **`amount` omitted
+when unknown**. Note the unit rule too: "$625 for the 8-week term" is `{625, "term"}`, never $78/class.
+
+**b) `sessions[]` with registration windows.** A listing can say "Tuesdays at 4pm" but cannot say what is
+bookable, when it runs, what it costs, or whether a parent can still get in. `registrationOpensAt` /
+`registrationClosesAt` are called out in the spec as the most useful thing a reviewer can find that has
+nowhere to be stored — and "summer camp registration opens next month" is the strongest reason a family
+returns to the product.
+
+**c) `venueModel`: `own_premises | host_sites | in_home | online | outdoors | unknown`.** **This one the
+bridge repo can corroborate hardest.** "Does this operator have a venue, and whose is it?" has been the
+single most common judgement call across every review pass, and it has five different right answers that
+the model cannot currently express: Physique Swimming teaches in seven host pools year-round (kept); The
+Art Farm rents a school hall for an eight-week camp while owning its own venue (camp cards retired); Steve
+& Kate's rents five school campuses and owns nothing anywhere (kept — renting IS the business); Brooklyn
+Robot Foundry has a Gowanus studio *and* a mobile arm (kept, mobile framing stripped); Super Duper Tennis
+has no courts at all and says so in its own page title (retired). Every one of those took independent
+research to reach a conclusion the provider states plainly on its own site.
+
+**d) `ageMinMonths` / `ageMaxMonths`.** The `0-2 / 3-5 / 6-8 / 9-12 / Teens` buckets cannot express "18
+months to 4 years", so it rounds into two buckets and a parent with a 20-month-old is shown a class for
+four-year-olds.
+
+**e) `outOfMarketLocation`.** See item 9 — now confirmed **five times**, and the field is already being
+violated in production data: cards exist carrying `boroughGuess: "Long Island"` and `"NYC / Long Island"`.
+A real business outside the five boroughs currently has no honest representation, so it gets coerced into
+the nearest borough.
+
+**f) `fieldVerifications[]`** — per-field `{field, verifiedAt, sourceUrl, method, verifiedBy}`. Today one
+freshly-checked phone number updates a whole-record `lastVerifiedAt` and makes an entirely stale listing
+look current.
+
+**g) `inclusion{}` and `trialPolicy{}`.** Usually stated on the provider's own page and currently discarded.
+Parents of disabled children cannot filter at all. `supportsAdditionalNeeds` should record **the provider's
+claim** with its `sourceText`, not an assessment.
+
+---
+
 ## 1. `"no category"` reaches families as a literal `NO CATEGORY` chip
 
 **Severity: highest — this is visible on real public cards.**
