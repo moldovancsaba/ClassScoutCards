@@ -51,15 +51,41 @@ export function parseSimpleFilter(collection: BridgeCollectionKey, rawFilter: st
 export interface OldestRowsResult {
   count: number;
   limit: number;
+  offset: number;
   collection: BridgeCollectionKey;
   filter: Record<string, string | number | boolean>;
   rows: Array<Record<string, unknown>>;
 }
 
+/**
+ * Clamps a caller-supplied `offset`. Unlike `limit` there is no upper bound — a sweep of the ~900
+ * published content cards has to be able to reach the far end of the pool.
+ */
+export function clampOffset(rawOffset: unknown): number {
+  const n = Number(rawOffset);
+  if (!Number.isFinite(n) || n <= 0) return 0;
+  return Math.trunc(n);
+}
+
+/**
+ * (2026-08-08) `offset` exists so a full-pool SWEEP can read without writing.
+ *
+ * Before it, the only way to see past the oldest `limit` rows was to touch them, which moves them to
+ * the back of the `updatedAt` ordering. That works — a touch is a genuine "reviewed, no change needed"
+ * record — but it makes read-only reconnaissance impossible: you could not survey the pool to decide
+ * where to look without first mutating ~900 records. The targeted off-topic sweep of published cards
+ * (a standing open item) is exactly that shape of job.
+ *
+ * The sort is `updatedAt` then the id field, which is a total order, so paging by offset is stable as
+ * long as nothing is written between pages. That caveat is real: interleaving writes with paging will
+ * shift rows backwards past the cursor and can skip records. Sweep first, then write — or re-sweep
+ * from 0 afterwards to confirm coverage.
+ */
 export async function getOldestRows(
   collection: BridgeCollectionKey,
   filter: Record<string, string | number | boolean>,
   limit: number,
+  offset = 0,
 ): Promise<OldestRowsResult> {
   const config = BRIDGE_REGISTRY[collection];
   const db = getBridgeDb();
@@ -67,8 +93,9 @@ export async function getOldestRows(
     .collection(config.mongoCollection)
     .find(filter, { projection: config.readProjection })
     .sort({ updatedAt: 1, [config.idField]: 1 })
+    .skip(offset)
     .limit(limit)
     .toArray();
 
-  return { count: rows.length, limit, collection, filter, rows };
+  return { count: rows.length, limit, offset, collection, filter, rows };
 }

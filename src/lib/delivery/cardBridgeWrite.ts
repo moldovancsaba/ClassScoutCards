@@ -9,6 +9,8 @@ import {
   type BridgeCollectionKey,
 } from "@/lib/delivery/cardBridgeRegistry";
 import { validateCopyQuality } from "@/lib/validation/copyQuality";
+import { alignActivityTypes, NO_CATEGORY_PLACEHOLDER } from "@/lib/delivery/activityAlignment";
+import { computeContentCardIdentity } from "@/lib/delivery/cardBridgeSplit";
 import { buildFamilyServicePlaceFact, buildFamilyServiceReviewPacket, isPublicStatus, normalizeFamilyServiceLead, reviewPacketEligible } from "@/lib/familyServices/core";
 import { FAMILY_SERVICE_LEAD_STATUSES, type FamilyServiceLead } from "@/lib/familyServices/types";
 
@@ -34,11 +36,42 @@ export type WriteValidationResult =
 
 const MIN_REASON_LENGTH = 5;
 
+/** The exact fields `computeContentCardIdentity` hashes into a content card's `fingerprint`. Every one
+ *  of them is writable through this bridge, so a change to any of them makes the stored fingerprint
+ *  stale — see the recompute in `applyCardBridgeWrite` for why that matters. */
+const FINGERPRINT_BASIS_FIELDS = ["title", "sourceUrl", "categoryHint", "boroughGuess", "neighborhoodGuess"] as const;
+
+/**
+ * Parses a candidate `contentCards.sourceUrl` and returns its canonical host, or null if the value is
+ * not a usable source. Shared by validation (reject early) and the apply path (derive `sourceHost`), so
+ * the two can never disagree about what counts as valid.
+ *
+ * The host is lowercased and `www.`-stripped to match how `sourceHost` is already stored on real
+ * records -- live data has `sourceHost: "streb.org"` next to `sourceUrl: "https://www.streb.org/"`, so
+ * keeping the `www.` here would silently split one duplicate cluster into two under the per-domain
+ * sweep.
+ */
+export function parseSourceUrl(value: string): { host: string } | null {
+  const trimmed = value.trim();
+  if (!trimmed.startsWith("https://")) return null;
+  let url: URL;
+  try {
+    url = new URL(trimmed);
+  } catch {
+    return null;
+  }
+  const host = url.hostname.toLowerCase().replace(/^www\./, "");
+  // A hostname with no dot ("localhost", "internal") is never a real public source page.
+  if (!host.includes(".")) return null;
+  return { host };
+}
+
 /**
  * Pure validation of an incoming write request body — no I/O. Every rejection path here is a 400: bad
  * shape, an unregistered collection, a field outside that collection's writable allow-list, a category
- * outside the real enum, an image field that isn't a plausible https URL, or copy that fails the
- * ported public-description quality gate. Nothing here ever contacts the database.
+ * outside the real enum, an image field that isn't a plausible https URL, a sourceUrl that isn't a
+ * parseable https URL, or copy that fails the ported public-description quality gate. Nothing here ever
+ * contacts the database.
  */
 export function validateWriteRequest(body: unknown): WriteValidationResult {
   if (typeof body !== "object" || body === null) {
@@ -91,6 +124,28 @@ export function validateWriteRequest(body: unknown): WriteValidationResult {
     }
   }
 
+  // (2026-08-07, owner directive: "Never add 'no category' even if no category") The ingestion-only
+  // placeholder must never enter ANY category/activity field through this bridge, on any collection.
+  // `alignActivityTypes` already strips it from `providers.activityTypes`, but that only covers one
+  // field on one collection -- this is the absolute boundary rule, so no future writable field can
+  // quietly reintroduce it. When there genuinely is no category, the correct value is ABSENT (omit the
+  // field), never a placeholder string standing in for one: a literal "NO CATEGORY" chip rendered on a
+  // real family's card is worse than no chip at all. See NO_CATEGORY_PLACEHOLDER in activityAlignment.ts
+  // for how this reached live records and why the strip is load-bearing.
+  const placeholderFields = ["category", "categoryHint", "primaryActivityType", "activityTypes"] as const;
+  for (const field of placeholderFields) {
+    if (!(field in updates)) continue;
+    const value = updates[field];
+    const values = Array.isArray(value) ? value : [value];
+    if (values.some((entry) => typeof entry === "string" && entry.trim().toLowerCase() === NO_CATEGORY_PLACEHOLDER)) {
+      return {
+        ok: false,
+        status: 400,
+        error: `${field} must never contain the ingestion placeholder "${NO_CATEGORY_PLACEHOLDER}" (owner directive: never add "no category" even when there is no category). Omit the field instead — an absent value is correct; a placeholder string renders as a literal "NO CATEGORY" chip on a real family's card.`,
+      };
+    }
+  }
+
   if ((collection === "providers" || collection === "meetupGroups") && "qualityStatus" in updates && updates.qualityStatus !== "quarantined") {
     return { ok: false, status: 400, error: 'qualityStatus can only be set to "quarantined" (the only real value the main app defines) — omit the field entirely rather than trying to clear it through this bridge' };
   }
@@ -99,13 +154,16 @@ export function validateWriteRequest(body: unknown): WriteValidationResult {
   }
 
   // (2026-08-07, owner directive) Cards must show at most 3 headline activities, never a raw keyword
-  // dump — cap activityTypes at the source's own top 3 here so the core system is never confused by a
-  // longer list. Anything cut belongs in the write's `reason` text (kept, just not shown), not in this field.
-  if (collection === "providers" && Array.isArray(updates.activityTypes) && (updates.activityTypes as unknown[]).length > 3) {
+  // dump. The actual top-3 SELECTION (which 3, in what order) is real business logic that needs the
+  // provider's own name/primaryActivityType to reason about — see `alignActivityTypes` in
+  // `activityAlignment.ts`, applied in `applyCardBridgeWrite` below, where that context is available.
+  // This is only a sanity ceiling here (pure validation, no DB access yet) to reject obviously-garbage
+  // input before it reaches that step, not the real cap.
+  if (collection === "providers" && Array.isArray(updates.activityTypes) && (updates.activityTypes as unknown[]).length > 20) {
     return {
       ok: false,
       status: 400,
-      error: `activityTypes can hold at most 3 entries through this bridge (got ${(updates.activityTypes as unknown[]).length}) — trim to the source's own top 3 and record anything cut in "reason"; use primaryActivityType to call out the headline activity instead of listing more.`,
+      error: `activityTypes has ${(updates.activityTypes as unknown[]).length} entries — that looks like a raw keyword dump, not a curated list. Trim to the source's own genuinely-evidenced activities before writing; this bridge realigns to the real top 3 automatically, but starting from garbage input defeats that.`,
     };
   }
 
@@ -153,6 +211,25 @@ export function validateWriteRequest(body: unknown): WriteValidationResult {
     const value = updates[field];
     if (typeof value === "string" && (!value.startsWith("https://") || value.trim().length < 12)) {
       return { ok: false, status: 400, error: `${field} must be a real https:// URL` };
+    }
+  }
+
+  // (2026-08-08) Re-sourcing a content card. Stricter than the image check above, because sourceUrl is
+  // the EVIDENCE a card is judged against: every later reality check reads it, and the per-domain sweep
+  // groups duplicate clusters by the host derived from it. A malformed value would not just look wrong,
+  // it would quietly remove the card from its own cluster.
+  if (collection === "contentCards" && "sourceUrl" in updates) {
+    const value = updates.sourceUrl;
+    if (typeof value !== "string") {
+      return { ok: false, status: 400, error: "sourceUrl must be a string" };
+    }
+    const parsed = parseSourceUrl(value);
+    if (!parsed) {
+      return {
+        ok: false,
+        status: 400,
+        error: `sourceUrl must be a parseable https:// URL with a real hostname — got ${JSON.stringify(value)}. Re-source to a page that actually evidences THIS specific location (a branch page, not a franchise root domain and not a third-party directory listing).`,
+      };
     }
   }
 
@@ -236,11 +313,89 @@ export async function applyCardBridgeWrite(request: NormalizedWriteRequest): Pro
     }
   }
 
+  // Top-3 activity alignment (owner directive, 2026-08-07): whenever a providers write touches
+  // activityTypes and/or primaryActivityType, recompute BOTH from the full picture (incoming update
+  // falling back to the current document) rather than trusting the caller's raw array order or a
+  // stale primaryActivityType — see activityAlignment.ts for the real reasoning (primary activity
+  // first, only same-cluster activities kept, capped at 3). Checked in BOTH dry-run and apply, same
+  // convention as the serviceLeads/geo guards above, so the realigned result is visible before commit.
+  // (2026-08-08) Re-sourcing derives sourceHost rather than trusting/accepting it from the caller, so a
+  // card can never end up with a host that disagrees with its own URL. Computed here (not in
+  // validation) so it shows up in the dry-run preview alongside every other derived field -- the loop's
+  // convention is that a dry-run shows exactly what an apply would write.
+  let derivedSourceHost: string | undefined;
+  if (request.collection === "contentCards" && typeof request.updates.sourceUrl === "string") {
+    derivedSourceHost = parseSourceUrl(request.updates.sourceUrl)?.host;
+  }
+
+  // (2026-08-08, from PR review) `fingerprint` is a hash of title + sourceUrl + categoryHint +
+  // boroughGuess + neighborhoodGuess, and the real collection's unique index is {fingerprint, kind} --
+  // that index, not contentCardId, is what stops discovery re-inserting a card it has already seen.
+  // Every one of those five basis fields is writable through this bridge, so ANY of them changing
+  // leaves the stored fingerprint describing a card that no longer exists: discovery re-encounters the
+  // corrected page, computes a different hash, matches nothing, and inserts a duplicate. Re-sourcing
+  // made this easy to notice, but it was already true of the other four fields before sourceUrl became
+  // writable -- so the fix is keyed on the basis as a whole, not on sourceUrl.
+  //
+  // `contentCardId` is deliberately NOT recomputed even though it is literally `cc-${fingerprint}`.
+  // It is the document's primary key and is referenced from the audit log and from anything that has
+  // already linked to this card; changing it would be a delete-and-recreate, which this bridge does not
+  // do (its only insert path is POST /split, with its own safety rails). The dedupe invariant lives on
+  // the index, and the index is on {fingerprint, kind}, so keeping the fingerprint honest is what
+  // actually matters. The consequence -- an id whose hash suffix no longer matches its own fingerprint
+  // -- is cosmetic and is recorded here so nobody "fixes" it later by mutating the key.
+  let derivedIdentity: { fingerprint: string; normalizedTitle: string } | undefined;
+  if (request.collection === "contentCards" && FINGERPRINT_BASIS_FIELDS.some((field) => field in request.updates)) {
+    const pick = (field: string) => String((request.updates[field] ?? current[field] ?? "") as string);
+    const identity = computeContentCardIdentity({
+      title: pick("title"),
+      sourceUrl: pick("sourceUrl"),
+      categoryHint: pick("categoryHint"),
+      boroughGuess: pick("boroughGuess"),
+      neighborhoodGuess: pick("neighborhoodGuess"),
+    });
+    if (identity.fingerprint !== current.fingerprint) {
+      // A collision here is not a hash accident: it means another card already carries exactly the
+      // identity this edit is moving toward, i.e. the two records are the same card. Surfacing that as
+      // a blocked write is strictly better than letting the unique index reject the update with a
+      // driver-level error, and better than silently skipping the recompute and leaving the index
+      // stale. The reviewer's own duplicate-on-re-source scenario ends here instead of in the data.
+      const clash = await collection.findOne({ fingerprint: identity.fingerprint, kind: current.kind ?? "content" });
+      if (clash && clash[config.idField] !== request.id) {
+        return {
+          found: true,
+          dryRun: request.dryRun,
+          touch: request.touch,
+          collection: request.collection,
+          id: request.id,
+          before,
+          blockedReason: `This edit would give ${request.id} the same {fingerprint, kind} as the existing card ${String(clash[config.idField])} — they would be the same card, and the collection's unique index would reject the write. Reconcile the two records first (keep one as canonical, mark the other BLOCKED_TERMINAL as a duplicate) rather than editing this one into a collision.`,
+        };
+      }
+      derivedIdentity = { fingerprint: identity.fingerprint, normalizedTitle: identity.normalizedTitle };
+    }
+  }
+
+  let activityAlignment: ReturnType<typeof alignActivityTypes> | undefined;
+  if (request.collection === "providers" && ("activityTypes" in request.updates || "primaryActivityType" in request.updates)) {
+    const candidateActivityTypes = (request.updates.activityTypes as string[] | undefined) ?? (current.activityTypes as string[] | undefined) ?? [];
+    const candidatePrimary = (request.updates.primaryActivityType as string | undefined) ?? (current.primaryActivityType as string | undefined);
+    const title = (request.updates.name as string | undefined) ?? (current.name as string | undefined);
+    activityAlignment = alignActivityTypes({ activityTypes: candidateActivityTypes, primaryActivityType: candidatePrimary, title });
+  }
+
   if (request.dryRun) {
     const previewExtra =
       request.collection === "serviceLeads" && normalizedLead
         ? { visibility: normalizedLead.visibility, blockers: normalizedLead.blockers, tags: normalizedLead.tags }
         : {};
+    const alignmentExtra = activityAlignment
+      ? { activityTypes: activityAlignment.activityTypes, primaryActivityType: activityAlignment.primaryActivityType, activityTypesDropped: activityAlignment.dropped }
+      : {};
+    const sourceHostExtra = {
+      ...(derivedSourceHost ? { sourceHost: derivedSourceHost } : {}),
+      ...(derivedIdentity ?? {}),
+    };
     return {
       found: true,
       dryRun: true,
@@ -251,8 +406,8 @@ export async function applyCardBridgeWrite(request: NormalizedWriteRequest): Pro
       // Even in dry-run, show what a touch would actually stamp — so the caller can verify the
       // no-op-content path before committing to it, same as any other write.
       applied: request.touch
-        ? { ...request.updates, ...previewExtra, updatedAt: "<now>", lastReviewedAt: "<now>", lastReviewedBy: request.source }
-        : { ...request.updates, ...previewExtra },
+        ? { ...request.updates, ...previewExtra, ...alignmentExtra, ...sourceHostExtra, updatedAt: "<now>", lastReviewedAt: "<now>", lastReviewedBy: request.source }
+        : { ...request.updates, ...previewExtra, ...alignmentExtra, ...sourceHostExtra },
     };
   }
 
@@ -279,6 +434,26 @@ export async function applyCardBridgeWrite(request: NormalizedWriteRequest): Pro
     finalUpdates.visibility = normalizedLead.visibility;
     finalUpdates.blockers = normalizedLead.blockers;
     finalUpdates.tags = normalizedLead.tags;
+  }
+
+  // Never trust the caller's raw activityTypes/primaryActivityType directly — always persist the
+  // realigned result computed above, so the core app's own badge/banner pickers (which read exactly
+  // these two persisted fields) can never end up with a mixed-category top-3 through this bridge.
+  if (activityAlignment) {
+    finalUpdates.activityTypes = activityAlignment.activityTypes;
+    finalUpdates.primaryActivityType = activityAlignment.primaryActivityType;
+  }
+
+  // Keep sourceHost in lockstep with sourceUrl (see parseSourceUrl). Never taken from the caller.
+  if (derivedSourceHost) {
+    finalUpdates.sourceHost = derivedSourceHost;
+  }
+
+  // Keep {fingerprint, kind} — the collection's real dedupe index — honest whenever a basis field
+  // changes. See the derivation above for why contentCardId is left alone.
+  if (derivedIdentity) {
+    finalUpdates.fingerprint = derivedIdentity.fingerprint;
+    finalUpdates.normalizedTitle = derivedIdentity.normalizedTitle;
   }
 
   const auditId = randomUUID();
