@@ -725,6 +725,20 @@ in a comment when you add one, the way the existing ports do.
   back office — while its actual sessions are open gyms in rented school and community halls. Putting
   "Ridgewood" in `neighborhoodGuess` would send a family to a door they cannot use. Fourth deliberate
   non-action of the sweep, alongside City Parks Foundation, Five Points Academy and Fit Soccer Kids.
+- **A wrong phone number is worse than no phone number — clear it rather than guess.** Found 2026-08-08 on
+  a LIVE provider: Kinder Prep Montessori carried `6158583658`, a **Nashville, Tennessee** area code, matching
+  none of the three numbers on the operator's own site. Because the operator runs five Brooklyn locations and
+  maps no number to this one, there was no evidenced replacement — so the field was cleared and the three
+  real numbers recorded in `reason` for the next pass. An empty field is an honest absence; a wrong one sends
+  a parent to a stranger.
+- **Fixing a record's copy does not re-run its derivations.** `alignActivityTypes()` fires only when a write
+  touches `activityTypes`/`primaryActivityType`. An enrichment write that rewrites descriptions and address
+  leaves a nine-tag activity list exactly as it was. After enriching a `providers` record, check the derived
+  fields separately — passing the existing array straight back through the write path is enough to
+  re-derive it.
+- **Check a record against ITSELF before opening a browser.** Ballet Tech's `address` field said "Flatiron"
+  and its `neighborhood` field said "Midtown". Two fields of one record contradicting each other is a defect
+  resolvable with no research at all, and it is free to look for.
 - **Cluster size alone is not evidence of a defect — a genuine multi-site operator produces a large, CORRECT
   cluster.** The necessary counterweight to the letsgobaby finding above, established the same session
   (2026-08-08). `laparks.org` carries 30 cards on a municipal `.org` domain, which looks like exactly the same
