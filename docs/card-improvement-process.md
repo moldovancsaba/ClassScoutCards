@@ -6406,3 +6406,56 @@ only place it can go.
   silently, the remaining gap is written into `terminalReason` — so when it resurfaces in the oldest-first
   queue, the next pass starts from "the site does not publish a parseable address" instead of re-running
   the same failed extraction.
+
+- v142 (2026-08-08): **the content-quality pass on `providers` — 137 records, and two auto-extraction
+  approaches abandoned on evidence.** Owner asked for quality "including the newly added properties".
+  Descriptions, phones, addresses and the new program fields exist ONLY on `providers`, so this run was
+  centred there. A full scan of all 1,040 live records produced the defect census below.
+
+  **Fixed (137 records, all verified by re-reading):**
+
+  | | count |
+  | --- | ---: |
+  | descriptions replaced with the operator's own `<meta description>` | **94** |
+  | `shortDescription` hard-truncated at 120 chars, mid-word, regenerated from the full text | **33** |
+  | misattributed `website` values cleared | **10** |
+
+  **Broken descriptions went 221 → 127 on visible records.** The replacements are the site's own
+  self-authored summary — nothing written or inferred here — and were rejected wherever the meta tag was
+  itself chrome, absent or too short. The truncation fix needed no research at all: all 34 were exactly 120
+  characters ending mid-word (`"…Carroll Gardens, Cobble Hill, Boerum Hil…"`) while `longDescription`
+  already held the full text, so the short one is regenerated from whole sentences. 32 of the 34 were
+  PUBLISHED.
+
+  **A NEW defect class, in the field a parent CLICKS: `providers.website` pointing at another
+  organisation.** Found by grouping live providers on their normalised website and keeping only groups
+  whose names share no distinctive token. 112 exact URLs are shared by 2+ providers; 22 of those groups are
+  different operators. **Upper East Side Tennis Club pointed at `nba.com/nets`. Brooklyn Dance & Sports
+  Club pointed at a rock-climbing gym. Two lacrosse clubs pointed at `lax.com`, an equipment RETAILER.**
+  Cleared, not replaced — same rule as a wrong phone number: an empty field is an honest absence, a wrong
+  one sends a parent to a stranger. (Most of the other 90 shared-URL groups are one operator with many
+  programme cards — the known program-not-a-location class, where the URL is correct.)
+
+  **Two automated approaches were built, tested and THROWN AWAY. Both deserve recording, because the
+  instinct to ship them was strong.**
+
+  1. **Price extraction from stored copy — abandoned.** 78 providers have a `$` amount in their own
+     description, which looks like free enrichment. The extractor produced **$100/week for Amazing
+     Athletes out of a navigation menu**, and — worse — read *"Rocking the Boat lists pricing at $450 per
+     camper per week"* and wrote **$90 per person**. That is precisely the "never round a price into a
+     different unit" rule, violated automatically, in the field the core spec says costs trust fastest.
+     **The order matters: you cannot mine prices out of descriptions until the descriptions are clean**,
+     and even then the unit needs a human. No prices were written.
+  2. **Body-prose extraction — abandoned for `shortDescription`.** Where no meta tag existed, pulling the
+     first clean paragraph from the page body produced text that was often *worse* than what was stored
+     (replacing "Gymnastics birthday parties in Tottenville" with a generic strength-and-coordination
+     blurb), and produced **the same paragraph for two unrelated businesses** — which is what exposed the
+     shared-website bug above. A lower-confidence source must not overwrite a higher-confidence field.
+
+  **Two negative results worth as much as the fixes.** 195 live records whose `shortDescription` is an
+  internal maintenance note ("Duplicate record; see Brooklearn.", "A class at Dodge YMCA; see the Dodge
+  YMCA listing at 225 Atlantic Avenue") looked like this loop leaking its own working notes to families —
+  **all 195 are `visibility: hidden`**, correctly retired tombstones. Checking one field prevented 195
+  needless writes. And 34 descriptions flagged by a prompt-leak regex were **all false positives**: good,
+  specific copy that merely ended in an ellipsis. Third time in two days that one of my own scan regexes
+  over-fired; the fix each time was to read the matches before acting on the count.
