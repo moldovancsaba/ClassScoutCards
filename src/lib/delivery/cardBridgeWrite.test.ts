@@ -47,8 +47,8 @@ describe("validateWriteRequest", () => {
     expect(validateWriteRequest({ ...validProviderBody, updates: {} }).ok).toBe(false);
   });
 
-  it("rejects a field outside the collection's writable allow-list — e.g. trying to overwrite website/email", () => {
-    const result = validateWriteRequest({ ...validProviderBody, updates: { website: "https://evil.example" } });
+  it("rejects a field outside the collection's writable allow-list — e.g. trying to overwrite sourceUrls", () => {
+    const result = validateWriteRequest({ ...validProviderBody, updates: { sourceUrls: ["https://evil.example"] } });
     expect(result.ok).toBe(false);
     expect(!result.ok && result.error).toMatch(/not writable/);
   });
