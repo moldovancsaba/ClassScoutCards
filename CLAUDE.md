@@ -578,6 +578,23 @@ in a comment when you add one, the way the existing ports do.
   never does. Practical use: when reconciling a cluster against an operator's location list, **check the
   outer-borough and less-central sites first**, because those are the ones no card will have found and
   therefore the ones a surplus card should be repurposed onto.
+- **Cluster size alone is not evidence of a defect — a genuine multi-site operator produces a large, CORRECT
+  cluster.** The necessary counterweight to the letsgobaby finding above, established the same session
+  (2026-08-08). `laparks.org` carries 30 cards on a municipal `.org` domain, which looks like exactly the same
+  shape; it is the City of LA Department of Recreation and Parks with one card per real facility (Hansen Dam
+  Recreational Lake, Lanark Pool, Sepulveda Pool, Griffith Park Boys Camp, Camp Seely…), on a legitimate
+  LA-tenant source. 28 of the 30 were left untouched — that is the one-card-per-location rule working
+  correctly at scale. Only the two sitting on the department's own homepage were retired. Establish what the
+  host IS before counting its cards against it.
+- **When a directory's listings really are children's activities, the "directory is a source, not a card
+  host" ruling splits three ways rather than applying wholesale.** Worked out 2026-08-08 on
+  `activityhero.com` (a real US kids-activity marketplace), as distinct from letsgobaby.co (restaurants,
+  where every card was wrong for the same reason). Terminal for cards that ARE the directory's own browse
+  pages — they name no single business, so there is nothing to re-source to. **Repairable** for cards that
+  name a specific provider but were scraped off a multi-provider browse page: a named entity exists to go and
+  find, so retiring them would discard real businesses. And a live `PUBLISHED` card sourced to someone else's
+  directory listing (SpeakItaly NYC, a genuinely real provider) comes off `PUBLISHED` with a re-source target
+  recorded — real entity, bad source pick, not contamination.
 - **A whole directory site can be ingested wholesale — check the SIZE of a suspicious host's cluster before
   assuming it is a handful of cards.** Found 2026-08-08: `letsgobaby.co` (Let's Go Baby, a directory of
   family-friendly NYC restaurants) had **795 content cards**, one per restaurant, bar, brewery, beer garden,

@@ -3325,6 +3325,44 @@ clusters, and **loop-until-nothing-new to finish them**.
   `letsgobaby.co/location/franklin-park` became a card called "Brooklyn", and
   `/location/docks-oyster-bar-midtown-east` became one called "Manhattan".
 
+### Cluster backlog, tranche 4: two contaminated hosts, and a negative control (2026-08-08)
+
+Three hosts, 17 cards, and one of the three deliberately left almost entirely alone.
+
+**`forum.lowyat.net` — 6 cards, all quarantined.** Lowyat.NET is a **Malaysian consumer-technology forum**
+based in Kuala Lumpur. Five cards carry its own tagline as their title, "Insanely Addictive Malaysia Forum";
+the sixth is titled "Kopitiam", one of its discussion sub-forums. The detail worth keeping: **the pipeline
+assigned New York boroughs to all six** — Manhattan, Brooklyn, the Bronx. A borough was invented for a
+website on the other side of the world, which is the same finding as the PlayGroup triplets from one more
+angle: `boroughGuess`/`neighborhoodGuess` are produced regardless of whether the source has any location at
+all.
+
+**`activityhero.com` — 9 cards resolved, and the split is the point.** ActivityHero is a US marketplace for
+children's activities — exactly the kind of directory the owner's letsgobaby.co ruling covers: fine as a
+place to *discover* providers, wrong as a host whose pages become cards. But unlike Let's Go Baby, its
+listings really are children's activities, so the disposition splits three ways:
+- **2 terminal** — cards that *are* the directory's own browse pages, and say so in their own titles
+  ("ActivityHero — Queens NY (browse hub)"). No single business is named, so there is nothing to re-source
+  to. The Psychology Today shape.
+- **6 repairable** — cards that name a specific provider (Kallpachay Spanish Immersion, Art Fun Studio
+  Brooklyn, Hablemos Play NYC…) but were scraped off a multi-provider city browse page, so their facts cannot
+  be checked against their own source. A named entity exists to go and find, so these are repairable, not
+  terminal.
+- **1 was LIVE** — "SpeakItaly NYC Kids", `PUBLISHED`, sourced to `activityhero.com/biz/speak-italy-nyc`.
+  SpeakItaly NYC is genuinely real and teaches Italian to children aged 0–16 at its own
+  `speakitalynyc.com`. Real entity, bad source pick — moved off `PUBLISHED` with the re-source target
+  recorded, because a live card should not be sourced to somebody else's directory listing.
+
+**`laparks.org` — 30 cards, 28 left exactly as they are.** This is the negative control, and it is worth
+recording as loudly as the finds. A 30-card cluster on a `.org` municipal domain looks like the letsgobaby
+shape, and it is not: these are the City of LA Department of Recreation and Parks' individual facilities —
+Hansen Dam Recreational Lake, North Hollywood Recreation Center, Lanark Pool, Sepulveda Pool, Griffith Park
+Boys Camp, Camp Seely — on a legitimate LA-tenant source, one card per real physical facility. **That is not
+a duplicate cluster; it is the one-card-per-location rule working correctly at scale.** Only two cards were
+retired: both sat on the department's own homepage rather than any facility. **Cluster size alone is not
+evidence of a defect** — a genuine multi-site operator produces a large, correct cluster, and the letsgobaby
+lesson must not turn into "big cluster, retire it."
+
 ## Changelog
 
 - v1 (2026-08-06): first version, written after tracing the family-services pipeline stall and adding
@@ -4190,3 +4228,18 @@ clusters, and **loop-until-nothing-new to finish them**.
   LOWER BOUNDS for this reason. Partition to find clusters; loop-until-nothing-new to finish them. Also
   visible in the same cluster: 11 titles ending in the literal token `: family_service_review_required`, and
   several cards titled just "Brooklyn" or "Manhattan". See "The letsgobaby.co cluster" above.
+- v97 (2026-08-08): cluster tranche 4 -- three hosts, 17 cards, one deliberate negative control.
+  **`forum.lowyat.net` (6 cards, all quarantined)** is a Malaysian consumer-tech forum in Kuala Lumpur; five
+  cards carry its own tagline as their title and one is named after a sub-forum -- and **the pipeline gave
+  all six New York boroughs**, inventing a location for a site on the other side of the world, corroborating
+  the PlayGroup finding that the location fields are generated rather than read. **`activityhero.com` (9
+  resolved)** is a real children's-activity marketplace, so the owner's directory ruling splits three ways
+  here rather than applying wholesale: 2 terminal (cards that ARE the directory's own browse pages and say so
+  in their titles), 6 repairable (cards naming a specific provider but scraped off a multi-provider browse
+  page -- a named entity exists to find, so not terminal), and **1 that was LIVE at PUBLISHED** ("SpeakItaly
+  NYC Kids", a real Italian-for-children provider sourced to its ActivityHero listing) moved off PUBLISHED
+  with the re-source target recorded. **`laparks.org` (30 cards, 28 left alone)** is the negative control and
+  matters as much as the finds: a 30-card cluster on a municipal .org looks like the letsgobaby shape but is
+  one card per real LA Parks facility on a legitimate LA-tenant source -- the one-card-per-location rule
+  working correctly at scale. Only the two cards sitting on the department's own homepage were retired.
+  **Cluster size alone is not evidence of a defect.**
