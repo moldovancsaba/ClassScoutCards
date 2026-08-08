@@ -5748,7 +5748,56 @@ only place it can go.
   (offset paging undercounts). `prioritise()` is exported and unit-tested — an unrecognised state sorts
   LAST, since a state the script has not heard of is not evidence of urgency.
 
+  **SUPERSEDED IN PART — see v127.** This entry's queue model ranked states purely by exposure, and the
+  batch note accompanying it said, of 1,317 unpublished cards, "none are PUBLISHED, so don't spend the batch
+  here." That is wrong and was corrected by owner directive the same day: **drafts are maintained too**. The
+  ordering described here is fine; using it as a FILTER was not.
+
   **Known limitation, stated rather than hidden:** the script could not be executed end-to-end from this
   sandbox — Node's fetch uses a different egress allowlist than curl and gets a 403 for the bridge host, so
   only its pure logic is verified by tests. It needs one live run in an environment that can reach the
   bridge before being trusted for enumeration counts.
+- v127 (2026-08-08): **SCOPE CORRECTION, owner directive — every card is maintained, published AND draft.
+  The only exempt cards are those whose CONTENT is forbidden.** This corrects a real error in v126 of this
+  document and in the queue tooling, and the correction is bigger than the mistake.
+
+  **What I got wrong.** I ranked cards by exposure — PUBLISHED first — which is right as ORDERING, and then
+  used it as a FILTER: on finding 1,317 unpublished seed cards I wrote "none are PUBLISHED, so don't spend
+  the batch here." Priority decides what you open first; **scope decides what is in the queue at all**, and
+  drafts are always in it. The whole future catalogue passes through the draft states, so an unmaintained
+  draft pool is an unmaintained catalogue tomorrow. Census: **779 PUBLISHED + 1,847 draft = 2,626
+  maintainable**. Working only the published cards covered **30%** of the mandate.
+
+  **The confusion this exposed, and it is the substantive finding.** Quarantine had been used as a bin for
+  cards the pipeline could not finish. An audit of **all 1,221** quarantined content cards found **874
+  carrying ONLY pipeline or completeness blockers** — `placeholder_or_junk_source` (861),
+  `compacted_low_value` (489), `missing_official_image` (232) — with **no content-prohibition code at all**.
+  Those are drafts, not forbidden content, and quarantine means *never revive*.
+
+  Sampling before acting changed the plan, and would have caught a bad bulk write:
+  - **673 are research TASKS, not cards** — titles like *"Activity research (Woodside, Queens)"* and
+    *"Music provider research (Brooklyn NY)"*, on `internal://classscout/source-seed/` URLs. They name a
+    neighbourhood, not a business. These are work-queue items that leaked into `contentCards`; moving them
+    to a draft state would be as wrong as quarantining them. **Core-app recommendation: they need their own
+    `kind`, not `kind: "content"`.**
+  - **~200 name a real business** and are the genuinely mis-filed ones. **68 were returned to
+    BLOCKED_REPAIRABLE** — Russian School of Mathematics UWS, Aquaskills Brooklyn, PLAY Greenpoint, Brooklyn
+    Spanish Academy, Elite Skills Basketball, The Tiny Scientist Brooklyn and others. Returning a card to
+    draft publishes nothing; it puts it back in the queue. The reality and venue-model checks are recorded
+    as **still owed**, because restoring a card is not the same as verifying it.
+  - Quarantine is doing its real job too: one card in that set was sourced to **xhamster.com**. That is what
+    the state is for.
+
+  **Codified, not just written down.** `defect-cohorts.ts` now exports `MAINTAINABLE_STATES`,
+  `CONTENT_FORBIDDEN_STATES`, `NO_ENTITY_STATES` and `partitionByScope()`, with tests pinning that every
+  draft state is maintainable and that the two exempt reasons stay distinct. **QUARANTINED and
+  BLOCKED_TERMINAL are not interchangeable**: quarantine means the content must never be revived; terminal
+  means there is no entity there at all (a directory page, a duplicate). Filing a card under the wrong one
+  either buries a repairable business or resurrects a prohibited one.
+
+  **A correction to v125's negative result.** v125 reported that `policy_or_safety_review` "does not
+  generalise", on the basis that **zero** of a 25-card sample carried it. Enumerating all 1,221 quarantined
+  cards shows **253 carry it — 21%**. The sample was unrepresentative and the conclusion was wrong. Since at
+  least one of those (TLB Music) was confirmed to be a bot-block misread as a safety concern, this is now a
+  real open question rather than a closed one. **A 25-card sample is not a census, and this document should
+  say which it is every time.**

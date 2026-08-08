@@ -893,6 +893,25 @@ in a comment when you add one, the way the existing ports do.
   most serious blocker available purely because its site refuses bots. A 25-card sample of quarantined cards
   found ZERO others with the code, so it is an outlier, not a systemic false positive. Recorded because the
   negative result is worth as much as the finding.
+- **EVERY card is maintained — published AND draft. The only exempt cards are those whose CONTENT is
+  forbidden** (owner directive, 2026-08-08). Priority orders the queue; it never filters it. Getting this
+  wrong once meant treating 779 published cards as the whole job when the real scope is 2,626 maintainable
+  (779 published + 1,847 draft) — 30% coverage. Codified in `defect-cohorts.ts` as `MAINTAINABLE_STATES`
+  and `partitionByScope()`, with tests.
+- **QUARANTINED and BLOCKED_TERMINAL are NOT interchangeable, and quarantine is not a bin for unfinished
+  work.** Quarantine = the content is forbidden and must never be revived (off-topic, no fixed venue, out of
+  market, adults-only, fabricated, closed). Terminal = there is no entity to maintain (a directory page, a
+  duplicate). An audit of all 1,221 quarantined content cards found **874 carrying only pipeline blockers**
+  (`placeholder_or_junk_source`, `compacted_low_value`, `missing_official_image`) and no prohibition code —
+  drafts buried in the state that means "never revive". 68 named businesses were returned to draft.
+- **Sample before a bulk write, even when the query looks clean.** Those 874 looked like one rescue job;
+  sampling showed **673 are research TASKS, not cards** ("Activity research (Woodside, Queens)" on
+  `internal://classscout/source-seed/` URLs), where moving them to draft would have been as wrong as leaving
+  them quarantined. Only ~200 named a real business.
+- **Say whether a number is a SAMPLE or a CENSUS, every time.** A 25-card sample found zero cards carrying
+  `policy_or_safety_review` and that was written up as "does not generalise". The census across all 1,221
+  quarantined cards found **253 — 21%**. The conclusion was wrong because the sample size was never stated
+  loudly enough, which is the same mistake already recorded for the 50-card contamination sweep.
 - **The `providers.phone` field has held Unix timestamps and the city switchboard.** Found 2026-08-08 in a
   pool-wide scan: nineteen live records carried 10-digit epoch seconds (`1742850639` = 2025-03-24,
   `1672214040` = 2022-12-28) where the phone number should be, and eighteen carried `311`, New York City's
