@@ -204,6 +204,18 @@
       "lastVerified": "2026-08-09",
       "cadence": "n/a",
       "notes": "Recorded so nobody spends an afternoon rediscovering this. Index-mining substitutes for the walled-directory tier."
+    },
+    {
+      "id": "coursehorse",
+      "name": "CourseHorse (via index mining)",
+      "access": "agent WebSearch with allowed_domains=[\"coursehorse.com\"] -- direct curl returns 403, bot-walled like Yelp/Sawyer",
+      "roles": [
+        "discover"
+      ],
+      "status": "WORKING",
+      "lastVerified": "2026-08-09",
+      "cadence": "per-neighbourhood rounds, same tier as index-mining",
+      "notes": "A class marketplace, not a directory of businesses -- results name both the OPERATOR and the specific class (e.g. \"Bounce Basketball\", \"South Brooklyn Fencing\"). Same discipline as every index-mining source: the entity check against the operator's own site stays mandatory before create."
     }
   ]
 }

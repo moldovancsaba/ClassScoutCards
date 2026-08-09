@@ -8843,3 +8843,87 @@ collision report, not a name disambiguator — investigate before applying.**
 
 Coverage after: **428 sport listings, 420 served** (started the day at 391); Manhattan zeros 20 → 16,
 Brooklyn zeros 14 → 12.
+
+## v186 — shared-venue tenants, four owner spreadsheets, DOHMH camps, and a real guard bug found and fixed
+
+Continued the sovereign loop per owner directive ("stop waiting for DOHMH and continue"). This entry
+covers a long stretch: the Major Owens Center tenant expansion, four more owner-verified spreadsheets
+(Tribeca-20, SoHo/Little Italy/Hudson Square, Greenwich Village, West Village), the first sport-filtered
+pull from the DOHMH camp census, and a real bug fixed in production code.
+
+### Major Owens Center — the shared-venue tenant pattern, exercised for real
+
+Confirmed via the building's own tenant page: New Heights (basketball, Suite 2B), Asphalt Green (turf
+field), and — via SerpAPI, since the operator's own site wouldn't yield contact detail — Globall Sports
+Centers. All three needed a DISTINGUISHING address element (Suite 2B / Turf Field / Carey Gabay
+Recreation Center) to pass the street-address collision guard, which is the guard's error message
+working exactly as designed: "a different business in the same building... needs a distinguishing
+address (suite, floor, pier)." Also found and fixed: the LIVE Imagine Swimming record at this address
+carried ZIP 11216 instead of 11225 — simply wrong, corrected. Determined the real neighbourhood (Crown
+Heights, not Prospect Lefferts Gardens) by checking which side of the Empire Blvd boundary the
+building's own coordinates fall on, per the method established for World Martial Arts Center earlier
+this session.
+
+### Four more owner spreadsheets — the dance/arts filter, applied consistently
+
+Each spreadsheet mixed sport and non-sport activities; dance, ballet and theater rows were excluded from
+every one, consistent with the current sport-listings mandate:
+
+- **Tribeca-20**: 5 sport creates (Combat Club by KMI, ARC Athletics, Children's Tumbling, Cocoon
+  Tribeca, Ken-Zen Institute). Church Street Boxing Park Place was on the sheet but already live —
+  dropped rather than duplicated. **Ken-Zen Institute needed the unevidenced-children's-claim check**
+  (the 47 BJJ Coop trap): its main pages mention no youth program at all, and only the membership DUES
+  page settles it, pricing minors under 18 separately from adults — created on that evidence, not the
+  sheet's assertion.
+- **SoHo/Little Italy/Hudson Square**: 4 sport creates (KidStrong SoHo, Martial Arts Family Studio,
+  Creative Arts & Sports, United East Athletics Association — a genuine 1976-founded youth sports
+  nonprofit). This batch is what surfaced the Centre Street bug (below).
+- **Greenwich Village**: 1 create (Mushin MMA) and one real ENRICHMENT — International Martial Arts
+  Center's stored address was the PLACEHOLDER "Kips Bay, Manhattan, NYC" (part of the 288-record cohort
+  already documented), and the sheet supplied the real one, confirmed on the operator's own page: 98 3rd
+  Ave, 2nd Floor.
+- **West Village**: found a live address CONFLICT rather than creating anything. The sheet's "Aikido of
+  Manhattan, 150 W 26th St" does not match independent search, which places the real Aikido of Manhattan
+  at 60 W 39th St and a DIFFERENT school (Aikido Kokikai) at 250 W 26th St — neither matches the sheet's
+  address. Not created; recorded as genuinely ambiguous rather than guessed at.
+
+### DOHMH camp census, sport-filtered for the first time
+
+Filtered the 341-site census by name for sport keywords, cross-checked against the pool: 16 of 26
+sport-named sites were not obviously duplicates. Working a first batch of 5 surfaced the dedupe
+weakness already known from the ranked sweep queue — 3 of 5 (Coney Island, Chinatown, Bedford-Stuyvesant
+YMCA) were already live, caught by the address guard. **Two real finds survived**: Bergen Beach Sports
+and Recreation Camp (fills a zero-coverage neighbourhood, hosted at St. Bernard Catholic Academy — the
+seasonal-operator-renting-a-school shape already established for Steve & Kate's) and Bay Ridge Summer
+Sports and Theatre Camp (Our Lady of Angels). Checking the 3 "duplicates" paid off anyway: Chinatown
+YMCA's stored neighbourhood was "Chinatown" while its own address (273 Bowery) is BOWERY, a
+zero-coverage neighbourhood — the brand-name-in-a-place-field defect, corrected, closing a zero.
+
+Also confirmed the head-office-number pattern twice more: Coney Island YMCA and Bedford-Stuyvesant YMCA
+both had DOHMH-record phone numbers that differ from their own branch pages (a central registration
+line in one case, a one-digit variant in the other) — each record's OWN branch number was used, not the
+census record's.
+
+### The real bug: "Centre Street" tripped the British-spelling guard
+
+United East Athletics Association's own description — "has run youth sports on Centre Street since
+1976" — was rejected by `britishSpellingError` for the word "Centre". **Centre Street in Manhattan (ZIP
+10013) is the real, official spelling of a real NYC street**, the identical false-positive shape already
+solved for a capitalised "Theatre." Fixed in `src/lib/validation/copyQuality.ts`: a capitalised "Centre"
+immediately followed by "Street"/"St" is now exempt, narrowly — a capitalised "Centre" anywhere else
+still flags. Three new test cases added (two exemption cases, one confirming the exemption stays narrow
+by still flagging a bare "the Centre"). Committed, pushed, and the fix had to actually deploy before the
+blocked write would go through — a reminder that this bridge's writes run against the DEPLOYED code, not
+the local file, so a guard fix isn't done until it's live.
+
+### Registry: CourseHorse added
+
+Owner-suggested. Same shape as Yelp/Sawyer: bot-walled to curl (403), reachable via domain-scoped
+WebSearch. A class marketplace rather than a business directory — results name both the operator and the
+specific class, so the entity check against the operator's own site stays mandatory.
+
+Coverage after this stretch: **444 sport listings, 436 served** (started this stretch at 428/420).
+Manhattan zeros 16 → 14 (Bowery closed via the Chinatown YMCA correction). One batch (SoHo) was dry-run
+successfully but not applied until caught on the next status check — worth naming: **a successful
+dry-run is not a completed batch until `--apply` actually runs**, and the loop should check for that
+explicitly rather than assuming a passed dry-run was followed through.
