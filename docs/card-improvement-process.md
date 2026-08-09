@@ -8438,7 +8438,12 @@ Worked the scarcest sport neighbourhood in the catalogue (zero served sport list
 two corrections and three new listings, and — more usefully — an answer to a question the target of "10
 new per neighbourhood" assumes away.
 
-**PLG cannot support ten children's sport listings, and that is measurable rather than an opinion.** An
+**[SUPERSEDED same day — see v182 and `docs/source-registry.md`. This paragraph measured OpenStreetMap's
+coverage and called it the neighbourhood's reality; one hour of testing other source tiers surfaced
+roughly ten real children's activity operators in or on the edge of PLG that OSM does not carry. Kept in
+place rather than deleted, because the useful lesson is that a single source's count is never a
+neighbourhood ceiling — the identical mistake shape as the 50-card contamination sample, arrived at from
+a map instead of a sample.]** ~~PLG cannot support ten children's sport listings, and that is measurable rather than an opinion.~~ An
 Overpass sweep of the whole polygon (every named feature carrying a leisure/sport/amenity/shop/office tag)
 returned 31 candidates. The children's sport venues among them are three. The rest are three adult chain
 gyms, the parks, some childcare, and LeFrak Center at Lakeside — which is already carded six times over
@@ -8714,3 +8719,56 @@ is **Amerikick Park Slope**, a different business, enriched earlier in the same 
 operators, one name, two TLDs. That is the fourth instance of the shared-name shape in this catalogue
 after United Soccer Academy / Brooklyn United, the two fencing clubs, and the two Williamsburg Soccer
 Clubs — and the reason each was checked against its own site rather than merged on name similarity.
+
+## v182 — the discovery approach was the ceiling, not the city: deep research into sources (owner directive, 2026-08-09)
+
+The owner rejected the v175 conclusion that a ~60,000-resident neighbourhood supports three children's
+sport venues — correctly. The claim measured OPENSTREETMAP'S COVERAGE and reported it as reality. The
+research that followed tested every candidate source from this environment, produced the living source
+registry (`docs/source-registry.md` + `src/scripts/sourceRegistry.json`, owner-directed: discovery AND
+enrichment AND maintenance, refreshed on a stated cadence), and re-ran Prospect Lefferts Gardens as the
+pilot.
+
+### The pilot verdict, on the same neighbourhood, same day
+
+The index tier and shared-venue expansion surfaced — in one hour — operators the Overpass sweep is
+structurally blind to: **Discovery Kids** (448 Rogers Ave, sports summer camp), **Pixie Pods** (448
+Rogers Ave), **Collective Kind** (511 Rogers Ave), **Brooklyn Trails** (Prospect Park at Lincoln Rd),
+and the **Major Owens Center** (1561 Bedford Ave, 11225), one building where THREE separate operators
+run children's programs: New Heights (basketball), Imagine Swimming (6-lane pool), Asphalt Green
+(multi-sport turf field). With SKATEYOGI and World Martial Arts Center already corrected onto PLG this
+morning, the honest inventory is roughly TEN, not three. Each Major Owens tenant qualifies for its own
+listing under the rented-venue rule (a continuing program at a fixed address — the Physique Swimming
+precedent), and none of them has one yet: recorded as the next PLG creates.
+
+### What was tested and what came back (all 2026-08-09, from this environment)
+
+- **NYC Open Data (Socrata): WORKING, no key.** Including the decisive one: **NTA 2020 neighbourhood
+  POLYGONS as GeoJSON** (`9nt8-h7nd`) — real boundaries, which retire Nominatim bounding boxes from
+  every per-neighbourhood scan. Also rec centers, athletic facilities (updated July 2026), and a
+  14-day Parks events feed usable as a maintenance signal.
+- **Index mining over walled directories: WORKING, and it is the substitute for scraping.** Yelp and
+  Sawyer bot-wall curl, and **headless Chromium cannot CONNECT through the egress proxy at all**
+  (ERR_CONNECTION_RESET on example.com itself, proxy configured, CA trusted — recorded so nobody
+  rediscovers it). But domain-scoped search over their indexes returns titles that literally carry
+  `NAME - ADDRESS - phone`. The index is the dataset; the operator's own site remains the verifier.
+- **Franchise/chain locators: WORKING** and now a registry tier with a maintenance role — a branch
+  vanishing from its own chain's page is the strongest closure signal there is.
+- **Parent directories (Mommy Poppins, Macaroni KID, Brooklyn Bridge Parents, New York Family):
+  PARTIAL** — guides and articles reachable, directory listings render client-side; reach them via
+  index mining. Date-check everything: a Macaroni KID result still asserts Prospect Gymnastics PLG at
+  535 Rogers Ave, which the operator's own contact page disproves.
+- **NYS DOH children's camp permit roll: NOT PUBLISHED as a dataset** (three portals searched). Every
+  legal NYC day camp holds a permit, so the roll is a camp CENSUS — owner ask #1 (311/FOIL).
+- **Yelp Fusion / Google Places: NO KEYS.** Fusion is free at 5,000 calls/day with structured
+  `is_closed` — owner ask #2, and the cheapest automation of the closure sweep available anywhere.
+
+### The rules this adds
+
+1. **A single source's count is never a neighbourhood ceiling.** "Thin" may only be concluded after the
+   full registry stack has run, and is recorded as "these sources see N", sources attached.
+2. **Neighbourhood geometry comes from NTA polygons**, never from a geocoder's bounding box.
+3. **A shared venue is a discovery multiplier** — whenever a round touches a multi-tenant building, its
+   operator roster is expanded before the round moves on.
+4. **Sources carry `lastVerified` and a cadence**, and the daily/weekly/rolling ritual in
+   `docs/source-registry.md` is part of the maintenance loop, not an aspiration bolted onto it.
