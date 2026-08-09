@@ -8058,3 +8058,25 @@ The batch was first written keying on ids guessed from provider names. **All 36 
 an eight-hex suffix (`prov-iconic-cheer-elite-d3ead0cd`). Already recorded in CLAUDE.md and hit anyway;
 the fix is to map name → stored id from a fetched list rather than construct the slug, and to assert every
 id resolves BEFORE the dry-run rather than reading failures out of it.
+
+## v167 (2026-08-09): round 4 — the empty-neighbourhood listings that needed a fetch
+
+Round 3 took the ones whose own address answered the question. These four needed the operator's site, and
+three turned out not to be a missing field at all.
+
+- **Row New York ×2 — a duplicate that became a new location.** Both records pointed at the same Peter Jay
+  Sharp Dock on the Harlem River. Retiring the surplus was the obvious move; the operator's own contact
+  page lists a second NYC boathouse with no listing anywhere — the **Paerdegat Basin Dock, 1310 Paerdegat
+  Ave North, Canarsie**. So the surplus was REPURPOSED onto a real uncarded venue instead of deleted, and
+  the survivor got Inwood plus the phone and email it lacked. Its Queens boathouse is recorded for a later
+  pass. The same page's office address (110 W 40th St Suite 602) was deliberately not used.
+- **JukeBox — 'Brooklyn, NY' is a borough, not a place.** The operator's own site gave 491 5th Avenue,
+  ZIP 11215, Park Slope, and a phone the record did not carry.
+- **Bent on Learning — a missing VENUE, not a missing neighbourhood.** Its own page title is "Yoga &
+  Mindfulness in Schools": it sends teachers into public schools and runs no place a child attends. That
+  is the no-fixed-venue prohibition, and it is *why* the field was empty — the pipeline had nothing to
+  read. Retired to hidden, not quarantined; the organisation is real, it simply is not a place.
+
+**Worth generalising: an empty `neighborhood` is not always a gap to fill.** Three of four here were a
+duplicate, a borough-in-an-address-field, and an operator with no venue. Treat the empty field as a
+SYMPTOM and ask what produced it before reaching for a value.
