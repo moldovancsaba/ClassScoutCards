@@ -210,9 +210,36 @@ export const REAL_NEIGHBORHOODS_EXTRA: Partial<Record<Borough, string[]>> = {
   Brooklyn: ["Prospect Park"],
 };
 
+/**
+ * NYC neighbourhoods the ported registry omits, by borough.
+ *
+ * Deliberately SHORT. The ported NYC lists are already thorough — 49 Manhattan entries, 51 Queens, 50
+ * Brooklyn — and every one of these was added because a live record needed it or because its absence was
+ * plainly a hole rather than a judgement call. This is separate from `REAL_NEIGHBORHOODS_EXTRA` in
+ * `locations.ts`, which exists for a different reason: those are real names the GROUP vocabulary folds
+ * away (East Harlem into Harlem), whereas these are simply missing.
+ */
+export const NYC_NEIGHBORHOODS_EXTRA: Record<string, string[]> = {
+  Brooklyn: ["South Slope", "Greenwood Heights", "Weeksville", "Starrett City", "Bath Beach", "Sea Gate"],
+  Queens: ["Rockaway Park", "Belle Harbor", "Neponsit", "Utopia", "Pomonok", "Lefrak City", "Bayswater"],
+  Bronx: [
+    "Bedford Park", "Fieldston", "North Riverdale", "Van Cortlandt Village", "Woodlawn", "Norwood",
+    "Mott Haven", "Clason Point", "Edgewater Park", "Schuylerville", "Unionport",
+  ],
+  "Staten Island": ["Randall Manor", "Silver Lake", "Sunnyside", "Bay Terrace", "Great Kills", "Travis"],
+  Manhattan: ["Bowery", "Alphabet City", "Lenox Hill", "Tudor City", "Hudson Square", "Lincoln Center"],
+};
+
 /** Every name a card may legitimately store: the ported group vocabulary plus the real names above. */
 export const REAL_NEIGHBORHOODS: Record<Borough, string[]> = BOROUGHS.reduce((acc, b) => {
-  acc[b] = [...(NEIGHBORHOODS[b] ?? []), ...(REAL_NEIGHBORHOODS_EXTRA[b] ?? [])];
+  acc[b] = [
+    ...(NEIGHBORHOODS[b] ?? []),
+    ...(REAL_NEIGHBORHOODS_EXTRA[b] ?? []),
+    // Owner directive 2026-08-09: real NYC neighbourhoods the ported list simply omits. See
+    // NYC_NEIGHBORHOODS_EXTRA below for why these are separate from REAL_NEIGHBORHOODS_EXTRA -- those
+    // are names the GROUP vocabulary folds away, these are names it never had.
+    ...(NYC_NEIGHBORHOODS_EXTRA[b] ?? []),
+  ];
   return acc;
 }, {} as Record<Borough, string[]>);
 
@@ -337,6 +364,80 @@ export function findCanonicalNeighborhood(
   return matchCanonicalPlaceLabel(foldedBest, list) ?? best;
 }
 
+// ---------------------------------------------------------------------------------------------------
+// Gaps in the two ported city vocabularies (owner directive, 2026-08-09)
+//
+// "You have the right to finetune borough (district) and neighbourhood for any city, never made up
+// always confirm... The core system will filter out anyway."
+//
+// Kept in their own EXTRA constants and merged only into the REAL_* / resolver paths, never into
+// NEIGHBORHOODS or LA_AREAS themselves -- those are hand-synced copies of the main app's data, and this
+// repo has already recorded that mixing additions into a ported array is how such a copy goes stale
+// invisibly. Same pattern as REAL_NEIGHBORHOODS_EXTRA above.
+//
+// Every entry is geography, not judgement: a real named district, town or incorporated city. Adding
+// "La Canada Flintridge" to San Gabriel Valley asserts a fact about a map, not a claim about a business.
+// ---------------------------------------------------------------------------------------------------
+
+/**
+ * LA areas the ported `LA_AREAS` omits.
+ *
+ * South Los Angeles is a large, well-defined part of the city with real children's programmes in it, and
+ * its absence forced at least one real listing (Lula Washington Dance Theatre, 3773 Crenshaw Blvd) into
+ * "Central LA" with an empty neighbourhood.
+ */
+export const LA_AREAS_EXTRA: string[] = ["South LA"];
+
+/**
+ * LA neighbourhoods missing from the ported registry, by area.
+ *
+ * Each entry is a real, named Los Angeles district or incorporated city within that area. The three that
+ * blocked live listings are marked; the rest fill obvious holes in the same areas so the next record does
+ * not hit the same wall.
+ */
+export const LA_NEIGHBORHOODS_EXTRA: Record<string, string[]> = {
+  // The new area. Lula Washington Dance Theatre is on Crenshaw Blvd.
+  "South LA": [
+    "Crenshaw", "Leimert Park", "Baldwin Hills", "Baldwin Village", "View Park-Windsor Hills",
+    "West Adams", "Jefferson Park", "Adams-Normandie", "Exposition Park", "University Park",
+    "Vermont Square", "Vermont-Slauson", "Hyde Park", "Harvard Park", "South Park", "Watts",
+    "Florence", "Green Meadows", "Historic South-Central", "Central-Alameda", "Broadway-Manchester",
+    "Manchester Square", "Chesterfield Square", "Ladera Heights",
+  ],
+  // Del Rey blocked Broadway Gymnastics School, 5433 Beethoven Street.
+  Westside: [
+    "Del Rey", "Sawtelle", "Rancho Park", "Cheviot Hills", "Beverlywood", "Bel Air", "Malibu",
+    "Topanga", "Westchester", "Playa del Rey", "Ladera Heights",
+  ],
+  // La Cañada Flintridge blocked Descanso Gardens, 1418 Descanso Drive.
+  "San Gabriel Valley": [
+    "La Cañada Flintridge", "Altadena", "Azusa", "Baldwin Park", "Claremont", "Diamond Bar",
+    "El Monte", "South El Monte", "Industry", "La Puente", "La Verne", "Pomona", "San Dimas",
+    "Walnut", "Hacienda Heights", "Rowland Heights",
+  ],
+  "Central LA": [
+    "Chinatown", "Little Tokyo", "Arts District", "Fairfax", "Beverly Grove", "Miracle Mile",
+    "Pico-Union", "Historic Filipinotown", "Elysian Park", "Angelino Heights", "Rampart Village",
+    "Harvard Heights", "Windsor Square", "Melrose",
+  ],
+  "San Fernando Valley": [
+    "Calabasas", "Sun Valley", "Pacoima", "Sylmar", "Mission Hills", "Panorama City", "Winnetka",
+    "West Hills", "Porter Ranch", "Arleta", "Lake Balboa", "Valley Village", "Valley Glen",
+    "Tujunga", "Sunland", "Shadow Hills", "Chatsworth",
+  ],
+  Eastside: ["Cypress Park", "Glassell Park", "Elysian Valley", "University Hills"],
+  "South Bay": [
+    "Rancho Palos Verdes", "Rolling Hills Estates", "Rolling Hills", "Palos Verdes Peninsula", "Lomita",
+  ],
+  "Gateway Cities": [
+    "Compton", "Lynwood", "South Gate", "Huntington Park", "Bell", "Bell Gardens", "Cudahy", "Maywood",
+    "Signal Hill", "Artesia", "Hawaiian Gardens", "Santa Fe Springs", "Commerce", "Vernon", "Lakewood",
+  ],
+  Harbor: ["Terminal Island"],
+};
+
+
+
 // ---- laLocations.ts ----
 
 export const LA_AREAS: string[] = [
@@ -389,7 +490,15 @@ export const LA_NEIGHBORHOODS: Record<string, string[]> = {
 export function findCanonicalArea(value: string | null | undefined): string | null {
   const cleaned = normalizePlaceLabel(String(value ?? ""));
   if (!cleaned) return null;
-  return matchCanonicalPlaceLabel(cleaned, LA_AREAS);
+  return matchCanonicalPlaceLabel(cleaned, ALL_LA_AREAS);
+}
+
+/** The ported LA areas plus this repo's own additions. See LA_AREAS_EXTRA. */
+export const ALL_LA_AREAS: string[] = [...LA_AREAS, ...LA_AREAS_EXTRA];
+
+/** One area's neighbourhoods: the ported list plus this repo's own additions. */
+export function laNeighborhoodsFor(area: string): string[] {
+  return [...(LA_NEIGHBORHOODS[area] ?? []), ...(LA_NEIGHBORHOODS_EXTRA[area] ?? [])];
 }
 
 /**
@@ -401,8 +510,7 @@ export function findCanonicalLANeighborhood(area: string | null | undefined, val
   if (!area) return null;
   const raw = String(value ?? "").trim();
   if (!raw) return null;
-  const list = LA_NEIGHBORHOODS[area] ?? [];
-  return matchCanonicalPlaceLabel(raw, list);
+  return matchCanonicalPlaceLabel(raw, laNeighborhoodsFor(area));
 }
 
 // ---- Combined NYC+LA resolver (this repo's own convenience wrapper) ----

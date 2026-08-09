@@ -32,7 +32,12 @@ export const BRIDGE_SETTABLE_STATES = ALLOWED_STATES.filter((s) => s !== "PUBLIS
 /** Every writable collection gets these two review-provenance fields, stamped automatically by
  *  cardBridgeWrite.ts on every applied (non-dry-run) write, INCLUDING a pure touch (no content change)
  *  — this is what lets "reviewed, decided no change needed" be distinguished from "never reviewed". */
-const REVIEW_PROVENANCE_FIELDS = ["lastReviewedAt", "lastReviewedBy"] as const;
+// `fieldVerifications` is per-FIELD provenance, added 2026-08-09 on the owner's approval of the
+// recommendation in docs/classscout-core-recommendations.md. It sits beside lastReviewedAt/lastReviewedBy
+// rather than replacing them: the record-level stamp answers "did anything look at this card", the array
+// answers "which of its fields does anyone stand behind". See fieldVerifications.ts for why it is
+// supplied explicitly by the caller rather than derived from which fields a write happened to contain.
+const REVIEW_PROVENANCE_FIELDS = ["lastReviewedAt", "lastReviewedBy", "fieldVerifications"] as const;
 
 export interface BridgeCollectionConfig {
   /** Real Mongo collection name in the shared classscoutcluster database. */
@@ -83,6 +88,7 @@ export const BRIDGE_REGISTRY: Record<BridgeCollectionKey, BridgeCollectionConfig
       terminalReason: 1,
       lastReviewedAt: 1,
       lastReviewedBy: 1,
+      fieldVerifications: 1,
       updatedAt: 1,
       createdAt: 1,
     },
@@ -142,6 +148,7 @@ export const BRIDGE_REGISTRY: Record<BridgeCollectionKey, BridgeCollectionConfig
       visibility: 1,
       lastReviewedAt: 1,
       lastReviewedBy: 1,
+      fieldVerifications: 1,
       updatedAt: 1,
       publishedAt: 1,
       // Research fields (2026-08-07 finding, same class of gap as meetupGroups.website): the real
@@ -254,6 +261,7 @@ export const BRIDGE_REGISTRY: Record<BridgeCollectionKey, BridgeCollectionConfig
       visibility: 1,
       lastReviewedAt: 1,
       lastReviewedBy: 1,
+      fieldVerifications: 1,
       updatedAt: 1,
     },
     // qualityStatus/visibility mirror the providers entry above (added to MeetupGroup itself in the main
@@ -310,6 +318,7 @@ export const BRIDGE_REGISTRY: Record<BridgeCollectionKey, BridgeCollectionConfig
       duplicateKey: 1,
       lastReviewedAt: 1,
       lastReviewedBy: 1,
+      fieldVerifications: 1,
       updatedAt: 1,
       createdAt: 1,
     },

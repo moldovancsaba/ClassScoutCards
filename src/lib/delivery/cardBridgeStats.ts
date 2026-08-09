@@ -1,6 +1,7 @@
 import { getBridgeDb } from "@/lib/delivery/cardBridgeClient";
 import { BRIDGE_REGISTRY } from "@/lib/delivery/cardBridgeRegistry";
 import { resolveRegionAndNeighborhood } from "@/lib/delivery/locations";
+import { resolveAnyRegion } from "@/lib/delivery/expansionMarkets";
 import { isSportActivity } from "@/lib/delivery/sportActivity";
 import { splitDimensions } from "@/lib/delivery/activityDimension";
 
@@ -152,7 +153,10 @@ export async function getCollectionStats(collection: StatsCollectionKey): Promis
       if (record.published) sportCardsPublished += 1;
     }
 
-    const { region, neighborhood } = resolveRegionAndNeighborhood(record.region, record.neighborhood);
+    // Owner directive 2026-08-09: an out-of-city listing is a real listing, so the stats page groups
+    // expansion-market districts (Nassau County, Rockland County, Bergen County...) rather than
+    // dropping them into "(unresolved)" alongside genuine garbage.
+    const { region, neighborhood } = resolveAnyRegion(record.region, record.neighborhood, resolveRegionAndNeighborhood);
 
     const regionBucket = regionBuckets.get(region) ?? newBucket(region);
     tally(regionBucket, record.published);

@@ -10,6 +10,7 @@ import {
 } from "@/lib/delivery/cardBridgeRegistry";
 import { validateCopyQuality } from "@/lib/validation/copyQuality";
 import { alignActivityTypes, isNonAnswerCategoryValue, NO_CATEGORY_PLACEHOLDER } from "@/lib/delivery/activityAlignment";
+import { mergeFieldVerifications } from "@/lib/delivery/fieldVerifications";
 import { computeContentCardIdentity } from "@/lib/delivery/cardBridgeSplit";
 import { monthsToAgeBuckets, validateRecurringPrograms } from "@/lib/delivery/programSchema";
 import { buildFamilyServicePlaceFact, buildFamilyServiceReviewPacket, isPublicStatus, normalizeFamilyServiceLead, reviewPacketEligible } from "@/lib/familyServices/core";
@@ -220,6 +221,18 @@ export function validateWriteRequest(body: unknown): WriteValidationResult {
 
   if ((collection === "providers" || collection === "meetupGroups") && "qualityStatus" in updates && updates.qualityStatus !== "quarantined") {
     return { ok: false, status: 400, error: 'qualityStatus can only be set to "quarantined" (the only real value the main app defines) — omit the field entirely rather than trying to clear it through this bridge' };
+  }
+
+  // Per-field verification provenance (owner-approved 2026-08-09). Shape is checked here so a malformed
+  // payload is a 400 before anything touches the database; the merge against the record's EXISTING
+  // entries happens in applyCardBridgeWrite, because only that has the current document.
+  if ("fieldVerifications" in updates) {
+    const fv = updates.fieldVerifications;
+    if (!Array.isArray(fv) || fv.length === 0) {
+      return { ok: false, status: 400, error: "fieldVerifications must be a non-empty array of {field, verdict, source?} entries" };
+    }
+    const probe = mergeFieldVerifications([], fv as never, "validate", "1970-01-01T00:00:00.000Z", BRIDGE_REGISTRY[collection].writableFields);
+    if (!probe.ok) return { ok: false, status: 400, error: probe.error! };
   }
   if ((collection === "providers" || collection === "meetupGroups") && "visibility" in updates && updates.visibility !== "hidden") {
     return { ok: false, status: 400, error: 'visibility can only be set to "hidden" (the only real value the main app defines) — omit the field entirely rather than trying to clear it through this bridge' };
@@ -544,6 +557,28 @@ export async function applyCardBridgeWrite(request: NormalizedWriteRequest): Pro
     lastReviewedAt: nowIso,
     lastReviewedBy: request.source,
   };
+
+  // Per-FIELD provenance (owner-approved 2026-08-09). Supplied explicitly by the caller as
+  // `fieldVerifications: [{field, verdict, source?}]` and merged replace-by-field into whatever the
+  // record already carries. Deliberately NOT derived from `request.updates`: a bulk sweep that sets a
+  // field mechanically has established nothing, and stamping it as verified would manufacture exactly
+  // the false confidence this exists to remove. A write that supplies none stamps none.
+  if ("fieldVerifications" in request.updates) {
+    const merged = mergeFieldVerifications(
+      (current as Record<string, unknown>).fieldVerifications,
+      request.updates.fieldVerifications as never,
+      request.source,
+      nowIso,
+      config.writableFields,
+    );
+    if (!merged.ok) {
+      // Refusals at apply time surface as `blockedReason`, matching every other guard in this file
+      // (the fingerprint-collision and geo-downgrade checks). The shape is validated earlier in
+      // validateWriteRequest; this catches what only the CURRENT record can reveal.
+      return { found: true, dryRun: request.dryRun, touch: request.touch, collection: request.collection, id: request.id, before, blockedReason: merged.error };
+    }
+    finalUpdates.fieldVerifications = merged.value;
+  }
 
   // Mirror the main app's categoryReclassifiedFrom/At provenance convention (business-rules.md rule
   // re: board 44 F3) so a category change made through this bridge is reversible the same way.
