@@ -8080,3 +8080,38 @@ three turned out not to be a missing field at all.
 **Worth generalising: an empty `neighborhood` is not always a gap to fill.** Three of four here were a
 duplicate, a borough-in-an-address-field, and an operator with no venue. Treat the empty field as a
 SYMPTOM and ask what produced it before reaching for a value.
+
+## v168 (2026-08-09): round 5 — NYC Parks recreation centres, and the guard earning its keep again
+
+Venue-by-venue web sourcing hit three walls at once: discovery never crawled the scarce neighbourhoods,
+Yelp returns 403 and the parenting camp directories sit behind a WAF, and small operators are hard to
+enumerate. **NYC Parks is none of those** — reachable, one detail page per centre with a street address,
+cross streets and a direct phone line, and each is a genuine physical place children swim and play sport
+in rather than a programme borrowing a room. Twelve Manhattan and seven Brooklyn centres exist.
+
+**11 created**, including **Asser Levy at 392 Asser Levy Place, which is Kips Bay — a neighbourhood that
+showed a family nothing.** Four deliberately not created: Herbert Von King is a CULTURAL ARTS centre and
+would inflate a sport count with something that is not sport; Pelham Fritz, Shirley Chisholm and Sunset
+Park publish no street address this fetch could read and are recorded for when one is confirmed.
+
+All 11 are hidden — NYC Parks publishes no venue photograph, so under image-optional they are complete and
+invisible. **That is stated as a limitation, not counted as coverage**: eleven hidden listings help nobody
+until a photo lands. The status report gives them their own line for exactly this reason.
+
+### Four refusals, four real findings
+
+The address guard refused four creates and every refusal was worth more than the write would have been:
+
+- **An ID-TRUNCATION duplicate.** Two Thomas Jefferson records share the hash `eb3d06a2` and one id is cut
+  mid-word (`at-thomas--eb3d06a2` vs `at-thomas-jefferson-park-eb3d06a2`). Already catalogued as something
+  a phone-normalised duplicate scan finds; here the create guard found it first.
+- **Two real venue records with no phone.** `prov-kids-in-motion-at-brownsville-playground` and
+  `...at-st-john-s-park` had already been retitled onto the recreation centres in an earlier pass and
+  carried no phone at all. The Parks facility pages supply both direct lines, and the source moved from a
+  playground page to the centre's own page.
+- **An empty neighbourhood answered by a sibling** — the St. John's programme card got Crown Heights the
+  moment the venue behind it was identified.
+
+**Generalising: a guard that refuses a CREATE is a duplicate detector for records that already exist.**
+This repo already recorded that the address pipeline's write refusals "were all real findings"; the same
+is now true one step earlier, before insert rather than after.
