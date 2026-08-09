@@ -8024,3 +8024,37 @@ reported "0 held back for no image" while Boro Park YM-YWHA sat hidden for exact
 records were excluded from the pool, so **the report was hiding the thing it was built to surface**. A
 listing hidden only for want of a photograph is now counted and reported separately from both the visible
 total and the quarantined, which are different questions.
+
+## v166 (2026-08-09): round 3 — the empty-neighbourhood cohort, resolved from each record's own address
+
+40 records worked: **29 assigned a real neighbourhood, 11 deliberately left empty.** The cohort of live
+Manhattan/Brooklyn sport listings with no neighbourhood went **61 → 32**, and Brooklyn's count of
+neighbourhoods showing a family nothing went **16 → 14** — Red Hook (Brooklyn Sluggers Academy, 80A Verona
+St) and Dyker Heights (CityParks Junior Golf Center, 8850 14th Ave) both came off zero without a single
+new business being researched.
+
+**The total did not move, and that is the correct result.** These listings were always counted; they were
+never *findable*. Coverage and count are different questions and the status report now says so.
+
+### What earned an escalation rather than a guess
+
+Eleven, and the reasons cluster into four shapes worth reusing:
+
+- **The record contradicts itself** — Ardon Sweet Science stores "143 30th Street" (Greenwood Heights
+  territory) with ZIP 11230 (Midwood, miles away). One is wrong and nothing in the record says which.
+- **A suite number is an office, not a venue** — Apex for Youth (195 Chrystie St #200) and Mo'Motion (2214
+  Frederick Douglass Blvd, Ste 313). Writing the neighbourhood sends a family to a door they cannot use.
+- **A three-way boundary** — 9201 and 9216 7th Ave sit where Bay Ridge, Fort Hamilton and Dyker Heights
+  meet, and the vocabulary carries all three separately.
+- **A park with no fold target** — Riverside Park between W96 and W110, and Randall's Island, which is not
+  in the Manhattan vocabulary at all.
+
+Every one of those would have been easy to fill, and each would have moved the coverage number. That is
+exactly why they were not: the sweep meant to increase precision is the worst place to fake it.
+
+### The truncated-id trap, hit again
+
+The batch was first written keying on ids guessed from provider names. **All 36 failed** — real ids carry
+an eight-hex suffix (`prov-iconic-cheer-elite-d3ead0cd`). Already recorded in CLAUDE.md and hit anyway;
+the fix is to map name → stored id from a fetched list rather than construct the slug, and to assert every
+id resolves BEFORE the dry-run rather than reading failures out of it.
