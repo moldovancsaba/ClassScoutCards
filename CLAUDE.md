@@ -1238,6 +1238,25 @@ in a comment when you add one, the way the existing ports do.
   different location, which needed its own check. It happened to also be closed, but that had to be
   established, not assumed.
 
+- **A search summary is not the operator's own locations page, and I got this wrong in production today.**
+  Resolving the `Manhattan/Brooklyn` cohort, I read a search result listing three Big City Volleyball gyms,
+  all in Manhattan, and wrote "its gyms are ALL IN MANHATTAN" onto the card. Its own locations page lists
+  gyms in THREE boroughs — Congregation Beth Elohim in Park Slope, The Post BK in Greenpoint, New Post in
+  Bushwick, Prospect Park Long Meadow and Brooklyn Bridge Park Pier 6 in Brooklyn; Commonpoint Queens and
+  Newtown High School in Queens. **"The sites I was shown are all in X" is not the claim "all its sites are
+  in X."** Corrected in place the same session. Two things make it worse than an ordinary slip: the same
+  sweep had already recorded the rule ("an operator's own location finder beats a search summary, and the
+  gap between them is where fabricated locations survive"), and the disproof was sitting in this catalogue
+  the whole time — a separate provider record, *Big City Volleyball Brooklyn*, pointing at the operator's
+  own `/youth-classes-brooklyn` page. **Before ruling on how many boroughs an operator spans, fetch the
+  locations page, and check whether a sibling record already contradicts you.**
+- **A record whose own description tells the reader to look at a different listing is a card admitting it
+  should not exist.** Eight were found this way — "see the Soccer Stars NYC listing", "covered by the 92NY
+  Center for Children & Family record", "A class at Bedford-Stuyvesant YMCA; see the … listing at 1121
+  Bedford Avenue". They are cheap to grep for and unambiguous. All retired to hidden (never quarantined —
+  nothing forbidden, just no separate place), each only after confirming the parent exists. A pool-wide
+  re-scan afterwards returned **zero**, which is a real negative result: this cohort is now closed.
+
 ## Work in BATCHES of 4-10, covering EVERY component, and improve the process after each one (owner directive, 2026-08-09)
 
 **"Do you understand your task to do the listing fixes in batches maximum 4-10 at the time and deliver
