@@ -11,6 +11,7 @@ import {
 import { validateCopyQuality } from "@/lib/validation/copyQuality";
 import { alignActivityTypes } from "@/lib/delivery/activityAlignment";
 import { categoryValueError, placeValueError } from "@/lib/delivery/fieldGuards";
+import { providerPublishGate } from "@/lib/delivery/publishGate";
 import { mergeFieldVerifications } from "@/lib/delivery/fieldVerifications";
 import { findExpansionDistrict, expansionMarketKeys } from "@/lib/delivery/expansionMarkets";
 import { computeContentCardIdentity } from "@/lib/delivery/cardBridgeSplit";
@@ -230,11 +231,30 @@ export function validateWriteRequest(body: unknown): WriteValidationResult {
       ? (updates.borough as string)
       : null;
 
+  // ------------------------------------------------------------------------------------------------
+  // THE SECOND EXCEPTION (2026-08-09, owner-approved): the publish gate, IMPLEMENTED rather than avoided.
+  //
+  // The original rail said revealing is "the main app's own gate to open and this bridge does not
+  // replicate it." That was right about the risk and wrong about the conclusion — the gate is ordinary,
+  // readable, deterministic logic (`isPublicProvider`), and refusing to replicate it left fully-researched
+  // real listings permanently invisible with no path forward short of hand-editing the database.
+  //
+  // A reveal is therefore allowed only when the record, AS IT WILL BE AFTER THIS WRITE, passes the ported
+  // gate in FULL — imgbb image, name, category, location, source URL, no scraped chrome, not quarantined.
+  // That check needs the stored document, so validation only records the intent; `applyCardBridgeWrite`
+  // runs `providerPublishGate` over the merged record and refuses with `blockedReason` if it fails.
+  // Nothing about it is a judgement call, which is precisely why it can live here.
+  //
+  // `meetupGroups` is NOT covered: its public gate is a different function over a different shape, and
+  // porting a gate for a collection this loop does not enrich would be speculative.
+  // ------------------------------------------------------------------------------------------------
+  const revealAllowedForCollection = collection === "providers";
+
   if ((collection === "providers" || collection === "meetupGroups") && "qualityStatus" in updates && updates.qualityStatus !== "quarantined") {
-    if (updates.qualityStatus === "" && reinstatementDistrict) {
-      // allowed: taxonomy-gap reinstatement, see above
+    if (updates.qualityStatus === "" && (reinstatementDistrict || revealAllowedForCollection)) {
+      // allowed: taxonomy-gap reinstatement, or a gate-checked reveal (verified at apply time)
     } else {
-      return { ok: false, status: 400, error: `qualityStatus can only be set to "quarantined" through this bridge, or cleared to "" in the same write that places the record in a resolvable expansion-market district (the taxonomy-gap reinstatement path). ${reinstatementDistrict ? "" : "This write supplies no such district."}` };
+      return { ok: false, status: 400, error: `qualityStatus can only be set to "quarantined" through this bridge, cleared to "" on a providers record that passes the public gate, or cleared in the same write that places the record in a resolvable expansion-market district.` };
     }
   }
 
@@ -260,10 +280,11 @@ export function validateWriteRequest(body: unknown): WriteValidationResult {
     if (!probe.ok) return { ok: false, status: 400, error: probe.error! };
   }
   if ((collection === "providers" || collection === "meetupGroups") && "visibility" in updates && updates.visibility !== "hidden") {
-    if (updates.visibility === "" && reinstatementDistrict) {
-      // allowed: taxonomy-gap reinstatement, see the block above `qualityStatus`
+    const revealing = updates.visibility === "" || updates.visibility === "visible";
+    if (revealing && (reinstatementDistrict || revealAllowedForCollection)) {
+      // allowed: taxonomy-gap reinstatement, or a gate-checked reveal (verified at apply time)
     } else {
-      return { ok: false, status: 400, error: `visibility can only be set to "hidden" through this bridge, or cleared to "" in the same write that places the record in a resolvable expansion-market district (the taxonomy-gap reinstatement path). ${reinstatementDistrict ? "" : "This write supplies no such district."}` };
+      return { ok: false, status: 400, error: `visibility can only be set to "hidden" through this bridge, or to "" / "visible" on a providers record that passes the main app's own public gate (imgbb image, name, category, location, source URL, no scraped chrome). Got ${JSON.stringify(updates.visibility)}.` };
     }
   }
 
@@ -402,6 +423,38 @@ export async function applyCardBridgeWrite(request: NormalizedWriteRequest): Pro
         id: request.id,
         before,
         blockedReason: `Cannot set status="${normalizedLead.status}" (a public status) while blockers exist: ${normalizedLead.blockers.join(", ")}. Resolve the blockers first (they are re-derived, not settable directly).`,
+      };
+    }
+  }
+
+  // (2026-08-09) THE PUBLISH GATE, checked against the record as it will be AFTER this write.
+  //
+  // `validateWriteRequest` can allow the intent to reveal but cannot judge it: the gate reads the whole
+  // document (image, name, category, location, source, copy) and validation is pure. So a reveal is
+  // permitted through validation and adjudicated here, against {stored ∪ updates} — which is the only
+  // form of the record that answers the actual question, "would a family see this?".
+  //
+  // Deliberately checked in BOTH dry-run and apply, like every other guard in this file: a dry-run that
+  // reported success and an apply that refused would be worse than no dry-run at all.
+  if (
+    request.collection === "providers"
+    && (("visibility" in request.updates && request.updates.visibility !== "hidden")
+      || ("qualityStatus" in request.updates && request.updates.qualityStatus !== "quarantined"))
+  ) {
+    const merged = { ...(current as Record<string, unknown>), ...request.updates };
+    // The gate reads these two as the record's own state; a reveal means they are being cleared.
+    if ("visibility" in request.updates) merged.visibility = "";
+    if ("qualityStatus" in request.updates) merged.qualityStatus = "";
+    const gate = providerPublishGate(merged);
+    if (!gate.ok) {
+      return {
+        found: true,
+        dryRun: request.dryRun,
+        touch: request.touch,
+        collection: request.collection,
+        id: request.id,
+        before,
+        blockedReason: `This write would reveal ${request.id}, but the record does not pass the main app's own public gate: ${gate.missing.join("; ")}. Fix those in the same write (or an earlier one) and the reveal is allowed — the gate is not a veto on revealing, it is the condition for it.`,
       };
     }
   }

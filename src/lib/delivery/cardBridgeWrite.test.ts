@@ -100,10 +100,30 @@ describe("validateWriteRequest", () => {
       expect(validateWriteRequest({ ...validProviderBody, updates: { visibility: "hidden" } }).ok).toBe(true);
     });
 
-    it("rejects any other qualityStatus/visibility value — these fields only ever move ONE direction through this bridge", () => {
+    it("rejects an arbitrary qualityStatus/visibility value — these are not free-text fields", () => {
       expect(validateWriteRequest({ ...validProviderBody, updates: { qualityStatus: "approved" } }).ok).toBe(false);
-      expect(validateWriteRequest({ ...validProviderBody, updates: { visibility: "visible" } }).ok).toBe(false);
+      expect(validateWriteRequest({ ...validProviderBody, updates: { visibility: "maybe" } }).ok).toBe(false);
       expect(validateWriteRequest({ ...validProviderBody, updates: { qualityStatus: null } }).ok).toBe(false);
+    });
+
+    // (2026-08-09, owner-approved) These two used to be strictly one-directional: hide, never reveal,
+    // "because revealing is the main app's own gate to open and this bridge does not replicate it."
+    // The gate is now REPLICATED (publishGate.ts, a faithful port of isPublicProvider), so a reveal is
+    // allowed — conditionally. Validation is pure and cannot read the stored document, so it lets the
+    // INTENT through and `applyCardBridgeWrite` adjudicates against {stored ∪ updates}. The test that
+    // the gate is actually enforced lives in publishGate.test.ts; what matters here is that validation
+    // no longer refuses outright.
+    it("lets a reveal through validation, because the gate is judged at apply time against the real record", () => {
+      expect(validateWriteRequest({ ...validProviderBody, updates: { visibility: "visible" } }).ok).toBe(true);
+      expect(validateWriteRequest({ ...validProviderBody, updates: { visibility: "" } }).ok).toBe(true);
+      expect(validateWriteRequest({ ...validProviderBody, updates: { qualityStatus: "" } }).ok).toBe(true);
+    });
+
+    it("still refuses to reveal a meetupGroup, whose public gate has NOT been ported", () => {
+      const meetupBody = { collection: "meetupGroups", id: "mg-1", reason: "Testing the reveal rail", source: "test" };
+      expect(validateWriteRequest({ ...meetupBody, updates: { visibility: "hidden" } }).ok).toBe(true);
+      expect(validateWriteRequest({ ...meetupBody, updates: { visibility: "visible" } }).ok).toBe(false);
+      expect(validateWriteRequest({ ...meetupBody, updates: { qualityStatus: "" } }).ok).toBe(false);
     });
   });
 

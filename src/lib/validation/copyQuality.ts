@@ -65,3 +65,15 @@ export function validateCopyQuality(value: string, label: string): string | null
   }
   return null;
 }
+
+/**
+ * The main app's own `containsScrapedChrome` (publicDescriptionQuality.ts), exposed separately from
+ * `validateCopyQuality` because it is part of a DIFFERENT question. `validateCopyQuality` decides
+ * whether a write may store a string; this decides whether the stored copy lets the listing appear
+ * publicly at all — `isPublicProvider` calls it over the concatenated short + long + announcement
+ * descriptions, so a listing can pass every write and still be invisible because of copy it already
+ * had. See publishGate.ts.
+ */
+export function containsScrapedChrome(value: string): boolean {
+  return SCRAPED_CHROME_PATTERNS.some((p) => p.test(value)) || CAROUSEL_ARTIFACT_PATTERN.test(value);
+}
