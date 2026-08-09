@@ -7609,3 +7609,57 @@ three batches.
 Also closed: The Painted Pot's two studios both given their real addresses (188 5th Avenue and 339 Smith
 Street) — the Carroll Gardens card had been storing *Park Slope* as its address, the other studio's
 neighbourhood, on the wrong card.
+
+## v159 (2026-08-09): batches 45–47 — a directory, a location slug for a name, and a placeholder on a real domain
+
+### Three records that were not businesses
+
+- **`prov-new-york-ny`** — a live provider literally named "New York, Ny", which is the location label from
+  the URL it was scraped from (`ny-new-york.childrensartclasses.com`, a per-territory franchise site). Its
+  address was a placeholder, its phone a NASSAU COUNTY (516) number, its email a named franchisee's. A
+  franchise TERRITORY is not an address — the same ruling that kept Brooklyn Robot Foundry's surplus cards
+  off "NY – Manhattan East".
+- **`prov-tidybash-party-directory-nyc`** — a party DIRECTORY's own browse page. Its name says so, its URL
+  is `/directory`, and its long description is a jumble of other businesses' offerings. Same ruling as
+  letsgobaby.co and ActivityHero's browse pages.
+- **`prov-goldfish-swim-school-manhattan`** — a chain-level card for a borough, on a brand whose Manhattan
+  situation this catalogue had already worked out: the only open NYC school is in Gowanus, and the UWS
+  Broadway school is in pre-registration and was deliberately not carded. Retired rather than corrected,
+  because correcting it either way would card a pre-opening pool or duplicate an existing card.
+
+### Two limits of the shared-description scan, both confirmed in the wild
+
+A **seventh** Brooklyn Bridge Park programme card turned up that the six-card cluster did not contain,
+because its copy differs. **Closing a shared-description cluster closes a scrape, not an operator.** And
+the third **sentence fragment stored as an address** appeared (BAX: *"421 5th Avenue, Park Slope This
+building is located roughly"*), after the Wikitravel and Brooklyn Bridge Park instances — three makes it a
+pattern: the extractor takes the run-on text after an address rather than stopping at it.
+
+### The email scan, reported as three censuses
+
+Prompted by batch 46's `play@info.com`. Across all 712 live providers, 392 with an email:
+
+| Check | Result |
+| --- | --- |
+| Placeholder or malformed by domain denylist | **ZERO** — the one hit was a false positive of my own check (`mail@` is an ordinary real prefix) |
+| Free-mail (gmail/aol/hotmail) as a business contact | **54**, and **not a defect** — these are volunteer-run neighbourhood clubs. Recorded so nobody sweeps them |
+| Email domain unrelated to website domain | **42**, of which ~35 are benign (subdomains, parent orgs, partners) and **7 are real** |
+
+A ~17% hit rate, against the 90%-false-positive rate of the domain-token detector this loop abandoned
+earlier. One of the seven was deliberately written up as a NON-defect (Fordham's reading programme is
+delivered with an outside partner whose address is the published contact) — **an email domain differing
+from a website domain is a question, not a finding.**
+
+**The sharpest find would have been missed by any denylist: `filler@godaddy.com`.** The word FILLER, on a
+real, well-known domain. A generic-domain denylist looks for `example.com`; a placeholder can sit on a
+domain that is entirely real, and the tell is the LOCAL PART. It also appears inside that record's own
+scraped description — *"Signed in as: filler@godaddy.com"* — meaning the scraper captured a LOGGED-IN
+SESSION belonging to whoever built the site rather than the public page.
+
+The others: another company's email and phone on a card (`info@soccerstars.com` on Amazing Athletes); a
+`.co.za` South African address on an NYC party company; **PLAYDAY's Upper West Side card carrying the Long
+Island City studio's email and a Park Slope address — three of the brand's four studios on one card**,
+which is exactly the confusion that produced the fabricated "PLAYDAY NYC Tribeca" card an earlier pass
+quarantined; a real dojo whose `website` was a third-party directory listing while its `email` was the
+operator's own (the email was the field telling the truth); and a booking platform's inbox standing as an
+operator's.
