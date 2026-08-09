@@ -7825,3 +7825,82 @@ vocabulary cannot express?* — and could only be answered by enumerating the po
 is verified only by the records that prompted it is verified against its own training set. Recording a
 census result (712, not a sample) is the other half of the already-catalogued rule about saying sample-vs-
 census out loud.
+
+## v163 (2026-08-09): sport coverage by scarcity — the plan, and round 1
+
+Owner directive: *"I need to find more sport related listings for Brooklyn and Manhattan… based on
+scarcity. Where the less available sport camps and classes are… 10 in a round, then find the next most
+under-represented neighbourhood and do it again."*
+
+### What had to be built first, and one fact that changed the whole approach
+
+**`publishedAt` is NOT the public gate.** It is a sort key (`{publishedAt: -1, id: 1}`), defaulted to the
+epoch when absent. The stats page reports a "published" count from it and that number — 227 — is not the
+number of listings a family can see. The real gate is `isPublicProvider` in the main app's
+`publicBrowse.ts`: an **imgbb-hosted image**, a name, a category, a location, a usable source URL, not
+hidden, not quarantined, and no scraped chrome in the copy. By that test **all 712 live listings are
+visible**, and the scarcity counts below are real.
+
+Three capabilities were added because the work is impossible without them:
+
+- **`publishGate.ts`** — a faithful port of `isPublicProvider`. `visibility`/`qualityStatus` on
+  `providers` are no longer strictly one-directional: a write may reveal a record **only when the record,
+  as it will be after that write, passes the gate in full**, adjudicated in `applyCardBridgeWrite` against
+  the merged document. The old rail said revealing is "the main app's own gate to open and this bridge
+  does not replicate it" — right about the risk, wrong about the conclusion. `meetupGroups` is untouched;
+  its gate has not been ported.
+- **`POST /api/card-bridge/create`** — one new `providers` listing. Splitting needed a parent, so a
+  genuinely new business had no way in. Image is **mandatory**, per the owner: *"the image is always
+  required and always has to be checked and added to the database."* Three collisions are refused before
+  insert: `id`, normalised **street address**, and **image reuse**.
+- **`POST /api/card-bridge/image`** — re-hosts a venue's own photograph on imgbb, the only host the main
+  app renders. It re-hosts; it never generates or substitutes.
+
+### The scarcity ranking, measured by DISPLAY GROUP
+
+Ranking raw neighbourhoods is misleading: Manhattanville, Sugar Hill and West Harlem all read zero and
+all fold into **Harlem**, which has 34. Against the 38 Manhattan and 54 Brooklyn groups a family can
+actually browse: **20 Manhattan groups and 18 Brooklyn groups show zero sport listings.**
+
+### The finding that outranks creating anything
+
+**70 live Manhattan and Brooklyn sport listings have an EMPTY `neighborhood`, and 50 of them already
+carry a full street address.** They are published, visible, and unreachable by any neighbourhood browse —
+and they sit exactly in the scarce neighbourhoods (CityParks Junior Golf at 8850 14th Ave is Dyker
+Heights; The Little Gym at 8681 18th Ave is Bensonhurst; Lenny Krayzelburg at 3300 Coney Island Ave is
+Sheepshead Bay). Kings Bay Y is the worked example: a live, published swim school at 3495 Nostrand Avenue
+with no neighbourhood, which is the entire reason **Sheepshead Bay read zero**. This cohort is the
+cheapest coverage in the catalogue — no question of whether the business is real, only where it is.
+
+### Round 1
+
+| Neighbourhood | Sport before | Listing | Outcome |
+| --- | --- | --- | --- |
+| Canarsie | 0 | Hebrew Educational Society, 9502 Seaview Ave | **created, visible** |
+| Windsor Terrace | 0 | Windsor Terrace Martial Arts, 1256 Prospect Ave | **created, visible** |
+| Borough Park | 0 | Champions Martial Arts, 4103 Fort Hamilton Pkwy | **created, visible** |
+| Sheepshead Bay | 0 | Kings Bay Y | neighbourhood filled — already live |
+| Crown Heights | 5 | World Martial Arts Center ×2 | duplicate retired; canonical confirmed |
+
+**Both new guards earned their place on first use.** The address guard refused the World Martial Arts
+Center create and turned up TWO existing records for 1120 Washington Avenue, one carrying the site's
+navigation menu as both descriptions. The image guard is why only ONE Champions dojo was created: the
+operator serves a single brand photograph across every location page, and its Dyker Heights and Mill
+Basin dojos — both in zero-coverage neighbourhoods — are deferred until location-specific photographs
+exist rather than given a picture of somewhere else.
+
+### Lessons from round 1
+
+- **A guessed URL slug's 404 is not evidence a location closed.** `/fort-lee-racquet-club/` and
+  `/water-mill/` both 404; the real paths are `/fort-lee/` and `/watermill/`, and both venues are
+  operating. Take slugs from the site's own navigation.
+- **A bot-challenge interstitial is defeated by a browser User-Agent.** "One moment, please… your request
+  is being verified" is not a dead site. Same class as the TLS-issuer check.
+- **`WebFetch` and `curl` have different egress allowlists in this environment** — three operator sites
+  blocked for one worked fine for the other. Try both before recording a site as unreachable.
+- **The scarcity target is exactly when the precision-in-a-wrong-claim rule bites hardest.** A directory
+  put World Martial Arts Center in Prospect Lefferts Gardens, which has zero listings and would have been
+  a convenient answer. The operator's own page names no neighbourhood and the address sits on the
+  boundary at Empire Boulevard, so the stored Crown Heights was left alone and escalated.
+- **A search summary put "Red Hook Martial Arts" in Red Hook — Dutchess County, ZIP 12571**, 90 miles from
+  Brooklyn. Token collision on a neighbourhood name, and the same shape as `camp.com` and `zing.cz`.
