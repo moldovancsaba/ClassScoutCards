@@ -7663,3 +7663,49 @@ which is exactly the confusion that produced the fabricated "PLAYDAY NYC Tribeca
 quarantined; a real dojo whose `website` was a third-party directory listing while its `email` was the
 operator's own (the email was the field telling the truth); and a booking platform's inbox standing as an
 operator's.
+
+## v160 (2026-08-09): batches 48–49 — both cohorts closed to zero, and two mistakes of my own
+
+**`format_self_contradiction`: 57 → 0. Shared descriptions: 88 records → 0.** Both cohorts, opened earlier
+today, are now empty across 711 live providers.
+
+### A card can assemble one field from each of an operator's locations — twice, in two batches
+
+Kinder Prep Montessori's card is NAMED Brooklyn Heights, filed under Brooklyn Heights, ADDRESSED to DUMBO,
+and emailed at `williamsburg@`. Three of the operator's five Brooklyn locations, one per field. The
+previous batch found the identical shape on PLAYDAY's Upper West Side card (LIC email, Park Slope address).
+Two unrelated operators in two consecutive batches makes it a pipeline shape worth naming: **when an
+operator has several locations, a card can end up taking one field from each**, and every field will look
+individually plausible.
+
+Modern Martial Arts Tribeca was the mild version — name, neighbourhood and email all saying Tribeca against
+an address saying Upper West Side. Three fields agreeing against one is the easiest form to resolve.
+
+### Two mistakes of my own, both worth more than the fixes
+
+**A reason is not a write.** Batch 33's write on Descanso Gardens said, in its recorded reason, *"category
+Drop-In Activities against programType Camps; both now Drop-In Activities"* — and set neither field. The
+prose asserted a change the payload did not contain, and it read as done. This is the same failure the
+owner caught earlier today when SOP v147 claimed a compound value was "rejected on write" while the guard
+did not yet cover it. **The batch driver's read-back verifies only the fields that were actually sent, so
+it is structurally unable to catch a field that was described and omitted.** Re-running the cohort query is
+what caught it — an argument for measuring a cohort to zero rather than trusting a batch report.
+
+**A derivation that filters an unknown value makes an invalid write look successful.** Batch 48 set Kinder
+Prep's `primaryActivityType` to `"Preschool"`, which is not in the activity vocabulary. The write
+succeeded, `alignActivityTypes` correctly discarded the unrecognised value, and the record was left with NO
+primary activity and an EMPTY tag list — **worse than the wrong "Gymnastics" it started with.** The only
+signal was a DIFF in the read-back on those two fields. Before writing an activity value, check it against
+the vocabulary actually in use.
+
+### Also closed
+
+Little Flower Yoga quarantined for no fixed venue — its own navigation is "Why / Training / Schools /
+Books / About", its headline offering is *"Certification for Educators and Clinicians"*, and it publishes
+neither an address nor a class a parent could book, which is why the record's address and neighbourhood
+were both entirely empty rather than placeholders. Same ground as MakerState. Soccer Kids NYC came out the
+other way on the same question and was kept with a needs_human, because its site is entirely family-facing
+with real enrollable programmes — the difference is who the operator is talking to.
+
+Broadway Dance Center's children's card carried **an adults-only course listing as its description**
+("Ages 18+ • Oct 5, 2026-May 14, 2027"), on the record for the Children & Teens division.
