@@ -8335,3 +8335,48 @@ Four hypotheses for the residue have now been tested and disproved by data: regi
 Between two consecutive reads the served count went **429 → 507**, and `Drop-In Activities` went from
 0 served to 75. The core team is deploying as this loop runs. Any causal claim about the read path needs
 a timestamp attached, and an audit result is a photograph rather than a fact.
+
+## v173 (2026-08-09): the residue explained — it is arts and academic, not sport
+
+Four hypotheses for the 130 unserved-but-apparently-fine records had been tested and disproved (region,
+`discoveryTier`, category, a naive activity set). The fifth attempt found it by measuring the **served
+rate per activity** across a like-for-like pool (Manhattan/Brooklyn, Classes or Camps, imaged, not hidden):
+
+| activity | served / total |
+| --- | --- |
+| STEM | **0 / 17** |
+| Art | 16 / 53 |
+| Music | 20 / 49 |
+| Theater | 10 / 19 |
+| Science | 8 / 14 |
+| Soccer, Martial Arts, Swimming, Gymnastics, Fencing, Volleyball … | **100%** |
+
+And by `primaryActivityType`, the unserved are Art (26), Music (14), STEM (12), Theater (8); the served
+are Soccer (50), Martial Arts (41), Swimming (37), Basketball (29), Gymnastics (28). **Browse is scoped
+in a way that excludes arts and academic listings.** Not a defect, not a sport problem, and not this
+bridge's to change — but it does mean an arts listing created here is invisible, exactly as a Drop-In one
+was.
+
+Also ruled out on the way, so nobody re-tests them: **pagination is not a factor** (paged reads return
+nothing the un-paged read misses), and **no single FIELD separates served from unserved** — it is a
+value-level check, which is why field-presence diffing found nothing.
+
+### The part that was actually actionable: 16 unreachable SPORT listings
+
+Nine sat in Birthday Parties or Drop-In Activities, and most were gyms and swim schools whose entire
+business is graded classes with party hire as a sideline — The Little Gym (two branches), Jodi's Gym,
+Joy Gymnastics, NY Kids Club, NY Sports 4 Kids, Physique Swimming. Eight recategorised.
+
+**Two deliberately not.** ONEYOGAHOUSE's record is named "Kids Yoga PARTIES" and is one — recategorising
+it would make it reachable and would be a lie in the field families filter on, so it is marked `confirmed`
+instead, which records that the question was asked. Kids in the Game at PS 261 runs inside a public school
+and is already catalogued as a citywide operator with no venue of its own; the real question there is
+whether it should be a listing at all, so it is `needs_human` rather than quietly recategorised.
+
+**A second defect surfaced while reading one of them**: `prov-physique-swimming-battery-park-city` stored
+its neighbourhood as **Harlem**. The name was right and the field was wrong — the same shape this
+catalogue has recorded repeatedly.
+
+**Sport coverage now: 398 in the database, 390 reachable.** The remaining 8 include the three Tennis
+Innovators courts, whose only distinguishing feature is a missing `publishedAt` — still with the core
+developer.
