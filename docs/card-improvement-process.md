@@ -8946,3 +8946,70 @@ address, separate from its main branch 8 blocks away at 225 Atlantic Ave. Added 
 building found this session, after Major Owens.
 
 Coverage: **447 sport listings, 439 served.**
+
+## v188 — Murray Hill filled, a resolved satellite-name ambiguity, five owner spreadsheets, and a live e-commerce contamination quarantined on owner report
+
+Continued the loop after v186/v187. This entry covers Gymboree (DOHMH census, closed), a fresh
+zero-coverage SerpAPI sweep of Murray Hill, and five owner-verified spreadsheets (Chinatown/Two Bridges
+x2 batches, Lower East Side), plus a live contamination case the owner personally reported.
+
+### Gymboree: 2 of 3 created, 1 correctly refused as closed
+
+The DOHMH census named three Gymboree sites. SerpAPI's structured data confirmed Upper West Side (120
+Riverside Blvd) and Upper East Side (1622 1st Ave) as live, both created. The third, DOHMH's "Gymboree
+Play & Music of Manhattan" at 235 E 38th St, was NOT created: SerpAPI shows a "Gymboree Play & Music,
+Murray Hill" at 236 E 31st St — a few blocks away — marked **permanently closed**, sharing the exact
+phone number as the still-open UES site. **This is the second time this session the DOHMH census needed
+a currency check before acting on it** (after the Coney Island/Bedford-Stuyvesant number discrepancies) —
+the census records registration history, not current operating status.
+
+### Murray Hill filled via a fresh SerpAPI sweep
+
+NYC Martial Arts Center (trading as Professional Tae Kwon Do), 553 2nd Ave, established 1985 — found by
+running SerpAPI's structured search directly over Murray Hill's centroid (having exhausted the DOHMH
+list), then verified via the operator's actual site once a plausible-but-wrong domain
+(professionaltaekwondo.com, unreachable) was ruled out. Filled a zero.
+
+### Chinatown/Two Bridges — 9 creates across two batches, and the Beacon ambiguity resolved
+
+A 12-row owner spreadsheet, worked in two batches of 5 and 4 (one dropped as already-live, Basketball
+City). Two things worth keeping:
+
+- **Resolved an ambiguity flagged earlier in this same stretch.** The DOHMH census listed "CHINATOWN YMCA
+  BEACON SATELLITE @ TWO BRIDGES" at 286 South Street; SerpAPI's structured search had returned "Beacon
+  Center at MS 131" at 100 Hester Street instead — two different addresses under similar names, not
+  created at the time. This spreadsheet independently confirmed BOTH as real, separate sites: the Beacon
+  Center is genuinely at 100 Hester St (MS 131), and 286 South Street is a THIRD Chinatown YMCA site,
+  Cornerstone at Two Bridges Community Center — not a duplicate of either. All three Chinatown YMCA
+  physical sites (Bowery, Beacon/Hester, Cornerstone/South St) are now distinct listings.
+- **Ten Tigers Kung Fu Chinatown is a satellite class of an out-of-borough business**, and its own website
+  (ten-tigers.com) describes ONLY its Huntington Station, Long Island location — no NYC mention anywhere
+  on the site. Independent search confirmed the weekly Chinatown class (Sundays, Yoga Art Oasis, 191
+  Canal St) separately. Created with the provenance stated plainly: the operator's own site does not
+  evidence this location at all, only independent corroboration does.
+- Caught and discarded a **template placeholder** left live on Champions Martial Arts Chinatown's own
+  page: phone `555-555-5555` and email `mymail@mailservice.com` sitting beside the real, location-specific
+  contact details on the same page.
+
+### Lower East Side — 4 of 9 sport-qualifying rows created
+
+A dense 11-row spreadsheet; dance-only rows (Taylor Dance East, Abrons' dance/movement offering) excluded
+per the sport-listings mandate, 7 of the remaining 9 already live. Created Workshop NYC (youth Jiu-Jitsu
+and Muay Thai, confirmed via a dedicated /youth page), Henry Street Settlement Athletics (one of a
+century-old settlement house's several buildings — checked against its own "Our Buildings" list rather
+than assumed), New York Rockits, and Capoeira Guatambu.
+
+### A live e-commerce contamination, reported by the owner and quarantined on sight
+
+The owner flagged `prov-lax-com-youth-848d425e` directly. Investigation: "Lax.com Youth," categorised as
+a Camp teaching Lacrosse at 350 E 72nd St, was sourced to **lax.com — an online lacrosse EQUIPMENT
+RETAILER** ("One Stop Shop for Lacrosse": sticks, heads, gloves, apparel), headquartered in Norwalk, CT,
+with ten sister retail stores across four states, none within miles of this Manhattan address. No
+evidence anywhere that lax.com runs youth camps at all. Quarantined per the children's-safety-first
+directive — the categorically prohibited e-commerce/shopping-platform shape, same tier as the toy
+manufacturer's checkout-page case already in this document. **A pool-wide scan for sibling instances
+(other listings sourced to sporting-goods retail domains) found none** — a real negative result, not
+assumed.
+
+Coverage after this stretch: **461 sport listings, 453 served** (started the stretch at 444/436).
+Manhattan zeros 14 → 12.
