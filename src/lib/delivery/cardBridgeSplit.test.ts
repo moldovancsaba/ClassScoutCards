@@ -110,3 +110,50 @@ describe("validateSplitRequest", () => {
     expect(result.ok && result.value.dryRun).toBe(true);
   });
 });
+
+// (2026-08-09) The guards the UPDATE path had and this one did not. Found by using the split for real:
+// four Tennis Innovators children were inserted with no `primaryActivityType` and an unaligned activity
+// list, and nothing would have stopped a compound borough or a "no category" hint either. A split is the
+// only path that CREATES a document, so it being the laxest was exactly backwards.
+describe("split children go through the same value-shape guards as an update", () => {
+  const providerChild = (over: Record<string, unknown> = {}) => ({
+    name: "Real Club Gowanus", website: "https://example.org/gowanus/", category: "Classes",
+    borough: "Brooklyn", neighborhood: "Gowanus", ...over,
+  });
+  const body = (children: unknown[]) => ({
+    collection: "providers", parentId: "prov-parent", children,
+    reason: "A reason long enough to pass the minimum length check", source: "test",
+  });
+
+  it("refuses a compound place on a child, which the update path already refused", () => {
+    const r = validateSplitRequest(body([providerChild({ borough: "Manhattan/Brooklyn" }), providerChild()]));
+    expect(r.ok).toBe(false);
+    expect(!r.ok && r.error).toMatch(/children\[0\]\.borough must name ONE place/);
+  });
+
+  it("refuses a delivery model where a neighbourhood belongs", () => {
+    const r = validateSplitRequest(body([providerChild({ neighborhood: "NYC-wide" }), providerChild()]));
+    expect(!r.ok && r.error).toMatch(/children\[0\]\.neighborhood must name ONE place/);
+  });
+
+  it("refuses the no-category placeholder and the Multi-category non-answer in activityTypes", () => {
+    expect(validateSplitRequest(body([providerChild({ activityTypes: ["no category"] }), providerChild()])).ok).toBe(false);
+    expect(validateSplitRequest(body([providerChild({ activityTypes: ["Multi-category"] }), providerChild()])).ok).toBe(false);
+  });
+
+  it("refuses a compound boroughGuess on a contentCards child too", () => {
+    const r = validateSplitRequest({
+      collection: "contentCards", parentId: "cc-parent",
+      children: [
+        { title: "A", sourceUrl: "https://example.org/a/", categoryHint: "Sports", boroughGuess: "Manhattan or Brooklyn", neighborhoodGuess: "Gowanus" },
+        { title: "B", sourceUrl: "https://example.org/b/", categoryHint: "Sports", boroughGuess: "Brooklyn", neighborhoodGuess: "Park Slope" },
+      ],
+      reason: "A reason long enough to pass the minimum length check", source: "test",
+    });
+    expect(!r.ok && r.error).toMatch(/children\[0\]\.boroughGuess must name ONE place/);
+  });
+
+  it("still accepts a clean split, so the guards are not simply refusing everything", () => {
+    expect(validateSplitRequest(body([providerChild(), providerChild({ name: "Real Club Bushwick", website: "https://example.org/bushwick/", neighborhood: "Bushwick" })])).ok).toBe(true);
+  });
+});

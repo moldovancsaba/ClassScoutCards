@@ -2,6 +2,8 @@ import { createHash, randomUUID } from "crypto";
 import { getBridgeDb } from "@/lib/delivery/cardBridgeClient";
 import { CATEGORY_VALUES } from "@/lib/delivery/cardBridgeRegistry";
 import { validateCopyQuality } from "@/lib/validation/copyQuality";
+import { alignActivityTypes } from "@/lib/delivery/activityAlignment";
+import { categoryValueError, placeValueError } from "@/lib/delivery/fieldGuards";
 
 /**
  * Splitting one bad card into N real ones -- built 2026-08-07 after a 100-card review pass kept
@@ -197,6 +199,23 @@ export function validateSplitRequest(body: unknown): SplitValidationResult {
       }
     }
 
+    // (2026-08-09) The value-shape guards the UPDATE path had and this one did not. Found by using
+    // the split for real: four Tennis Innovators children were inserted with no `primaryActivityType`
+    // and an unaligned activity list, and nothing here would have stopped a compound borough or a
+    // `no category` hint either. A split is the only path that CREATES a document, so it is the last
+    // place that should be the laxest.
+    const placeKeys = collection === "contentCards"
+      ? (["boroughGuess", "neighborhoodGuess"] as const)
+      : (["borough", "neighborhood"] as const);
+    for (const key of placeKeys) {
+      const err = placeValueError(child[key]);
+      if (err) return { ok: false, status: 400, error: `${label}.${key} ${err}` };
+    }
+    for (const key of collection === "contentCards" ? (["categoryHint"] as const) : (["category", "activityTypes"] as const)) {
+      const err = categoryValueError(child[key]);
+      if (err) return { ok: false, status: 400, error: `${label}.${key} ${err}` };
+    }
+
     const rawSource = String((child as Record<string, unknown>)[sourceKey]).trim().toLowerCase();
     if (seenSources.has(rawSource)) {
       return { ok: false, status: 400, error: `Two children share the same ${sourceKey} ("${rawSource}") -- each child needs a genuinely distinct source, or this isn't a real split.` };
@@ -315,6 +334,15 @@ export async function applyCardBridgeSplit(request: NormalizedSplitRequest): Pro
   } else {
     for (const child of request.children) {
       const id = await uniqueProviderId(db, child.name!);
+      // (2026-08-09) The same derivation every `providers` write goes through. Without it a split child
+      // arrived with NO `primaryActivityType` at all and an activity list nobody had put through the
+      // sport-dominant rule — so the one path that creates records was also the one path that skipped
+      // the taxonomy. The child's own name is the title signal, which is exactly what the update path
+      // passes when a provider write touches these fields.
+      const aligned = alignActivityTypes({
+        activityTypes: child.activityTypes ?? [],
+        title: child.name,
+      });
       childDocs.push({
         id,
         name: child.name,
@@ -322,7 +350,8 @@ export async function applyCardBridgeSplit(request: NormalizedSplitRequest): Pro
         borough: child.borough,
         neighborhood: child.neighborhood,
         address: child.address,
-        activityTypes: child.activityTypes ?? [],
+        activityTypes: aligned.activityTypes,
+        primaryActivityType: aligned.primaryActivityType,
         shortDescription: child.shortDescription,
         longDescription: child.longDescription,
         website: child.website,

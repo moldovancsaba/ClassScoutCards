@@ -9,7 +9,8 @@ import {
   type BridgeCollectionKey,
 } from "@/lib/delivery/cardBridgeRegistry";
 import { validateCopyQuality } from "@/lib/validation/copyQuality";
-import { alignActivityTypes, isNonAnswerCategoryValue, NO_CATEGORY_PLACEHOLDER } from "@/lib/delivery/activityAlignment";
+import { alignActivityTypes } from "@/lib/delivery/activityAlignment";
+import { categoryValueError, placeValueError } from "@/lib/delivery/fieldGuards";
 import { mergeFieldVerifications } from "@/lib/delivery/fieldVerifications";
 import { findExpansionDistrict, expansionMarketKeys } from "@/lib/delivery/expansionMarkets";
 import { computeContentCardIdentity } from "@/lib/delivery/cardBridgeSplit";
@@ -135,32 +136,22 @@ export function validateWriteRequest(body: unknown): WriteValidationResult {
   // field), never a placeholder string standing in for one: a literal "NO CATEGORY" chip rendered on a
   // real family's card is worse than no chip at all. See NO_CATEGORY_PLACEHOLDER in activityAlignment.ts
   // for how this reached live records and why the strip is load-bearing.
+  //
+  // (2026-08-08, owner-reported from the live Kinder Prep Montessori card) The same rule in a second
+  // vocabulary. "Multi-category", "Multi-enrichment", "Preschool / Multi-enrichment" are the pipeline
+  // recording that it could not classify the listing — in the owner's words, "a technical leak, not
+  // something informal for a parent". It reached a family's card as the LEAD chip. Blocked here rather
+  // than only in alignActivityTypes, because that only covers providers.activityTypes and this arrived
+  // through categoryHint.
+  //
+  // (2026-08-09) Both checks now live in `fieldGuards.ts` and are shared with the SPLIT path, which had
+  // neither of them — see that module's header for why the one path that creates documents was also the
+  // one path that could create these values.
   const placeholderFields = ["category", "categoryHint", "primaryActivityType", "activityTypes"] as const;
   for (const field of placeholderFields) {
     if (!(field in updates)) continue;
-    const value = updates[field];
-    const values = Array.isArray(value) ? value : [value];
-    if (values.some((entry) => typeof entry === "string" && entry.trim().toLowerCase() === NO_CATEGORY_PLACEHOLDER)) {
-      return {
-        ok: false,
-        status: 400,
-        error: `${field} must never contain the ingestion placeholder "${NO_CATEGORY_PLACEHOLDER}" (owner directive: never add "no category" even when there is no category). Omit the field instead — an absent value is correct; a placeholder string renders as a literal "NO CATEGORY" chip on a real family's card.`,
-      };
-    }
-    // (2026-08-08, owner-reported from the live Kinder Prep Montessori card) The same rule in a second
-    // vocabulary. "Multi-category", "Multi-enrichment", "Preschool / Multi-enrichment" are the pipeline
-    // recording that it could not classify the listing — in the owner's words, "a technical leak, not
-    // something informal for a parent". It reached a family's card as the LEAD chip. Blocked here rather
-    // than only in alignActivityTypes, because that only covers providers.activityTypes and this arrived
-    // through categoryHint.
-    const nonAnswer = values.find((entry) => typeof entry === "string" && isNonAnswerCategoryValue(entry));
-    if (typeof nonAnswer === "string") {
-      return {
-        ok: false,
-        status: 400,
-        error: `${field} must not contain "${nonAnswer.trim()}" — it records the pipeline's failure to classify rather than naming anything a family can act on, and it renders on the card as a chip. Omit the field, or write the real activity.`,
-      };
-    }
+    const error = categoryValueError(updates[field]);
+    if (error) return { ok: false, status: 400, error: `${field} ${error}` };
   }
 
   // (2026-08-08) recurringPrograms was a BARE PASSTHROUGH -- writable as a whole array with no shape
@@ -203,21 +194,11 @@ export function validateWriteRequest(body: unknown): WriteValidationResult {
   // blocked); then `,` the same day, when the owner's restatement of the rule prompted a full sweep of
   // separator shapes and "Manhattan, Brooklyn" was still getting through. No canonical place name in
   // either the NYC or LA vocabulary contains any of them, which is asserted by a test over all 341.
-  const COMPOUND = /\s*(?:\/|\band\b|\bor\b|&|\+|;|\||,)\s*/i;
-  const NOT_A_PLACE = /^(?:multiple\b|various\b|citywide$|nyc-?wide$|city-?wide$|mobile$|virtual$|online$|tbd$|n\/?a$)/i;
-  const DELIVERY_TOKEN = /\b(?:mobile|virtual|online|citywide|nyc-?wide|multiple locations?)\b/i;
+  // The separator list itself now lives in `fieldGuards.placeValueError`, shared with the SPLIT path.
   for (const field of placeFields) {
     if (!(field in updates)) continue;
-    const value = updates[field];
-    if (typeof value !== "string" || value.trim() === "") continue; // empty = honest absence, allowed
-    const v = value.trim();
-    if (COMPOUND.test(v) || NOT_A_PLACE.test(v) || DELIVERY_TOKEN.test(v)) {
-      return {
-        ok: false,
-        status: 400,
-        error: `${field} must name ONE place, not a compound or a delivery model (got "${v}"). A compound like "Manhattan/Brooklyn" usually hides a split candidate — card each real location separately. A delivery model like "NYC-wide" or "mobile" answers how the programme is delivered, not where a child goes; if the operator has no fixed venue it is out of scope entirely. If no single place is evidenced, write an empty string — an honest absence is better than a wrong or vague answer.`,
-      };
-    }
+    const error = placeValueError(updates[field]);
+    if (error) return { ok: false, status: 400, error: `${field} ${error}` };
   }
 
   // ------------------------------------------------------------------------------------------------
