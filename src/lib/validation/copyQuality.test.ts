@@ -71,6 +71,25 @@ describe("British spelling in public copy", () => {
     expect(validateCopyQuality("Classes run at the Kaufman Music Centre building on West 67th Street.", "longDescription")).toBeNull();
   });
 
+  it("NEVER flags Centre Street — a real Manhattan street, not the common noun", () => {
+    // Found 2026-08-09: this blocked United East Athletics Association's own write, "...has run
+    // youth-focused sports at 215 Centre Street since 1976...". Renaming a real street is the same
+    // class of error as renaming a real theatre.
+    for (const text of [
+      "United East Athletics Association has run youth sports on Centre Street since 1976.",
+      "The organization is at 215 Centre St, a short walk from the courthouses.",
+    ]) {
+      expect(validateCopyQuality(text, "longDescription"), text).toBeNull();
+    }
+  });
+
+  it("still flags a capitalised Centre that is not followed by Street/St", () => {
+    // The exemption is narrow: capitalised Centre only escapes when Street/St follows immediately.
+    // Not preceded by a capitalised word either, so the existing proper-noun rule doesn't save it.
+    const err = validateCopyQuality("Classes run at the Centre for years, teaching every age group.", "longDescription");
+    expect(err).toContain("Centre");
+  });
+
   it("DOES flag a sentence-initial capital, which is not evidence of a name", () => {
     const err = validateCopyQuality("Programmes run every weekday afternoon for children aged six and over.", "longDescription");
     expect(err).toContain("Programme");

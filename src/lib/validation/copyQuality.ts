@@ -94,6 +94,10 @@ export function containsScrapedChrome(value: string): boolean {
  * than the spelling, so:
  *
  *   - a CAPITALISED "Theatre" is never flagged;
+ *   - a CAPITALISED "Centre" directly followed by "Street"/"St" is never flagged — Centre Street in
+ *     Manhattan (ZIP 10013) is the real, official spelling of a real NYC street, found 2026-08-09 when
+ *     it blocked a United East Athletics Association write ("...on Centre Street since 1976...").
+ *     Renaming a real street is the same class of error as renaming a real theatre;
  *   - nothing capitalised and directly preceded by another capitalised word is flagged, because that is
  *     proper-noun position ("Music Centre", "Youth Programme").
  *
@@ -134,6 +138,10 @@ export function britishSpellingError(value: string, label: string): string | nul
       const word = m[0];
       // A capitalised Theatre is somebody's name, always.
       if (/^T/.test(word) && word.toLowerCase().startsWith("theatre")) continue;
+      // A capitalised Centre immediately followed by Street/St is the real street name (Centre Street,
+      // Manhattan), not the common noun.
+      if (/^C/.test(word) && word.toLowerCase().startsWith("centre")
+        && /^\s+(?:street|st\.?)\b/i.test(value.slice(m.index + word.length))) continue;
       if (inProperNoun(value, m.index, word)) continue;
       return `${label} uses British spelling ("${word}") — this site serves US families and its copy must be US English. Write "${us}". Proper nouns are exempt: a business genuinely named "... Theatre" keeps its own spelling.`;
     }
