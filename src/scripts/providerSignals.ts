@@ -36,6 +36,7 @@ export type SignalName =
   | "desc_tiny"
   | "desc_missing"
   | "desc_not_english"
+  | "desc_binary"
   | "desc_page_furniture"
   | "desc_is_a_claim"
   | "addr_placeholder"
@@ -68,8 +69,22 @@ export function providerSignals(p: ProviderLike): SignalName[] {
   if (short && short.length < 120) s.push("desc_tiny");
   if (!short && !long) s.push("desc_missing");
   // Batch 1, Kids in Sports UES: both descriptions were Hungarian YouTube Kids boilerplate, because the
-  // stored website was youtubekids.com. Accented characters are the cheapest reliable tell.
-  if (/[őűáéíóúöüÁÉÍÓÚÖÜŐŰ]|\b(?:kérd|használat|böngész|para|pour|und)\b/.test(both)) s.push("desc_not_english");
+  // stored website was youtubekids.com. Batch 6, Brooklyn Design Lab: Indonesian, from an expired domain
+  // serving syndicated content — no accents and none of the European stopwords, so a first version missed
+  // it. Widening to bare accented characters then produced SEVEN false positives out of nine, because
+  // ordinary NYC copy is full of them: Lycée Français, Gjøa, café, piñata. So neither signal fires alone —
+  // it takes TWO distinct foreign function words. Brooklyn Design Lab has five; Anderson's Martial Arts
+  // Academy has one ("Sifu/Guru Dan", a person's name) and is correctly ignored.
+  const foreign = new Set(
+    (both.toLowerCase().match(
+      /\b(?:kérd|használat|böngész|szülődet|alkalmazás|pour|avec|nous|dalam|yang|untuk|dengan|adalah|saya|telah|berbagai|atau|dari)\b/g,
+    ) ?? []),
+  );
+  if (foreign.size >= 2) s.push("desc_not_english");
+  // Batch 6, Textile Arts Center: the description was raw gzip bytes. Control characters and replacement
+  // characters cannot occur in copy anyone wrote.
+  // eslint-disable-next-line no-control-regex
+  if (/[\x00-\x08\x0e-\x1f]|\uFFFD/.test(both)) s.push("desc_binary");
   if (/skip (?:to )?(?:main|navigation)|cookie|sign in|log in|Extract |Summari[sz]e /i.test(both)) s.push("desc_page_furniture");
   // Batch 2, Chess at Three: BOTH descriptions were "A study by the University of Memphis found that
   // chess-playing students improved their problem-solving abilities by 50%." A marketing statistic lifted

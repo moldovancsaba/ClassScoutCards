@@ -51,6 +51,34 @@ describe("signals learned in batch 2 (2026-08-09)", () => {
     expect(s).toContain("desc_is_a_claim");
   });
 
+  it("catches Indonesian, which has no accents and defeated the first version — Brooklyn Design Lab", () => {
+    const s = providerSignals({
+      shortDescription:
+        "Dalam beberapa kesempatan, saya telah mencoba berbagai lokasi untuk pertemuan, baik untuk diskusi proyek, presentasi, maupun workshop.",
+    });
+    expect(s).toContain("desc_not_english");
+  });
+
+  it("does NOT fire on English copy that merely contains accents — seven real false positives", () => {
+    // Widening to a bare accent class produced 7 bad hits out of 9. Ordinary NYC copy is full of them.
+    for (const text of [
+      "Lycée Français de New York cultural programmes for children, with dioramas and café events.",
+      "Gjøa Youth Soccer runs recreational and travel teams from its Sunset Park clubhouse.",
+    ]) {
+      expect(providerSignals({ shortDescription: text, longDescription: "q".repeat(200) })).not.toContain("desc_not_english");
+    }
+  });
+
+  it("does NOT fire on one foreign-looking word that is really a name — Sifu/Guru Dan", () => {
+    expect(
+      providerSignals({ shortDescription: "Anderson's Martial Arts Academy, led by Sifu Dan and his team.", longDescription: "q".repeat(200) }),
+    ).not.toContain("desc_not_english");
+  });
+
+  it("catches raw binary stored as a description — Textile Arts Center", () => {
+    expect(providerSignals({ shortDescription: "\u001f\ufffd\b\u0000\u0000\u0003}r H" })).toContain("desc_binary");
+  });
+
   it("does not fire on ordinary prose that happens to contain a number", () => {
     const s = providerSignals({
       shortDescription:

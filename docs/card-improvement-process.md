@@ -6567,6 +6567,14 @@ only place it can go.
   action, since four of them are the correct output of an earlier split. Four confirmed-closed
   businesses were live.
 
+- v146 (2026-08-09): **batch curation — seven batches, 45 listings, every component.** Replaced
+  single-field cohort sweeps after an owner directive. Built a defect-signal queue to replace `updatedAt`
+  (dead, because this loop's own sweeps touched the pool); each batch added a signal, ending with
+  `desc_binary` after Textile Arts Center was found storing raw gzip bytes as its description. Ran the
+  reference-host check on PROVIDERS for the first time: 7 hits, and on providers the article's text
+  becomes the business's description. Two clusters resolved build-then-retire (Gjøa, TMFC). Manhattan
+  Patriots quarantined — it is in Manhattan, ILLINOIS.
+
 ## v144 (2026-08-08): the location-evidence audit — 64 live provider records, and a check that was measuring itself
 
 This round started as a routine continuation of the cross-collection neighbourhood fill and turned into
@@ -6775,3 +6783,95 @@ writable — set, per the content-quality mandate.
 
 104 records: 92 real-neighbourhood refinements, 4 closure quarantines, 3 further quarantines, 2 terminals,
 1 repairable, 2 re-sourced, 1 mashup repaired. Every one dry-run first and verified by re-reading.
+
+## v146 (2026-08-09): batch curation, seven batches, 45 listings — and what each batch taught the queue
+
+Owner directive: work 4–10 listings at a time, every component, and after each batch turn what was found
+by hand into a measurement. This replaced a stretch of single-field cohort sweeps that had run hundreds of
+`neighborhood`-only writes and **zero descriptions**.
+
+### The queue changed
+
+`updatedAt` is dead as a queue — this project's own bulk sweeps touched most of the live pool, so "oldest
+updated" surfaces records the loop wrote minutes earlier. The queue is now worst-first by defect signal
+(`src/scripts/providerSignals.ts`), with a `batch_done` set, because fixing a record rarely clears every
+signal on it (an operator who publishes no email still trips `email_missing` after a perfect review).
+
+Baseline across 1,040 live providers: 497 missing email, 343 descriptions under 120 characters, 317
+missing phone, 270 placeholder addresses, 222 missing neighbourhood, 125 with short and long
+byte-identical, 63 sharing a stock banner. **145 records trip nothing.**
+
+### Signals each batch added
+
+| batch | found by hand | now measured |
+| --- | --- | --- |
+| 1 | AYDT's short and long were the same 104-char filler | `desc_identical`, `desc_tiny` |
+| 1 | Kids in Sports UES carried Hungarian YouTube Kids boilerplate | `desc_not_english` |
+| 1 | `csny-banner-dance.png` on two unrelated studios | `image_shared` (63 records, 16 files) |
+| 2 | Chess at Three's description was a University of Memphis STATISTIC | `desc_is_a_claim` |
+| 3 | Creative Kitchen's phone had area code 238 — unassigned, but NANP-shaped | `isDialablePhone` |
+| 3 | "Multiple Brooklyn locations" as an address | `isDeliveryModelAddress` |
+| 6 | Brooklyn Design Lab's copy was INDONESIAN — no accents, so `desc_not_english` missed it | widened |
+| 7 | Textile Arts Center's descriptions were raw GZIP BYTES | `desc_binary` |
+
+**The Indonesian widening is the instructive one.** Adding a bare accented-character class produced
+**seven false positives out of nine** — ordinary NYC copy is full of accents (Lycée Français, Gjøa, café).
+The fix was to require TWO distinct foreign function words: Brooklyn Design Lab has five, while Anderson's
+Martial Arts Academy has one ("Sifu/Guru Dan", a person's name) and is correctly ignored. **Widening a
+detector is not free, and the cost shows up as false positives on exactly the records that were fine.**
+
+### Contamination lives in `providers`, not just `contentCards`
+
+The reference-host check had only ever been run on cards. Run on providers it found **seven of 1,039**, and
+on providers it is worse — providers carry descriptions, so the article's text becomes the business's own:
+
+- **Asphalt Green Youth Tennis** → `en.wikipedia.org/wiki/Asphalt_concrete`, the article on ROAD SURFACING.
+  Its description was a passage about the Nazis barring Jewish children from school, and George Soros.
+- **NY Sports 4 Kids** → `nytimes.com`, the homepage. Its description was that day's headlines.
+- **Downtown United Soccer Club** → `/wiki/Downtown`. Its ADDRESS was the fragment `"2 million square"`.
+- **Manhattan Youth** ×2 → `/wiki/Manhattan`. Both carried the same Washington DC phone number, which is
+  what condemned it: a number on two unrelated records is a scrape, not a number.
+
+All seven name real operators, so all seven were **re-sourced and rewritten, never quarantined** —
+entity-before-domain. Three further contamination cases were quarantined because no entity exists behind
+them: an **NCAA March Madness bracket article** live as a Gymnastics provider on the Upper West Side; a
+**city-rankings publication** whose description was Los Angeles real-estate news and whose address was "5
+Times Square" while its neighbourhood said Harlem; and a **Bronx facts listicle** whose address was the
+fragment `"1520 Sedgwick Avenue, the birthplace of hip hop in the Bronx. Fact"` — with the word "Fact"
+still attached.
+
+### Cluster resolution: build-then-retire, twice
+
+**Gjøa** (4 records, 1 club) and **Tim Morehouse Fencing Club** (6 records, 3 studios). In both, the venue
+record was corrected onto a real address FIRST, and only then were the programme records hidden — hidden,
+not quarantined, because a programme card is "no separate place", not forbidden content.
+
+TMFC showed both sides of the escape hatch in one cluster. Its **Teen Program** record was the only one
+covering the East Side salle, so hiding it would have removed a real studio from the pool — it was
+**repurposed into that studio's venue card** instead. And its **Starter Program** record, whose address was
+the compound "Upper West Side and Midtown East locations", was **repurposed onto 210 West 91st Street**, a
+third studio with no card at all.
+
+**A negative result that nearly cost a real location:** 2710 Broadway looked stale, because the club's West
+Side page also names 210 West 91st Street. Reading the page rather than the extract showed both are
+current — "summer camps are in session at two Upper West Side studios". Moving that studio would have sent
+families to an address it never had.
+
+### A new out-of-market shape
+
+**Manhattan Patriots Football & Cheer** is in Manhattan, **ILLINOIS**. Confirmed on the operator's own
+site: it practises at Manhattan Intermediate School and plays home games at Lincoln-Way West High School,
+both Will County. Every previously catalogued out-of-market case was a business in a nearby real market
+given a fabricated NYC borough; this is a **token collision on a place name**, where the borough field is
+not fabricated so much as the right word for the wrong Manhattan. Nothing on the record looks wrong. Only
+reading the venue names catches it.
+
+### Deliberate non-actions
+
+Creative Kitchen has TWO real Manhattan studios (270 Greenwich St, 226 E 57th St), so its address was left
+EMPTY and both were recorded — writing one would tell a family the other does not exist. Bed-Stuy Sports
+and Brooklyn Crescents play on public fields and publish no home ground, so their placeholders stand.
+Baby Fingers is filed under Music because this platform's activity vocabulary has no sign-language value —
+recorded as a vocabulary gap rather than silently mislabelled. NYC Parks Afterschool Program is
+`needs_human`: it is a citywide programme index whose borough is the compound "Manhattan or Brooklyn", and
+picking one borough would tell families in the other four that nothing runs near them.
