@@ -8573,3 +8573,54 @@ own contact page returns a 500 error, so the address is left alone with the conf
 Sunset Park. And the 14th Street Y is stored under EAST VILLAGE, its real neighbourhood, not under one of
 the three zero-coverage neighbourhoods whose overlapping sweep boxes surfaced it. Writing a zero-coverage
 name there to move a counter would be precisely the fabrication this scarcity work exists to avoid.
+
+## v178 — NYC Parks recreation centers, and the address guard as a report again
+
+`src/scripts/recCenters.py`. A recreation center is one of the very few sources where the two checks that
+cost this loop the most time — is the entity real, is it a fixed place a child attends — are satisfied by
+the source itself. The department publishes name, street address, cross streets, phone and closure
+notices for every center, grouped by borough.
+
+Nine open Manhattan and Brooklyn centers were checked. **Four listings resulted** (Herbert Von King
+Cultural Arts Center, Red Hook, Shirley Chisholm, and Pelham Fritz by promotion), and the other five are
+the interesting half.
+
+### The address guard refused four creates, and every refusal was correct
+
+Already recorded here: *"a guard built to prevent bad writes is worth reading as a REPORT."* It happened
+again, and this time it caught **my own bad reconnaissance**. A name-match against the pool reported
+Chelsea, Highbridge and J. Hood Wright as having no venue card. They all do. The check printed only the
+first two hits per center, and `prov-chelsea-recreation-center` sat third behind two unrelated records
+that merely contain the word "Chelsea". **Truncating a hit list for display turned "exists" into
+"missing"** — the same shape as the sample-versus-census error already recorded twice in this document,
+arrived at from a third direction. Print the whole list or print the count; never print the first two and
+read a conclusion off it.
+
+### The one that IS a promotion, not a create
+
+Pelham Fritz's only record at 18 Mount Morris Park West was *"Summer Sports Experience: Various Sports at
+Pelham Fritz Recreation Center"* — a season's program, part of the fifteen-card NYC Parks cohort this repo
+already records as all carrying the Parks Department's Arsenal headquarters address. Creating the venue
+beside it was refused, correctly. So the program card **became** the venue: renamed, repointed from the
+Parks homepage to the center's own page, and given the building's own number in place of **212-360-1305,
+the Parks central switchboard** — a number that reaches no gym, and the same shape as the eighteen live
+records already found storing `311`.
+
+### Lifecycle exclusions, stated rather than silently dropped
+
+- **Brownsville Recreation Center** is open, and its own page says the indoor pool and gymnasium are both
+  closed for construction with only the Golden Age side in use. The sport facilities *are* the sport
+  listing, so listing it would send a family to a locked gym. Not built.
+- **J. Hood Wright** is closed to public access July 6 – August 21 while it runs its summer camp. Already
+  carded, so this is recorded in its own listing rather than acted on.
+- Four centers were excluded outright as temporarily closed: Hamilton Fish, Hansborough, Thomas Jefferson,
+  Tony Dapolito in Manhattan; McCarren Play Center, Metropolitan and Sunset Park in Brooklyn. **Sunset
+  Park Recreation Center was in the Overpass queue as a live candidate** — the Parks page is what caught
+  it.
+
+### Phone versus fax
+
+Four of the nine pages list a Fax immediately after the Phone, and a naive "first ten-digit number on the
+page" grab takes the wrong one on at least Highbridge (fax 212-927-2063) and Red Hook (fax 718-722-7341).
+The parser reads the labelled field. Worth remembering wherever a government or institutional page is the
+source — a fax number passes every shape check a phone validator applies.
