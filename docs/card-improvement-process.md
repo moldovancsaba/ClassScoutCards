@@ -9128,3 +9128,58 @@ coarser label the sheet itself used).
 Coverage after this batch: **465 sport listings served in Brooklyn+Manhattan** (461 → 465), plus one
 existing live record corrected in place. Per the owner's stop instruction, autonomous discovery
 (SerpAPI/Yelp/DOHMH sweeps) remains paused — this entry closes out another bounded spreadsheet task.
+
+### Midtown-Times Square + Stuyvesant Town/Peter Cooper Village — zero new creates, two real defects found and fixed, one new access-restriction pattern named (2026-08-09)
+
+Two more spreadsheets, same bounded-task discipline. Neither produced a net-new create — both nonetheless
+paid for the research time.
+
+**Midtown-Times Square (8 rows).** Excluded (dance/theatre): Brickhouse NYC, Broadway Dance Center –
+Times Square (also a duplicate address question — see below), Martha Graham School, Open Jar Institute,
+Times Square Alliance TSQ LIVE Dance, Ailey Extension TSQ LIVE. Excluded on the **administrative-office
+pattern already named in this doc**: Juventus Academy New York's given address (1345 6th Ave, 33rd Floor)
+is a corporate/franchise office suite, not a training field — the operator's own page describes its
+methodology at length but names no specific NYC training venue. Real, legitimate, and probably belongs in
+this catalogue eventually, but not at this address; left unresolved rather than guessed.
+
+**Fencers Club (20 W 33rd St) surfaced a real duplicate-with-stale-address, the same shape already
+catalogued for Tiger Schulmann's UES/UES and Karate City.** The sheet's address matched an existing live
+record (`prov-fencers-club-9f071a34`) exactly, but that record had an EMPTY neighborhood — filled in as
+Koreatown via a Nominatim reverse-geocode of the exact address (the Fifth Ave–Broadway corridor around W
+32nd–36th St, already in this platform's vocabulary). A **second** live record, `prov-fencers-club-youth-
+programs`, named the same club with the same phone/email/website/age-ranges/activityTypes but a DIFFERENT,
+STALE address (229 West 28th Street) — the club's own contact page states plainly "Fencers Club is located
+at 20 West 33rd Street, Level 2," with no mention of a second location. Retired the stale-address twin
+(`visibility: hidden`) rather than correcting its address to match its sibling, which would only have
+produced a true duplicate. Net effect: zero new cards, one existing record enriched, one stale duplicate
+retired.
+
+**Stuyvesant Town/Peter Cooper Village (11 rows) — a new pattern, deliberately NOT created from.** Every
+row but one is sourced to `stuytown.com/amenities/our-80-acres/stuytown-sports-and-camps` — a PROPERTY
+MANAGEMENT company's own leasing/marketing page ("Find your home... Amenities... Sign in as an
+Applicant... Resident Portal"), not an activity provider's own site. Checking the flagship listing
+(Amazing Athletes' StuyTown camp) directly on the OPERATOR's own page (not the property's) found it says,
+verbatim: **"Amazing Athletes Sports & STEAM Camps offers an incredible fun and memorable camp experience
+for StuyTown residents."** That is a private residential complex's own amenity, restricted to its own
+tenants — not a program any NYC family could show up and enroll in, the same underlying harm the
+no-fixed-venue and administrative-office rules exist to prevent (a card that reads as an open public
+option but isn't one), arrived at by a new route. The remaining vendor rows (FFA Soccer, Huddle Up Flag
+Football, Super Soccer Stars, Karate by KP, Amazing Athletes Fitness Classes, StuyTown Junior Golf, Oval
+Kids) share the identical sourcing (the same property-management "amenities" page, no independent
+confirmation either way of general-public access) and were **deliberately left uncreated as a group**
+rather than resolved individually under time pressure — this is a `needs_human` escalation, not a reality-
+check failure: the businesses themselves may be entirely real and legitimate, the open question is
+specifically whether an outside family can actually enroll. **NYC Volleyballers is the one row that reads
+differently** — its own independent site (not stuytown.com) lists StuyTown as one of THREE locations
+alongside Kips Bay (UNIS) and the Upper East Side (92Y), which looks more like a citywide multi-site
+youth-sports operator renting space across several venues than a residents-only amenity — but its
+StuyTown-specific page did not resolve to confirm public registration either way in the time available, so
+it was left uncreated alongside the rest rather than guessed in either direction. **Recommendation for a
+future pass**: contact or directly test registration flow for NYC Volleyballers' StuyTown program and for
+one or two of the stuytown.com-listed vendors, to establish a general rule for this shape (private
+residential complex hosting third-party children's activity vendors) rather than resolving it row by row
+each time it recurs — StuyTown/PCV is an 80-acre, ~25,000-resident complex, so this shape will likely
+recur at other large NYC residential developments.
+
+No new creates from either sheet. Two real live-record defects corrected. One new pattern named and
+deliberately left as an open recommendation rather than forced either way.
