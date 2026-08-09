@@ -1281,6 +1281,24 @@ in a comment when you add one, the way the existing ports do.
   the queue were ones this loop had already hidden. Fixed. When a queue and a retirement mechanism use
   different fields, the queue has to know about both.
 
+- **A detector with a 90% false-positive rate is worse than no detector, and narrowing beats abandoning.**
+  Chasing the fabricated cluster, the obvious next check was "does the provider's website domain share any
+  distinctive token with its business name?" It returned **135 records, of which roughly nine in ten were
+  fine** — acronym domains are simply the norm for clubs and nonprofits: `bhsbrooklyn.org` (Brooklyn
+  Heights Synagogue), `nybg.org` (New York Botanical Garden), `yyaa.org` (Yorkville Youth Athletic
+  Association), `gwysl.org` (Greenpoint Williamsburg Youth Soccer League), `ppba.info`, `bxcm.org`. Rather
+  than drop it, narrow it to the **checkable contradiction**: the domain names one NYC place and the
+  record's name names a different one. 135 → **6**, and every hit was worth reading. Two were sub-place
+  false positives that still exposed empty neighbourhoods (Ballet in the Bronx on `huntspoint.org`,
+  MetroRock on `bushwick.metrorock.com`); one found a Kansas phone number on an East Harlem club; two were
+  confirmations; and one was the real thing — **Sunset Park Youth Baseball sourced to
+  `harlemlittleleague.org`**, with that site's chrome as its description.
+- **Two real organisations can share a name across two boroughs, and the second one looks exactly like a
+  duplicate.** `jcc-brooklyn.org` hosts a programme called "Williamsburg Soccer Club" at 14 Hope Street —
+  a different entity from the Williamsburg Soccer Club at the WSC Clubhouse, 33 Nassau Avenue, whose
+  "Williamsburg" is a brand and which is actually in Greenpoint. Third confirmed instance of this shape
+  after United Soccer Academy/Brooklyn United and the two fencing clubs. Confirm both before merging either.
+
 ## Work in BATCHES of 4-10, covering EVERY component, and improve the process after each one (owner directive, 2026-08-09)
 
 **"Do you understand your task to do the listing fixes in batches maximum 4-10 at the time and deliver
