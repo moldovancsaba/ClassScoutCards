@@ -8210,3 +8210,43 @@ domain yielded **1 of 12** (McCarren Play Center).
 Publishing a CC BY-SA photograph uncredited would breach its licence, so the other eleven stay imageless
 pending an owner decision on where attribution would live. **Recorded as a blocked decision rather than
 quietly resolved either way** — the tempting move is to use the better photo and say nothing.
+
+### Two categories are switched off for browse — so creating in them is creating nothing
+
+Measuring every live Manhattan/Brooklyn sport listing against what the public API actually returns: **71
+are in the database and not served.** 15 are the image gate. Of the 56 that DO carry a valid image:
+
+| category | not served |
+| --- | --- |
+| Drop-In Activities | 38 |
+| Birthday Parties | 12 |
+| Classes | 6 |
+
+That is `isBrowseCategoryEnabled` doing its job, not a defect — but the operational consequence is sharp:
+**a listing created as `Drop-In Activities` or `Birthday Parties` is invisible by construction.** Until
+the core developer confirms otherwise, this loop creates only `Classes` and `Camps`, and the coverage
+target is counted from those two.
+
+**And the status report now measures what the API SERVES, not what the database holds.** It spent a day
+reporting "397 visible to families" while counting database rows; the true reachable figure was 326. A
+report that measures the wrong side of a gate is worse than no report, because it is believed.
+
+### Two categories are switched off for browse — so creating in them is creating nothing
+
+Measuring every live Manhattan/Brooklyn sport listing against what the public API actually returns: **71
+are in the database and not served.** 15 are the image gate. Of the 56 that DO carry a valid image:
+
+| category | not served |
+| --- | --- |
+| Drop-In Activities | 38 |
+| Birthday Parties | 12 |
+| Classes | 6 |
+
+That is `isBrowseCategoryEnabled` doing its job, not a defect — but the operational consequence is sharp:
+**a listing created as `Drop-In Activities` or `Birthday Parties` is invisible by construction.** Until
+the core developer confirms otherwise, this loop creates only `Classes` and `Camps`, and the coverage
+target is counted from those two.
+
+**And the status report now measures what the API SERVES, not what the database holds.** It spent a day
+reporting "397 visible to families" while counting database rows; the true reachable figure was 326. A
+report that measures the wrong side of a gate is worse than no report, because it is believed.
