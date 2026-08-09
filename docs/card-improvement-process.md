@@ -8380,3 +8380,54 @@ catalogue has recorded repeatedly.
 **Sport coverage now: 398 in the database, 390 reachable.** The remaining 8 include the three Tennis
 Innovators courts, whose only distinguishing feature is a missing `publishedAt` — still with the core
 developer.
+
+## v174 (2026-08-09): US English in family-facing copy (owner directive)
+
+*"We use and have to use US English on the site so every content, listing should be rephrased to US
+English if required."* **297 records** carried British spelling in their descriptions — "programme" 389
+times, "centre" 129, plus neighbourhood, organisation, travelling, defence, enrolment. A large share was
+written by this loop.
+
+### Proper nouns are what make this more than a word list
+
+Treasure Trunk Theatre, American Ballet Theatre, Dance Theatre of Harlem, Lula Washington Dance Theatre,
+Jalopy Theatre and New York Theatre Ballet are all spelled that way **because it is their name**. A
+catalogue that renames American Ballet Theatre has done something worse than leave a British spelling in
+place. Two rules, both verified before writing (zero capitalised `Theatre` altered across 297 records,
+23 occurrences preserved):
+
+- a CAPITALISED `Theatre` is never converted — only the lowercase common noun;
+- nothing capitalised and directly preceded by another capitalised word is converted, because that is
+  proper-noun position. A sentence-initial capital IS converted; a capital after a full stop is not
+  evidence of a name.
+
+**Provider NAMES were checked separately and mostly left alone.** Of 11 carrying a British spelling, 10
+are genuine business names; exactly one is a generated title where it is a common noun (`Prospect Park
+YMCA — School-Age Swim Programme`).
+
+`britishSpellingError` in `copyQuality.ts` now refuses it on write, with the same exemptions and with the
+real business names pinned as must-not-flag test cases.
+
+### A bug that was literally invisible
+
+The pattern list was written through a non-raw Python heredoc, so **every `\b` became a literal backspace
+byte**. The file rendered as `/\bprogrammes?\b/g` in a terminal and matched nothing; the guard passed
+every input silently. 34 corrupt bytes. Only a failing test of my own caught it, and a repo-wide check
+confirmed the corruption was nowhere else. **When a regex mysteriously matches nothing, check the bytes,
+not the rendering.**
+
+### A word list is only as complete as the last time somebody read real copy against it
+
+Re-scanning AFTER the sweep found a second family the spelling list had missed — not `-ise/-our`
+substitutions but British USAGES: `whilst`, `amongst`, `maths`, `jewellery`, `catalogue`, `storey`, and
+the `-ing` form of `emphasise`, which the list held in its `-e/-es/-ed` forms only. 12 more records.
+
+### The refusal was worth more than the fix — BARS Boxing
+
+One record came back as a copy-quality refusal, and following it beat the spelling change it blocked.
+Both descriptions were the site's navigation menu, which is also why the listing was not being served.
+The chrome contained a Staten Island address contradicting the stored Brooklyn one, and the operator's own
+contact page settled it: two gyms, 1665 Richmond Rd (Staten Island) and 24 Cobek Court (Brooklyn) — and
+the stored `1601 Gravesend Neck Road` **belongs to neither**. Copy rewritten, address corrected, split
+candidate recorded, plus a note that `New York Fight Club Youth Boxing` is live at the same Cobek Court
+address sourced to a sanctioning-body registry.
