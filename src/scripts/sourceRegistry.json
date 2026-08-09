@@ -1,38 +1,63 @@
 {
-  "_readme": "The living source registry (owner directive, 2026-08-09): every source this loop uses to DISCOVER new listings, ENRICH existing ones, and MAINTAIN them (detect closures, moves, schedule changes). docs/source-registry.md is the human half — read it before adding or dropping a source. Every source carries lastVerified (the day it was last actually exercised from this environment) and status as observed THAT day, because reachability here is a fact about the egress proxy as much as about the source. Update lastVerified whenever a source is exercised; a source not exercised for 14+ days is stale and its status is a claim, not a fact.",
+  "_readme": "The living source registry (owner directive, 2026-08-09): every source this loop uses to DISCOVER new listings, ENRICH existing ones, and MAINTAIN them (detect closures, moves, schedule changes). docs/source-registry.md is the human half \u2014 read it before adding or dropping a source. Every source carries lastVerified (the day it was last actually exercised from this environment) and status as observed THAT day, because reachability here is a fact about the egress proxy as much as about the source. Update lastVerified whenever a source is exercised; a source not exercised for 14+ days is stale and its status is a claim, not a fact.",
   "updatedAt": "2026-08-09",
   "sources": [
     {
       "id": "nyc-open-data",
       "name": "NYC Open Data (Socrata)",
-      "access": "curl, no key, JSON/GeoJSON — data.cityofnewyork.us/resource/<id>.json",
-      "roles": ["discover", "enrich", "maintain"],
+      "access": "curl, no key, JSON/GeoJSON \u2014 data.cityofnewyork.us/resource/<id>.json",
+      "roles": [
+        "discover",
+        "enrich",
+        "maintain"
+      ],
       "status": "WORKING",
       "lastVerified": "2026-08-09",
       "cadence": "daily delta check via dataUpdatedAt on tracked datasets",
       "datasets": {
-        "9nt8-h7nd": "NTA 2020 neighborhood POLYGONS (GeoJSON) — real boundaries; replaces Nominatim bounding boxes everywhere",
+        "9nt8-h7nd": "NTA 2020 neighborhood POLYGONS (GeoJSON) \u2014 real boundaries; replaces Nominatim bounding boxes everywhere",
         "ydj7-rk56": "Directory of Recreation Centers",
         "qpgi-ckmp": "Athletic Facilities (updated 2026-07)",
-        "w3wp-dpdi": "NYC Parks Public Events, next 14 days — MAINTENANCE signal: program activity per park"
+        "w3wp-dpdi": "NYC Parks Public Events, next 14 days \u2014 MAINTENANCE signal: program activity per park"
       },
-      "notes": "The catalog API (api.us.socrata.com/api/catalog/v1?domains=data.cityofnewyork.us) is itself queryable — search it before assuming a dataset does not exist."
+      "notes": "The catalog API (api.us.socrata.com/api/catalog/v1?domains=data.cityofnewyork.us) is itself queryable \u2014 search it before assuming a dataset does not exist."
     },
     {
       "id": "nycgovparks",
       "name": "NYC Parks pages (recreationcenters, parks, per-facility)",
       "access": "curl with browser UA",
-      "roles": ["discover", "enrich", "maintain"],
+      "roles": [
+        "discover",
+        "enrich",
+        "maintain"
+      ],
       "status": "WORKING",
       "lastVerified": "2026-08-09",
-      "cadence": "weekly re-fetch of the rec-center directory; its closure/alert banners are the maintenance signal (Brownsville pool closed, J. Hood Wright summer closure — both caught from banners)",
+      "cadence": "weekly re-fetch of the rec-center directory; its closure/alert banners are the maintenance signal (Brownsville pool closed, J. Hood Wright summer closure \u2014 both caught from banners)",
       "notes": "Parse the MARKUP not the flattened text; read the LABELLED phone, never the first 10-digit number (fax sits beside it on 4 of 9 pages)."
+    },
+    {
+      "id": "serpapi-google-maps",
+      "name": "SerpAPI \u2014 structured Google Maps results (owner-provided key, 2026-08-09)",
+      "access": "curl via src/scripts/serp.py; key in .env.local (SERPAPI_API_KEY, gitignored). Free plan: 250 searches/month, HARD cap",
+      "roles": [
+        "discover",
+        "enrich",
+        "maintain"
+      ],
+      "status": "WORKING",
+      "lastVerified": "2026-08-09",
+      "cadence": "~2 calls per neighbourhood round; 25-call reserve enforced in serp.py for maintenance emergencies; ledger at scratchpad serp_ledger.json",
+      "notes": "One call returns up to 20 places with name, FULL address, phone, type, gps, place_id, rating, hours, and 'Permanently closed' markers (the maintenance signal). First two calls found New Generation School of Martial Arts (395 Maple St, 11225 \u2014 a PLG venue NO other tier had) and a FOURTH operator at Major Owens (Globall Sports Centers). Noise profile: results can include out-of-market places (a Sterling VA gym appeared in a Brooklyn-centred search) \u2014 the entity and geo checks stay mandatory. Never spend a search on what a free tier answers."
     },
     {
       "id": "index-mining",
       "name": "Search-index mining over walled directories (Yelp, Sawyer, ClassPass, Mindbody)",
-      "access": "agent WebSearch tool with allowed_domains — NOT curl, NOT a browser; both are blocked (Yelp/Sawyer bot-wall curl; Chromium cannot CONNECT through the egress proxy at all, verified 2026-08-09 against example.com)",
-      "roles": ["discover", "enrich"],
+      "access": "agent WebSearch tool with allowed_domains \u2014 NOT curl, NOT a browser; both are blocked (Yelp/Sawyer bot-wall curl; Chromium cannot CONNECT through the egress proxy at all, verified 2026-08-09 against example.com)",
+      "roles": [
+        "discover",
+        "enrich"
+      ],
       "status": "WORKING",
       "lastVerified": "2026-08-09",
       "cadence": "per-neighbourhood rounds; re-run a neighbourhood's query set when it is next worked",
@@ -42,7 +67,11 @@
       "id": "operator-sites",
       "name": "Operators' own sites (locations pages, schedules, contact pages)",
       "access": "curl with browser UA (fetch.sh)",
-      "roles": ["enrich", "verify", "maintain"],
+      "roles": [
+        "enrich",
+        "verify",
+        "maintain"
+      ],
       "status": "WORKING",
       "lastVerified": "2026-08-09",
       "cadence": "re-fetch every listing's website on a rolling ~30-day cycle; diffs in address/phone/schedule blocks are the maintenance signal",
@@ -52,7 +81,11 @@
       "id": "franchise-locators",
       "name": "Franchise / chain / network location directories",
       "access": "curl; one request returns every branch with address+phone",
-      "roles": ["discover", "enrich", "maintain"],
+      "roles": [
+        "discover",
+        "enrich",
+        "maintain"
+      ],
       "status": "WORKING",
       "lastVerified": "2026-08-09",
       "cadence": "monthly re-fetch per chain; a branch disappearing from its own chain's list is the strongest closure signal there is",
@@ -63,7 +96,9 @@
       "id": "shared-venue-tenants",
       "name": "Shared-venue tenant expansion (one building, several operators)",
       "access": "the venue's own site names its operators; then each operator's site",
-      "roles": ["discover"],
+      "roles": [
+        "discover"
+      ],
       "status": "WORKING",
       "lastVerified": "2026-08-09",
       "cadence": "whenever a multi-tenant venue is touched",
@@ -73,56 +108,70 @@
       "id": "parent-directories",
       "name": "NYC parenting directories (Mommy Poppins, Macaroni KID, Brooklyn Bridge Parents, New York Family)",
       "access": "articles/guides curl-reachable; Mommy Poppins directory listings render client-side, reach them via index-mining instead",
-      "roles": ["discover"],
+      "roles": [
+        "discover"
+      ],
       "status": "PARTIAL",
       "lastVerified": "2026-08-09",
-      "cadence": "seasonal — camp guides land Jan-Apr, class roundups Aug-Sep",
+      "cadence": "seasonal \u2014 camp guides land Jan-Apr, class roundups Aug-Sep",
       "notes": "DISCOVERY SOURCE, not a card host (letsgobaby directive). Their per-neighbourhood camp guides name operators with addresses. Date-check every article: a 2018 roundup lists closed businesses."
     },
     {
       "id": "overpass-osm",
       "name": "OpenStreetMap via Overpass",
       "access": "curl POST to overpass-api.de",
-      "roles": ["discover"],
+      "roles": [
+        "discover"
+      ],
       "status": "WORKING-BUT-SPARSE",
       "lastVerified": "2026-08-09",
       "cadence": "per-neighbourhood rounds",
-      "notes": "DEMOTED from primary to one voice among several (2026-08-09): its PLG sweep returned 3 venues in a neighbourhood the index tier shows has ~10. It sees mapped storefronts, misses second-floor studios, church-basement programs and shared-venue tenants entirely. Its addresses can be stale (BKLA had moved) or wrong (Sportspark's number). Still worth running — it finds mapped venues other tiers miss — but its count is NEVER a neighbourhood ceiling."
+      "notes": "DEMOTED from primary to one voice among several (2026-08-09): its PLG sweep returned 3 venues in a neighbourhood the index tier shows has ~10. It sees mapped storefronts, misses second-floor studios, church-basement programs and shared-venue tenants entirely. Its addresses can be stale (BKLA had moved) or wrong (Sportspark's number). Still worth running \u2014 it finds mapped venues other tiers miss \u2014 but its count is NEVER a neighbourhood ceiling."
     },
     {
       "id": "nominatim",
       "name": "Nominatim geocoding",
       "access": "curl with contact UA, 1.2s spacing",
-      "roles": ["enrich", "verify"],
+      "roles": [
+        "enrich",
+        "verify"
+      ],
       "status": "WORKING",
       "lastVerified": "2026-08-09",
       "cadence": "on every address write",
-      "notes": "Street-grade only (place_rank >= 26); borough bounding-box guard mandatory — it resolved three numbered-avenue Manhattan addresses to Westchester."
+      "notes": "Street-grade only (place_rank >= 26); borough bounding-box guard mandatory \u2014 it resolved three numbered-avenue Manhattan addresses to Westchester."
     },
     {
       "id": "nys-doh-camps",
       "name": "NYS DOH children's camp permits",
       "access": "no downloadable dataset found (2026-08-09); health.ny.gov pages describe the permit regime only",
-      "roles": ["discover", "verify"],
+      "roles": [
+        "discover",
+        "verify"
+      ],
       "status": "NOT-YET-USABLE",
       "lastVerified": "2026-08-09",
       "cadence": "re-check quarterly for a published dataset",
-      "notes": "Every legal NYC day camp holds a DOHMH permit — the permit roll would be a camp CENSUS. Worth an owner-side ask (311/FOIL or DOHMH ABCEats-style portal) — highest-value single acquisition on this list."
+      "notes": "Every legal NYC day camp holds a DOHMH permit \u2014 the permit roll would be a camp CENSUS. Worth an owner-side ask (311/FOIL or DOHMH ABCEats-style portal) \u2014 highest-value single acquisition on this list."
     },
     {
       "id": "commercial-apis",
       "name": "Yelp Fusion API / Google Places API",
       "access": "requires API keys the project does not hold",
-      "roles": ["discover", "enrich", "maintain"],
+      "roles": [
+        "discover",
+        "enrich",
+        "maintain"
+      ],
       "status": "NOT-YET-USABLE",
       "lastVerified": "2026-08-09",
       "cadence": "n/a until keys exist",
-      "notes": "OWNER DECISION REQUESTED: Yelp Fusion is free at 5,000 calls/day and returns name/address/phone/categories/is_closed as structured JSON — is_closed alone would automate the closure sweep. Google Places has a monthly free tier. Either one turns index-mining from title-parsing into structured data."
+      "notes": "SerpAPI now covers the Google side (see serpapi-google-maps). Yelp Fusion remains the outstanding ask: free at 5,000 calls/day with structured is_closed, which would take closure-sweep load OFF the 250/month SerpAPI budget."
     },
     {
       "id": "headless-browser",
       "name": "Playwright/Chromium scraping",
-      "access": "BLOCKED in this environment — Chromium cannot CONNECT through the egress proxy (ERR_CONNECTION_RESET on every site incl. example.com, with proxy configured and CA trusted; verified 2026-08-09)",
+      "access": "BLOCKED in this environment \u2014 Chromium cannot CONNECT through the egress proxy (ERR_CONNECTION_RESET on every site incl. example.com, with proxy configured and CA trusted; verified 2026-08-09)",
       "roles": [],
       "status": "BLOCKED",
       "lastVerified": "2026-08-09",

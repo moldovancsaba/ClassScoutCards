@@ -8772,3 +8772,20 @@ precedent), and none of them has one yet: recorded as the next PLG creates.
    operator roster is expanded before the round moves on.
 4. **Sources carry `lastVerified` and a cadence**, and the daily/weekly/rolling ritual in
    `docs/source-registry.md` is part of the maintenance loop, not an aspiration bolted onto it.
+
+## v183 — SerpAPI key received and wired in (owner, 2026-08-09)
+
+Minutes after the v182 research shipped with "no structured place API" as its top gap, the owner
+supplied a SerpAPI key. Tested live: `engine=google_maps` returns 20 structured places per call —
+name, full street address, phone, type, gps, place_id, rating, hours, and "Permanently closed"
+markers. Two calibration calls immediately: (1) found **New Generation School of Martial Arts, 395
+Maple St Ste A, 11225** — a real PLG dojo with published hours that NO other tier had surfaced,
+raising the PLG pilot count again; (2) found a **fourth children's operator at Major Owens** (Globall
+Sports Centers) and revealed BKLA's swim actually runs at the Bedford-Union Armory pool; (3) returned
+a Sterling, Virginia gym inside a Brooklyn-centred query — the noise specimen that keeps the entity
+check mandatory.
+
+Budget is the design constraint: free plan, **250 searches/month**. `src/scripts/serp.py` is the only
+sanctioned caller — ledger on every call, 25-call reserve for maintenance emergencies, and free tiers
+always queried first. ~2 calls per neighbourhood round covers all 92 with room to spare. Key in
+`.env.local` only, never committed.

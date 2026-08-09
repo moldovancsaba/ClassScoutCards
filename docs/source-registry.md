@@ -91,3 +91,23 @@ The registry serves maintenance only if it is exercised on a cycle, not once:
   sweep that is currently manual judgement. **Owner ask #2: register a free Yelp Fusion key** (and/or
   Google Places, which has a monthly free tier). Either upgrade turns index mining from title-parsing
   into structured data, for discovery AND maintenance.
+
+## SerpAPI (added 2026-08-09, owner-provided key)
+
+The owner supplied a SerpAPI key the same day this registry was written, closing the "no structured
+Google data" gap. `src/scripts/serp.py` is the only sanctioned caller — it enforces the budget
+discipline the free plan makes mandatory (**250 searches/month, hard**): every call logged to a ledger,
+a 25-call reserve kept for maintenance emergencies, and a standing rule that no search is spent on what
+a free tier answers. The key lives in `.env.local` (gitignored), never in the repo.
+
+What its first two calls bought, as calibration: 40 structured places (name, full address, phone, type,
+gps, place_id, rating, operating hours), among them **New Generation School of Martial Arts, 395 Maple
+St, 11225** — a Prospect Lefferts Gardens venue no other tier had found — and a **fourth operator at the
+Major Owens Center** (Globall Sports Centers), plus the fact that BKLA's swim academy runs at the
+Bedford-Union Armory pool rather than its Powell Street site. And one noise specimen worth remembering:
+a Sterling, Virginia gym returned inside a Brooklyn-centred search. The entity and geo checks are not
+optional for this tier either.
+
+Its unique maintenance value: results carry **"Permanently closed"** markers, so a neighbourhood
+re-scan doubles as a closure sweep — pending the Yelp Fusion key (owner ask still open), which would
+take that load off the 250/month budget entirely at 5,000 free calls/day.
