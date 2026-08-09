@@ -8115,3 +8115,47 @@ The address guard refused four creates and every refusal was worth more than the
 **Generalising: a guard that refuses a CREATE is a duplicate detector for records that already exist.**
 This repo already recorded that the address pipeline's write refusals "were all real findings"; the same
 is now true one step earlier, before insert rather than after.
+
+## v169 (2026-08-09): "I don't see the results online" — the diagnosis, and the map pin
+
+The owner reported not seeing the new listings. **The writes were reaching Atlas the whole time** —
+`classscout.vercel.app/api/public/providers` returned 394 providers including the new ones. Two things
+were wrong, one mine and one not:
+
+1. **Every listing this bridge created had `geo: null`**, while 232 of 394 live listings had pins. The
+   core app's **map viewport is a real FILTER**, not a display hint, so a listing with a perfect street
+   address and no coordinates is absent from the map and from every map-bounded browse. The owner had
+   asked for "professional address to map properly" and got the address without the pin.
+2. **The public API is CDN-cached** (`x-vercel-cache: HIT`, `age: 28`). A read straight after a write
+   returns the pre-write body, which makes a successful write look like a failed one. Bust the cache with
+   a throwaway query param before concluding anything from a live read — a fresh read showed **340 pinned,
+   up from 232**, immediately after the batch.
+
+### The geo guard's reason had expired
+
+It accepted only `source: "approximate"` because "this bridge has no real geocoder". That stopped being
+true. Widened to allow `nominatim` — the same service that produced the existing live pins — with two
+things still refused: a source the bridge cannot perform, and a **centroid-grade** result. A geocoder
+answer that only resolves to a neighbourhood is still a centroid, and seven live listings already share
+one Upper East Side point from exactly that. 146 pins written, 144 exact and 2 interpolated; 13 dropped,
+almost all because a floor or suite in the address (`4B`, `Suite 1506`, `#200`) defeats the geocoder.
+
+**Generalising: widening a guard is legitimate when its stated PREMISE becomes false** — the same test
+this repo already applies to clearing a blocker. What is not legitimate is widening it because it is in
+the way.
+
+### The placeholder-address hole, walked into twice
+
+`normalizeStreetAddress` returns null for an address with no house number, and **288 live providers store
+a neighbourhood name as their address**. So the create path's duplicate check silently skipped every one
+of them, and a second Movement Gowanus was created at the real street address while a record with
+"Gowanus, Brooklyn, NYC" already existed. Closed with a website-host fallback: same domain, neither
+address resolvable to a street, refuse.
+
+### Checking before acting turned nine into two
+
+The owner's spreadsheet verified nine venues this catalogue held only as hidden programme cards, and the
+obvious move was to promote all nine. Checking each ADDRESS first showed **seven already have a live venue
+record under a different id**. Only Chelsea Piers' Chelsea field house (six hidden programme cards, none
+live) and Prospect Park YMCA (seven) were genuinely stranded — the retire-first mistake in the data. Both
+promoted; the claim of nine would have produced seven duplicates.
