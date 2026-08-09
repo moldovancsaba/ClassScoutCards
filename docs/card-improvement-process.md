@@ -7455,3 +7455,55 @@ Shared descriptions after this batch: **17 texts / 69 records, down from 24 / 88
 dominated by three genuinely large clusters — 33 NYC Parks Summer Sports Experience and Kids in Motion
 records, 6 Brooklyn Bridge Park Conservancy records, 3 Steve & Kate's campuses — which are programme
 clusters needing the build-then-retire treatment rather than pairwise deduplication.
+
+## v156 (2026-08-09): batches 37–38 — the rented-venue rule applied in BOTH directions
+
+### Batch 37: two clusters at 334 Furman Street, 9 records
+
+**The address-cluster classifier's documented under-count, caught in the wild.** `addressClusters()` put
+Brooklyn Bridge Park Conservancy and Brooklyn Lacrosse Club in ONE cluster labelled `one-operator`, because
+every name in it begins with "Brooklyn". They are two unrelated organisations sharing a building. This is
+exactly why `mixed` versus `one-operator` may order a queue and must never authorise a sweep.
+
+- **Brooklyn Bridge Park, 6 → 1.** All six records carried the park's OPENING-HOURS TABLE as their
+  description — *"Pier 2 8AM-11PM* seasonal Pier 5 6AM-11PM Education Center 3-5PM (THU/FRI)…"* — useful
+  information in entirely the wrong field, identical six times. Five were programme cards naming a PIER
+  rather than an address (a soccer league, basketball and volleyball clinics, two kayaking programmes). A
+  pier is part of a park the same way a named school inside one building is a division rather than a
+  venue. The Environmental Education Center at 99 Plymouth Street stays separate — it is a distinct building.
+- **Brooklyn Lacrosse Club, 3 → 1**, including the **fourth** confirmed pair of live records with a
+  byte-identical name (after Harlem Jets and Bedstuy Youth Soccer Club).
+
+### Batch 38: the rented-venue rule cuts both ways in one batch, 12 records
+
+Steve & Kate's and Soccer Stars both run programmes in other people's buildings, and the catalogue's own
+rule sends them **opposite** ways:
+
+- **Steve & Kate's: campuses KEPT.** It owns no venue anywhere — renting school buildings for the summer
+  *is* the business — so its campuses are its real locations. Five live records collapsed to the two real
+  Manhattan campuses (1 West 88th Street, and the Cathedral School at 1047 Amsterdam Avenue).
+- **Soccer Stars: rentals RETIRED.** It has a year-round centre at 606 Columbus Avenue, so its summer camps
+  inside Tribeca Synagogue and at Socceroof Wall Street are surplus — the same call as The Art Farm's
+  `/summer-camp-uws/` card at the Calhoun School. Two further cards ("Super Soccer Stars Park Slope" and
+  "…Brooklyn Heights") name no venue at all and join five siblings an earlier pass had already retired for
+  exactly that.
+
+**Applying one rule to both without noticing which side each falls on would have deleted a real camp
+operator or kept four cards for one soccer school.** The test is not who owns the building; it is whether
+the operator has anywhere else to be.
+
+Two other findings:
+
+- **A new ID-truncation shape: the ampersand.** `prov-kate` is what the slug generator produced from
+  "Steve & Kate's Camp" — everything before the `&` was lost. The id cannot be rewritten through this
+  bridge, so the record was retired in favour of its twin at the same address, after moving its better
+  name across first.
+- **Another garbage title on a live record: "Brooklyn City ."** — the club's name truncated mid-word with
+  the stray full stop from "F.C." left behind. Same family as the "New" / "And" / "Crossbar (new)" titles.
+  Its sibling's address field held four public pitches in one string, which was **cleared**: a league on
+  public fields is not caught by the no-fixed-venue prohibition (Brooklyn AYSO and Gjøa were both kept on
+  that ground), but those two each had ONE identified home ground and this has four, so an empty field is
+  the honest one and the four grounds are recorded as a split candidate.
+
+Shared descriptions after these two batches: **12 texts / 51 records, from 24 / 88.** What is left is
+dominated by the 33-record NYC Parks Summer Sports Experience and Kids in Motion cluster.
