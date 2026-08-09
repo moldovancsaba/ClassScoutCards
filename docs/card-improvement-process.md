@@ -8691,3 +8691,26 @@ compound "Bay Ridge / Fort Hamilton", which is a split or research question rath
 Points Academy was deliberately left at borough grain in an earlier pass because 148 Lafayette Street sits
 on the SoHo / Little Italy / Chinatown boundary and sources disagree — that decision is already in this
 document and was not quietly reversed to move a counter.
+
+## v181 — the sweep queue, and the address guard as the dedupe of record
+
+`src/scripts/rankSweepQueue.py` turns a raw sweep into a workable queue: drop the national adult chains
+and sporting-goods retail by name, score by how likely a venue is to teach children (venue kind, sport
+tag, a child word in the name, having a website and a phone), and dedupe on address. Run across all 92
+browsable Brooklyn and Manhattan neighbourhoods it produced **75 candidates not already in the pool**,
+saved as `src/scripts/sportVenueQueue.json` so the next round starts from a list rather than a search box.
+
+**Its dedupe is weaker than the server's, and that is now measured.** Four creates in the last two batches
+were refused by the street-address guard for venues that already exist — Sheridan Fencing Academy and
+Brooklyn Martial Arts among them — because the queue compares a 22-character normalised prefix while
+`normalizeStreetAddress` on the server does the real job. "1801 1st Avenue" and "1801 1st Ave, New York,
+NY 10128" do not match on prefix. **Treat the queue's `known` flag as a hint and the create endpoint's
+refusal as the answer**; the refusals cost one request each and have been right every time.
+
+### A name collision worth recording
+
+`brooklynmartialarts.COM` is a school on Livingston Street in Downtown Brooklyn. `brooklynmartialarts.NET`
+is **Amerikick Park Slope**, a different business, enriched earlier in the same session. Two real
+operators, one name, two TLDs. That is the fourth instance of the shared-name shape in this catalogue
+after United Soccer Academy / Brooklyn United, the two fencing clubs, and the two Williamsburg Soccer
+Clubs — and the reason each was checked against its own site rather than merged on name similarity.

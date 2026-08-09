@@ -1,21 +1,37 @@
 [
  {
-  "name": "Little Tigers Martial Arts",
-  "addr": "177 Avenue C",
-  "zip": "10009",
-  "sport": "",
+  "name": "YMCA",
+  "addr": "2980 West 29th Street",
+  "zip": "11224",
+  "sport": "swimming;gym;racquet",
   "kind": "sports_centre",
-  "phone": "",
-  "web": "https://www.championstkd.com/stores/martial-arts-school-in-avenue-c/",
-  "lat": 40.7264416,
-  "lon": -73.9773591,
+  "phone": "+1-718-215-6900",
+  "web": "https://ymcanyc.org/locations/coney-island-ymca",
+  "lat": 40.573351,
+  "lon": -73.9955115,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "Coney Island"
+  ],
+  "score": 10
+ },
+ {
+  "name": "Sheridan Fencing Academy",
+  "addr": "1801 1st Avenue",
+  "zip": "10128",
+  "sport": "fencing",
+  "kind": "dojo",
+  "phone": "+1 212-831-0764",
+  "web": "https://www.sheridanfencing.com/locations/upper-east-side",
+  "lat": 40.7816368,
+  "lon": -73.9461364,
   "known": false,
   "boro": "Manhattan",
   "nbs": [
-   "Alphabet City",
-   "Gramercy"
+   "Upper East Side"
   ],
-  "score": 9
+  "score": 10
  },
  {
   "name": "Amerikick Martial Arts",
@@ -30,8 +46,7 @@
   "known": false,
   "boro": "Brooklyn",
   "nbs": [
-   "Greenwood Heights",
-   "South Slope"
+   "Sunset Park"
   ],
   "score": 8
  },
@@ -48,24 +63,428 @@
   "known": false,
   "boro": "Brooklyn",
   "nbs": [
-   "South Slope"
+   "Sunset Park"
   ],
   "score": 8
  },
  {
-  "name": "Brooklyn Boulders Queensbridge",
-  "addr": "23-10 41st Avenue",
-  "zip": "11101",
+  "name": "Brooklyn Aikikai",
+  "addr": "408 3rd Avenue",
+  "zip": "11215",
+  "sport": "aikido",
+  "kind": "dojo",
+  "phone": "+1-718-643-6044",
+  "web": "https://www.brooklynaikikai.com/",
+  "lat": 40.6732635,
+  "lon": -73.9899021,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "Carroll Gardens"
+  ],
+  "score": 8
+ },
+ {
+  "name": "Brooklyn Kung Fu",
+  "addr": "923 Broadway",
+  "zip": "11206",
+  "sport": "martial_arts",
+  "kind": "sports_centre",
+  "phone": "+1-347-998-5230",
+  "web": "https://brooklynkungfu.com",
+  "lat": 40.697661,
+  "lon": -73.9359212,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "Bushwick"
+  ],
+  "score": 8
+ },
+ {
+  "name": "Brooklyn Martial Arts",
+  "addr": "293 Livingston Street",
+  "zip": "11201",
+  "sport": "martial_arts",
+  "kind": "sports_centre",
+  "phone": "+1-718-403-9026",
+  "web": "https://brooklynmartialarts.com/",
+  "lat": 40.6882834,
+  "lon": -73.9819212,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "Boerum Hill",
+   "Downtown Brooklyn"
+  ],
+  "score": 8
+ },
+ {
+  "name": "Center Point for Martial Arts",
+  "addr": "475 Onderonk Avenue",
+  "zip": "",
+  "sport": "",
+  "kind": "dojo",
+  "phone": "+1-917-770-0213",
+  "web": "http://www.centerpointma-ny.com/",
+  "lat": 40.7068101,
+  "lon": -73.9117387,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "Bushwick"
+  ],
+  "score": 8
+ },
+ {
+  "name": "Champions Martial Arts",
+  "addr": "1139 Brighton Beach Avenue",
+  "zip": "",
+  "sport": "",
+  "kind": "dojo",
+  "phone": "+1 347-347-4793",
+  "web": "https://championstkd.com/blog/stores/brighton-beach/",
+  "lat": 40.5777816,
+  "lon": -73.9555737,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "Brighton Beach"
+  ],
+  "score": 8
+ },
+ {
+  "name": "Champions Martial Arts",
+  "addr": "434 Myrtle Avenue",
+  "zip": "11205",
+  "sport": "",
+  "kind": "sports_centre",
+  "phone": "+1-929-210-4197",
+  "web": "https://www.championstkd.com/stores/clinton-hill/",
+  "lat": 40.6930493,
+  "lon": -73.9682659,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "Fort Greene"
+  ],
+  "score": 8
+ },
+ {
+  "name": "Gotham Archery",
+  "addr": "480 Baltic Street",
+  "zip": "11217",
+  "sport": "archery",
+  "kind": "sports_centre",
+  "phone": "+1-718-858-5060",
+  "web": "https://www.got-archery.com/location-brooklyn",
+  "lat": 40.68249,
+  "lon": -73.9860889,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "Boerum Hill",
+   "Carroll Gardens"
+  ],
+  "score": 8
+ },
+ {
+  "name": "Gregor Gracie Jiu-Jitsu",
+  "addr": "153 Bridge Park Drive",
+  "zip": "11201",
+  "sport": "brazilian_jiu-jitsu",
+  "kind": "dojo",
+  "phone": "+1-347-457-6704",
+  "web": "https://www.gregorgracie.com",
+  "lat": 40.6937262,
+  "lon": -74.0006737,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "Cobble Hill"
+  ],
+  "score": 8
+ },
+ {
+  "name": "Heights Casino",
+  "addr": "75 Montague Street",
+  "zip": "11201",
+  "sport": "squash;tennis",
+  "kind": "sports_centre",
+  "phone": "+1-718-624-0810",
+  "web": "https://www.heightscasino.com",
+  "lat": 40.6955746,
+  "lon": -73.996258,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "Brooklyn Heights",
+   "Cobble Hill",
+   "DUMBO"
+  ],
+  "score": 8
+ },
+ {
+  "name": "Hugo's Taekwondo",
+  "addr": "197 Himrod Street",
+  "zip": "11237",
+  "sport": "fitness",
+  "kind": "dojo",
+  "phone": "+16469964557",
+  "web": "https://www.hugostaekwondo.com/bushwick",
+  "lat": 40.6988576,
+  "lon": -73.9214401,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "Bushwick"
+  ],
+  "score": 8
+ },
+ {
+  "name": "Kanku Dai Zanshin Dojo Karate School & Fitness Studio",
+  "addr": "124 Central Avenue",
+  "zip": "",
+  "sport": "",
+  "kind": "dojo",
+  "phone": "+1-718-559-9349",
+  "web": "http://kankudaidojo.org/",
+  "lat": 40.6998584,
+  "lon": -73.9285982,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "Bushwick"
+  ],
+  "score": 8
+ },
+ {
+  "name": "Locust Valley Martial Arts",
+  "addr": "197 Himrod Street",
+  "zip": "11237",
+  "sport": "fitness",
+  "kind": "dojo",
+  "phone": "+15166711715",
+  "web": "https://www.locustvalleymartialarts.com/",
+  "lat": 40.6988322,
+  "lon": -73.9213998,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "Bushwick"
+  ],
+  "score": 8
+ },
+ {
+  "name": "Martinez-Kai Karate Dojo",
+  "addr": "503 46th Street",
+  "zip": "11220",
+  "sport": "karate",
+  "kind": "sports_centre",
+  "phone": "+1-718-686-2616",
+  "web": "https://martinezkai.weebly.com",
+  "lat": 40.6472665,
+  "lon": -74.0076476,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "Sunset Park"
+  ],
+  "score": 8
+ },
+ {
+  "name": "MetroRock Brooklyn",
+  "addr": "321 Starr Street",
+  "zip": "11237",
   "sport": "climbing",
   "kind": "sports_centre",
-  "phone": "+1 718 482 7078",
-  "web": "https://brooklynboulders.com/queensbridge/",
-  "lat": 40.7525859,
-  "lon": -73.9401946,
+  "phone": "+1-929-500-7625",
+  "web": "https://www.metrorock.com/brooklyn",
+  "lat": 40.7080614,
+  "lon": -73.9203394,
   "known": false,
-  "boro": "Manhattan",
+  "boro": "Brooklyn",
   "nbs": [
-   "Roosevelt Island"
+   "Bushwick"
+  ],
+  "score": 8
+ },
+ {
+  "name": "Renzo Gracie",
+  "addr": "7914 3rd Avenue",
+  "zip": "11209",
+  "sport": "brazilian_jiu-jitsu",
+  "kind": "sports_centre",
+  "phone": "+1-718-812-4745",
+  "web": "https://www.renzograciebayridge.com",
+  "lat": 40.6282141,
+  "lon": -74.0292968,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "Bay Ridge"
+  ],
+  "score": 8
+ },
+ {
+  "name": "Socceroof",
+  "addr": "1700 Atlantic Avenue",
+  "zip": "11213",
+  "sport": "soccer",
+  "kind": "sports_centre",
+  "phone": "+1-917-993-1008",
+  "web": "https://www.socceroof.com/en/clubs/crown-heights/",
+  "lat": 40.677439,
+  "lon": -73.9342477,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "Bedford-Stuyvesant",
+   "Crown Heights"
+  ],
+  "score": 8
+ },
+ {
+  "name": "St. John\u2019s Recreation Center",
+  "addr": "1251 Prospect Place",
+  "zip": "11213",
+  "sport": "basketball;soccer;table_tennis;billiards;athletics;dance",
+  "kind": "sports_centre",
+  "phone": "+1-718-771-2787",
+  "web": "https://www.nycgovparks.org/facilities/recreationcenters/B245",
+  "lat": 40.6738862,
+  "lon": -73.9349053,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "Bedford-Stuyvesant",
+   "Crown Heights"
+  ],
+  "score": 8
+ },
+ {
+  "name": "Sun Dojo",
+  "addr": "1256 Prospect Avenue",
+  "zip": "11218",
+  "sport": "jiu-jitsu",
+  "kind": "dojo",
+  "phone": "+1-718-435-7100",
+  "web": "http://sundojo.com",
+  "lat": 40.6525136,
+  "lon": -73.9762577,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "Kensington",
+   "Windsor Terrace"
+  ],
+  "score": 8
+ },
+ {
+  "name": "The Cliffs at DUMBO",
+  "addr": "99 Plymouth Street",
+  "zip": "11201",
+  "sport": "climbing",
+  "kind": "sports_centre",
+  "phone": "+1-347-830-7625",
+  "web": "https://dumbo.thecliffsclimbing.com/",
+  "lat": 40.7041336,
+  "lon": -73.9891475,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "DUMBO"
+  ],
+  "score": 8
+ },
+ {
+  "name": "United TaeKwon Do Center",
+  "addr": "2018 86th Street",
+  "zip": "11214",
+  "sport": "taekwondo",
+  "kind": "dojo",
+  "phone": "+1-718-266-8489",
+  "web": "https://unitedtkdcenters.com/bensonhurst-86th-st",
+  "lat": 40.6041659,
+  "lon": -73.9979083,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "Bath Beach"
+  ],
+  "score": 8
+ },
+ {
+  "name": "Urban Martial Arts",
+  "addr": "965 Coney Island Avenue",
+  "zip": "11230",
+  "sport": "",
+  "kind": "dojo",
+  "phone": "+1-718-287-5500",
+  "web": "https://urbandojo.com/",
+  "lat": 40.6339977,
+  "lon": -73.9670772,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "Ditmas Park"
+  ],
+  "score": 8
+ },
+ {
+  "name": "VITAL Climbing Gym",
+  "addr": "221 North 14th Street",
+  "zip": "11249",
+  "sport": "climbing",
+  "kind": "sports_centre",
+  "phone": "+1-716-220-8195",
+  "web": "https://www.vitalclimbinggym.com/brooklyn",
+  "lat": 40.7229015,
+  "lon": -73.9548304,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "Greenpoint",
+   "Williamsburg"
+  ],
+  "score": 8
+ },
+ {
+  "name": "Zero G",
+  "addr": "180 Hoyt Street",
+  "zip": "11201",
+  "sport": "brazilian_jiu-jitsu",
+  "kind": "dojo",
+  "phone": "+1-646-353-7238",
+  "web": "https://zerogbrazilianjiujitsu.com",
+  "lat": 40.684834,
+  "lon": -73.9891074,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "Boerum Hill",
+   "Carroll Gardens",
+   "Cobble Hill"
+  ],
+  "score": 8
+ },
+ {
+  "name": "Zero G Brazilian Jiu-jitsu",
+  "addr": "65 Woodhull Street",
+  "zip": "11231",
+  "sport": "brazilian_jiu-jitsu",
+  "kind": "sports_centre",
+  "phone": "+1-646-353-7238",
+  "web": "https://zerogbjj.com",
+  "lat": 40.6812776,
+  "lon": -74.0024138,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "Carroll Gardens",
+   "Cobble Hill",
+   "Columbia Street Waterfront",
+   "Red Hook"
   ],
   "score": 8
  },
@@ -82,25 +501,27 @@
   "known": false,
   "boro": "Manhattan",
   "nbs": [
-   "Little Italy",
-   "Nolita"
+   "Chinatown",
+   "Lower East Side",
+   "NoHo",
+   "SoHo"
   ],
   "score": 8
  },
  {
-  "name": "Oishi Judo Club",
-  "addr": "547 Greenwich Street",
-  "zip": "10013",
-  "sport": "judo",
+  "name": "New York Eastside Aikikai",
+  "addr": "307 East 92nd Street",
+  "zip": "",
+  "sport": "aikido",
   "kind": "dojo",
-  "phone": "+1 212-966-6850",
-  "web": "https://oishi-judo.com/",
-  "lat": 40.7271687,
-  "lon": -74.0087436,
+  "phone": "+1-646-509-9212",
+  "web": "https://nyeaikikai.com/",
+  "lat": 40.7816138,
+  "lon": -73.948245,
   "known": false,
   "boro": "Manhattan",
   "nbs": [
-   "Hudson Square"
+   "Upper East Side"
   ],
   "score": 8
  },
@@ -117,24 +538,114 @@
   "known": false,
   "boro": "Manhattan",
   "nbs": [
-   "Alphabet City"
+   "Chinatown",
+   "Lower East Side",
+   "NoHo"
   ],
   "score": 8
  },
  {
-  "name": "Kaizenkan Aikido Dojo",
-  "addr": "67 35th Street",
-  "zip": "11232",
-  "sport": "aikido",
-  "kind": "dojo",
-  "phone": "",
-  "web": "https://kzadojo.com",
-  "lat": 40.6569405,
-  "lon": -74.0069057,
+  "name": "Abe Stark Skating Arena",
+  "addr": "1902 Surf Avenue",
+  "zip": "11224",
+  "sport": "ice_hockey",
+  "kind": "sports_centre",
+  "phone": "+1 718-946-6536",
+  "web": "",
+  "lat": 40.5729725,
+  "lon": -73.9858988,
   "known": false,
   "boro": "Brooklyn",
   "nbs": [
-   "Greenwood Heights"
+   "Coney Island"
+  ],
+  "score": 7
+ },
+ {
+  "name": "Jikishinkan Aikido Dojo",
+  "addr": "316 Dean Street",
+  "zip": "11217",
+  "sport": "aikido",
+  "kind": "dojo",
+  "phone": "",
+  "web": "https://www.directmind.com",
+  "lat": 40.6837124,
+  "lon": -73.9812114,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "Boerum Hill",
+   "Fort Greene"
+  ],
+  "score": 7
+ },
+ {
+  "name": "Panda King's Taekwondo",
+  "addr": "5701 6th Avenue",
+  "zip": "11220",
+  "sport": "taekwondo",
+  "kind": "sports_centre",
+  "phone": "+1-646-824-6661",
+  "web": "",
+  "lat": 40.6396917,
+  "lon": -74.0121619,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "Sunset Park"
+  ],
+  "score": 7
+ },
+ {
+  "name": "The Grappling Club",
+  "addr": "370 Hooper Street",
+  "zip": "11211",
+  "sport": "jiu-jitsu",
+  "kind": "sports_centre",
+  "phone": "",
+  "web": "https://www.thegrapplingclubnyc.com/",
+  "lat": 40.7080935,
+  "lon": -73.9532436,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "Williamsburg"
+  ],
+  "score": 7
+ },
+ {
+  "name": "Way of Action",
+  "addr": "316 7th Street",
+  "zip": "11215",
+  "sport": "taekwondo",
+  "kind": "dojo",
+  "phone": "+1-917-453-9349",
+  "web": "",
+  "lat": 40.670428,
+  "lon": -73.9857219,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "Carroll Gardens"
+  ],
+  "score": 7
+ },
+ {
+  "name": "YMCA",
+  "addr": "225 Atlantic Avenue",
+  "zip": "11201",
+  "sport": "",
+  "kind": "sports_centre",
+  "phone": "+1-718-625-3136",
+  "web": "https://ymcanyc.org/locations/dodge-ymca",
+  "lat": 40.6895968,
+  "lon": -73.9915352,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "Boerum Hill",
+   "Cobble Hill",
+   "Downtown Brooklyn"
   ],
   "score": 7
  },
@@ -151,8 +662,8 @@
   "known": false,
   "boro": "Manhattan",
   "nbs": [
-   "Alphabet City",
-   "Gramercy"
+   "East Village",
+   "Kips Bay"
   ],
   "score": 7
  },
@@ -169,7 +680,7 @@
   "known": false,
   "boro": "Manhattan",
   "nbs": [
-   "Hudson Heights"
+   "Washington Heights"
   ],
   "score": 7
  },
@@ -186,10 +697,130 @@
   "known": false,
   "boro": "Manhattan",
   "nbs": [
-   "Hudson Yards",
-   "Koreatown"
+   "Midtown"
   ],
   "score": 7
+ },
+ {
+  "name": "Goldfish Swim School",
+  "addr": "1534 2nd Avenue",
+  "zip": "10021",
+  "sport": "swimming",
+  "kind": "sports_centre",
+  "phone": "",
+  "web": "https://goldfishswimschool.com/ues-e-80th-street",
+  "lat": 40.7737943,
+  "lon": -73.9544507,
+  "known": false,
+  "boro": "Manhattan",
+  "nbs": [
+   "Upper East Side"
+  ],
+  "score": 7
+ },
+ {
+  "name": "Marcus Garvey Park Pool",
+  "addr": "2 East 124th Street",
+  "zip": "10027",
+  "sport": "swimming",
+  "kind": "sports_centre",
+  "phone": "",
+  "web": "https://www.nycgovparks.org/parks/marcus-garvey-park/facilities/outdoor-pools/marcus-garvey-pool",
+  "lat": 40.8052332,
+  "lon": -73.9432924,
+  "known": false,
+  "boro": "Manhattan",
+  "nbs": [
+   "Harlem"
+  ],
+  "score": 7
+ },
+ {
+  "name": "The Cliffs at Harlem",
+  "addr": "256 West 125th Street",
+  "zip": "10027",
+  "sport": "climbing",
+  "kind": "sports_centre",
+  "phone": "",
+  "web": "https://harlem.thecliffsclimbing.com/",
+  "lat": 40.8096064,
+  "lon": -73.9502428,
+  "known": false,
+  "boro": "Manhattan",
+  "nbs": [
+   "Harlem"
+  ],
+  "score": 7
+ },
+ {
+  "name": "Blitz Dojo",
+  "addr": "312 Church Avenue",
+  "zip": "",
+  "sport": "jiu-jitsu;karate;kickboxing;fitness",
+  "kind": "dojo",
+  "phone": "",
+  "web": "",
+  "lat": 40.6440328,
+  "lon": -73.9761613,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "Kensington",
+   "Windsor Terrace"
+  ],
+  "score": 6
+ },
+ {
+  "name": "Bourand Goju Karate",
+  "addr": "548B East 2nd Street",
+  "zip": "",
+  "sport": "",
+  "kind": "dojo",
+  "phone": "",
+  "web": "",
+  "lat": 40.6377239,
+  "lon": -73.9774038,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "Kensington"
+  ],
+  "score": 6
+ },
+ {
+  "name": "Everyday Athlete",
+  "addr": "130 Clinton Street",
+  "zip": "11201",
+  "sport": "climbing",
+  "kind": "sports_centre",
+  "phone": "",
+  "web": "",
+  "lat": 40.6924745,
+  "lon": -73.9934628,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "Brooklyn Heights",
+   "Cobble Hill"
+  ],
+  "score": 6
+ },
+ {
+  "name": "Set Billiards & Bowling",
+  "addr": "3200 Coney Island Avenue",
+  "zip": "11235",
+  "sport": "billiards;table_tennis;snooker;10pin;9pin",
+  "kind": "sports_centre",
+  "phone": "",
+  "web": "",
+  "lat": 40.5775708,
+  "lon": -73.9598031,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "Brighton Beach"
+  ],
+  "score": 6
  },
  {
   "name": "PingPod Club",
@@ -204,24 +835,46 @@
   "known": false,
   "boro": "Manhattan",
   "nbs": [
-   "Little Italy"
+   "Chinatown",
+   "Lower East Side",
+   "NoHo",
+   "SoHo"
   ],
   "score": 6
  },
  {
-  "name": "Roosevelt Island Racquet Club",
-  "addr": "281 West Main Street",
-  "zip": "10044",
-  "sport": "tennis",
+  "name": "Racquet and Tennis Club",
+  "addr": "370 Park Avenue",
+  "zip": "10022",
+  "sport": "tennis;real_tennis;squash",
   "kind": "sports_centre",
   "phone": "",
   "web": "",
-  "lat": 40.7568014,
-  "lon": -73.9545169,
+  "lat": 40.758902,
+  "lon": -73.9732146,
   "known": false,
   "boro": "Manhattan",
   "nbs": [
-   "Roosevelt Island"
+   "Turtle Bay"
+  ],
+  "score": 6
+ },
+ {
+  "name": "Renzo Gracie Brazilian Jiu-Jitsu",
+  "addr": "31 West 14th Street",
+  "zip": "",
+  "sport": "",
+  "kind": "dojo",
+  "phone": "",
+  "web": "",
+  "lat": 40.7368035,
+  "lon": -73.9949957,
+  "known": false,
+  "boro": "Manhattan",
+  "nbs": [
+   "Chelsea",
+   "East Village",
+   "Greenwich Village"
   ],
   "score": 6
  },
@@ -238,25 +891,144 @@
   "known": false,
   "boro": "Brooklyn",
   "nbs": [
-   "Greenwood Heights",
-   "South Slope"
+   "Sunset Park"
   ],
   "score": 5
  },
  {
-  "name": "Brooklyn Lifestyle Athletic Club",
-  "addr": "1500 Paerdegat Avenue North",
-  "zip": "11236",
-  "sport": "swimming;soccer;athletics;basketball;multi",
-  "kind": "",
-  "phone": "+1-718-209-1010",
-  "web": "https://bklanyc.com/",
-  "lat": 40.6267253,
-  "lon": -73.9024747,
+  "name": "Barclays Center",
+  "addr": "620 Atlantic Avenue",
+  "zip": "11217",
+  "sport": "basketball;hockey",
+  "kind": "stadium",
+  "phone": "+19176186100",
+  "web": "https://www.barclayscenter.com/",
+  "lat": 40.6825619,
+  "lon": -73.9753463,
   "known": false,
   "boro": "Brooklyn",
   "nbs": [
-   "Bergen Beach"
+   "Fort Greene",
+   "Prospect Heights"
+  ],
+  "score": 5
+ },
+ {
+  "name": "Borodin's Gym",
+  "addr": "2209 Avenue Z",
+  "zip": "11235",
+  "sport": "kickboxing",
+  "kind": "dojo",
+  "phone": "+1 718-332-7993",
+  "web": "https://www.borodinsgym.com/",
+  "lat": 40.5888917,
+  "lon": -73.9470571,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "Sheepshead Bay"
+  ],
+  "score": 5
+ },
+ {
+  "name": "Capoeira Vida",
+  "addr": "316 7th Street",
+  "zip": "11215",
+  "sport": "capoeira",
+  "kind": "dojo",
+  "phone": "+1-917-722-6703",
+  "web": "https://www.capoeiravida.com",
+  "lat": 40.670402,
+  "lon": -73.9856676,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "Carroll Gardens"
+  ],
+  "score": 5
+ },
+ {
+  "name": "Gowanus Dredgers Canoe Club",
+  "addr": "165 2nd Street",
+  "zip": "11231",
+  "sport": "canoe",
+  "kind": "sports_centre",
+  "phone": "+1-718-243-0849",
+  "web": "https://www.gowanuscanal.org",
+  "lat": 40.6770802,
+  "lon": -73.9900519,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "Carroll Gardens"
+  ],
+  "score": 5
+ },
+ {
+  "name": "MatchPoint NYC",
+  "addr": "9000 Bay Parkway",
+  "zip": "11214",
+  "sport": "soccer;tennis",
+  "kind": "",
+  "phone": "+1-718-866-1031",
+  "web": "https://matchpoint.nyc/our-clubs/bensonhurst/",
+  "lat": 40.5950784,
+  "lon": -74.0015034,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "Bath Beach"
+  ],
+  "score": 5
+ },
+ {
+  "name": "Move With Grace",
+  "addr": "431 Myrtle Avenue",
+  "zip": "11205",
+  "sport": "yoga;pilates",
+  "kind": "sports_centre",
+  "phone": "+1-718-230-0013",
+  "web": "https://www.movewithgrace.com",
+  "lat": 40.6932744,
+  "lon": -73.968499,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "Fort Greene"
+  ],
+  "score": 5
+ },
+ {
+  "name": "Red Planet MMA",
+  "addr": "1449 Broadway",
+  "zip": "",
+  "sport": "",
+  "kind": "dojo",
+  "phone": "+1 347-939-7088",
+  "web": "https://www.team-redplanet.com/",
+  "lat": 40.6880918,
+  "lon": -73.9192887,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "Bushwick"
+  ],
+  "score": 5
+ },
+ {
+  "name": "Shambhala Yoga & Dance Center",
+  "addr": "691 Washington Avenue",
+  "zip": "11238",
+  "sport": "yoga",
+  "kind": "sports_centre",
+  "phone": "+1-718-638-1111",
+  "web": "https://www.shambhalayogadance.com",
+  "lat": 40.6763523,
+  "lon": -73.963318,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "Prospect Heights"
   ],
   "score": 5
  },
@@ -273,7 +1045,43 @@
   "known": false,
   "boro": "Brooklyn",
   "nbs": [
-   "Greenwood Heights"
+   "Sunset Park"
+  ],
+  "score": 5
+ },
+ {
+  "name": "Upper 90 Soccer Brooklyn",
+  "addr": "359 Atlantic Avenue",
+  "zip": "",
+  "sport": "soccer",
+  "kind": "sports",
+  "phone": "+1-646-863-7076",
+  "web": "https://u90soccer.com/",
+  "lat": 40.6876531,
+  "lon": -73.9862283,
+  "known": false,
+  "boro": "Brooklyn",
+  "nbs": [
+   "Boerum Hill",
+   "Carroll Gardens",
+   "Downtown Brooklyn"
+  ],
+  "score": 5
+ },
+ {
+  "name": "5 Iron Golf",
+  "addr": "1681 3rd Avenue",
+  "zip": "10128",
+  "sport": "golf",
+  "kind": "sports_centre",
+  "phone": "+1 315-613-4653",
+  "web": "https://fiveirongolf.com/nyc-upper-east-side/",
+  "lat": 40.7839829,
+  "lon": -73.9499919,
+  "known": false,
+  "boro": "Manhattan",
+  "nbs": [
+   "Upper East Side"
   ],
   "score": 5
  },
@@ -290,7 +1098,7 @@
   "known": false,
   "boro": "Manhattan",
   "nbs": [
-   "Hudson Yards"
+   "Chelsea"
   ],
   "score": 5
  },
@@ -307,27 +1115,27 @@
   "known": false,
   "boro": "Manhattan",
   "nbs": [
-   "Hudson Square",
-   "Little Italy"
+   "Chinatown",
+   "NoHo",
+   "SoHo",
+   "Tribeca"
   ],
   "score": 5
  },
  {
-  "name": "Evolution Muay Thai",
-  "addr": "12 West 27th Street",
-  "zip": "10001",
+  "name": "Harlem Branch YMCA",
+  "addr": "180 West 135th Street",
+  "zip": "10030",
   "sport": "",
   "kind": "sports_centre",
-  "phone": "+1-646-649-3976",
-  "web": "https://evolutionmuaythai.com/",
-  "lat": 40.7444981,
-  "lon": -73.9893685,
+  "phone": "",
+  "web": "",
+  "lat": 40.8146993,
+  "lon": -73.9429514,
   "known": false,
   "boro": "Manhattan",
   "nbs": [
-   "Gramercy",
-   "Koreatown",
-   "Rose Hill"
+   "Harlem"
   ],
   "score": 5
  },
@@ -344,24 +1152,9 @@
   "known": false,
   "boro": "Manhattan",
   "nbs": [
-   "Little Italy"
-  ],
-  "score": 5
- },
- {
-  "name": "Lucky Strike Social",
-  "addr": "624-660 West 42nd Street",
-  "zip": "10036",
-  "sport": "10pin",
-  "kind": "bowling_alley",
-  "phone": "+1 646-829-0170",
-  "web": "https://www.luckystrikesocial.com/locations/new-york/",
-  "lat": 40.7614486,
-  "lon": -74.0009642,
-  "known": false,
-  "boro": "Manhattan",
-  "nbs": [
-   "Hudson Yards"
+   "Chinatown",
+   "Lower East Side",
+   "SoHo"
   ],
   "score": 5
  },
@@ -378,9 +1171,7 @@
   "known": false,
   "boro": "Manhattan",
   "nbs": [
-   "Hudson Yards",
-   "Koreatown",
-   "Rose Hill"
+   "Midtown"
   ],
   "score": 5
  },
@@ -397,7 +1188,12 @@
   "known": false,
   "boro": "Manhattan",
   "nbs": [
-   "Little Italy"
+   "Chinatown",
+   "East Village",
+   "Greenwich Village",
+   "Lower East Side",
+   "NoHo",
+   "SoHo"
   ],
   "score": 5
  },
@@ -414,9 +1210,9 @@
   "known": false,
   "boro": "Manhattan",
   "nbs": [
-   "Alphabet City",
-   "Gramercy",
-   "Little Italy"
+   "East Village",
+   "Greenwich Village",
+   "NoHo"
   ],
   "score": 5
  },
@@ -433,7 +1229,7 @@
   "known": false,
   "boro": "Manhattan",
   "nbs": [
-   "Hudson Yards"
+   "Chelsea"
   ],
   "score": 5
  },
@@ -450,9 +1246,24 @@
   "known": false,
   "boro": "Manhattan",
   "nbs": [
-   "Gramercy",
-   "Koreatown",
-   "Rose Hill"
+   "Flatiron"
+  ],
+  "score": 5
+ },
+ {
+  "name": "Tennis Lab FX",
+  "addr": "235 East 51st Street",
+  "zip": "10022",
+  "sport": "tennis",
+  "kind": "sports",
+  "phone": "+1 646-669-8444",
+  "web": "https://www.tennislabfx.com/",
+  "lat": 40.7560214,
+  "lon": -73.9687574,
+  "known": false,
+  "boro": "Manhattan",
+  "nbs": [
+   "Turtle Bay"
   ],
   "score": 5
  },
@@ -469,10 +1280,8 @@
   "known": false,
   "boro": "Manhattan",
   "nbs": [
-   "Alphabet City",
-   "Gramercy",
-   "Rose Hill",
-   "Stuyvesant Town"
+   "East Village",
+   "Kips Bay"
   ],
   "score": 5
  },
@@ -489,9 +1298,8 @@
   "known": false,
   "boro": "Manhattan",
   "nbs": [
-   "Gramercy",
-   "Koreatown",
-   "Rose Hill"
+   "Flatiron",
+   "Greenwich Village"
   ],
   "score": 5
  },
@@ -508,60 +1316,10 @@
   "known": false,
   "boro": "Manhattan",
   "nbs": [
-   "Alphabet City"
+   "Chinatown",
+   "Lower East Side",
+   "NoHo"
   ],
   "score": 5
- },
- {
-  "name": "Fort Hamilton Bowling Center",
-  "addr": "124 Wainwright Drive",
-  "zip": "11209",
-  "sport": "10pin;billiards",
-  "kind": "bowling_alley",
-  "phone": "",
-  "web": "https://hamilton.armymwr.com/programs/hamilton-bowling",
-  "lat": 40.608581,
-  "lon": -74.0270159,
-  "known": false,
-  "boro": "Brooklyn",
-  "nbs": [
-   "Fort Hamilton"
-  ],
-  "score": 4
- },
- {
-  "name": "Roosevelt Island Sportspark",
-  "addr": "300 Main Street",
-  "zip": "10044",
-  "sport": "",
-  "kind": "sports_centre",
-  "phone": "",
-  "web": "https://rioc.ny.gov/Sportspark.htm",
-  "lat": 40.7563489,
-  "lon": -73.954877,
-  "known": false,
-  "boro": "Manhattan",
-  "nbs": [
-   "Roosevelt Island"
-  ],
-  "score": 4
- },
- {
-  "name": "The Gutter - Lower East Side",
-  "addr": "77 Essex Street",
-  "zip": "10002",
-  "sport": "10pin",
-  "kind": "bowling_alley",
-  "phone": "",
-  "web": "https://www.thegutterbarles.com/lower-east-side",
-  "lat": 40.7180466,
-  "lon": -73.9886698,
-  "known": false,
-  "boro": "Manhattan",
-  "nbs": [
-   "Alphabet City",
-   "Little Italy"
-  ],
-  "score": 4
  }
 ]
