@@ -8492,3 +8492,84 @@ substring matched `public_tranSPORT` and returned three MTA bus depots, plus "Sp
 `leisure=sports_centre`, because **`_` is a word character so `\b` never fires between `sports` and
 `_centre`** — a fix that broke more than the bug. Both are covered by the filter's own test cases now.
 Normalise `_ ; =` to spaces before matching anything against an OSM tag blob.
+
+## v176 — 70 live listings had a map pin in the wrong place, and the map is a FILTER
+
+The biggest defect this loop has found in one pass, and it was invisible to every scan before today
+because **no single field contradicted itself**. Prospect Park Zoo stores `450 Flatbush Ave` — correct —
+and a pin at `40.8615,-73.8905`, which is the Bronx, and specifically the Wildlife Conservation Society
+headquarters. The HQ-address contamination already catalogued here five times over turns out to have a
+twin in the COORDINATES, and clearing the address never cleared the pin. New York Aquarium is pinned at
+that same Bronx point. Gotham Tennis Academy, 160 Columbus Avenue on the Upper West Side, was pinned on
+Staten Island, 35 km away. Row New York's Canarsie boathouse was pinned in Manhattan.
+
+**Why this outranks an ordinary wrong field.** The map viewport is a real filter in the core app, not a
+display hint. A listing with a wrong pin is not merely mislabelled — it is served to families browsing a
+neighbourhood it is not in, and absent from the one it is in, while looking perfectly confident on the
+map. Ten of the 70 were pinned outside their own borough.
+
+### How it was found — three scans, each answering what the previous one could not
+
+1. **`pinDrift.py`** measures each stored pin against the centroid of the neighbourhood the record claims.
+   Deliberately NOT a ZIP-to-neighbourhood table: this repo already records why a hand-built map that is
+   80% right is worse than none. Nominatim is asked once per distinct neighbourhood NAME for that
+   neighbourhood's own centroid, so nothing is inferred about where a boundary runs. 152 hits.
+2. **`pinJudge.py`** re-geocodes each hit's OWN ADDRESS to separate the causes, because reading the first
+   run showed the design was aimed at the wrong field — "160 Columbus Ave, claims Upper West Side, 36.7 km
+   away" is not a neighbourhood error. Result: **67 stale pins, 10 wrong neighbourhoods, 69 placeholder
+   addresses with nothing to conclude.** Reporting those three merged would have been a count nobody could
+   act on.
+3. **`pinFix.py`** re-derives and writes, with a borough guard.
+
+### The guard, and why it is not optional
+
+The first classification run trusted Nominatim, which quietly resolved `76 Ninth Avenue, New York, NY
+10011`, `110 Fifth Avenue, New York, NY 10011` and `2180 First Avenue, New York, NY 10029` to a cluster
+around 40.91,-73.81 — **Westchester**. Numbered avenues exist in every town in the region and the ZIP in
+the string does not stop the fallback. **Two of those three records already STORE that Westchester
+point**, so the pipeline made the identical mistake and a naive re-geocode-and-write would have written
+the error back as a correction. Every candidate is now checked against its own borough's bounding box, a
+borough-qualified query is tried first, and anything that will not resolve in-borough is refused and
+reported rather than written. Two were refused on exactly that ground.
+
+**70 pins re-derived and applied**, `geo` only, nothing else on those records touched.
+
+### The general lesson
+
+A cross-field consistency check finds defects that no single-field check can, but **the field it flags is
+not necessarily the field that is wrong**. This scan was built to catch wrong neighbourhoods, and 96% of
+what it found was wrong coordinates. Build the disambiguating second step before believing the first
+step's label — and note this is the same shape as the already-recorded finding that a
+`neighborhood`-in-`address` check scored placeholders healthy and real data broken.
+
+## v177 — Brooklyn round 2 and Manhattan round 1: what a map database costs and buys
+
+Six more listings, sourced from `neighborhoodSportSweep.py`. The sweep is a LEAD GENERATOR and this pair
+of batches priced that qualifier exactly:
+
+- **It got an address flatly wrong, in a way that would have fabricated a location.** OpenStreetMap puts
+  Brooklyn Lifestyle Athletic Club at 1500 Paerdegat Avenue North in Bergen Beach, which is why it
+  surfaced. The operator's own site says, twice and in capitals, "NEW LOCATION! Ebenezer Urban Ministry
+  Center, 660 Powell Street" — the club has moved to BROWNSVILLE. Created there.
+- **It was contradicted by an operator and lost.** The sweep put Amerikick at 529 14th Street; the record
+  held the bare fragment "529 5th Ave.", which looked like the weaker value and was the right one. Same
+  corner, which is how the map came to disagree. The catalogue was right and the map was not — the
+  opposite of the BKLA case in the same batch.
+- **It found a dead URL.** Roosevelt Island Sportspark's OSM website is `rioc.ny.gov/Sportspark.htm`,
+  a 404; the live page is `/community/sportspark`. Its OSM address (300 Main Street) is also wrong; the
+  facility is at 250 Main Street.
+- **It works.** Kaizenkan Aikido Dojo, Oishi Judo Club, Gotham Archery Manhattan and the 14th Street Y
+  were all confirmed against the operator's own pages with address, phone, email and age bands intact.
+
+**Manhattan's sweep behaves differently from Brooklyn's and it is worth knowing before running it.**
+Nominatim's bounding boxes for Manhattan's micro-neighbourhoods overlap heavily — Koreatown, NoMad and
+Rose Hill returned largely the same 70-odd venues — and the borough is dense with adult boutique fitness
+that tags identically to a children's school. Raw count much higher, yield per candidate much lower.
+
+**Two records were deliberately not "improved".** Ardon Sweet Science Gym has two addresses in circulation
+(the record's 143 30th Street, OSM's and Yelp's 861 4th Avenue, around the corner from each other) and its
+own contact page returns a 500 error, so the address is left alone with the conflict written into
+`fieldVerifications`; what could be settled was — both are ZIP 11232, so the empty `neighborhood` became
+Sunset Park. And the 14th Street Y is stored under EAST VILLAGE, its real neighbourhood, not under one of
+the three zero-coverage neighbourhoods whose overlapping sweep boxes surfaced it. Writing a zero-coverage
+name there to move a counter would be precisely the fabrication this scarcity work exists to avoid.
