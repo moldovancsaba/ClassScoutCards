@@ -7964,3 +7964,23 @@ onto each record rather than glossed.
 Canarsie ×2 (Hebrew Educational Society, T. Kang), Sheepshead Bay (T. Kang), Marine Park (T. Kang),
 Windsor Terrace (Windsor Terrace Martial Arts), Borough Park (Champions Martial Arts), Tribeca (T. Kang),
 Hell's Kitchen / Upper West Side / Upper East Side / Water Mill (the four Tennis Innovators courts).
+
+### Image made optional (owner directive, same day)
+
+*"Image is optional not requirement. The better the existing."* Applied to `POST /create`: still validated
+when supplied, omitted freely otherwise. **The consequence is recorded rather than glossed** — all three
+of the main app's read paths require an imgbb-hosted image (`deriveServingDoc` computes its `renderable`
+flag from `isRenderableListing`; `publicListReads` and `publicBrowse` both filter on it, verified by
+reading that repo). So an image-less listing is created complete and HIDDEN until a photograph lands, and
+the publish gate reports exactly that as the one unmet requirement. Boro Park YM-YWHA is the first.
+
+Making it optional is still right: the research is the expensive half, and a listing with a real address
+and phone waiting on a photo beats no record of the business at all.
+
+### Two token collisions caught this round, both by checking the address
+
+`bpaasports.org` — "Brooklyn Park Athletic Association", youth soccer, looks perfect for Brooklyn. Its
+address is **15802 Wayzata Boulevard, Brooklyn Park, MINNESOTA**. Likewise a search surfaced "Red Hook
+Martial Arts" for Brooklyn's Red Hook; it is in Red Hook, **Dutchess County, ZIP 12571**, 90 miles north.
+Both are the `camp.com` / `zing.cz` shape with a PLACE name instead of a business name, and the address
+is what catches them every time.
