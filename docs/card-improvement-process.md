@@ -8250,3 +8250,46 @@ target is counted from those two.
 **And the status report now measures what the API SERVES, not what the database holds.** It spent a day
 reporting "397 visible to families" while counting database rows; the true reachable figure was 326. A
 report that measures the wrong side of a gate is worse than no report, because it is believed.
+
+## v171 (2026-08-09): the image gate removed — a mechanical audit of everything still not served
+
+The core developer removed the image requirement. **Verified before reporting**, which is the lesson from
+yesterday: six imageless listings went from absent to served and the endpoint total moved 401 → 416, the
+exact count of imageless records.
+
+`src/scripts/blockAudit.py` attributes a reason to every provider the live API does not return. It is
+deliberately built to answer the owner's actual question — *which are blocked by the image ALONE* — which
+means attributing per record rather than reporting a total, and separating "image was the only fault"
+from "image was one of several".
+
+### Result: **ZERO blocked by the missing image alone.** The fix is complete.
+
+Of 1,120 records, 416 are served and 704 are not:
+
+| primary reason | count |
+| --- | --- |
+| hidden (retired by this loop or the pipeline) | 371 |
+| category switched off for browse — Drop-In Activities | 126 |
+| category switched off for browse — Birthday Parties | 52 |
+| **unexplained** | **133** |
+| no borough | 7 |
+| quarantined | 5 |
+| scraped chrome in the copy | 5 |
+| borough outside the served regions | 5 |
+| **blocked by the missing image alone** | **0** |
+
+### The 133, and why they are reported as unexplained rather than bucketed
+
+Three hypotheses were tested and each was disproved by the data rather than by argument:
+
+- **Region gating** — 59 are Bronx / Queens / Staten Island / LA, which it would explain. It does not
+  explain the other **74, which are Manhattan and Brooklyn**.
+- **Activity gating** — the unserved carry Art, Music, STEM, Theater. But Art (13), Music (18), Theater
+  (9) and Science (8) all appear among SERVED listings too, so the activity alone does not decide it.
+- **`discoveryTier: { $ne: "browse_only" }`** — in `buildProviderListQuery`, and a filter this audit had
+  originally missed. Also disproved: **12 served listings carry `browse_only`.**
+
+So the residue is real and is 74 Manhattan/Brooklyn records (53 Classes, 21 Camps) that pass every check
+observable from outside this bridge. **Recorded as unexplained rather than assigned to the nearest
+plausible bucket** — an audit that always has an answer is an audit that is guessing, and each of these
+three hypotheses would have looked convincing if I had stopped at the first one.
