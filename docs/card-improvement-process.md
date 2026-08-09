@@ -9183,3 +9183,65 @@ recur at other large NYC residential developments.
 
 No new creates from either sheet. Two real live-record defects corrected. One new pattern named and
 deliberately left as an open recommendation rather than forced either way.
+
+### Resumed general sovereign maintenance loop — defect-signal batch #1 (2026-08-09)
+
+Owner said "Continue the process" with no spreadsheet attached, reopening the general loop (the earlier
+"Stop the loop now" had paused it; this instruction resumes it). `updatedAt` is useless as a queue (a full
+session's own sweeps touched most of the pool already), so the batch was chosen from `signals.py`'s
+worst-first defect-signal ordering across the 405 live providers not yet touched this session. Six
+corrected in place, two quarantined — full component review on each, not a single-field sweep.
+
+**Sloomoo Institute NYC** — reality check passed (currently ticketing live visits), but its own nav badge
+("New York Institute Coming soon NEW!") looked at first glance like the pre-opening-location pattern
+already named in this doc (Goldfish Swim School UWS). Checking the location's OWN dedicated page rather
+than trusting the nav badge showed it was already open and selling tickets — the badge is decorative site
+chrome, not a status indicator. Real address found (475 Broadway, SoHo). Its description was scraped
+customer-review quotes verbatim ("Paul J", "Angela R", "Kohl H") — a name-attributed-testimonial variant
+of the already-catalogued scraped-chrome defect, rewritten as real copy. Category corrected `Classes` →
+`Drop-In Activities`: a timed-entry ticketed walk-in experience has no curriculum to enroll in.
+
+**SFX Youth Sports Flag Football** and **US Sports Institute Washington Heights** both turned out to be
+the already-named "league/program plays on public fields" shape (Brooklyn AYSO/Gjøa precedent) — SFX's own
+page states outright it's "the only Flag Football league that plays in Prospect Park," so the address was
+set to the real park rather than left as a bare borough placeholder; US Sports Institute's own program page
+confirmed classes run across UNNAMED neighborhood parks with no single venue, so its neighborhood-grade
+address was correctly left alone rather than forced into a fabricated street. Both had identical short/long
+generic filler descriptions, replaced with the real program menus from each operator's own page.
+
+**Taro's Origami Studio Kids — wrong neighborhood, not wrong borough**, a variant of the address-beats-name
+pattern already in this doc. Its own contact page names its Brooklyn studio as "Japan Village 2nd Floor
+'The Loft', 934 3rd Ave, Brooklyn, NY 11232, Industry City, Building 4" — Industry City is in **Sunset
+Park**, not the previously-stored Park Slope. Phone and email added from the same page. (The same page also
+surfaced the company's Philadelphia HQ and a Tokyo studio — HQ address correctly NOT used, per the
+already-catalogued parent-HQ-address failure mode.)
+
+**Take Me to the Water Upper East Side** — this specific record's own `sourceUrls` array already named the
+exact venue (`/hunter-college`), which the operator's JS-rendered page didn't yield to a static fetch; the
+well-established public address of Hunter College's own main campus was used instead of guessing. Its
+description was a dangling sentence fragment beginning "Their classes..." with no antecedent — a scrape
+that started mid-sentence, rewritten as complete copy.
+
+**Taste Buds Kitchen Brooklyn — a fourth confirmed real-brand-wrong-location case, resolved by the
+exactly-one-real-answer rule.** The operator's own current location directory lists exactly one NYC-proper
+site ("New York City – Chelsea") and its only other NY-area location is Long Island–Smithtown — **no
+Brooklyn location exists in the current list at all.** Since exactly one real NYC-proper answer exists (not
+zero, not several), corrected rather than quarantined: renamed, re-bordered Brooklyn→Manhattan, address set
+to the operator's own Chelsea page (109 W 27th St, 10th Fl), phone added. `activityTypes` also corrected
+from `["Art"]` (a token-match artifact on a cooking studio) to the real, vocabulary-recognized `"Cooking"`.
+
+**Two quarantines, both reality-check failures found by actually reading the source, not by any field-level
+tell.** *UWS & Midtown NYC Family Events* is sourced to kiddosinthecity.com, whose own homepage describes
+itself as "your local guide to family events... curated by a local mom" — a blog/newsletter aggregating
+OTHER businesses' events, the identical structural shape already named for Psychology Today's own
+category-search page and letsgobaby.co: the card names no single business because its source never named
+one. *Prep Academy Tutors Manhattan* is a real, legitimate tutoring company whose own site describes
+exclusively "Flexible, in-home & online tutoring" — the categorically prohibited no-fixed-venue shape
+(a network of independent tutors traveling to a family's home, no studio of the business's own), distinct
+from the hybrid real-venue-plus-online case this catalogue keeps rather than quarantines.
+
+Retrospective: two of six corrections in this batch (SFX, US Sports Institute) came from the SAME
+underlying shape (park-based programs, no owned venue) recognized on sight because it was already named
+from the AYSO/Gjøa work — a concrete case of a documented pattern paying for itself immediately on reuse,
+not just as a reference. Net: 6 corrected, 2 quarantined, 0 left unresolved. `batch_done.json` (now 636
+IDs) updated so the next pass doesn't re-serve any of these.
