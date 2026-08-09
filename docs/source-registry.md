@@ -161,3 +161,34 @@ Extract saved to `src/scripts/dohmhPermittedCamps.json`.
 Search the column values of adjacent datasets before concluding a public record does not exist. And the
 census is of *legally permitted day camps*, not sport camps — the sport filter and the entity check
 still run per candidate.
+
+## The first Yelp closure census (2026-08-09) — a real negative result, and three matcher bugs found
+
+`src/scripts/closureSweep.py`, promised in the registry's Yelp Fusion entry, run for the first time
+against the WHOLE live pool with a phone (587 of 587, not a sample) — cheap on the 5,000-call/day budget.
+**Result: zero genuine closures.** Getting to that honest zero took three rounds of fixing the tool's own
+false-positive shapes, each worth keeping because each will recur:
+
+1. **Shared phone, different address.** An operator running several locations can reuse one phone number
+   across separate Yelp listings — The Tiny Scientist's Brooklyn number matched two OTHER, unrelated
+   addresses marked closed. Fixed by requiring the closed result's address to match the stored record's.
+2. **Same address, different name — a relocation.** Staten Island Museum's phone matched both its old
+   downtown listing (75 Stuyvesant Pl, closed) and its current Snug Harbor listing (1000 Richmond Ter,
+   open) — same phone, same ZIP, different STREET. Matching on ZIP alone let the old address through;
+   fixed to require street-level agreement.
+3. **Same address, different name — a rebrand.** Clayhouse Brooklyn's address and phone exactly match a
+   closed "The Painted Pot" listing at the same door — the shop renamed, and Yelp kept the old brand's
+   listing marked closed. Not evidence the current business is closed.
+4. **A seasonal sub-event whose name contains the venue's name.** New York Botanical Garden's phone
+   matched a closed "Haunted Pumpkin Garden - New York Botanical Garden" listing — a past Halloween
+   event, not the venue, closed because the SEASON ended. Plain substring containment let this through;
+   fixed to require the shorter name cover at least 70% of the longer one's length.
+
+**The general lesson, stated once for the next tool built on a join key:** a phone number, an address and
+a name are each individually weak evidence of "same specific listing" — chains share phones, businesses
+move and rename, and event sub-pages borrow a venue's name. Cross-referencing two of the three (address
++ name, here) is what a lookup-by-shared-key needs before its result can be trusted; matching on the key
+alone produced a false positive in every one of the first five hits before the fix.
+
+**A negative result is worth stating loudly precisely because it is a census, not a sample** — the
+distinction this repo has recorded twice before as a mistake to avoid repeating.
