@@ -208,15 +208,32 @@ export async function applyCardBridgeCreate(request: NormalizedCreateRequest): P
     }
   }
 
+  // (2026-08-09, narrowed the same day it was written) The defect this exists for is 63 live records
+  // sharing 16 image files — one generic banner, `csny-banner-sports.png`, across FOURTEEN UNRELATED
+  // businesses. That is the harm: a family sees a photograph that belongs to somebody else entirely.
+  //
+  // Two BRANCHES OF ONE OPERATOR sharing that operator's own photograph is a different thing, and the
+  // first real use of this endpoint proved the original rule too blunt. T. Kang Taekwondo runs four
+  // dojos — Tribeca, Marine Park, Canarsie, Sheepshead Bay — each with its own address, phone, email
+  // and opening hours on the operator's own site, and publishes exactly one usable class photograph.
+  // Under a flat rule, three real dojos in under-served neighbourhoods stay invisible over a picture.
+  // Nobody is misled about WHOSE place it is; at worst the photo is of the programme rather than that
+  // specific room, which is recorded on the record rather than glossed.
+  //
+  // So the test is host identity, not image identity: reuse is allowed only when the new listing and
+  // the existing holder share a website host. Two different operators still cannot share an image.
+  const host = (value: string): string => {
+    try { return new URL(value).hostname.toLowerCase().replace(/^www\./, ""); } catch { return ""; }
+  };
   const imageClash = await db.collection("providers").findOne(
     { image: text("image"), visibility: { $ne: "hidden" } },
-    { projection: { id: 1, name: 1 } },
+    { projection: { id: 1, name: 1, website: 1 } },
   );
-  if (imageClash) {
+  if (imageClash && host(String(imageClash.website ?? "")) !== host(text("website"))) {
     return {
       created: false,
       dryRun: request.dryRun,
-      blockedReason: `That image is already used by "${imageClash.name}" (${imageClash.id}). A listing's image is a photograph of the place a family is deciding to walk to; sharing one between two businesses misrepresents both. Upload this venue's own photo.`,
+      blockedReason: `That image is already used by "${imageClash.name}" (${imageClash.id}), which is a DIFFERENT operator (${host(String(imageClash.website ?? "")) || "no website"} vs ${host(text("website")) || "no website"}). A listing's image is a photograph of the place a family is deciding to walk to; sharing one between two businesses misrepresents both. Upload this venue's own photo. Branches of the SAME operator may share that operator's own photograph.`,
     };
   }
 
