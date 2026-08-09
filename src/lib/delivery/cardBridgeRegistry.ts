@@ -162,10 +162,13 @@ export const BRIDGE_REGISTRY: Record<BridgeCollectionKey, BridgeCollectionConfig
       phone: 1,
       email: 1,
       sourceUrls: 1,
-      // Read-only (2026-08-07 finding): a provider can belong to a non-NYC city tenant (issue 472 —
+      // (2026-08-07 finding) a provider can belong to a non-NYC city tenant (issue 472 —
       // absent means the "nyc" default) with its own region/neighborhood vocabulary entirely distinct
       // from NYC boroughs (e.g. LA's "Central LA"/"Harbor" instead of "Manhattan"/"Brooklyn") — without
       // seeing this field, a non-NYC borough value looks like a data-quality bug when it may not be one.
+      // WRITABLE since 2026-08-09 (see the writableFields entry): the owner's expansion-market directive
+      // is not actionable without it, because a record in "Rockland County" whose tenant still says nyc
+      // contradicts itself.
       city: 1,
       // Structured address + geo (2026-08-07, owner directive: a corrected address must be "properly
       // accessible for maps" — zip/geo/neighbourhood/borough/city all confirmed, not just a nicer street
@@ -196,6 +199,13 @@ export const BRIDGE_REGISTRY: Record<BridgeCollectionKey, BridgeCollectionConfig
       // record literally named "Camp" when the real org is "Camp Orot" -- and there was previously no
       // way to correct it through this bridge at all, only its description/address/etc.
       "name",
+      // (2026-08-09) `city` is the TENANT key, and it had to become writable for the owner's
+      // expansion-market directive to be actionable at all: a record placed in "Rockland County" while
+      // its city still says nyc is internally contradictory, and the stats page would group a Hudson
+      // Valley county under the New York City tenant. Validated in validateWriteRequest against the two
+      // served cities plus the expansion market keys — an arbitrary string is rejected, because a
+      // mistyped tenant silently removes a record from every view rather than erroring.
+      "city",
       "category",
       "categoryConfidence",
       "programType",

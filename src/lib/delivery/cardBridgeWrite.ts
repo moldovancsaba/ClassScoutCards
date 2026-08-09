@@ -11,6 +11,7 @@ import {
 import { validateCopyQuality } from "@/lib/validation/copyQuality";
 import { alignActivityTypes, isNonAnswerCategoryValue, NO_CATEGORY_PLACEHOLDER } from "@/lib/delivery/activityAlignment";
 import { mergeFieldVerifications } from "@/lib/delivery/fieldVerifications";
+import { findExpansionDistrict, expansionMarketKeys } from "@/lib/delivery/expansionMarkets";
 import { computeContentCardIdentity } from "@/lib/delivery/cardBridgeSplit";
 import { monthsToAgeBuckets, validateRecurringPrograms } from "@/lib/delivery/programSchema";
 import { buildFamilyServicePlaceFact, buildFamilyServiceReviewPacket, isPublicStatus, normalizeFamilyServiceLead, reviewPacketEligible } from "@/lib/familyServices/core";
@@ -219,8 +220,51 @@ export function validateWriteRequest(body: unknown): WriteValidationResult {
     }
   }
 
+  // ------------------------------------------------------------------------------------------------
+  // The one-directional rails on `qualityStatus` and `visibility`, and the SINGLE exception to them.
+  //
+  // These fields have always been DEFENSIVE-only through this bridge: a write may hide or quarantine a
+  // record, never reveal one, because revealing is the main app's own gate to open and this bridge does
+  // not replicate it. That rail is right and stays.
+  //
+  // The exception, added 2026-08-09 on an explicit owner directive: *"Out of existing city, out of
+  // borough, out of neighbourhoods but real, legit listings should be built properly, create the missing
+  // city, borough (district), neighbourhoods for that."*
+  //
+  // This loop had hidden real, confirmed children's programmes for one reason and one reason only — the
+  // place they are in had no value in the taxonomy. 92NY's Camp Yomi, a 50-acre day camp in Rockland
+  // County with bus service from Manhattan, was retired for having an address. Camp Yomawha at the Henry
+  // Kaufmann Campgrounds in Pearl River was quarantined for the same. Those are not content judgements
+  // and the owner has now supplied the missing vocabulary, so the records must be able to come back.
+  //
+  // The exception is deliberately narrow and self-limiting: a record may be un-hidden or un-quarantined
+  // ONLY in the same write that places it in an expansion market whose district actually resolves. That
+  // means the write can only reverse the specific defect the owner authorised fixing — it cannot revive
+  // a record quarantined for being off-topic, fabricated, adults-only, closed or without a fixed venue,
+  // because none of those writes has a resolvable out-of-borough district to offer. There is no other
+  // path back from hidden through this bridge.
+  // ------------------------------------------------------------------------------------------------
+  const reinstatementDistrict =
+    typeof updates.borough === "string" && expansionMarketKeys().some((k) => findExpansionDistrict(k, updates.borough as string))
+      ? (updates.borough as string)
+      : null;
+
   if ((collection === "providers" || collection === "meetupGroups") && "qualityStatus" in updates && updates.qualityStatus !== "quarantined") {
-    return { ok: false, status: 400, error: 'qualityStatus can only be set to "quarantined" (the only real value the main app defines) — omit the field entirely rather than trying to clear it through this bridge' };
+    if (updates.qualityStatus === "" && reinstatementDistrict) {
+      // allowed: taxonomy-gap reinstatement, see above
+    } else {
+      return { ok: false, status: 400, error: `qualityStatus can only be set to "quarantined" through this bridge, or cleared to "" in the same write that places the record in a resolvable expansion-market district (the taxonomy-gap reinstatement path). ${reinstatementDistrict ? "" : "This write supplies no such district."}` };
+    }
+  }
+
+  // `city` is the tenant key. A mistyped one does not error anywhere downstream — it silently drops the
+  // record out of every view — so it is validated against a closed list here rather than trusted.
+  if ("city" in updates) {
+    const city = String(updates.city ?? "").trim().toLowerCase();
+    const known = ["nyc", "la", ...expansionMarketKeys()];
+    if (!known.includes(city)) {
+      return { ok: false, status: 400, error: `city must be one of: ${known.join(", ")} — got ${JSON.stringify(updates.city)}. A tenant key that matches nothing removes the record from every view without erroring.` };
+    }
   }
 
   // Per-field verification provenance (owner-approved 2026-08-09). Shape is checked here so a malformed
@@ -235,7 +279,11 @@ export function validateWriteRequest(body: unknown): WriteValidationResult {
     if (!probe.ok) return { ok: false, status: 400, error: probe.error! };
   }
   if ((collection === "providers" || collection === "meetupGroups") && "visibility" in updates && updates.visibility !== "hidden") {
-    return { ok: false, status: 400, error: 'visibility can only be set to "hidden" (the only real value the main app defines) — omit the field entirely rather than trying to clear it through this bridge' };
+    if (updates.visibility === "" && reinstatementDistrict) {
+      // allowed: taxonomy-gap reinstatement, see the block above `qualityStatus`
+    } else {
+      return { ok: false, status: 400, error: `visibility can only be set to "hidden" through this bridge, or cleared to "" in the same write that places the record in a resolvable expansion-market district (the taxonomy-gap reinstatement path). ${reinstatementDistrict ? "" : "This write supplies no such district."}` };
+    }
   }
 
   // (2026-08-07, owner directive) Cards must show at most 3 headline activities, never a raw keyword

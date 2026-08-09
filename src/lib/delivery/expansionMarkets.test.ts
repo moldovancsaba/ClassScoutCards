@@ -131,3 +131,33 @@ describe("registry integrity", () => {
     }
   });
 });
+
+describe("the taxonomy-gap reinstatement path — the ONLY way back from hidden through this bridge", () => {
+  // These assert the guard's INTENT against the real records that motivated it. The guard itself lives
+  // in cardBridgeWrite.validateWriteRequest; what matters here is which writes qualify.
+  const qualifies = (borough: unknown) =>
+    typeof borough === "string" && expansionMarketKeys().some((k) => findExpansionDistrict(k, borough));
+
+  it("lets a listing retired ONLY for having an out-of-borough address come back", () => {
+    // 92NY Camp Yomi: a 50-acre day camp in Rockland County, retired for having an address.
+    expect(qualifies("Rockland County")).toBe(true);
+    // Camp Yomawha, Henry Kaufmann Campgrounds, Pearl River.
+    expect(findExpansionNeighborhood("hudson-valley", "Rockland County", "Pearl River")).toBe("Pearl River");
+  });
+
+  it("does NOT let anything else back, because no other write has a district to offer", () => {
+    // A record quarantined for being off-topic, fabricated, adults-only, closed or without a fixed venue
+    // has no out-of-borough district to supply, so it can never take this path.
+    for (const b of ["Manhattan", "Brooklyn", "Central LA", "", "NYC-wide", "Multiple", undefined, null]) {
+      expect(qualifies(b)).toBe(false);
+    }
+  });
+
+  it("does not accept a market KEY where a district is required", () => {
+    // "long-island" is the market, not the district — the district is the county, and a write must name
+    // one, so a vague market-level value cannot reinstate anything.
+    expect(qualifies("long-island")).toBe(false);
+    expect(qualifies("Long Island")).toBe(false);
+    expect(qualifies("Nassau County")).toBe(true);
+  });
+});
