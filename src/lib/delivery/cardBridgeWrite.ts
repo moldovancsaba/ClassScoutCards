@@ -192,7 +192,11 @@ export function validateWriteRequest(body: unknown): WriteValidationResult {
   // absence when no single answer exists, and that must stay available -- an empty field is better than a
   // wrong one, which is the whole reason this check exists.
   const placeFields = ["borough", "boroughGuess", "neighborhood", "neighborhoodGuess"] as const;
-  const COMPOUND = /\s*(?:\/|\band\b|&|\+)\s*/i;
+  // `\bor\b` was missing until 2026-08-09 and the gap was live: THIRTEEN providers carried
+  // "Manhattan or Brooklyn", the write path accepted it, and a doc claiming it was "rejected on write"
+  // had to be corrected. A guard is only as good as the separators it lists — when a new compound
+  // shape turns up in the data, add it here rather than only cleaning the rows.
+  const COMPOUND = /\s*(?:\/|\band\b|\bor\b|&|\+|;|\|)\s*/i;
   const NOT_A_PLACE = /^(?:multiple\b|various\b|citywide$|nyc-?wide$|city-?wide$|mobile$|virtual$|online$|tbd$|n\/?a$)/i;
   const DELIVERY_TOKEN = /\b(?:mobile|virtual|online|citywide|nyc-?wide|multiple locations?)\b/i;
   for (const field of placeFields) {

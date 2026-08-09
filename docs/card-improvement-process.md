@@ -6894,6 +6894,14 @@ is the run-level-default signature already catalogued for `"East New York"` and 
 NYC"`, and this one is false twice over: it names no single place, and every programme in the cohort runs
 in more than two boroughs.
 
+**A claim in the first version of this section was wrong and is corrected here.** It said the value was
+"now rejected on write". It was not: `validateWriteRequest`'s compound separator list covered `/`, `and`,
+`&` and `+` — **but not `or`** — so the write path would have accepted `"Manhattan or Brooklyn"` right
+back in. The owner caught it. `or`, `;` and `|` are now in the list, with regression tests, and all 341
+canonical place names were re-checked against the widened guard (zero wrongly rejected). The general
+lesson: **cleaning the rows is not the same as closing the hole, and a guard is only as good as the
+separators it enumerates.**
+
 It split cleanly in two.
 
 **Five satellites that said so themselves.** Their own descriptions read *"See the Imagine Swimming

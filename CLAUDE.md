@@ -892,6 +892,13 @@ in a comment when you add one, the way the existing ports do.
 - **"No street address" is often the correct answer, not a gap.** Of 198 listings no probe could resolve, 30
   say in their own words that they are mobile, run in schools, or have multiple locations. Those are the
   `venueModel` gap in the wild — the fix is a schema field, not a street line.
+- **A guard is only as good as the separators it enumerates — and I documented one as closed while it was
+  still open.** The compound check covered `/`, `and`, `&`, `+` but **not `or`**, so `"Manhattan or
+  Brooklyn"` — carried by thirteen live providers — would have been accepted straight back in, while SOP
+  v147 claimed it was "rejected on write". The owner caught the false claim. `or`, `;` and `|` added, with
+  tests, and all 341 canonical place names re-checked against the widened guard (zero wrongly rejected).
+  **Cleaning the rows is not the same as closing the hole**, and when a doc says a value is now impossible,
+  that sentence needs a test behind it before it is written.
 - **A place field must name ONE place — now enforced in `validateWriteRequest`, not just conventional.**
   Compound values ("Manhattan/Brooklyn", "Coney Island / Bensonhurst") and delivery models ("NYC-wide",
   "mobile", "Multiple") are rejected on `borough`/`boroughGuess`/`neighborhood`/`neighborhoodGuess`. A

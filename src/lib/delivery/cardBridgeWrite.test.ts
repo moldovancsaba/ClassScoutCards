@@ -510,3 +510,31 @@ describe("recurringPrograms[].activityTypes (owner-reported 2026-08-08)", () => 
     expect(aligned.activityTypes[0]).toBe("Swimming");
   });
 });
+
+describe('compound place values: the separators the guard actually lists (2026-08-09)', () => {
+  const tryBorough = (borough: string) =>
+    validateWriteRequest({
+      collection: 'providers', id: 'x', updates: { borough }, reason: 'compound guard', source: 'test', dryRun: true,
+    } as never);
+
+  it('rejects "or", which was MISSING and live on thirteen providers', () => {
+    // The gap was real: the write path accepted "Manhattan or Brooklyn" while a doc claimed it did not.
+    expect(tryBorough('Manhattan or Brooklyn').ok).toBe(false);
+  });
+
+  it('rejects the other separators that turn up in this data', () => {
+    for (const v of ['Manhattan/Brooklyn', 'Manhattan and Brooklyn', 'Manhattan; Brooklyn', 'Manhattan|Brooklyn', 'Queens / Long Island']) {
+      expect(tryBorough(v).ok).toBe(false);
+    }
+  });
+
+  it('accepts every single canonical place name — the guard must not eat real data', () => {
+    for (const v of ['Manhattan', 'Brooklyn', 'Bedford-Stuyvesant', 'Prospect Lefferts Gardens', 'Hell\'s Kitchen']) {
+      expect(tryBorough(v).ok).toBe(true);
+    }
+  });
+
+  it('still allows an empty value — clearing is how an honest absence is recorded', () => {
+    expect(tryBorough('').ok).toBe(true);
+  });
+});
