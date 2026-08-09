@@ -217,3 +217,99 @@ spreadsheet coverage coming, and should be treated as a live, recurring feed alo
 not a one-time batch. The owner's own framing for the eventual ClassScout ingestion pipeline — the same
 five-tier hierarchy above — is worth carrying into any future automation of this process, since it is the
 owner's own stated standard for what counts as proof versus a lead.
+
+The owner separately sent the complete list of ~140 operator/venue URLs used to build these spreadsheets.
+It's the concrete artifact behind the hierarchy above — every business name in the spreadsheets traces to
+one of these domains — and is recorded here as a durable, checkable reference rather than left to scroll
+out of a chat transcript. Grouped by the owner's own neighborhood clusters (Primary/citywide, Tribeca-
+Downtown, SoHo/Chinatown/LES/East Village, Midtown/Chelsea/Gramercy/StuyTown, Upper East Side/Sutton
+Place/Roosevelt Island, and Government/institutional):
+
+```
+Primary / citywide:
+https://www.mygym.com/                              https://www.thelittlegym.com/
+https://nycelite.com/                                https://www.imagineswimming.com/
+https://soho.kidstrong.com/                          https://www.championstkd.com/
+https://www.chelseapiers.com/                        https://truesupreme.com/
+https://www.mmanewyorkcity.com/                      https://goldfishswimschool.com/
+https://www.asphaltgreen.org/                        https://wendyhilliard.org/
+https://www.ywhi.org/                                https://www.msjsgym.com/
+https://nymaa.com/                                   https://www.swimjim.com/
+https://www.aquabeba.com/                            https://www.gothamgymnastics.com/
+https://www.prospectgymnastics.com/                  https://www.kingsbayy.org/
+https://www.sokolnewyork.org/                        https://www.breakawayhoops.com/
+https://bayridgesportsandtheatercamp.com/            https://www.renzograciebayridge.com/
+https://bayridgedojo.com/                            https://kenwakan.com/
+https://hindscombatmidtownwest.com/                  https://www.ninjawarrioracademy.com/
+https://eldojonyc.com/                               https://ues.kidsinsports.com/
+https://fastbreakkids.com/                           https://www.jodisgym.com/
+https://www.funfitnyc.com/                           https://www.elliottsclasses.com/
+https://brooklynzoony.com/                           https://brooklynmartialarts.net/
+https://www.aikidoofparkslope.com/                   https://tsk.com/
+https://www.brooklynjudoacademy.com/                 https://premiermartialarts.com/
+https://brooklynmartialarts.com/                     https://elitemartialartsbk.com/
+https://www.darumamartialarts.com/                   https://nextevolutionmartialarts.com/
+https://www.happykicks.com/                          https://eliteswimmingnyc.com/
+
+Tribeca / Downtown:
+https://www.tkangtkd.com/                            https://combatclub.cc/
+https://www.arcathletics.com/                        https://www.manhattanyouth.org/
+https://nypreschoolandkidsclub.com/                  https://childrentumbling.com/
+https://www.downtowndancefactory.com/                https://www.dancewithmissrachel.com/
+https://tutuschool.com/                              https://spotlightkidsny.com/
+https://www.lunaperformingarts.com/                  https://www.joincocoon.com/
+https://playgardennyc.com/                           https://gnynf.org/
+https://csboxinggymparkplace.com/
+
+SoHo / Chinatown / LES / East Village:
+https://martialartsfamilystudio.com/                 https://www.creativeartsandsports.com/
+https://www.ueaa.org/                                https://www.rebeccakellyballet.com/
+https://www.blkf.nyc/                                https://www.shaolinnewyork.com/
+https://twobridges.org/                              https://basketballcity.com/
+https://amazingathletes.com/                         https://www.liondance211.org/
+https://ten-tigers.com/                              https://www.workshop-nyc.com/
+https://lessportsacademy.org/                        https://nyclions.nyc/
+https://www.henrystreet.org/                         https://www.abronsartscenter.org/
+https://paultaylordance.org/                         https://mannycantor.org/
+https://nyrockits.org/                               https://leagues.bluesombrero.com/olslittleleague
+https://capoeiraguatambu-les.com/                    https://ahnstkdnyc.com/
+https://www.kidsinthegame.com/                       https://lnfkids.com/
+https://www.universitysettlement.org/                https://www.peridance.com/
+https://www.lmdt.org/                                https://nytb.org/
+https://greenwichhouse.org/                          https://www.therainbownyc.com/
+https://broadwaydancecenter.com/                     https://ailey.org/
+
+Midtown / Chelsea / Gramercy / StuyTown:
+https://book.nicolsquash.com/                        https://mphc.com/
+https://www.oknyc.org/                               https://karatecitynyc.com/
+https://www.hartleyhouse.org/                        https://www.mugeukmartialarts.com/
+https://nyc.geniusgems.com/                          https://www.yang-taekwondo.com/
+https://cpadnyc.com/                                 https://tadatheater.com/
+https://www.kidhopnyc.com/                           https://www.unionsquareplay.com/
+https://brickhousedance.com/                         https://marthagraham.edu/
+https://www.openjarinstitute.com/                    https://fencersclub.org/
+https://academy.juventus.com/                        https://www.timessquarenyc.org/
+https://www.stuytown.com/                            https://nycvolleyballers.wixsite.com/website-1
+https://www.icandothatnyc.com/                       https://nykidsclub.com/
+https://tigerstrongnyc.com/                          https://www.midtownmovementanddance.com/
+https://www.weeonesclub.com/                         https://nychighlanddance.com/
+https://www.penguincityswim.com/                     https://www.spsnyc.org/
+https://abovethenotes.com/                           http://www.childrenfirstsports.com/
+
+Upper East Side / Sutton Place / Roosevelt Island:
+https://www.92ny.org/                                https://acematkd.com/
+https://www.gothamcityswim.com/                      https://www.playonnyc.com/
+https://www.yyaa.org/                                https://activestudiosnyc.com/
+https://www.bigappleyouthsports.com/                 https://www.tennisinmanhattan.com/
+https://www.rioc.ny.gov/
+
+Government / institutional:
+https://www.nycgovparks.org/                         https://ymcanyc.org/
+https://www.rioc.ny.gov/
+```
+
+**Cross-confirmation, not duplication**: several of these (Karate City, Fencers Club, Yang Taekwondo,
+Tiger Strong NYC) were independently resolved by this bridge's own review loop through a DIFFERENT route
+earlier the same session (pool-signal sweeps, prior spreadsheet batches) before this list arrived — the
+same real businesses, found twice, by two different methods. Worth treating as a positive signal about
+both methods' accuracy rather than redundant effort.

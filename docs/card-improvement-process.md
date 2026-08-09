@@ -9294,3 +9294,64 @@ A real negative result — worth recording precisely because most batches this s
 Coverage: **466 sport listings served in Brooklyn+Manhattan** (465 → 466). `batch_done.json` grows with
 each pass; autonomous discovery (SerpAPI/Yelp/DOHMH) remains untouched this session — every fix and create
 in this stretch came from spreadsheet cross-checks and pool-internal sibling comparisons.
+
+### Sutton Place–Midtown East + UES-Lenox Hill-Roosevelt Island + Carnegie Hill — 12 creates, 4 real defects fixed (2026-08-09)
+
+Three spreadsheets with heavy mutual overlap (Ace Martial Arts, Modern Martial Arts, SwimJim, Gotham City
+Swim, NYC Elite Gymnastics, Supreme Martial Arts and Yorkville Tennis Club all appear on 2 of the 3 sheets
+at identical addresses) — cross-checked once per business, not once per sheet.
+
+**Two genuinely separate real locations of national chains, correctly distinguished from earlier
+resolved duplicate clusters rather than re-litigated.** Penguin City Swim already has a card correctly
+resolved to Riverdale, the Bronx, after 8 earlier duplicate cards wrongly guessed Manhattan/Brooklyn for
+what turned out to be one pool — the standing risk was repeating that exact mistake. Checked first: the
+operator's own site lists FOUR distinct location categories (Upper West Side, Midtown East, Riverdale,
+Upper East Side), so "Penguin City Swim – Midtown East" at 132 E 45th St is a genuinely separate real
+location, not a re-guess of the Riverdale pool — created. Same discipline for My Gym: two branches
+("Upper East 60th" and "Upper East 83rd") both created as distinct, since the operator's own site names
+them as separate locations, not one business guessed twice.
+
+**SwimJim Upper East Side had a wrong address that matched NEITHER of the operator's two real UES
+locations.** The stored address (1113 York Ave) doesn't correspond to either "Two Sutton Place North" or
+"The Yorkshire Towers" (305 E 86th St) — SwimJim's own locations page names exactly these two current UES
+branches. Corrected to the Yorkshire Towers address this batch's spreadsheet independently confirmed. The
+Two Sutton Place North branch remains uncarded — its exact street number wasn't found — recorded as an
+open gap rather than guessed. **Gotham City Swim School, created at the same 305 E 86th St address**, is a
+second, distinct swim-school operator sharing that building's pool — a shared-venue-tenant case, the same
+shape as Chelsea Piers and Major Owens Center.
+
+**Modern Martial Arts Tribeca — two live duplicate records, and the "richer" one had the stale phone.**
+Both at 78 Reade St; one had a complete, real description and a branch-specific email but a phone
+(212-772-3700) that independently re-fetching mmanewyorkcity.com/tribeca showed is stale; the other had a
+scraped description cut off mid-sentence ("...They grow not only in martial arts, but") but the CURRENT
+real phone (212-587-1099). Kept the better-written record, corrected its phone from the other, retired the
+truncated-description twin — a reminder that "which twin is richer" and "which twin is right" can point at
+different records on different fields, so check both before picking a survivor.
+
+**Shared-venue-tenant case at the Sutton Place Family Center (225 E 51st St)**: Kids in Sports and Sutton
+Place Synagogue's own summer camp both operate in the same building — created both, with a `Suite SPS`
+address marker on the second per this bridge's own collision-guard convention, rather than merging two
+distinct real organizations into one card.
+
+Excluded: Above the Notes (dance/collaborative-arts), Juliette & Ella's Play Date (music/movement, not in
+the sport vocabulary), Kids in the Game Summer Camp – Carnegie Hill (the same "no venue of its own"
+citywide-operator caution excluded twice already this session), and **Big Apple Youth Sports — a new
+instance of that same shape found by reading its own page**: "The Afterschool Sports providers for PS6,
+MNS and YCS" states outright it operates inside several private schools, not from a venue of its own.
+**Children First Sports** was excluded on insufficient verification, not a reality-check failure — the
+spreadsheet itself flagged "lower verification confidence" and independently, `childrenfirstsports.com`
+does not even resolve (DNS failure); no live site exists to confirm anything against.
+
+12 created, 4 existing records corrected (3 address/neighborhood fixes, 1 duplicate retired). Coverage:
+**480 sport listings served in Brooklyn+Manhattan** (466 → 480).
+
+### Owner-contributed operator URL list folded into the source registry (2026-08-09)
+
+The owner sent the complete list of ~140 operator/venue URLs behind these spreadsheets in one message —
+recorded into `docs/source-registry.md` alongside the source-hierarchy principle from the same
+conversation (provider official site → official host/venue → municipal/institutional source → structured
+local-business discovery → third-party directory as a lead only). Several URLs on that list correspond to
+businesses already resolved in this catalogue by a DIFFERENT route earlier in the session (e.g. Karate
+City, Fencers Club, Yang Taekwondo, Tiger Strong NYC) — useful confirmation that this owner-curated list
+and this bridge's own review loop are converging on the same real businesses independently, not working
+at cross purposes.
