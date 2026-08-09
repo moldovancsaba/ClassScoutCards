@@ -9075,3 +9075,56 @@ Coverage after this batch: **461 sport listings in Brooklyn+Manhattan, 461 serve
 8 built-but-not-yet-served elsewhere in the pool). Per the owner's stop instruction, autonomous discovery
 is paused here pending further direction — this entry closes out the bounded spreadsheet-processing task,
 not a loop iteration.
+
+### Hell's Kitchen + Midtown South/Flatiron/Union Square — 4 creates + 1 in-place correction (2026-08-09)
+
+Owner uploaded four spreadsheets in one message: Chelsea/Hudson Yards and East Village were BYTE-IDENTICAL
+to the ones fully processed in the batch immediately above — no new work there. Hell's Kitchen (8 rows)
+and Midtown South/Flatiron/Union Square (8 rows) were genuinely new. Worked as the same kind of bounded
+task as the prior batch, per the owner's earlier "Stop the loop now" instruction (still in force, not
+rescinded by these uploads).
+
+Excluded (dance/theatre, not sport): Broadway Dance Center (also already live at a different, correct
+address — Lincoln Square), The Ailey School Junior Division, Center for Performing Arts and Dance
+(CPAD NYC — "rhythmic gymnastics" is one item on an otherwise dance-dominant menu, the same
+dance-dominant-menu judgment already applied elsewhere), TADA! Youth Theater (already live), KidHop.
+
+Excluded on insufficient sport-specificity, not on the reality check: **Hartley House** (413 W 46th St) is
+a confirmed real, physically-located organization with a genuine after-school and summer camp program —
+but its own site names no specific sport, only "youth recreation," and JS-rendered program subpages didn't
+resolve anything more specific to a static fetch. Not the same as a reality-check failure; simply doesn't
+clear the sport-specificity bar this queue is filtering for. **Union Square Play** (67 E 11th St — a real,
+different physical location from the already-live Upper East Side branch) excluded for the identical
+reason: "child-led physical play" and yoga are not in this catalogue's sport vocabulary.
+
+Already live, no duplicate created: New York Ninja Academy Manhattan (625 W 55th St, exact address match),
+Karate-Do Ken Wa Kan (34 W 15th St, exact address match), and **Karate City** (525A W 52nd St) — confirmed
+still correctly live as `prov-karate-city-uws`, with its fabricated "Upper East Side" twin still correctly
+`visibility: hidden` from an earlier session's retirement. Worth recording as a small confirmation that a
+prior correction held.
+
+**Tiger Schulmann's Martial Arts – Chelsea/Flatiron (688 6th Ave) surfaced a live defect, not a new
+create.** The sheet named this location, and an existing live record (`prov-tiger-schulmann-s-chelsea`)
+already covered the business — but with a borough-level placeholder address ("Chelsea, Manhattan, NYC")
+AND `activityTypes: ["Art", "Music"]` on a martial arts school, the exact substring-match failure mode
+this catalogue has already named ("Art" hides inside "m**Art**ial"). Independently fetched
+`tsk.com/locations/ny/chelsea/`, confirmed the real address (688 Ave. of the Americas = 688 6th Ave,
+10010) and the school's real activity, and corrected both fields **in place** via `/update` rather than
+creating a duplicate. A reminder that verifying a spreadsheet row against a live pool match is itself a
+chance to catch an existing defect, not just a dedupe check.
+
+Created (4): Nicol NYC – Hell's Kitchen (Classes, Squash — address taken on the spreadsheet's own
+verification since the operator's site renders its address via JavaScript and a static fetch could only
+confirm the entity/neighborhood/Junior program, not the street number), Manhattan Plaza Health Club
+(Classes, Swimming+Climbing, 482 W 43rd St — both the learn-to-swim and kids-climbing programs confirmed
+directly off the operator's own navigation menu), Renshin-Kai Karate – Matsumoto Dojo (Classes, Karate,
+754 9th Ave — the operator's own homepage says outright "our dojo in Hell's Kitchen," an unusually direct
+self-confirmation), Yang Taekwondo (Classes, Taekwondo, 39 E 30th St — neighborhood **corrected** from the
+spreadsheet's coarse "Midtown South/Flatiron/Union Square" batch label to "Rose Hill," the real, specific
+micro-neighborhood a Nominatim reverse-geocode of the exact address returns and which is already in this
+platform's own NYC neighborhood vocabulary; stored per the "store the real name" directive rather than the
+coarser label the sheet itself used).
+
+Coverage after this batch: **465 sport listings served in Brooklyn+Manhattan** (461 → 465), plus one
+existing live record corrected in place. Per the owner's stop instruction, autonomous discovery
+(SerpAPI/Yelp/DOHMH sweeps) remains paused — this entry closes out another bounded spreadsheet task.
