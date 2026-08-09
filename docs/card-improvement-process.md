@@ -7918,3 +7918,49 @@ zero-coverage neighbourhoods, and four Manhattan/Suffolk tennis courts belonging
 On their photographs: Tennis Innovators publishes four images of its own courts and serves the same four
 on every location page, so each court was given a *different* one of the four and the fact that it is the
 operator's programme generally rather than that specific court is recorded on the record, not glossed.
+
+## v164 (2026-08-09): the target is 10 NEW per neighbourhood, on top of what exists
+
+Owner correction, emphatic: *"You have to deliver NEW 10 listings to every neighbourhood top on the
+existing!!!!"* Not "bring each neighbourhood to 10" — **add 10 to each**, including the nine that already
+clear it. Across the 92 browsable display groups in Manhattan and Brooklyn that is **920 new listings**,
+not the 698 a bring-to-10 reading gives. Chelsea goes 15 → 25; Park Slope 22 → 32.
+
+**Round 1 was the wrong shape and is recorded as such**: it produced one listing each in three
+neighbourhoods. A round is 10 in ONE neighbourhood, then the next-scarcest.
+
+### What actually limits throughput, measured rather than guessed
+
+Not tooling. Three things, in order of severity:
+
+1. **The catalogue's coverage gap mirrors the discovery pipeline's gap.** Mining the unpublished pool by
+   neighbourhood was the obvious first move and it does not work where it is most needed: Borough Park has
+   **1** content card, Canarsie **0**, Dyker Heights **0**, Turtle Bay **0**. These neighbourhoods are
+   scarce because they were never crawled, so there is nothing to promote.
+2. **Bulk directory sources are closed.** `yelp.com` returns 403 to this environment; NYC Open Data's
+   dataset API returns 403 on the resource endpoints while its catalogue endpoint works, and the one
+   promising dataset (`ebkm-iyma`, DYCD Program Sites) is overwhelmingly jobs/housing programmes run
+   inside school buildings — the rented-venue case, not venues of their own. Sourcing is therefore
+   per-venue web research plus verification against the operator's own site.
+3. **The image requirement is the binding constraint per listing.** Most small operators publish one to
+   three usable photographs. This is what makes it one listing per distinct venue photograph that exists
+   on the open web, and it is why only ONE Champions dojo was created in round 1.
+
+### The image guard, narrowed the same day it was written
+
+The original rule refused any image already used by a live listing. Its actual target is 63 live records
+sharing 16 files, one banner — `csny-banner-sports.png` — across **fourteen unrelated businesses**. Two
+BRANCHES OF ONE OPERATOR sharing that operator's own photograph is not that harm.
+
+T. Kang Taekwondo forced the issue: four dojos (Tribeca, Marine Park, Canarsie, Sheepshead Bay), each with
+its own address, phone, email and opening hours on the operator's own site, and exactly one usable class
+photograph. Under a flat rule three real dojos in under-served neighbourhoods stay invisible over a
+picture. **The test is now host identity, not image identity** — two different operators still cannot
+share an image, and the fact that the photo is of the programme rather than that specific room is written
+onto each record rather than glossed.
+
+### Live as of this entry — 11 new publicly visible listings
+
+Canarsie ×2 (Hebrew Educational Society, T. Kang), Sheepshead Bay (T. Kang), Marine Park (T. Kang),
+Windsor Terrace (Windsor Terrace Martial Arts), Borough Park (Champions Martial Arts), Tribeca (T. Kang),
+Hell's Kitchen / Upper West Side / Upper East Side / Water Mill (the four Tennis Innovators courts).
