@@ -7984,3 +7984,43 @@ address is **15802 Wayzata Boulevard, Brooklyn Park, MINNESOTA**. Likewise a sea
 Martial Arts" for Brooklyn's Red Hook; it is in Red Hook, **Dutchess County, ZIP 12571**, 90 miles north.
 Both are the `camp.com` / `zing.cz` shape with a PLACE name instead of a business name, and the address
 is what catches them every time.
+
+## v165 (2026-08-09): camps are the scarcer half, and a status report after every batch
+
+Owner: *"Do you focus on Camps as well?"* — no, and the brief said "sport camps and classes". All twelve
+creates went in as `Classes`, making the imbalance slightly worse.
+
+| | sport **Camps** | sport **Classes** | neighbourhoods with ZERO sport camps |
+| --- | --- | --- | --- |
+| Brooklyn | 34 | 96 | **37 of 54** |
+| Manhattan | 40 | 102 | **26 of 38** |
+
+**63 of the 92 browsable neighbourhoods show a family no sport camp at all.** Camps are the scarcer half
+by a wide margin and future rounds are weighted toward them, roughly 6:4.
+
+### One venue, both formats — the main app already solved this
+
+A venue that runs a camp alongside year-round classes must NOT become two listings; one card per physical
+location, and the address guard would refuse the second anyway. But `category` is single-valued, so on its
+face such a venue is findable under one format only. It isn't: `providerServesCategory` matches on
+`category` **or** any entry in `offerings[]`, and `inferOfferingCategories` derives those from the
+listing's own text on `\bcamps?\b|day camp|summer camp|break camp|holiday camp`. **Naming the camp in the
+description is what makes the venue findable under Camps**, with no duplicate. `offerings` is not writable
+through this bridge — added to the core recommendations rather than worked around.
+
+### The backfill found almost nothing, and that is the useful part
+
+Checking each of the twelve against its own site for camp evidence: T. Kang (all four dojos), Windsor
+Terrace Martial Arts and Champions Borough Park mention **no camp anywhere**. Only the Hebrew Educational
+Society and two of the four Tennis Innovators courts run one, and all three already name it in their copy.
+So there was nothing to backfill — **the camp gap cannot be closed by relabelling venues that teach
+classes.** It needs dedicated camp operators sourced as their own listings, which is what the next rounds
+do. Adding camp language to the other nine would have been fabrication in the copy field.
+
+### The status report, and the flaw it shipped with
+
+`status.py` reports the sum of sport listings in Brooklyn and Manhattan after every batch. Its first run
+reported "0 held back for no image" while Boro Park YM-YWHA sat hidden for exactly that reason — hidden
+records were excluded from the pool, so **the report was hiding the thing it was built to surface**. A
+listing hidden only for want of a photograph is now counted and reported separately from both the visible
+total and the quarantined, which are different questions.
