@@ -6575,6 +6575,13 @@ only place it can go.
   becomes the business's description. Two clusters resolved build-then-retire (Gjøa, TMFC). Manhattan
   Patriots quarantined — it is in Manhattan, ILLINOIS.
 
+- v147 (2026-08-09): **batches 8-10 — the citywide-programme-index cohort.** Thirteen live providers
+  shared the byte-identical borough `"Manhattan or Brooklyn"`; five were satellites whose own
+  descriptions told the reader to look at another listing (hidden, parents confirmed first) and eight
+  were genuine citywide programmes (borough cleared, kept live). Zero compound boroughs remain. Also:
+  CompleteBody Kids quarantined, Peter Stuyvesant Little League's description was an encyclopaedia
+  passage about a 1940s housing complex, and an LA-vocabulary gap recorded for Crenshaw.
+
 ## v144 (2026-08-08): the location-evidence audit — 64 live provider records, and a check that was measuring itself
 
 This round started as a routine continuation of the cross-collection neighbourhood fill and turned into
@@ -6875,3 +6882,60 @@ Baby Fingers is filed under Music because this platform's activity vocabulary ha
 recorded as a vocabulary gap rather than silently mislabelled. NYC Parks Afterschool Program is
 `needs_human`: it is a citywide programme index whose borough is the compound "Manhattan or Brooklyn", and
 picking one borough would tell families in the other four that nothing runs near them.
+
+## v147 (2026-08-09): batches 8–10 — the citywide-programme-index cohort, cleared
+
+### The cohort
+
+Batch 9 kept producing the same shape — a real, free, valuable programme with a delivery-model address and
+a compound borough — so it was measured instead of worked one at a time. **Thirteen live providers carried
+the byte-identical borough string `"Manhattan or Brooklyn"`.** Identical value across unrelated operators
+is the run-level-default signature already catalogued for `"East New York"` and `"Manhattanville, Manhattan,
+NYC"`, and this one is false twice over: it names no single place, and every programme in the cohort runs
+in more than two boroughs.
+
+It split cleanly in two.
+
+**Five satellites that said so themselves.** Their own descriptions read *"See the Imagine Swimming
+listing for the pool where this runs"*, *"A Soccer Stars programme; see the Soccer Stars NYC listing"*,
+*"A programme at the Police Athletic League; see the PAL Sports Leagues listing"* — a card telling the
+reader to go and look at a different card is a card admitting it should not exist. Retired to **hidden**,
+not quarantined, and only after confirming each parent exists (Imagine Swimming has three real location
+records; Soccer Stars NYC has four; PAL Sports Leagues is kept live in the same batch as the parent).
+
+**Eight genuine citywide programmes** — Rising New York Road Runners, PAL Sports Leagues, Cornerstone (94
+NYCHA community centres), Beacon (80 school-based centres), NYC Parks Afterschool, NYC Parks Youth Swim
+Team, Rising NYRR Wheelchair, Kids in Motion. **Borough cleared, not replaced.** There is no single borough
+to write, and picking one tells families in the other four that nothing runs near them. An empty field is
+an honest absence; `"Manhattan or Brooklyn"` was an assertion that excluded three boroughs. All kept live —
+these are free public programmes and among the most useful listings in the catalogue.
+
+**Rising NYRR Wheelchair Training Program was explicitly protected.** Its data is genuinely weak and the
+temptation is to tidy it away, but it is a free adaptive running programme for young people with physical
+disabilities, there are very few such listings, and thin data still serves that family better than no
+listing. The no-fixed-venue prohibition is about businesses with no location at all, not about a free
+programme whose sites rotate seasonally.
+
+Compound boroughs remaining in the live pool: **zero**.
+
+### Also in these batches
+
+- **CompleteBody Kids / Kids Sports NYC** was still live. Its own scraped description is the real business:
+  *"Premium gym in NYC with 5 Manhattan locations… saltwater pool, rock climbing wall & Himalayan salt
+  lounge."* A Himalayan salt lounge is not a children's activity. Sibling copies were quarantined in an
+  earlier pass and this one was missed — the signal queue found it.
+- **Peter Stuyvesant Little League**'s descriptions were an encyclopaedia passage about the *housing
+  complex* ("built during the 1940s for returning World War II veterans"), from the catalogued
+  `/wiki/Saint_Peter` token match. Its `website` field was empty; set to psll.org.
+- **Evolutionary Martial Arts** said Upper West Side while its own address said 64 E 4th Street — four
+  miles apart, resolvable with no research — and was sourced to findglocal.com, a directory. Its
+  description was a social-media post: *"Saw 'Star Wars?' Well, we fixed that and had a big fun class
+  beforehand."*
+- **Lula Washington Dance Theatre** is `needs_human` on a genuine LA-VOCABULARY GAP, not a defect: 3773
+  Crenshaw Blvd is in South LA, and this platform's LA taxonomy has no South LA area — its ten areas run
+  from Central LA to Antelope Valley with nothing covering Crenshaw. Recorded alongside the standing NYC
+  Borough-taxonomy gap.
+- **Premier Martial Arts Brooklyn Heights** got its real address (75 Smith St) but its neighbourhood was
+  deliberately NOT changed: 75 Smith Street is arguably Boerum Hill while the studio's own name and every
+  directory say Brooklyn Heights. That is precisely the address-versus-brand tie `judgeLocation` refuses to
+  break automatically.
