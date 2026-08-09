@@ -196,7 +196,12 @@ export function validateWriteRequest(body: unknown): WriteValidationResult {
   // "Manhattan or Brooklyn", the write path accepted it, and a doc claiming it was "rejected on write"
   // had to be corrected. A guard is only as good as the separators it lists — when a new compound
   // shape turns up in the data, add it here rather than only cleaning the rows.
-  const COMPOUND = /\s*(?:\/|\band\b|\bor\b|&|\+|;|\|)\s*/i;
+  // Separators found in live data, each added after it turned up: `/`, `and`, `&`, `+`; then `or`, `;`,
+  // `|` (2026-08-09, after "Manhattan or Brooklyn" sat on 13 providers while a doc claimed it was
+  // blocked); then `,` the same day, when the owner's restatement of the rule prompted a full sweep of
+  // separator shapes and "Manhattan, Brooklyn" was still getting through. No canonical place name in
+  // either the NYC or LA vocabulary contains any of them, which is asserted by a test over all 341.
+  const COMPOUND = /\s*(?:\/|\band\b|\bor\b|&|\+|;|\||,)\s*/i;
   const NOT_A_PLACE = /^(?:multiple\b|various\b|citywide$|nyc-?wide$|city-?wide$|mobile$|virtual$|online$|tbd$|n\/?a$)/i;
   const DELIVERY_TOKEN = /\b(?:mobile|virtual|online|citywide|nyc-?wide|multiple locations?)\b/i;
   for (const field of placeFields) {

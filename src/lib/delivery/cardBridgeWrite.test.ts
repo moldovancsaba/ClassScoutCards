@@ -522,8 +522,15 @@ describe('compound place values: the separators the guard actually lists (2026-0
     expect(tryBorough('Manhattan or Brooklyn').ok).toBe(false);
   });
 
-  it('rejects the other separators that turn up in this data', () => {
-    for (const v of ['Manhattan/Brooklyn', 'Manhattan and Brooklyn', 'Manhattan; Brooklyn', 'Manhattan|Brooklyn', 'Queens / Long Island']) {
+  it('rejects EVERY separator shape found in this data — the list grew three times', () => {
+    // Owner's restatement of the rule, 2026-08-09: "Single Manhattan ok. Single Brooklyn ok. Single any
+    // borough is ok. The fuzzy is not ok, there is no physical location such as 'Manhattan and Brooklyn'."
+    for (const v of [
+      'Manhattan/Brooklyn', 'Manhattan and Brooklyn', 'Manhattan or Brooklyn', 'Manhattan, Brooklyn',
+      'Manhattan & Brooklyn', 'Manhattan + Brooklyn', 'Manhattan; Brooklyn', 'Manhattan|Brooklyn',
+      'Brooklyn / Manhattan / Queens', 'Queens / Long Island', 'NYC / Manhattan',
+      'Brooklyn Heights, Carroll Gardens', 'Carroll Gardens, Park Slope, Windsor Terrace',
+    ]) {
       expect(tryBorough(v).ok).toBe(false);
     }
   });

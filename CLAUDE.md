@@ -1269,6 +1269,36 @@ resolve, and **an `image` shared byte-for-byte with an unrelated provider** (63 
 touched most of the pool, so "oldest updated" now surfaces records written minutes ago. Order by defect
 signal; keep a `batch_done` set so worked records do not reappear.
 
+## A place field names ONE place, and two places means TWO LISTINGS (owner directive, 2026-08-09)
+
+**"Single Manhattan ok. Single Brooklyn ok. Single any borough is ok. The fuzzy is not ok, there is no
+physical location such as 'Manhattan and Brooklyn'. So that is not ok. If an organization has physical
+location both in Manhattan and Brooklyn those are different listings."**
+
+Two halves, and the second is the one that is easy to under-apply:
+
+1. **A single borough or area is always fine; any compound is not.** There is no such place. Enforced in
+   `validateWriteRequest` on `borough`/`boroughGuess`/`neighborhood`/`neighborhoodGuess`. The separator
+   list grew three times in one day as each new shape turned up in real data — `/`, `and`, `&`, `+`, then
+   `or`, `;`, `|`, then `,`. A test asserts all **341** canonical NYC and LA place names pass the guard and
+   that an empty value still passes, because clearing is how an honest absence is recorded.
+2. **A compound is a SPLIT SIGNAL, not a value to tidy.** An organisation with premises in two boroughs is
+   two listings, not one listing with a fuzzy field. So "clear the compound" is a stopgap that stops the
+   bleeding; it is not the fix. The fix is one listing per physical location.
+
+**Where the stopgap is currently all that is possible, and why.** `POST /api/card-bridge/split` requires
+each child to carry a **genuinely distinct source** (`website` for providers, `sourceUrl` for cards) — that
+requirement is what makes a split real rather than a way of manufacturing duplicates. Several compound
+records cannot meet it yet: Creative Kitchen's two studios share one domain with no per-location pages, and
+the citywide programmes (PAL, Cornerstone at 94 NYCHA centres, Beacon at 80 school centres) have no
+per-site URLs at all. Those carry a cleared field plus a recorded split candidate until per-location
+sources exist. **Record which locations are confirmed** so the split pass does not re-research them.
+
+**The corollary already proven repeatedly:** when a cluster has surplus cards and a real location with
+none, RETITLE the surplus onto the missing location rather than splitting — that is how Tim Morehouse's
+210 West 91st Street studio and MatchPoint's two Coney Island clubs got their own listings without a single
+split call.
+
 ## Store the REAL neighbourhood; the page's grouping rule handles display (owner directive, 2026-08-08)
 
 **"I want the real neighbourhoods and boroughs for every single listing, there is a grouping rule how the
