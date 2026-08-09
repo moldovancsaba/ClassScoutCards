@@ -168,17 +168,18 @@
       "notes": "Street-grade only (place_rank >= 26); borough bounding-box guard mandatory \u2014 it resolved three numbered-avenue Manhattan addresses to Westchester."
     },
     {
-      "id": "nys-doh-camps",
-      "name": "NYS DOH children's camp permits",
-      "access": "no downloadable dataset found (2026-08-09); health.ny.gov pages describe the permit regime only",
+      "id": "dohmh-permitted-camps",
+      "name": "DOHMH permitted children's camps (inside the Childcare Center Inspections dataset)",
+      "access": "curl, no key: data.cityofnewyork.us/resource/dsg6-ifza.json?childcaretype=Camp \u2014 grouped extract in src/scripts/dohmhPermittedCamps.json",
       "roles": [
         "discover",
-        "verify"
+        "verify",
+        "maintain"
       ],
-      "status": "NOT-YET-USABLE",
+      "status": "WORKING",
       "lastVerified": "2026-08-09",
-      "cadence": "re-check quarterly for a published dataset",
-      "notes": "Every legal NYC day camp holds a DOHMH permit \u2014 the permit roll would be a camp CENSUS. Worth an owner-side ask (311/FOIL or DOHMH ABCEats-style portal) \u2014 highest-value single acquisition on this list."
+      "cadence": "re-pull on the dataset's update cycle (dataUpdatedAt; last 2026-02-11); re-extract each spring before camp season",
+      "notes": "OWNER ASK #1 CLOSED WITHOUT A FOIL. The camp permit roll was hiding inside a dataset named 'Childcare Center Inspections': childcaretype=Camp yields 1,431 inspection records collapsing to 341 distinct permitted camp sites (105 Brooklyn, 99 Manhattan, 95 Queens, 22 SI, 20 Bronx) with name, building+street, borough, ZIP and phone. This is CENSUS-grade for legally-operating day camps. Lesson recorded: the dataset was missed twice by catalog searches for 'camp' \u2014 search the COLUMN VALUES of adjacent datasets, not just dataset titles. Sport-filtering still needed (a daycare camp is not a sport camp), and the entity check stays mandatory."
     },
     {
       "id": "commercial-apis",

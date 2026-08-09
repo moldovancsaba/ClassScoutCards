@@ -1,0 +1,92 @@
+[
+ {
+  "borough": "Brooklyn",
+  "neighborhood": "Brooklyn Heights",
+  "name": "Premier Martial Arts Brooklyn Heights",
+  "address": "75 Smith St, Brooklyn, NY 11201",
+  "sport": "Kids martial arts; karate camps ages 5\u201312",
+  "website": "https://premiermartialarts.com/new-york-brooklyn-heights/",
+  "status": "NEW"
+ },
+ {
+  "borough": "Brooklyn",
+  "neighborhood": "Downtown Brooklyn / Boerum Hill",
+  "name": "Brooklyn Martial Arts",
+  "address": "293 Livingston St, Brooklyn, NY 11217",
+  "sport": "Kids martial arts; karate, BJJ, kickboxing",
+  "website": "https://brooklynmartialarts.com/kids-martial-arts/",
+  "status": "IN-POOL"
+ },
+ {
+  "borough": "Brooklyn",
+  "neighborhood": "Crown Heights",
+  "name": "Elite Martial Arts of Brooklyn",
+  "address": "1690 Atlantic Ave, Brooklyn, NY 11213",
+  "sport": "Martial arts ages 3\u201319",
+  "website": "https://elitemartialartsbk.com/",
+  "status": "IN-POOL"
+ },
+ {
+  "borough": "Brooklyn",
+  "neighborhood": "Crown Heights",
+  "name": "Daruma Martial Arts",
+  "address": "777 Franklin Ave, Brooklyn, NY 11238",
+  "sport": "Children's martial arts ages 3\u201312; teen martial arts",
+  "website": "https://www.darumamartialarts.com/",
+  "status": "IN-POOL"
+ },
+ {
+  "borough": "Manhattan",
+  "neighborhood": "East Harlem / Spanish Harlem",
+  "name": "Next Evolution Martial Arts & Kioto BJJ",
+  "address": "1786 3rd Ave, New York, NY 10029",
+  "sport": "Kids karate & BJJ ages 3\u201313; after-school; summer camp",
+  "website": "https://nextevolutionmartialarts.com/",
+  "status": "IN-POOL"
+ },
+ {
+  "borough": "Brooklyn",
+  "neighborhood": "Brooklyn Heights",
+  "name": "The Little Gym of Brooklyn Heights",
+  "address": "221 Atlantic Ave, Brooklyn, NY 11201",
+  "sport": "Children's gymnastics ages 4 months\u201312; camps",
+  "website": "https://www.thelittlegym.com/new-york-brooklyn-heights/",
+  "status": "IN-POOL"
+ },
+ {
+  "borough": "Brooklyn",
+  "neighborhood": "Prospect Lefferts Gardens",
+  "name": "World Martial Arts Center / Happy Kicks",
+  "address": "1120 Washington Ave, 3rd Floor, Brooklyn, NY 11225",
+  "sport": "Children's martial arts ages 3\u201312; camps",
+  "website": "https://www.happykicks.com/",
+  "status": "IN-POOL"
+ },
+ {
+  "borough": "Brooklyn",
+  "neighborhood": "Downtown Brooklyn",
+  "name": "My Gym City Point",
+  "address": "445 Albee Square West, Floor 1A, Brooklyn, NY 11201",
+  "sport": "Children's fitness and gymnastics classes",
+  "website": "https://www.mygym.com/citypoint/",
+  "status": "NEW"
+ },
+ {
+  "borough": "Brooklyn",
+  "neighborhood": "Cobble Hill",
+  "name": "My Gym Cobble Hill",
+  "address": "209 Smith St, Brooklyn, NY 11201",
+  "sport": "Children's fitness and gymnastics classes",
+  "website": "https://www.mygym.com/cobblehill/",
+  "status": "NEW"
+ },
+ {
+  "borough": "Brooklyn",
+  "neighborhood": "Midwood",
+  "name": "Elite Swimming NYC",
+  "address": "2216 Avenue L, Brooklyn, NY 11210",
+  "sport": "Swimming school / youth swim instruction",
+  "website": "https://eliteswimmingnyc.com/",
+  "status": "NEW"
+ }
+]

@@ -145,3 +145,19 @@ and cross-checked against the pool on receipt — **9 of the 20 are not yet in t
 at the top of the create queue (`src/scripts/ownerVerifiedQueue.json`). Highest-trust discovery tier,
 and still verified per candidate before create: the first such spreadsheet contained 7 venues that
 already had live records, and acting on it unchecked would have created 7 duplicates.
+
+## The DOHMH camp census — owner ask #1 CLOSED, no FOIL needed (2026-08-09)
+
+The permit roll was on NYC Open Data all along, hiding inside a dataset whose TITLE says nothing about
+camps: **DOHMH Childcare Center Inspections** (`dsg6-ifza`) carries `childcaretype = "Camp"` — 1,431
+inspection records collapsing to **341 distinct permitted camp sites** (Brooklyn 105, Manhattan 99,
+Queens 95, Staten Island 22, Bronx 20), each with name, building + street, borough, ZIP and phone.
+Extract saved to `src/scripts/dohmhPermittedCamps.json`.
+
+- Dataset: https://data.cityofnewyork.us/Health/DOHMH-Childcare-Center-Inspections-Historical-/dsg6-ifza
+- API: `https://data.cityofnewyork.us/resource/dsg6-ifza.json?childcaretype=Camp`
+
+**Lesson recorded**: two catalog searches for "camp" missed this because they searched dataset TITLES.
+Search the column values of adjacent datasets before concluding a public record does not exist. And the
+census is of *legally permitted day camps*, not sport camps — the sport filter and the entity check
+still run per candidate.
