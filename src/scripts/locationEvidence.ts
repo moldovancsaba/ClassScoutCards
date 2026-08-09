@@ -85,6 +85,47 @@ export function sharedDefaults<T>(
   return new Map([...counts].filter(([, n]) => n > threshold));
 }
 
+/**
+ * Strip the ", New York, NY 10128" tail from an address before matching anything against its body.
+ *
+ * This exists because of a bug that fired on EVERY Manhattan address at once. A hand-written avenue
+ * regex listed `york` as an alternative (for York Avenue), and `\byork\b` matches the "York" in
+ * "New York" — so every address in the city looked like it named York Avenue, and a sweep meant to
+ * separate Carnegie Hill from Yorkville put all of Carnegie Hill in Yorkville.
+ *
+ * That is the same substring false positive `scanGuards.matchesWholeWord` was written to prevent, two
+ * commits earlier, by the same author. **A guard only helps where it is actually called** — writing a
+ * fresh regex by hand reintroduced the exact class it exists to stop. Worth knowing that the bug was
+ * also producing a RIGHT answer for one record by accident, which is why the output looked plausible.
+ */
+export function stripCityStateTail(address: string): string {
+  const TAIL = /,?\s*(?:new\s+york|ny|n\.y\.)\s*,?\s*(?:ny)?\s*\d{0,5}\s*$/i;
+  let a = String(address ?? "").trim();
+  for (let prev = ""; prev !== a; ) {
+    prev = a;
+    a = a.replace(TAIL, "").trim().replace(/,$/, "").trim();
+  }
+  return a;
+}
+
+/**
+ * Manhattan's numbered cross-streets number outward from Fifth Avenue, which makes the house number a
+ * usable cross-street proxy: on the East Side 200+ is east of Lexington and 300+ is east of Third; on
+ * the West Side 300+ is west of Eighth and 400+ west of Ninth.
+ *
+ * Returns the house number and the street ordinal only when BOTH are present — a bare avenue address
+ * ("334 Amsterdam Ave") carries no cross-street evidence and must resolve to null rather than to a
+ * guess. That distinction is the whole point: 13 records in the live sweep hit it and were left alone.
+ */
+export function manhattanCrossStreet(address: string): { house: number; street: number } | null {
+  const body = stripCityStateTail(address);
+  const house = body.match(/^(\d+)\s/);
+  // "E." with a period is common and was initially unparsed: "431 E. 91st Street".
+  const street = body.match(/\b(?:e|w|east|west)\.?\s+(\d{1,3})(?:st|nd|rd|th)\b/i);
+  if (!house || !street) return null;
+  return { house: Number(house[1]), street: Number(street[1]) };
+}
+
 export interface LocationClaim {
   /** What the field currently says. */
   stored: string | null | undefined;

@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   extractZip,
+  manhattanCrossStreet,
+  stripCityStateTail,
   isPlaceholderAddress,
   judgeLocation,
   sharedDefaults,
@@ -101,5 +103,40 @@ describe("judgeLocation — address beats name beats field, and the exception th
 
   it("escalates a record that carries nothing to reason from", () => {
     expect(judgeLocation({ stored: "" }).action).toBe("needs_human");
+  });
+});
+
+describe("stripCityStateTail — the bug that fired on every Manhattan address at once", () => {
+  it("removes the city/state/ZIP tail so `york` cannot match the York in New York", () => {
+    expect(stripCityStateTail("17 East 89th Street, New York, NY 10128")).toBe("17 East 89th Street");
+    expect(stripCityStateTail("1725 York Avenue, New York, NY 10128")).toBe("1725 York Avenue");
+    expect(stripCityStateTail("555 E 90th St, New York, NY 10128")).toBe("555 E 90th St");
+  });
+
+  it("is what separates a real York Avenue address from every other address in the city", () => {
+    const naive = (a: string) => /\byork\b/i.test(a);
+    expect(naive("17 East 89th Street, New York, NY 10128")).toBe(true); // the bug
+    expect(naive(stripCityStateTail("17 East 89th Street, New York, NY 10128"))).toBe(false);
+    expect(naive(stripCityStateTail("1725 York Avenue, New York, NY 10128"))).toBe(true);
+  });
+});
+
+describe("manhattanCrossStreet — house number as a cross-street proxy", () => {
+  it("parses the forms actually stored, including the abbreviated `E.`", () => {
+    expect(manhattanCrossStreet("17 East 89th Street, New York, NY 10128")).toEqual({ house: 17, street: 89 });
+    expect(manhattanCrossStreet("431 E. 91st Street, New York, NY 10128")).toEqual({ house: 431, street: 91 });
+    expect(manhattanCrossStreet("5 West 63rd Street, New York, NY 10023")).toEqual({ house: 5, street: 63 });
+  });
+
+  it("returns null for an avenue address, which carries NO cross-street evidence", () => {
+    // 13 live records hit exactly this and were deliberately left at their coarse value.
+    expect(manhattanCrossStreet("334 Amsterdam Ave, New York, NY 10023")).toBeNull();
+    expect(manhattanCrossStreet("2020 Broadway, New York, NY 10023")).toBeNull();
+  });
+
+  it("supports the boundary the live sweep turned on: 300 is east of Third Ave", () => {
+    // Carnegie Hill vs Yorkville within ZIP 10128.
+    expect(manhattanCrossStreet("24 East 95th Street")!.house).toBeLessThan(300);   // Carnegie Hill
+    expect(manhattanCrossStreet("421 East 91st Street")!.house).toBeGreaterThanOrEqual(300); // Yorkville
   });
 });

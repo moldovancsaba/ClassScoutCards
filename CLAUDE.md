@@ -1170,6 +1170,21 @@ in a comment when you add one, the way the existing ports do.
   extractor had nothing to read and reached for a default — check the no-fixed-venue prohibition before
   hunting for an address that may not exist.
 
+- **A guard only helps where it is actually called — I rebuilt the exact bug `scanGuards.ts` exists to
+  prevent, two commits after writing it.** Refining Carnegie Hill vs Yorkville inside ZIP 10128 needed an
+  avenue matcher, and the hand-written regex listed `york` as an alternative for York Avenue. `\byork\b`
+  matches the **"York" in "New York"**, so every address in the city looked like it named York Avenue and
+  all of Carnegie Hill was about to be filed as Yorkville. Two things make it worth recording rather than
+  just fixing. The bug produced a **right answer for one record by accident** (431 E. 91st really is
+  Yorkville), so the output read plausibly; and it was caught only by spot-reading two rows whose house
+  numbers were obviously west of Third. Now `stripCityStateTail` + `manhattanCrossStreet` in
+  `locationEvidence.ts`, with the naive regex asserted failing in a test. **When an address is the
+  haystack, strip the ", New York, NY 10128" tail before matching anything against its body.**
+- **An avenue address carries no cross-street evidence, and that is a result, not a gap.** "334 Amsterdam
+  Ave" cannot say which side of a neighbourhood boundary it is on; 13 live records hit this and kept their
+  coarse value. `manhattanCrossStreet` returns null rather than guessing, and a boundary street is left to
+  the coarser side (W 72nd stays Upper West Side rather than being claimed for Lincoln Square).
+
 ## Store the REAL neighbourhood; the page's grouping rule handles display (owner directive, 2026-08-08)
 
 **"I want the real neighbourhoods and boroughs for every single listing, there is a grouping rule how the
