@@ -18,6 +18,8 @@
 export interface ProviderLike {
   id?: string;
   name?: string | null;
+  category?: string | null;
+  programType?: string | null;
   shortDescription?: string | null;
   longDescription?: string | null;
   address?: string | null;
@@ -49,7 +51,8 @@ export type SignalName =
   | "activity_over_cap"
   | "nb_missing"
   | "image_missing"
-  | "image_shared";
+  | "image_shared"
+  | "format_self_contradiction";
 
 const blank = (v: unknown) => !String(v ?? "").trim();
 
@@ -112,6 +115,21 @@ export function providerSignals(p: ProviderLike): SignalName[] {
   if (blank(p.primaryActivityType)) s.push("activity_missing");
   if ((p.activityTypes ?? []).length > 3) s.push("activity_over_cap");
   if ((p.ageRanges ?? []).length === 0) s.push("ages_missing");
+
+  // Batch 31 (2026-08-09). `category` and `programType` both hold the FORMAT — the taxonomy's own first
+  // rule — so a record where they disagree is refuting itself with no research required, the same class as
+  // Ballet Tech's `address` saying Flatiron while its `neighborhood` said Midtown. Three records in two
+  // consecutive batches carried one (Asphalt Green: Drop-In Activities vs Camps; World Martial Arts:
+  // Birthday Parties vs Classes; KOKO Music: Camps vs Classes), which is what prompted measuring it: **57
+  // of 760 live providers**, dominated by `Camps`/`Classes` (14) and `Birthday Parties`/`Classes` (11).
+  //
+  // Deliberately NOT auto-resolved. The obvious rule — prefer the year-round format, because a school
+  // leading with "Camps" in October misleads — is right most of the time and wrong for a genuinely
+  // summer-only camp, and this repo has already recorded what a bulk fill keyed on a plausible rule costs.
+  // The signal puts the record in the queue; a human decides which of the two fields is the lie.
+  const cat = String(p.category ?? "").trim().toLowerCase();
+  const prog = String(p.programType ?? "").trim().toLowerCase();
+  if (cat && prog && cat !== prog) s.push("format_self_contradiction");
   return s;
 }
 

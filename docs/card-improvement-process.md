@@ -7268,3 +7268,76 @@ Three findings from it:
 `Bronx House — Summer Fun 2026`, `New York Botanical Garden Science Camp (2026)`, `Staten Island Children's
 Museum — Summer Camp 2026`. Each retired as a program card anyway, but a year in a title is its own defect:
 the card will still be live next summer.
+
+## v153 (2026-08-09): batches 31–32 — two records that describe nothing, and a self-refutation signal
+
+### Batch 31: the signal queue, 8 records
+
+Two of the eight were not businesses at all, and both were **live**:
+
+- **`prov-manhattan-wikitravel`** — a live Dance / Birthday Parties provider named "Manhattan -
+  Wikitravel", sourced to `wikitravel.org/en/Manhattan`. Its short description is a census statistic ("The
+  average household had 2.1 people"); its long one continues into a plot summary of a novel set in 1870s
+  New York; its `address` is a fragment of a travel-guide sentence, *"145 West 47th Street, you find the
+  hotel RIU Plaza Manhattan Times Square"*. It also carried a geo pin marked `precision: "exact"`, so a
+  family would have seen a confident Times Square marker for a provider that does not exist. This is the
+  reference-host token-match bug — documented on 25 content cards — **reaching `providers`, where the
+  record is live and carries copy.**
+- **`prov-how-to-improve-your-english-speaking`** — sourced to `learnenglish.britishcouncil.org`, claiming
+  an Upper West Side address, `primaryActivityType: "Art"`. Quarantined on two independent grounds: it is a
+  page of learning material rather than an organisation, and read generously as the British Council's
+  LearnEnglish service it is online-only with no New York premises.
+
+**A negative result, stated as a census.** Scanning ALL live providers for a reference/platform host in
+name, website or copy returned **six**, of which one was real. Four of the five false positives were an
+operator's own social links inside scraped chrome. The fifth is mine: the pattern `ebay\.` matched
+`healthebay.org` — Heal the Bay — with no word boundary. **Third time this session a hand-written regex has
+reproduced the exact substring class `scanGuards.matchesWholeWord` exists to prevent** (after `york` in
+"New York" and `Art` in "Martial Arts").
+
+Also in the batch: **CityPickle** corrected off a `Times Square, Manhattan, NYC` placeholder onto the real
+flagship at 1501 Broadway, with the other three NYC clubs (Long Island City, Wollman Rink, Brooklyn Bridge)
+recorded as a split candidate that already meets the distinct-source requirement; **Heal the Bay Aquarium**
+moved off Heal the Bay's own office at 1444 9th St onto 1600 Ocean Front Walk under the Santa Monica Pier —
+the **sixth** instance of the parent-HQ-address defect and the first on the LA tenant; and **Launch Math**
+corrected from a fabricated Upper EAST Side to its one real centre at 173 W 81st, the sibling check coming
+back clean, which is what makes it a correction rather than a retirement.
+
+### The new signal: `format_self_contradiction`
+
+`category` and `programType` BOTH hold the format — the taxonomy's own first rule — so a record where they
+disagree is refuting itself with no research required. Three records in two consecutive batches carried one
+(Asphalt Green: Drop-In Activities vs Camps; World Martial Arts: Birthday Parties vs Classes; KOKO Music:
+Camps vs Classes), which prompted measuring it: **57 of 760 live providers**, dominated by `Camps`/`Classes`
+(14), `Birthday Parties`/`Classes` (11) and `Camps`/`Birthday Parties` (11). A further 317 have a category
+and an empty programType — a gap, not a contradiction, and deliberately a different signal, because
+conflating them would bury 57 real self-refutations in 374 rows.
+
+**Deliberately not auto-resolved.** The obvious rule — prefer the year-round format, since a school leading
+with "Camps" in October misleads — is right most of the time and wrong for a genuinely summer-only camp.
+The signal orders the queue; a human decides which field is the lie.
+
+### Batch 32: the first nine of that cohort, and what the flag was pointing at
+
+Every one carried other defects the contradiction had merely pointed at, which is the argument for the
+queue-not-sweep treatment:
+
+- **Writopia Lab Brooklyn contradicted itself on three axes at once** — named Brooklyn, filed under
+  Manhattan / Upper West Side, and its own copy said the workshops are in "Brooklyn's northern suburbs",
+  which is not a place. Writopia has two real NYC labs, but for a card that *names* Brooklyn there is
+  exactly one real answer (391 5th Avenue, Park Slope). The Manhattan lab at 155 W 81st is recorded as an
+  uncarded coverage gap.
+- **A preschool whose record was named "… Camps"** — Pusteblume, where `category: Camps` disagreed with
+  both its own name and its own copy simultaneously.
+- **"Central LA" looks like a default on the LA tenant.** Brentwood Art Center at 1625 Olympic Blvd is in
+  Santa Monica, a *Westside* neighbourhood in this platform's own vocabulary — the second LA record in two
+  batches with exactly that pair of errors, after Heal the Bay. Worth a cohort query.
+- **A second `182 Henry St` duplicate**, already sitting in the address-cluster output, resolved here.
+
+### Malformed phone STRINGS: a census, and a real negative result
+
+NYC Elite Gymnastics stored `'(212-334-3628'` — an opening bracket with no closing one. Scanning all 760
+live providers for unbalanced brackets, stray characters or too-few digits found **exactly two**, both the
+same unbalanced-paren truncation (the other being Planet Han Mandarin's `'646) 928-0086'`, the mirror
+image). Both repaired as punctuation, digits kept. This is distinct from the earlier undialable-number
+sweep, which found 42 records whose digits were wrong; here the digits are right and the string is broken.

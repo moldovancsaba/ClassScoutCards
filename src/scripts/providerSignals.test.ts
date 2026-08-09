@@ -89,6 +89,25 @@ describe("signals learned in batch 2 (2026-08-09)", () => {
   });
 });
 
+describe("signals learned in batch 31 (2026-08-09)", () => {
+  it("catches a record refuting itself: category and programType both hold the FORMAT", () => {
+    // KOKO Music DUMBO read Camps / Classes; World Martial Arts read Birthday Parties / Classes.
+    expect(providerSignals({ category: "Camps", programType: "Classes" })).toContain("format_self_contradiction");
+    expect(providerSignals({ category: "Drop-In Activities", programType: "Birthday Parties" })).toContain(
+      "format_self_contradiction",
+    );
+  });
+
+  it("does not fire when they agree, or when one is absent", () => {
+    // 317 of 760 live providers have a category and no programType. That is a gap, not a contradiction,
+    // and conflating the two would bury 57 real self-refutations in 374 rows.
+    expect(providerSignals({ category: "Classes", programType: "Classes" })).not.toContain("format_self_contradiction");
+    expect(providerSignals({ category: "classes", programType: " Classes " })).not.toContain("format_self_contradiction");
+    expect(providerSignals({ category: "Classes" })).not.toContain("format_self_contradiction");
+    expect(providerSignals({ programType: "Classes" })).not.toContain("format_self_contradiction");
+  });
+});
+
 describe("sharedImages — a signal no single record can reveal about itself", () => {
   it("flags a stock banner used by unrelated providers, not a genuinely unique photo", () => {
     const rows = [
