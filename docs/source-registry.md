@@ -192,3 +192,28 @@ alone produced a false positive in every one of the first five hits before the f
 
 **A negative result is worth stating loudly precisely because it is a census, not a sample** — the
 distinction this repo has recorded twice before as a mistake to avoid repeating.
+
+## Owner-contributed source hierarchy and the spreadsheet methodology (2026-08-09)
+
+The owner's own neighborhood-by-neighborhood spreadsheets (Tribeca, SoHo, Greenwich/West Village,
+Chinatown/Two Bridges, Lower East Side, Chelsea/Hudson Yards, East Village, Hell's Kitchen, Midtown South,
+Midtown-Times Square, Stuyvesant Town/PCV, Gramercy, Murray Hill-Kips Bay, and more) are themselves a
+DISCOVERY SOURCE this bridge's own loop consumes, not just an input to be processed once and forgotten.
+The owner described the methodology behind them directly, worth recording verbatim as the source
+hierarchy this whole registry should aspire to:
+
+> Source hierarchy: **provider official site → official host/venue → NYC/municipal/institutional source →
+> structured local-business discovery → third-party directory only as a discovery lead, not final proof.**
+
+This matches, almost exactly, the discipline this bridge's own review loop arrived at independently
+through hard-won mistakes (entity-before-domain, operator's-own-site-over-search-summary, directory pages
+as leads not proof) — useful confirmation that two independent methodologies converged on the same
+ordering. The specific provider names the owner listed as sources for these spreadsheets (a mixture of
+primary provider sites, Tribeca/Downtown-specific sources, SoHo/Chinatown/LES/East Village sources,
+Midtown/Chelsea/Gramercy/StuyTown sources, Upper East Side/Sutton Place/Roosevelt Island sources, and
+government/institutional sources — NYC Parks, YMCA of Greater New York, the Roosevelt Island Operating
+Corporation, and StuyTown's own official site) are a useful map of WHICH neighborhoods still have
+spreadsheet coverage coming, and should be treated as a live, recurring feed alongside SerpAPI/Yelp/DOHMH,
+not a one-time batch. The owner's own framing for the eventual ClassScout ingestion pipeline — the same
+five-tier hierarchy above — is worth carrying into any future automation of this process, since it is the
+owner's own stated standard for what counts as proof versus a lead.

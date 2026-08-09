@@ -9245,3 +9245,52 @@ underlying shape (park-based programs, no owned venue) recognized on sight becau
 from the AYSO/Gjøa work — a concrete case of a documented pattern paying for itself immediately on reuse,
 not just as a reference. Net: 6 corrected, 2 quarantined, 0 left unresolved. `batch_done.json` (now 636
 IDs) updated so the next pass doesn't re-serve any of these.
+
+### Gramercy (boundary-audit sheet) + Murray Hill–Kips Bay — 1 create, 4 real defects fixed via a chain-wide sibling check (2026-08-09)
+
+The Gramercy sheet's own filename ("HARVEST_with_boundary_audit") signaled its purpose, and it bore out:
+most of its 12 rows describe real businesses that are NOT actually in Gramercy. Cross-checking each
+against the pool surfaced more value than the sheet's own target neighborhood did.
+
+**Tiger Strong NYC's sheet-given address (22 E 14th St, Union Square) is stale/wrong.** The operator's own
+current site says "Karate Near Me on the **Upper East Side**" at 1521 York Ave — exactly matching the
+address already on the existing live record. Not a Gramercy business at all; confirms the existing record
+was already correct and the sheet's claim should not be trusted here.
+
+**NY Kids Club — a chain-wide Art/Music defect found by checking ONE branch against its siblings.**
+The sheet's "NY Kids Club – Gramercy" (38 E 22nd St) matched an existing live record exactly, which turned
+up two defects: `neighborhood: "Midtown"` (38 E 22nd St is nowhere near Midtown; Nominatim resolves it to
+Flatiron) and `activityTypes: ["Art","Music"]`. Checking this against the OTHER 6 NY Kids Club branches
+already in the catalogue found 4 correctly carry `["Gymnastics","Sports"]` (matching the chain's real core
+programming) and **2 more — 68th Street and Cobble Hill — carry the identical wrong `["Art","Music"]`**.
+All 3 corrected to match the chain's own consistently-populated branches, without needing to fetch any of
+their pages directly — the pool itself, once one branch's defect was known, was the source of the fix for
+the other two. **Kids at Work Incorporated** had a bare Chelsea-borough placeholder address, filled in from
+this sheet's specific street address (123 W 20th St, Suite 2E), consistent with the sheet's own
+verification note calling it "Chelsea/Gramercy-adjacent."
+
+**One new create: British Swim School – The Continental (885 6th Ave, Chelsea).** The operator's own
+location page 403s to every user-agent tried (bot-walled) — rather than skip it, the address was
+independently confirmed via Nominatim, which resolves a real building ("Tower 111"/The Continental) at
+that exact address in the Chelsea District. A case where the entity-confirmation discipline doesn't
+require the operator's OWN page specifically — an independent, authoritative geocode of a national
+franchise's stated address is enough when the page itself is unreachable.
+
+Excluded (dance/theatre, insufficient sport-specificity, or already live): Midtown Movement and Dance
+Company, Wee Ones Club (yoga/movement, not in the sport vocabulary), NYC School of Highland Dance, the
+duplicate "Wee Ones/Midtown Movement hosted programme" row. **St. Vartan Park youth sports** was excluded
+on a new, narrow ground: the sheet itself frames it as "a facility/programme-location record, not a
+private provider" — a bare NYC Parks facility with no specific identified program or operator is not
+itself a card-worthy provider in this schema (distinct from the SFX/Prospect Park and AYSO/Parade Ground
+precedents, where a SPECIFIC named program plays at a park; here no specific program was named).
+
+**Murray Hill–Kips Bay (8 rows) needed zero creates and zero fixes** — every real, in-scope candidate
+(Professional Martial Arts Taekwondo Center, matching the already-live NYC Martial Arts Center Murray Hill
+at the identical 553 2nd Ave address; Asser Levy Recreation Center; Yang Taekwondo, created in the earlier
+Hell's Kitchen/Midtown South batch) was already correctly represented in the pool, and both already-live
+records checked out clean on a full field read (name, address, activityTypes, neighborhood, description).
+A real negative result — worth recording precisely because most batches this session have found something.
+
+Coverage: **466 sport listings served in Brooklyn+Manhattan** (465 → 466). `batch_done.json` grows with
+each pass; autonomous discovery (SerpAPI/Yelp/DOHMH) remains untouched this session — every fix and create
+in this stretch came from spreadsheet cross-checks and pool-internal sibling comparisons.
