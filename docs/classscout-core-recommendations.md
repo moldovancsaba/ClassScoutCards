@@ -617,3 +617,27 @@ NYC tenant, in the one field nobody had checked because the LA tenant is small. 
 against its own street address moved them to seven different areas. **If the discovery pipeline has an
 area-of-last-resort for the LA tenant, that is worth finding and removing**; a blank is honest and a
 confident wrong area is not.
+
+### (g) `contentCards` has no `city` field, so an expansion-market card cannot say which tenant it is in
+
+Found 2026-08-09 while implementing the owner's directive that out-of-city listings be built properly
+rather than deleted.
+
+`providers` has a `city` field — absent means the `nyc` default, `"la"` marks the LA tenant — and this
+bridge has now made it writable so a listing outside the five boroughs can declare its market
+(`long-island`, `hudson-valley`, `north-jersey`, `southwest-connecticut`, with districts = counties).
+**`contentCards` has no equivalent.** A content card for School of Rock Roslyn can now carry
+`boroughGuess: "Nassau County"` and `neighborhoodGuess: "Roslyn"`, both real and both correct, with
+nothing on the record saying which tenant that county belongs to.
+
+The practical consequence: a card is only unambiguous once it becomes a provider. Until then a consumer
+reading `boroughGuess: "Nassau County"` has to infer the market from the county name, which works for a
+human and not for a filter. **Please add `city` to `ContentCard`**, defaulting the same way `providers`
+does. It is a small field and it closes the loop between discovery and the live record.
+
+Related, and cheap to do at the same time: the same six cards had been QUARANTINED — the state that means
+*never revive* — purely because "Long Island" was not an expressible borough. That was this bridge's
+doing, not the pipeline's, and it is fixed. But it is worth knowing that **the discovery pipeline is
+producing cards for real out-of-area businesses** (School of Rock Roslyn on the operator's own
+per-location page; Goldfish's Centereach, Farmingdale and Garden City schools) and they have had nowhere
+to land. Those are, in the owner's words, *"precious listings when we expand our services there"*.
