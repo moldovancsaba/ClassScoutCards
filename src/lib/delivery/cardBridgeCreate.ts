@@ -236,6 +236,34 @@ export async function applyCardBridgeCreate(request: NormalizedCreateRequest): P
   const host = (value: string): string => {
     try { return new URL(value).hostname.toLowerCase().replace(/^www\./, ""); } catch { return ""; }
   };
+
+  // (2026-08-09) THE HOLE THE ADDRESS CHECK HAS BY CONSTRUCTION, found by walking into it twice.
+  //
+  // `normalizeStreetAddress` returns null for an address with no house number, so the duplicate check
+  // above SKIPS every record whose address is a placeholder — and 288 live providers store the
+  // neighbourhood name as their address ("Gowanus, Brooklyn, NYC"). Creating a listing with a real
+  // street address for a venue whose existing record has a placeholder therefore sails straight past
+  // the guard. That is exactly what happened to Movement Gowanus.
+  //
+  // The fallback: when the incoming website host matches a live record's, and neither address can be
+  // normalised into a comparable street, treat it as the same operator and refuse. Host identity is the
+  // right key — it is the same test the image guard uses, and two records on one domain at one
+  // unresolvable address are far more likely to be one venue than two.
+  const incomingHost = host(text("website"));
+  if (!normalized && incomingHost) {
+    const sameHost = await db.collection("providers").findOne(
+      { website: { $regex: `^https?://(www\\.)?${incomingHost.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(/|$)` },
+        visibility: { $ne: "hidden" }, qualityStatus: { $ne: "quarantined" } },
+      { projection: { id: 1, name: 1, address: 1 } },
+    );
+    if (sameHost && !normalizeStreetAddress(String(sameHost.address ?? ""))) {
+      return {
+        created: false,
+        dryRun: request.dryRun,
+        blockedReason: `A live listing on the same domain already exists — "${sameHost.name}" (${sameHost.id}), whose address is "${sameHost.address}". Neither address resolves to a comparable street, so this is very likely the same venue. Enrich that record with the real street address rather than creating a second one; if they genuinely are two different venues, give each a street address first so the address check can tell them apart.`,
+      };
+    }
+  }
   const imageClash = text("image") ? await db.collection("providers").findOne(
     { image: text("image"), visibility: { $ne: "hidden" } },
     { projection: { id: 1, name: 1, website: 1 } },
