@@ -7422,3 +7422,36 @@ address — with no invented schedule, price or age band. **The shared website i
 than cleared**: an empty `website` is this catalogue's strongest fabrication signal, and these are not
 fabrications. One neighbourhood (59 Malcolm X Boulevard, on the Bed-Stuy/Bushwick line) was deliberately
 left empty.
+
+## v155 (2026-08-09): batch 36 — six clusters only the shared-description scan could reach
+
+Eleven records, six clusters, and the point of the batch is what found them. Every pair here shares a
+description word for word, and **none is reachable by any other scan in this repo**:
+
+- **Three share a name too similar for a name scan to be safe.** "Brooklyn Rugby" against "Brooklyn Youth
+  Rugby"; "NYC Cops & Kids Boxing Club" against "NYPD Cops and Kids Boxing"; and "Bedstuy Youth Soccer
+  Club" **twice, byte-identical** — the third confirmed instance of that shape after Harlem Jets and
+  Brooklyn Lacrosse Club. A name sweep loose enough to catch the first two would be loose enough to merge
+  United Soccer Academy with Brooklyn United, which this catalogue has already recorded as dangerous.
+- **Two carry placeholder addresses**, so `addressClusters()` is blind to them by construction.
+
+### A new program-card sub-shape: split by AUDIENCE
+
+"JukeBox Kids Boxing" and "JukeBox Teen Boxing" — same phone, same site, same placeholder address, same
+description. The catalogued version of the program-card defect splits a venue by which SPORT it teaches
+(Textile Arts Center Kids, Brooklyn BJJ Kids, Asphalt Green Basketball Foundations); this splits it by
+which CHILDREN it teaches. One gym teaching two age bands is one gym.
+
+### The scan handed over a safety fix nobody had asked for
+
+An earlier batch cleared a phone with a KANSAS area code, (785) 375-3589, from East Harlem Youth Track
+because it matched nothing on the operator's site. The shared-description scan then paired that record with
+Manhattan Track Club Youth — same website, same word-for-word description — and **that record carries the
+identical Kansas number, which nobody checked at the time.** Cleared. This is the "check the whole pattern,
+not the instances you noticed" rule catching a miss of my own, and it is the second time in two batches
+that a shared-description pair has surfaced a defect that was only half-fixed.
+
+Shared descriptions after this batch: **17 texts / 69 records, down from 24 / 88.** What remains is
+dominated by three genuinely large clusters — 33 NYC Parks Summer Sports Experience and Kids in Motion
+records, 6 Brooklyn Bridge Park Conservancy records, 3 Steve & Kate's campuses — which are programme
+clusters needing the build-then-retire treatment rather than pairwise deduplication.
