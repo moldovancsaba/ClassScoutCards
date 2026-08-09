@@ -7553,3 +7553,59 @@ were deliberately left empty** — Ben Abrams Playground, whose location could n
 Scarangella Park, which sits between two adjacent vocabulary entries with nothing on the record to settle it.
 
 **Shared descriptions across the live pool: 9 texts / 18 records, from 24 / 88 when the scan was written.**
+
+## v158 (2026-08-09): batches 42–44 — the shared-description cohort closed, 88 records → 0
+
+`sharedDescriptions()` was written three batches ago and reported **24 texts shared by 88 of 756 live
+providers**. It is now **zero**, across 716 live providers. What it found on the way down is more
+interesting than the count.
+
+### A limit of the scan, worth stating alongside the others
+
+**A shared description groups the records that share ONE scrape, not all the records for one operator.**
+The scan reported Asphalt Green as a PAIR; the operator had four live records covering two real centres.
+It reported 78 Youth Sports as a pair; there were four. It never paired Church Street Boxing's two
+locations at all, because only one of them carried the text that formed the pair. Every cluster scan in
+this repo returns a slice — the slice is a lead, and the operator is the unit.
+
+### The operator's own PAGE TITLE gave an address two cards had wrong
+
+`nycsocceracademy.com`'s title tag reads *"NYC Soccer Academy | soccer camp | Columbia University Baker
+Athletics Complex, West 218th Street, New York, NY, USA"*. Both of its cards stored **145 East 14th
+Street**, five miles south. Corrected to the Baker Athletics Complex in Inwood. Note the symmetry: a title
+tag has produced garbage business names repeatedly this session — "Crossbar (new)", "Kids Multi" — and here
+the same field is the most reliable evidence on the page.
+
+Its twin was named **"Manhattan Soccer Academy"**, and that is the already-catalogued danger: Manhattan
+Soccer Club is a real, separate, long-established New York youth club, so leaving that card live would
+quietly hand families searching for one club a different one.
+
+### Two records at 220 East 11th Street, neither operator there
+
+Downtown United Soccer Club is carded correctly at Pier 40; this second card placed it at 220 East 11th
+Street with `nyc.gov/parks/programs/recreation/youth-sports` as its website. Its address-sharing twin,
+NYCFC Academy Youth, describes an academy that actually trains at the Etihad City Football Academy in
+**Rockland County** — the third out-of-taxonomy record found today, after 92NY's Camp Yomi and the YMCA of
+Metropolitan Los Angeles's Mammoth Lakes camp.
+
+### A needs_human from batch 26, settled — in the opposite direction
+
+Batch 26 found Sunset Park Youth Baseball sourced to `harlemlittleleague.org` and deliberately did **not**
+tidy it, on the ground that improving a field on a record whose reality is unestablished makes a doubtful
+record look more credible. The shared-description scan settled it the other way: the identical text sits on
+Harlem Little League's own correct card, and the two are five miles and two boroughs apart, so the source
+is **provably** not this entity's — a fact about the pipeline, not a doubt about the business. Sunset Park
+Youth Baseball is real at 420 45th Street; its website was **cleared** rather than kept, because pointing a
+family at another borough's league is worse than pointing them nowhere.
+
+### And several pairs that were not duplicates at all
+
+FDNY Bravest Boxing (9 Duane Street) and Church Street Boxing (52 Walker Street) shared only a *generated*
+sentence about USA Boxing Metro registration. Church Street's own two records — 52 Walker Street and 25
+Park Place, different phone lines — are two real gyms, correctly carded one each. **Finding two records for
+one brand is not by itself a duplicate finding**, which is the counterweight to everything else in these
+three batches.
+
+Also closed: The Painted Pot's two studios both given their real addresses (188 5th Avenue and 339 Smith
+Street) — the Carroll Gardens card had been storing *Park Slope* as its address, the other studio's
+neighbourhood, on the wrong card.
