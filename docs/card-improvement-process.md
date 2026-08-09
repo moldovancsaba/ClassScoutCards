@@ -8293,3 +8293,45 @@ So the residue is real and is 74 Manhattan/Brooklyn records (53 Classes, 21 Camp
 observable from outside this bridge. **Recorded as unexplained rather than assigned to the nearest
 plausible bucket** — an audit that always has an answer is an audit that is guessing, and each of these
 three hypotheses would have looked convincing if I had stopped at the first one.
+
+## v172 (2026-08-09): recategorising out of a browse-disabled category — and a test I ran badly
+
+142 live Manhattan/Brooklyn listings sat in `Drop-In Activities` or `Birthday Parties`, both switched off
+for browse and therefore invisible. The tempting move is to sweep the lot into Classes and watch coverage
+jump. **That would be lying in the field a family filters on** — a museum's open play session and a bounce
+park genuinely ARE drop-in.
+
+**The test is what the record asserts itself to be, read from its own NAME.** A keyword sweep over the
+COPY produced immediate errors: "Corlears School Birthday Party Rentals" reads as a class if you match
+"School" and ignore "Birthday Party". Name-driven, 142 → 19 candidates, of which three were still wrong
+and excluded by hand: Dance Theatre of Harlem's "Saturday Youth **DROP-IN**" (the name says it), the
+Guggenheim and Brooklyn Bridge Park programmes (drop-in by design), and Prep Academy Tutors ("Academy" is
+the brand; an earlier pass resolved its address to Toronto).
+
+**13 recategorised, 12 immediately reachable.** One test record first — Manhattan Volleyball Academy alone,
+416 → 417 — before the other twelve.
+
+### The outlier was worth more than the batch
+
+`prov-new-york-martial-arts-academy-brooklyn` stayed invisible, and carried three defects: a Jeet Kune Do
+academy tagged **`["Art", "Theater"]`**; a record named "…**Brooklyn**" filed under **Manhattan / Midtown**;
+and no street address. The operator's own locations page puts its Brooklyn academy at 188 Dupont Street,
+Greenpoint — so the NAME was right and the borough was wrong. Also a split candidate: nymaa.com lists five
+locations against this one record.
+
+### A methodological error, recorded because it nearly became a false conclusion
+
+I changed four fields on that record at once and it became served, and I began writing up "activity
+gating explains the residue". **It does not, and my test could not have shown that** — with four fields
+changed there is no attribution. Checking properly: of 78 unserved Manhattan/Brooklyn Classes and Camps,
+only **12** carry no activity that ever appears on a served listing. The other 66 carry Dance, Theater,
+Art, Music, Science — all of which appear on served records.
+
+Four hypotheses for the residue have now been tested and disproved by data: region, activity,
+`discoveryTier`, and category. **Change one field per test, or the result explains nothing.**
+
+### The target is moving while being measured
+
+Between two consecutive reads the served count went **429 → 507**, and `Drop-In Activities` went from
+0 served to 75. The core team is deploying as this loop runs. Any causal claim about the read path needs
+a timestamp attached, and an audit result is a photograph rather than a fact.
