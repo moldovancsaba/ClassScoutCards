@@ -37,6 +37,7 @@ export type SignalName =
   | "desc_missing"
   | "desc_not_english"
   | "desc_page_furniture"
+  | "desc_is_a_claim"
   | "addr_placeholder"
   | "addr_missing"
   | "phone_missing"
@@ -70,6 +71,12 @@ export function providerSignals(p: ProviderLike): SignalName[] {
   // stored website was youtubekids.com. Accented characters are the cheapest reliable tell.
   if (/[őűáéíóúöüÁÉÍÓÚÖÜŐŰ]|\b(?:kérd|használat|böngész|para|pour|und)\b/.test(both)) s.push("desc_not_english");
   if (/skip (?:to )?(?:main|navigation)|cookie|sign in|log in|Extract |Summari[sz]e /i.test(both)) s.push("desc_page_furniture");
+  // Batch 2, Chess at Three: BOTH descriptions were "A study by the University of Memphis found that
+  // chess-playing students improved their problem-solving abilities by 50%." A marketing statistic lifted
+  // off the page. It reads like real prose, passes every length and language check, and tells a parent
+  // nothing about what their child would actually do.
+  if (/\b(?:a study|research (?:shows|found)|studies (?:show|have shown)|scientists found|according to a study)\b/i.test(both)
+      || /\b\d{1,3}%\s+(?:of|more|improve|increase|better)/i.test(both)) s.push("desc_is_a_claim");
 
   // "Gowanus, Brooklyn, NYC" — a neighbourhood wearing an address's clothes. No digits means no street.
   if (address && !/\d/.test(address)) s.push("addr_placeholder");

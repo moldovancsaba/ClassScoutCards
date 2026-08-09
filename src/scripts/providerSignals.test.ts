@@ -42,6 +42,25 @@ describe("signals learned by hand-working batch 1 (2026-08-09), each now measura
   });
 });
 
+describe("signals learned in batch 2 (2026-08-09)", () => {
+  it("catches a description that is a research CLAIM rather than a description — Chess at Three", () => {
+    const s = providerSignals({
+      shortDescription:
+        "A study by the University of Memphis found that chess-playing students improved their problem-solving abilities by 50%.",
+    });
+    expect(s).toContain("desc_is_a_claim");
+  });
+
+  it("does not fire on ordinary prose that happens to contain a number", () => {
+    const s = providerSignals({
+      shortDescription:
+        "Story Time Chess teaches chess to children from age three by turning each piece into a character in a story, at its Madison Avenue studio.",
+      longDescription: "z".repeat(200),
+    });
+    expect(s).not.toContain("desc_is_a_claim");
+  });
+});
+
 describe("sharedImages — a signal no single record can reveal about itself", () => {
   it("flags a stock banner used by unrelated providers, not a genuinely unique photo", () => {
     const rows = [
