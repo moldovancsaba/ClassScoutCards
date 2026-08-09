@@ -1379,6 +1379,84 @@ things about it are worth carrying:
   tutuschooldumbo.com` off the Tutu School camp card, and Brooklyn Youth Sports Club's `information@bkysc.org`
   and ZIP off its volleyball programme card, each before the sibling was hidden.
 
+## Out-of-city, out-of-borough but REAL listings get built, not deleted (owner directive, 2026-08-09)
+
+**"You have the right to finetune borough (district) and neighbourhood for any city, never made up always
+confirm, the core system group them based on actual business requirements and logics."**
+
+**"Out of existing city, out of borough, out of neighbourhoods but real, legit listings should be built
+properly, create the missing city, borough (district), neighbourhoods for that. They will be precious
+listings when we expand our services there. The core system will filter out anyway."**
+
+This closes the longest-standing gap in this catalogue — the one flagged four separate times as "worth an
+actual product decision" (Fort Lee NJ, Huntington LI, Westchester/New Canaan, Rockland County). Before it,
+a real confirmed children's programme outside the five boroughs had two possible fates and both were
+wrong: **retired** (92NY's Camp Yomi, a 50-acre day camp in Rockland County with buses from Manhattan, was
+deleted for having an address; Camp Yomawha at the Henry Kaufmann Campgrounds, Pearl River, was
+quarantined for the same), or **left carrying a lie** — `boroughGuess: "Long Island"` on three cards and
+`"NYC / Long Island"` on a fourth, values that are not boroughs at all.
+
+### What now exists
+
+- **`src/lib/delivery/expansionMarkets.ts`** — four markets outside the served cities, districts = counties
+  because a county is the one administrative unit that is unambiguous, stable and universally agreed:
+  `long-island` (Nassau, Suffolk), `hudson-valley` (Westchester, Rockland, Putnam, Orange, Dutchess,
+  Ulster), `north-jersey` (Bergen, Hudson, Essex, Passaic, Union, Morris), `southwest-connecticut`
+  (Fairfield, New Haven).
+- **`LA_AREAS_EXTRA` / `LA_NEIGHBORHOODS_EXTRA` / `NYC_NEIGHBORHOODS_EXTRA`** in `locations.ts` — gaps
+  INSIDE the two served cities. **South LA did not exist as an area at all**, which is why Lula Washington
+  Dance Theatre sat under Central LA with an empty neighbourhood.
+- **`city` is writable**, validated against a closed list. A record in "Rockland County" whose tenant still
+  says `nyc` contradicts itself, and a mistyped tenant key does not error — it silently drops the record
+  out of every view.
+
+### Four rules this work established, in order of how easy each is to get wrong
+
+1. **Every market must carry EVIDENCE — a real listing already in the catalogue — and a test enforces it.**
+   A market cannot be added speculatively. The vocabulary grows because a real business needed it.
+2. **A vocabulary entry is geography; a listing's placement is a claim.** Adding "Huntington" to Suffolk
+   County asserts a fact about a map. "Never made up, always confirm" applies with full force to putting a
+   LISTING in a place, and the two must not be confused — the second is where families get hurt.
+3. **`locateTown()` REFUSES an ambiguous town rather than guessing.** *Fairfield* is a Connecticut town AND
+   an Essex County, New Jersey township; Chester, Monroe, Newtown, Orange, Milford and Greenwich all
+   collide across state lines in this region. A silent pick puts a New Jersey business in Connecticut.
+4. **There is exactly ONE way back from hidden through this bridge, and it is self-limiting.**
+   `visibility` and `qualityStatus` remain defensive-only — a write may hide or quarantine, never reveal,
+   because revealing is the main app's gate to open. The single exception: a record may be un-hidden or
+   un-quarantined **only in the same write that places it in an expansion-market district that actually
+   resolves.** A record quarantined for being off-topic, fabricated, adults-only, closed or without a fixed
+   venue has no out-of-borough district to supply, so it can never take this path.
+
+### The failure this exposed in my own work, three times
+
+Batch 47 corrected PLAYDAY's neighbourhood and address to the Upper West Side and left its BOROUGH saying
+Brooklyn. Batch 33 wrote a reason claiming a `programType` fix its payload never sent. Batch 48 wrote an
+activity value not in the vocabulary, and the derivation silently discarded it, leaving the record with no
+activity at all. **When correcting a place, write every level of it — city, borough, neighbourhood,
+address — even the ones that look untouched.** A partially-corrected location is internally contradictory
+in a way the batch driver's read-back cannot see, because read-back only checks the fields that were sent.
+
+## Per-field provenance: `fieldVerifications[]` (owner-approved, 2026-08-09)
+
+`src/lib/delivery/fieldVerifications.ts`. Every applied write still stamps record-level `lastReviewedAt` /
+`lastReviewedBy`, and that is right as far as it goes — but it is a RECORD-level claim built from a
+FIELD-level act. Correct one wrong phone number on a listing whose address is a placeholder, whose image is
+a stock banner shared with thirteen other businesses and whose ages were never checked, and the whole
+record reports as reviewed today. **This catalogue is full of records in exactly that state, because this
+loop put them there.**
+
+- One entry per field: `{field, verifiedAt, verifiedBy, verdict, source?}`, verdict from the four the core
+  spec defines. **`confirmed` is the one that could not be expressed before at all** — a reviewer who reads
+  a phone number, checks it against the operator's own site and finds it right has done real work, changed
+  no bytes, and until now left no trace for the next pass.
+- **Supplied explicitly by the caller, never derived from which fields a write happened to contain.** A
+  bulk sweep that sets a field mechanically has established nothing; stamping it verified would manufacture
+  exactly the false confidence this removes. A write that supplies none stamps none.
+- **Merges replace-by-field**, not append — a field checked five times carries one entry, so the array
+  answers the only question anyone asks: when was this field last stood behind, and by whom.
+- **Nothing back-fills.** The ~1,000 records written before this keep a `lastReviewedAt` that is an
+  over-broad claim. Per-field provenance starts now, and saying so is more useful than pretending otherwise.
+
 ## A place field names ONE place, and two places means TWO LISTINGS (owner directive, 2026-08-09)
 
 **"Single Manhattan ok. Single Brooklyn ok. Single any borough is ok. The fuzzy is not ok, there is no

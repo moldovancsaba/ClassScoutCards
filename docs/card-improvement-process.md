@@ -7745,3 +7745,56 @@ recorded "Lil' Kickers Manhattan on manhattankickers.org" as a cross-wiring risk
 seen from the other side — and it is the fourth confirmed instance of two real organisations with
 confusingly similar names, after United Soccer Academy / Brooklyn United, the two fencing clubs, and the
 two Williamsburg soccer clubs.
+
+## v162 (2026-08-09): the taxonomy gap closed, and the listings it had deleted brought back
+
+Three owner directives, all implemented. See CLAUDE.md's new "Out-of-city, out-of-borough but REAL
+listings get built, not deleted" and "Per-field provenance" sections for the binding rules; this records
+what changed in the data.
+
+### Batch 51 — 8 records, including two camps back from the dead
+
+| Record | Was | Now |
+| --- | --- | --- |
+| **92NY Camp Yomi** | HIDDEN — retired for having a Rockland County address | `hudson-valley` / Rockland County / **Orangeburg**, address moved off 92NY's Manhattan building |
+| **Camp Yomawha** | QUARANTINED — same reason | `hudson-valley` / Rockland County / **Pearl River**, read off the address the record already had |
+| TGA of Northern Nassau County | LIVE, filed under Queens / Bellerose | `long-island` / **Nassau County**, town cleared (a territory is not a place) |
+| Commonpoint "Long Island / Queens" | compound name, wrong neighbourhood | Sam Field Center, **Little Neck**, Queens — its own ZIP settled it |
+| Lula Washington Dance Theatre | Central LA, empty neighbourhood | **South LA / Crenshaw** |
+| Descanso Gardens | neighbourhood deliberately empty | **La Cañada Flintridge** |
+| Broadway Gymnastics School | neighbourhood deliberately empty | **Del Rey** |
+| PLAYDAY Upper West Side | borough still said Brooklyn | Manhattan |
+
+**Two of those were honest empties that became honest values.** Batch 33 left Descanso Gardens and
+Broadway Gymnastics with no neighbourhood, recording explicitly that the vocabulary lacked La Cañada
+Flintridge and Del Rey and that rounding to a neighbour would be a precise wrong answer. That is exactly
+the sequence the directive was meant to enable: refuse to guess, record why, and fill it when the gap
+closes.
+
+### The reinstatement path, and why it is safe
+
+`visibility` and `qualityStatus` remain defensive-only through this bridge. The single exception is that a
+record may be un-hidden **only in the same write that places it in an expansion-market district that
+resolves** — which means it can reverse the taxonomy defect and nothing else, because a record quarantined
+for being off-topic, fabricated, adults-only, closed or without a fixed venue has no out-of-borough
+district to offer. Tests assert both directions, including that a market KEY ("long-island") is not
+accepted where a county is required.
+
+### `fieldVerifications` used in anger for the first time
+
+Batch 51 is the first to carry it. Camp Yomi now records four entries — three `corrected`, and
+`phone: confirmed` against 92NY's own published number. **That last one is the case the field exists for:**
+the phone was already right, checking it changed no bytes, and before today that work left no trace at all.
+
+TGA carries `neighborhood: needs_human` with the reason recorded on the field itself rather than buried in
+an audit-log reason nobody reads — a franchise territory is not a place, and the next pass can now see that
+the question was asked and deliberately left open.
+
+### A failure of mine, three instances, now named
+
+PLAYDAY's borough was left saying Brooklyn while batch 47 corrected its neighbourhood and address to the
+Upper West Side. Batch 33 recorded a reason claiming a `programType` fix its payload never sent. Batch 48
+wrote an activity value not in the vocabulary and the derivation silently discarded it. All three share a
+shape: **the batch driver's read-back verifies only the fields that were SENT**, so it cannot see a field
+that was described and omitted, nor one whose absence is the defect. When correcting a place, write every
+level of it.
