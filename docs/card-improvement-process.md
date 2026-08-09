@@ -8431,3 +8431,64 @@ contact page settled it: two gyms, 1665 Richmond Rd (Staten Island) and 24 Cobek
 the stored `1601 Gravesend Neck Road` **belongs to neither**. Copy rewritten, address corrected, split
 candidate recorded, plus a note that `New York Fight Club Youth Boxing` is live at the same Cobek Court
 address sourced to a sanctioning-body registry.
+
+## v175 — Prospect Lefferts Gardens round: the scarcity ceiling is a fact about the neighbourhood
+
+Worked the scarcest sport neighbourhood in the catalogue (zero served sport listings). The round produced
+two corrections and three new listings, and — more usefully — an answer to a question the target of "10
+new per neighbourhood" assumes away.
+
+**PLG cannot support ten children's sport listings, and that is measurable rather than an opinion.** An
+Overpass sweep of the whole polygon (every named feature carrying a leisure/sport/amenity/shop/office tag)
+returned 31 candidates. The children's sport venues among them are three. The rest are three adult chain
+gyms, the parks, some childcare, and LeFrak Center at Lakeside — which is already carded six times over
+under Prospect Park. Delivering ten here would require inventing seven.
+
+### What was NOT created, and why each one looked creatable
+
+| Candidate | Looked like | Actually |
+| --- | --- | --- |
+| Prospect Gymnastics PLG, 535 Rogers Ave | A press article says it opened there; a search summary repeats it | The operator's own contact page lists exactly two gyms (Ditmas Park, Bed-Stuy), its nav offers programs and calendars for those two only, and `/plg/` 404s |
+| Elite Martial Arts, 1244 Nostrand Ave | A "Which Location?" page offers three addresses, one of them in PLG | Every current page's footer, the schedule and the contact page give 1690 Atlantic Avenue alone; the schedule is one undifferentiated timetable, not three; and the Nostrand site's own domain returns "Domain disconnected" |
+| 47 BJJ Coop, 396 Rogers Ave | Real, open, a mapped sports centre with a phone and an email, and its homepage says it serves the PLG/Crown Heights community | **Adults only.** Its own schedule page lists every class at 7am or 6–9pm, with no age band and no youth program anywhere on the site |
+
+The 47 BJJ case is the one worth remembering: it passes the entity check, the physical-location check, the
+in-market check and the source-quality check. Only reading the schedule for an age band catches it. That is
+the already-catalogued *unevidenced children's claim* defect (NYC Footy), reached from the opposite
+direction — there the card asserted a children's clinic, here nothing but the reviewer's assumption would
+have.
+
+### The round's actual find was a listing the catalogue already had
+
+`prov-skate-yogi-kids-brooklyn` stored `address: 140 Empire Blvd` — Prospect Lefferts Gardens — with
+`neighborhood: "Williamsburg"`, which is SKATEYOGI's OTHER site, 6.5 km away. So the neighbourhood with
+zero sport listings already had one, filed under its sibling's name. **No amount of sourcing new
+businesses finds that.** Corrected onto PLG, and the Williamsburg site — which had no listing at all —
+created. One listing per physical location, reached by correcting and creating rather than by a split,
+because the existing record was always about one of the two.
+
+Same shape one street over: World Martial Arts Center (Happy Kicks), 1120 Washington Ave, was filed under
+Crown Heights. **ZIP 11225 spans both neighbourhoods so it cannot settle the question**, and the real
+boundary is Empire Boulevard, which is invisible in a house number. The pin (40.66194) is south of where
+Empire crosses Washington (~40.6637). Corrected, and the listing filled out from the operator's own pages:
+it had no phone, no email, no photograph and no age bands despite running an afterschool program.
+
+### Turned into scans
+
+- **`src/scripts/pinDrift.py`** — flags any live listing whose map pin is ≥3 km from the centroid of the
+  neighbourhood it claims. Deliberately NOT a ZIP-to-neighbourhood table: this repo already records why a
+  hand-built map that is 80% right is worse than none. Nominatim is asked once per distinct neighbourhood
+  NAME for that neighbourhood's own centroid, and nothing is inferred about where a boundary runs. A hit
+  is a lead — a big distance can equally mean the ADDRESS is wrong (the parent-HQ defect, five confirmed
+  instances) — so the threshold is loose enough that a borderline record never appears.
+- **`src/scripts/neighborhoodSportSweep.py`** — per-neighbourhood Overpass sweep, the thing that actually
+  worked when web search did not. A search for a small residential neighbourhood returns borough-wide Yelp
+  and ClassPass pages because the ranking has nothing local to show; Overpass answers the real question and
+  returns names, house numbers, phones and websites together.
+
+**Two bugs in the sweep's own filter, both already in this catalogue under other names.** `sport` as a
+substring matched `public_tranSPORT` and returned three MTA bus depots, plus "Sports & Imports Auto" — the
+`Art`-inside-`mARTial` trap. Fixing it with `\b` word boundaries then silently dropped every
+`leisure=sports_centre`, because **`_` is a word character so `\b` never fires between `sports` and
+`_centre`** — a fix that broke more than the bug. Both are covered by the filter's own test cases now.
+Normalise `_ ; =` to spaces before matching anything against an OSM tag blob.
