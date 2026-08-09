@@ -8810,3 +8810,36 @@ The registry now has THREE structured place sources with distinct strengths: Ser
 250/month, hours + permanently-closed markers), Yelp Fusion (5,000/day, is_closed + category aliases),
 and NYC Open Data (public facilities, unmetered). Discovery rounds run all three against the same
 neighbourhood; disagreement between them is itself a signal worth reading.
+
+## v185 — owner-verified queue worked: 12 creates, and a live zoo/parkour-gym fusion corrected
+
+The reason the loop paused after the DOHMH answer was answering instead of continuing — the owner
+called it, correctly. Resumed with the owner-verified spreadsheet queue, worked as two batches.
+
+**Batch A (7):** Karate-Do Ken Wa Kan (Flatiron — first sport listing there), Hinds Combat Sports
+(Midtown West, kids 6-17), New York Ninja Academy Manhattan (Hell's Kitchen) AND Brooklyn (Gowanus —
+NOT on the spreadsheet; found on the operator's own site while verifying the Manhattan location, one
+listing per physical location), El Dojo NYC (Lenox Hill), Supreme Martial Arts UES (Yorkville) and UWS —
+per-location phones read from the operator's own footer (UWS 586 Columbus = 212-799-6722, UES 1690
+2nd Ave = 212-722-6722), the head-office-number defect avoided at source.
+
+**Batch B (5 + 1 correction + 1 skip):** Elliott's Classes (Morningside Heights, ages 6 weeks-14),
+Brooklyn Judo Academy (Bay Ridge), My Gym City Point and My Gym Cobble Hill (both Cloudflare-walled to
+this environment — verified through independent listings and the owner's sheet, provenance recorded in
+fieldVerifications rather than dressed up as an operator-site read; both publish ONE shared phone,
+recorded so the duplicate-phone scan doesn't merge two real gyms), and Elite Swimming NYC (Midwood) —
+**first enrichment use of the Yelp Fusion tier on a create**: the operator publishes no phone, Yelp's
+structured record for the same name+address carries (929) 548-0178 with is_closed=false, provenance
+recorded. Premier Martial Arts was refused by the address guard — it already exists as a live listing —
+and Premier's brand name says "Brooklyn Heights" while 75 Smith Street is Boerum Hill, noted for that
+record's next enrichment pass.
+
+**The fusion record.** The Brooklyn Zoo create minted a `-2` id, and the collision was investigated
+rather than accepted: `prov-brooklyn-zoo-ny` was LIVE with the parkour gym's NAME, the Bronx as its
+borough (the WCS-HQ contamination again), prospectparkzoo.com as its website, and zoo-page chrome
+("Get Tickets…") as its description — a token-match fusion of two entities that were never the same
+thing. Corrected in place from the gym's own site instead of duplicating. **A minted `-2` suffix is a
+collision report, not a name disambiguator — investigate before applying.**
+
+Coverage after: **428 sport listings, 420 served** (started the day at 391); Manhattan zeros 20 → 16,
+Brooklyn zeros 14 → 12.
