@@ -8789,3 +8789,24 @@ Budget is the design constraint: free plan, **250 searches/month**. `src/scripts
 sanctioned caller — ledger on every call, 25-call reserve for maintenance emergencies, and free tiers
 always queried first. ~2 calls per neighbourhood round covers all 92 with room to spare. Key in
 `.env.local` only, never committed.
+
+## v184 — Yelp Fusion key received: the closure sweep is now automatable (owner, 2026-08-09)
+
+Owner ask #2 closed within the hour. `src/scripts/yelp.py` wraps the two modes that matter: radius
+discovery (50 structured places per call) and — the bigger prize — **closure checking by phone-join**:
+the pool's normalised phone digits are Yelp's `/businesses/search/phone` key, and the response carries
+`is_closed`. At 5,000 free calls/day the whole live pool fits in a weekly sweep with one day's budget
+to spare. `is_closed=True` is a lead for the human closure check, never an automatic quarantine — Yelp
+mis-marks businesses — but the City Treehouse / apple seeds class of defect (a closed business live on
+the site) now gets found by a script instead of by luck. Verified live: Prospect Gymnastics and Oishi
+Judo both return open, correctly.
+
+Same hour, the owner supplied a second verified spreadsheet (NEXT 20). Cross-checked on receipt: **9 of
+20 not yet in the pool**, saved to `src/scripts/ownerVerifiedQueue.json` as the top of the create queue.
+The IN-POOL/NEW flags are hints, not verdicts — Jodi's Gym read as NEW against a differently-formatted
+stored address, and the create endpoint's street-address guard remains the dedupe of record.
+
+The registry now has THREE structured place sources with distinct strengths: SerpAPI (Google's index,
+250/month, hours + permanently-closed markers), Yelp Fusion (5,000/day, is_closed + category aliases),
+and NYC Open Data (public facilities, unmetered). Discovery rounds run all three against the same
+neighbourhood; disagreement between them is itself a signal worth reading.

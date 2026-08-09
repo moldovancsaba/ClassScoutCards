@@ -111,3 +111,37 @@ optional for this tier either.
 Its unique maintenance value: results carry **"Permanently closed"** markers, so a neighbourhood
 re-scan doubles as a closure sweep — pending the Yelp Fusion key (owner ask still open), which would
 take that load off the 250/month budget entirely at 5,000 free calls/day.
+
+## Yelp Fusion (added 2026-08-09, owner-provided key) — owner ask #2 CLOSED
+
+`src/scripts/yelp.py`. Free tier is 5,000 calls/day — for this catalogue, effectively unmetered. Two
+modes, and the second is the bigger prize:
+
+- **Discovery**: one radius call returns up to 50 structured places (name, address, phone, category
+  aliases, coordinates). Its first PLG call added Rebel Fitness Bar (1196 Nostrand Ave, 11225),
+  TNK-Jujitsu, All Sports For All People (883 Classon Ave, 11225) and a second Maple Street dojo — the
+  PLG count keeps climbing with every tier added.
+- **The automated closure sweep**: Fusion's `is_closed` field, joined to the pool by PHONE — the
+  catalogue already normalises phones to digits as its cheapest duplicate key, and the same digits are
+  Yelp's `/businesses/search/phone` join key. The entire ~1,100-listing live pool can be closure-checked
+  weekly in a fraction of one day's budget. `is_closed=True` is a LEAD for the human closure check
+  (Yelp mis-marks businesses too), never an automatic quarantine — but it turns "which listings should
+  this week's maintenance look at" from guesswork into a list. Verified live on Prospect Gymnastics and
+  Oishi Judo (both open, both correct).
+
+Noise profile, measured on the first call: Yelp pads thin radii with out-of-area results (a Bronx swim
+instructor and a Long Beach gym appeared inside a 1.2 km PLG search) and lists home-based instructors
+with no venue — exactly the no-fixed-venue shape this catalogue prohibits. `row()` flags results with
+no street address; the operator-site check stays mandatory.
+
+Remaining owner ask: the **DOHMH children's camp permit roll** (311/FOIL) — still the only census-grade
+camp source there is.
+
+## Owner-verified spreadsheets (tier added 2026-08-09)
+
+The owner supplies hand-verified provider spreadsheets ("NEXT 20 verified local sport providers",
+2026-08-09: borough, neighbourhood, address, qualifying youth sport, official URL, evidence URL). Parsed
+and cross-checked against the pool on receipt — **9 of the 20 are not yet in the catalogue** and now sit
+at the top of the create queue (`src/scripts/ownerVerifiedQueue.json`). Highest-trust discovery tier,
+and still verified per candidate before create: the first such spreadsheet contained 7 venues that
+already had live records, and acting on it unchecked would have created 7 duplicates.

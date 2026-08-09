@@ -1,0 +1,202 @@
+[
+ {
+  "borough": "Manhattan",
+  "neighborhood": "Tribeca-Civic Center",
+  "name": "My Gym Tribeca",
+  "address": "415A Greenwich Street, New York, NY 10013",
+  "sport": "Children's fitness / gymnastics / classes",
+  "website": "https://www.mygym.com/tribeca/",
+  "evidence": "https://www.mygym.com/tribeca/?force=1",
+  "status": "IN-POOL"
+ },
+ {
+  "borough": "Manhattan",
+  "neighborhood": "Midtown South-Flatiron-Union Square",
+  "name": "Karate-Do Ken Wa Kan",
+  "address": "34 W 15th Street, Ground Floor, New York, NY 10011",
+  "sport": "Karate; youth/family martial arts",
+  "website": "https://kenwakan.com/",
+  "evidence": "https://kenwakan.com/",
+  "status": "NEW"
+ },
+ {
+  "borough": "Manhattan",
+  "neighborhood": "Chelsea-Hudson Yards",
+  "name": "Hinds Combat Sports \u2013 Midtown West",
+  "address": "360 W 36th Street, New York, NY 10018",
+  "sport": "Kids Muay Thai & Jiu-Jitsu, ages 6\u201317",
+  "website": "https://hindscombatmidtownwest.com/",
+  "evidence": "https://hindscombatmidtownwest.com/",
+  "status": "NEW"
+ },
+ {
+  "borough": "Manhattan",
+  "neighborhood": "Hell's Kitchen",
+  "name": "New York Ninja Academy \u2013 Manhattan",
+  "address": "625 W 55th Street, New York, NY 10019",
+  "sport": "Ninja obstacle classes; ages 4\u201313; summer sessions",
+  "website": "https://www.ninjawarrioracademy.com/",
+  "evidence": "https://www.ninjawarrioracademy.com/new-york/kids-classes",
+  "status": "NEW"
+ },
+ {
+  "borough": "Manhattan",
+  "neighborhood": "Upper East Side-Lenox Hill-Roosevelt Island",
+  "name": "El Dojo NYC",
+  "address": "1162 2nd Avenue, New York, NY 10065",
+  "sport": "Kids martial arts; 2026 summer martial-arts camp",
+  "website": "https://eldojonyc.com/",
+  "evidence": "https://eldojonyc.com/summer-camp/",
+  "status": "NEW"
+ },
+ {
+  "borough": "Manhattan",
+  "neighborhood": "Upper East Side-Yorkville",
+  "name": "Supreme Martial Arts \u2013 Upper East Side",
+  "address": "1690 2nd Avenue, New York, NY 10128",
+  "sport": "Kids Taekwondo; ages 4\u201312",
+  "website": "https://truesupreme.com/location/new-york-ny-upper-east/",
+  "evidence": "https://truesupreme.com/location/new-york-ny-upper-east/",
+  "status": "NEW"
+ },
+ {
+  "borough": "Manhattan",
+  "neighborhood": "Upper East Side-Lenox Hill-Roosevelt Island",
+  "name": "Kids in Sports \u2013 74th Street",
+  "address": "1420 2nd Avenue, New York, NY 10021",
+  "sport": "Multi-sport classes; mini camp ages 2.5\u20135",
+  "website": "https://ues.kidsinsports.com/",
+  "evidence": "https://ues.kidsinsports.com/age_levels/67",
+  "status": "IN-POOL"
+ },
+ {
+  "borough": "Manhattan",
+  "neighborhood": "Upper East Side-Yorkville",
+  "name": "NYC Elite Gymnastics \u2013 East 91st Street",
+  "address": "421 E 91st Street, New York, NY 10128",
+  "sport": "Youth gymnastics",
+  "website": "https://nycelite.com/",
+  "evidence": "https://nycelite.com/",
+  "status": "IN-POOL"
+ },
+ {
+  "borough": "Manhattan",
+  "neighborhood": "Upper East Side-Carnegie Hill",
+  "name": "Modern Martial Arts \u2013 Upper East Side",
+  "address": "220 E 86th Street, New York, NY 10028",
+  "sport": "Kids martial arts",
+  "website": "https://www.mmanewyorkcity.com/",
+  "evidence": "https://www.mmanewyorkcity.com/",
+  "status": "IN-POOL"
+ },
+ {
+  "borough": "Manhattan",
+  "neighborhood": "Upper East Side-Carnegie Hill",
+  "name": "Fastbreak Sports HQ",
+  "address": "1629 1st Avenue, New York, NY 10028",
+  "sport": "Basketball, multi-sport, flag football; camps",
+  "website": "https://fastbreakkids.com/",
+  "evidence": "https://fastbreakkids.com/classes/basketball-classes/",
+  "status": "IN-POOL"
+ },
+ {
+  "borough": "Manhattan",
+  "neighborhood": "Upper East Side-Carnegie Hill",
+  "name": "Jodi's Gym",
+  "address": "244 E 84th Street, New York, NY 10028",
+  "sport": "Gymnastics, Ninja, camps; children up to 12",
+  "website": "https://www.jodisgym.com/",
+  "evidence": "https://www.jodisgym.com/accelerated-gymnastics/",
+  "status": "NEW"
+ },
+ {
+  "borough": "Manhattan",
+  "neighborhood": "Upper West Side-Manhattan Valley",
+  "name": "FunFit Kids",
+  "address": "752 West End Avenue, New York, NY 10025",
+  "sport": "Multi-sport / children's fitness",
+  "website": "https://www.funfitnyc.com/",
+  "evidence": "https://www.funfitnyc.com/contact-us",
+  "status": "IN-POOL"
+ },
+ {
+  "borough": "Manhattan",
+  "neighborhood": "Morningside Heights",
+  "name": "Elliott's Classes",
+  "address": "550 W 110th Street, New York, NY 10025",
+  "sport": "Gymnastics and Ninja; ages 6 weeks\u201314",
+  "website": "https://www.elliottsclasses.com/",
+  "evidence": "https://www.elliottsclasses.com/spa-wellness",
+  "status": "NEW"
+ },
+ {
+  "borough": "Brooklyn",
+  "neighborhood": "Williamsburg",
+  "name": "Ms. J's Gymnastics & Dance \u2013 Williamsburg",
+  "address": "43 S 1st Street, Brooklyn, NY 11249",
+  "sport": "Children's gymnastics & dance",
+  "website": "https://www.msjsgym.com/",
+  "evidence": "https://www.msjsgym.com/",
+  "status": "IN-POOL"
+ },
+ {
+  "borough": "Brooklyn",
+  "neighborhood": "East Williamsburg",
+  "name": "Brooklyn Zoo NY",
+  "address": "230 Bogart Street, Brooklyn, NY 11206",
+  "sport": "Kids parkour, tumbling, trampoline, Ninja; ages 5\u201315",
+  "website": "https://brooklynzoony.com/",
+  "evidence": "https://brooklynzoony.com/kids-classes/",
+  "status": "NEW"
+ },
+ {
+  "borough": "Brooklyn",
+  "neighborhood": "Park Slope",
+  "name": "My Gym Park Slope",
+  "address": "808 Union Street, 2nd Floor, Brooklyn, NY 11215",
+  "sport": "Children's fitness, noncompetitive gymnastics, camps",
+  "website": "https://www.mygym.com/parkslope/",
+  "evidence": "https://www.mygym.com/parkslope/camp",
+  "status": "IN-POOL"
+ },
+ {
+  "borough": "Brooklyn",
+  "neighborhood": "Park Slope",
+  "name": "Amerikick Martial Arts Park Slope",
+  "address": "529 5th Avenue #2F, Brooklyn, NY 11215",
+  "sport": "Kids karate / martial arts; ages 3\u201312+",
+  "website": "https://brooklynmartialarts.net/",
+  "evidence": "https://brooklynmartialarts.net/about-us/",
+  "status": "IN-POOL"
+ },
+ {
+  "borough": "Brooklyn",
+  "neighborhood": "Carroll Gardens-Cobble Hill-Gowanus-Red Hook",
+  "name": "Aikido of Park Slope",
+  "address": "630 Sackett Street, Brooklyn, NY 11217",
+  "sport": "Children's Aikido; ages 5+",
+  "website": "https://www.aikidoofparkslope.com/",
+  "evidence": "https://www.aikidoofparkslope.com/schedule",
+  "status": "IN-POOL"
+ },
+ {
+  "borough": "Brooklyn",
+  "neighborhood": "Bay Ridge",
+  "name": "Tiger Schulmann's Martial Arts \u2013 Bay Ridge",
+  "address": "530 86th Street, 2nd Floor, Brooklyn, NY 11209",
+  "sport": "Kids karate / martial arts",
+  "website": "https://tsk.com/kids/karate/brooklyn-bay-ridge/",
+  "evidence": "https://tsk.com/kids/karate/brooklyn-bay-ridge/",
+  "status": "IN-POOL"
+ },
+ {
+  "borough": "Brooklyn",
+  "neighborhood": "Bay Ridge",
+  "name": "Brooklyn Judo Academy",
+  "address": "7914 3rd Avenue, 2nd Floor, Brooklyn, NY 11209",
+  "sport": "Kids Judo; ages 4\u201317",
+  "website": "https://www.brooklynjudoacademy.com/",
+  "evidence": "https://www.brooklynjudoacademy.com/",
+  "status": "NEW"
+ }
+]

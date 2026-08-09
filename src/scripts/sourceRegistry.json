@@ -51,6 +51,32 @@
       "notes": "One call returns up to 20 places with name, FULL address, phone, type, gps, place_id, rating, hours, and 'Permanently closed' markers (the maintenance signal). First two calls found New Generation School of Martial Arts (395 Maple St, 11225 \u2014 a PLG venue NO other tier had) and a FOURTH operator at Major Owens (Globall Sports Centers). Noise profile: results can include out-of-market places (a Sterling VA gym appeared in a Brooklyn-centred search) \u2014 the entity and geo checks stay mandatory. Never spend a search on what a free tier answers."
     },
     {
+      "id": "yelp-fusion",
+      "name": "Yelp Fusion API (owner-provided key, 2026-08-09)",
+      "access": "curl via src/scripts/yelp.py; key in .env.local (YELP_API_KEY, gitignored). Free tier: 5,000 calls/day",
+      "roles": [
+        "discover",
+        "enrich",
+        "maintain"
+      ],
+      "status": "WORKING",
+      "lastVerified": "2026-08-09",
+      "cadence": "discovery per neighbourhood round; WEEKLY closure sweep of the whole live pool by phone-join (the pool's normalized phone digits are Yelp's join key; ~1,100 calls, well inside one day's budget)",
+      "notes": "Structured name/address/phone/categories/coordinates plus is_closed \u2014 the closure signal nothing else on this registry has, maintained by Yelp. First PLG radius call added Rebel Fitness Bar (1196 Nostrand, 11225), TNK-Jujitsu, All Sports For All People (883 Classon, 11225) and a second Maple St dojo. Noise profile: pads thin radii with out-of-area results (a Bronx instructor and a Long Beach gym inside a 1.2km PLG search) and lists home-based instructors with no venue \u2014 row() flags missing street addresses, and the no-fixed-venue prohibition plus the operator-site check stay mandatory. is_closed=True is a LEAD for the closure check, never an automatic quarantine."
+    },
+    {
+      "id": "owner-verified-spreadsheets",
+      "name": "Owner-supplied verified provider spreadsheets",
+      "access": "uploaded .xlsx; parsed and cross-checked against the pool, saved as src/scripts/ownerVerifiedQueue.json",
+      "roles": [
+        "discover"
+      ],
+      "status": "WORKING",
+      "lastVerified": "2026-08-09",
+      "cadence": "as supplied",
+      "notes": "Two received so far (STRICT_REBUILD; NEXT_20, 2026-08-09 \u2014 9 of its 20 not yet in the pool). Highest-trust discovery tier but still verified per candidate before create: the first spreadsheet contained 7 venues that already had live records, and acting on it unchecked would have created duplicates."
+    },
+    {
       "id": "index-mining",
       "name": "Search-index mining over walled directories (Yelp, Sawyer, ClassPass, Mindbody)",
       "access": "agent WebSearch tool with allowed_domains \u2014 NOT curl, NOT a browser; both are blocked (Yelp/Sawyer bot-wall curl; Chromium cannot CONNECT through the egress proxy at all, verified 2026-08-09 against example.com)",
@@ -163,10 +189,10 @@
         "enrich",
         "maintain"
       ],
-      "status": "NOT-YET-USABLE",
+      "status": "SUPERSEDED",
       "lastVerified": "2026-08-09",
       "cadence": "n/a until keys exist",
-      "notes": "SerpAPI now covers the Google side (see serpapi-google-maps). Yelp Fusion remains the outstanding ask: free at 5,000 calls/day with structured is_closed, which would take closure-sweep load OFF the 250/month SerpAPI budget."
+      "notes": "Both halves now supplied: SerpAPI (serpapi-google-maps) and Yelp Fusion (yelp-fusion). Entry kept for history."
     },
     {
       "id": "headless-browser",
