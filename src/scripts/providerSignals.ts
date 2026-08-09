@@ -52,6 +52,7 @@ export type SignalName =
   | "nb_missing"
   | "image_missing"
   | "image_shared"
+  | "desc_shared"
   | "format_self_contradiction";
 
 const blank = (v: unknown) => !String(v ?? "").trim();
@@ -146,6 +147,36 @@ export function sharedImages(providers: readonly ProviderLike[]): Map<string, nu
   return new Map([...counts].filter(([, n]) => n > 1));
 }
 
+/**
+ * Descriptions shared word-for-word by more than one provider. **88 of 756 live records — 12% of the
+ * catalogue — on 24 distinct texts** when first measured (2026-08-09).
+ *
+ * This is `sharedImages` applied to the field a family actually reads, and it finds three things no
+ * per-record check can, because each of them is only visible when two records are held side by side:
+ *
+ *   - **Duplicates whose names differ**, which a name scan misses and an address scan misses when the
+ *     addresses are placeholders — "Bedstuy Youth Soccer Club" twice, "Brooklyn Rugby" against "Brooklyn
+ *     Youth Rugby", "NYPD Cops and Kids Boxing" against "NYC Cops & Kids Boxing Club".
+ *   - **A whole cluster scraped off a governing body's site.** Seven unrelated real boxing gyms shared
+ *     one text beginning "home about events registered clubs membership info registration forms rules
+ *     national rule book" — USA Boxing Metro's own navigation, standing as the description of seven
+ *     different businesses.
+ *   - **Pipeline-generated filler**, which reads like prose and is not scraped from anywhere: "Youth
+ *     soccer classes and leagues in Manhattan." on two records, "Recurring youth sports programme with
+ *     multiple sessions available throughout the season." on nine.
+ *
+ * The 40-character floor matters: below it, short generic fragments collide by coincidence rather than
+ * by provenance, and the signal fills with noise.
+ */
+export function sharedDescriptions(providers: readonly ProviderLike[]): Map<string, number> {
+  const counts = new Map<string, number>();
+  for (const p of providers) {
+    const d = String(p.shortDescription ?? "").replace(/\s+/g, " ").trim().toLowerCase();
+    if (d.length >= 40) counts.set(d, (counts.get(d) ?? 0) + 1);
+  }
+  return new Map([...counts].filter(([, n]) => n > 1));
+}
+
 export interface RankedProvider {
   id: string;
   name: string;
@@ -164,11 +195,14 @@ export function rankProviders(
   exclude: ReadonlySet<string> = new Set(),
 ): RankedProvider[] {
   const shared = sharedImages(providers);
+  const sharedDesc = sharedDescriptions(providers);
   return providers
     .filter((p) => p.id && !exclude.has(p.id))
     .map((p) => {
       const signals = providerSignals(p);
       if (shared.has(String(p.image ?? "").trim())) signals.push("image_shared");
+      const d = String(p.shortDescription ?? "").replace(/\s+/g, " ").trim().toLowerCase();
+      if (sharedDesc.has(d)) signals.push("desc_shared");
       return { id: String(p.id), name: String(p.name ?? ""), signals };
     })
     .filter((r) => r.signals.length > 0)

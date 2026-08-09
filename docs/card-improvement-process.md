@@ -7341,3 +7341,84 @@ live providers for unbalanced brackets, stray characters or too-few digits found
 same unbalanced-paren truncation (the other being Planet Han Mandarin's `'646) 928-0086'`, the mirror
 image). Both repaired as punctuation, digits kept. This is distinct from the earlier undialable-number
 sweep, which found 42 records whose digits were wrong; here the digits are right and the string is broken.
+
+## v154 (2026-08-09): batches 34–35 — a relocation banner, a lifecycle census, and 88 records sharing 24 descriptions
+
+### Batch 34: nine more format contradictions, 9 records
+
+The flag kept pointing at bigger things than itself:
+
+- **Johnny Karate NYC's own homepage opens with "We've moved. Please visit us at our new studio: 164 Union
+  St, Brooklyn, NY 11231".** The card stored the placeholder `Downtown Brooklyn, Brooklyn, NYC`; 164 Union
+  Street is CARROLL GARDENS. This is a lifecycle state the catalogue had not recorded — **relocated** —
+  alongside pre-opening (Goldfish UWS), temporarily closed (two library branches) and permanently closed
+  (City Treehouse). It is the one where the card is about a real, open business and is simply sending
+  families to the old door, and **no amount of field-against-field checking finds it**: the correction
+  exists only on the operator's front page.
+- **A sentence fragment stored as an address**, second instance: Brooklyn Bridge Park Conservancy's
+  `address` read *"99 Plymouth Street, visitors can drop in to our free Environmental Education Center for
+  self"* — a street number followed by the rest of a marketing sentence, cut mid-word. Same shape as the
+  quarantined Wikitravel record, but here the street part is right, so it is a truncation to repair.
+- **MakerState quarantined for no fixed venue.** Its own navigation is "Teacher Training & Coaching",
+  "Start an Afterschool Makerspace", "Resources for Teachers", "NSF Maker Partnership"; its contact is
+  `partners@maker-state.com`; its contact page gives no address. It runs STEM programmes inside other
+  people's schools. Recorded as real and not a fraud — it would qualify the day it opens a space of its own.
+- **Soccer Stars came out the OTHER way on the same question.** It was previously noted alongside Music To
+  Your Home as a possible no-fixed-venue case, but its own site names a "Soccer Stars Center" and its NYC
+  footer gives 606 Columbus Avenue, matching the record's stored neighbourhood. Real fixed venue plus park
+  classes is the hybrid case, not the prohibition. Its two Brooklyn siblings still carry placeholders and
+  name no venue — flagged, not inherited.
+- **Check for a venue card before retiring a "… Education" record.** Prospect Park Zoo Education was the
+  zoo's ONLY card, so it was promoted to the venue rather than retired as a program card.
+
+### Lifecycle language in stored copy: a census, and a near-total negative result
+
+Given the Johnny Karate find, the obvious question is whether operator lifecycle banners survive into
+scraped descriptions. Across **all 756 live providers**: **0 closing, 0 farewell, 0 temporarily-closed, 1
+relocation**, and 8 "pre-opening" hits of which nearly all are the ordinary word *pre-registration*. So the
+answer is no — **a relocation or closure can only be found by fetching the operator's page**, and the
+catalogue's existing closure findings (City Treehouse, apple seeds) were luck rather than method. Worth
+knowing before anyone plans a copy-based sweep for it.
+
+### The scan that census produced: `sharedDescriptions()`
+
+Two of the eight false positives had **byte-identical descriptions under different names** (Manhattan Track
+Club Youth and East Harlem Youth Track), which is `sharedImages` applied to the field a family reads and
+had never been measured. Result: **24 texts shared by 88 of 756 live records — 12% of the catalogue.**
+`src/scripts/providerSignals.ts`, with a 40-character floor so short fragments do not collide by chance.
+
+It finds three things no per-record check can, because each is only visible with two records side by side:
+
+1. **Duplicates whose names differ** — "Bedstuy Youth Soccer Club" twice, "Brooklyn Rugby" against
+   "Brooklyn Youth Rugby", "NYPD Cops and Kids Boxing" against "NYC Cops & Kids Boxing Club". A name scan
+   misses these, and an address scan misses them when both addresses are placeholders.
+2. **Pipeline-generated filler that reads like prose** — *"Youth soccer classes and leagues in Manhattan."*
+   on two records, *"Recurring youth sports programme with multiple sessions available throughout the
+   season."* on nine. Not scraped from anywhere; generated.
+3. **A whole cluster scraped off a governing body's site** — see below.
+
+Adding the signal immediately flagged **this repo's own test fixture**, where two "clean" records shared
+`"x".repeat(200)`. The signal was right; the fixture was fixed and the episode left in a comment.
+
+### Batch 35: the seven-gym USA Boxing Metro cluster — a FIFTH wrong-source shape
+
+Seven independent, real amateur boxing gyms — each with its own real street address across four
+neighbourhoods — all carried `usaboxingmetro.com` as their `website` and that site's navigation as their
+description: *"Home About Events Registered Clubs Membership Info Registration Forms Rules National Rule
+Book U…"*.
+
+Distinguish it from all four already catalogued. Not **off-topic contamination** (every entity is real).
+Not a **franchisor root domain** (USA Boxing Metro franchises nothing — the clubs are independent
+businesses paying it for sanctioning). Not **domain hijacking**. Not **token collision**. It is a
+**sanctioning-body registry**: the pipeline found the clubs on a governing body's "Registered Clubs" list
+and recorded the list as each club's own site. The tell is exactly what made it findable — N unrelated real
+businesses sharing one domain AND one description, where the domain belongs to an organisation none of them
+is.
+
+Handled as real-entity-bad-source. Each keeps its address, gains the neighbourhood its own address
+determines (Brighton Beach, Gravesend, East New York; NoHo corrected from Greenwich Village for 636
+Broadway at Bleecker), and gets copy stating only what the registry evidences — name, registration,
+address — with no invented schedule, price or age band. **The shared website is flagged needs_human rather
+than cleared**: an empty `website` is this catalogue's strongest fabrication signal, and these are not
+fabrications. One neighbourhood (59 Malcolm X Boulevard, on the Bed-Stuy/Bushwick line) was deliberately
+left empty.

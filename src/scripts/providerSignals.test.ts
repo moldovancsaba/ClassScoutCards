@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { providerSignals, rankProviders, sharedImages } from "./providerSignals";
+import { providerSignals, rankProviders, sharedDescriptions, sharedImages } from "./providerSignals";
 
 describe("signals learned by hand-working batch 1 (2026-08-09), each now measurable pool-wide", () => {
   it("catches the byte-identical generic description — American Youth Dance Theater", () => {
@@ -121,16 +121,51 @@ describe("sharedImages — a signal no single record can reveal about itself", (
   });
 });
 
+describe("sharedDescriptions — 88 of 756 live records, and three defects only visible in pairs", () => {
+  it("catches a governing body's navigation standing as seven unrelated gyms' descriptions", () => {
+    const usaBoxing =
+      "Home About Events Registered Clubs Membership Info Registration Forms Rules National Rule Book U";
+    const rows = [
+      { id: "fight-factory", shortDescription: usaBoxing },
+      { id: "victory", shortDescription: usaBoxing },
+      { id: "gym-x", shortDescription: usaBoxing },
+      { id: "real", shortDescription: "Church Street Boxing runs coached youth classes at 25 Park Place." },
+    ];
+    const shared = sharedDescriptions(rows);
+    expect(shared.get(usaBoxing.toLowerCase())).toBe(3);
+    expect(shared.size).toBe(1);
+  });
+
+  it("normalises whitespace and case, so formatting cannot hide the collision", () => {
+    const rows = [
+      { id: "a", shortDescription: "Youth soccer classes and leagues in Manhattan." },
+      { id: "b", shortDescription: "youth soccer   classes and leagues in  manhattan. " },
+    ];
+    expect(sharedDescriptions(rows).size).toBe(1);
+  });
+
+  it("ignores short fragments, which collide by coincidence rather than by provenance", () => {
+    const rows = [
+      { id: "a", shortDescription: "Soccer classes." },
+      { id: "b", shortDescription: "Soccer classes." },
+    ];
+    expect(sharedDescriptions(rows).size).toBe(0);
+  });
+});
+
 describe("rankProviders — the queue that replaced sorting by updatedAt", () => {
   it("orders worst-first and attaches the pool-level image signal", () => {
     const rows = [
+      // The two clean records must NOT share description text. An earlier version of this fixture gave
+      // both `"x".repeat(200)`, and adding `desc_shared` promptly flagged them — the signal working
+      // correctly on a fixture that had accidentally reproduced the very defect it detects.
       { id: "clean", name: "Clean", shortDescription: "x".repeat(200), longDescription: "y".repeat(300),
         address: "1 Real St, New York, NY 10001", phone: "212-555-0100", email: "a@b.test",
         website: "https://b.test", image: "https://img.test/unique.jpg", neighborhood: "Chelsea",
         primaryActivityType: "Dance", activityTypes: ["Dance"], ageRanges: ["6–8"] },
       { id: "bad", name: "Bad", shortDescription: "tiny", longDescription: "tiny",
         address: "Chelsea, Manhattan, NYC", image: "https://img.test/stock.png" },
-      { id: "alsostock", name: "Also", shortDescription: "x".repeat(200), longDescription: "y".repeat(300),
+      { id: "alsostock", name: "Also", shortDescription: "z".repeat(200), longDescription: "w".repeat(300),
         address: "2 Real St, New York, NY 10001", phone: "212-555-0101", email: "c@d.test",
         website: "https://d.test", image: "https://img.test/stock.png", neighborhood: "Chelsea",
         primaryActivityType: "Dance", activityTypes: ["Dance"], ageRanges: ["6–8"] },
