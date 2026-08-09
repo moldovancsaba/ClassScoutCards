@@ -8927,3 +8927,22 @@ Manhattan zeros 16 → 14 (Bowery closed via the Chinatown YMCA correction). One
 successfully but not applied until caught on the next status check — worth naming: **a successful
 dry-run is not a completed batch until `--apply` actually runs**, and the loop should check for that
 explicitly rather than assuming a passed dry-run was followed through.
+
+## v187 — DOHMH camp census, second batch: a three-site name resolution before creating anything
+
+Continued the census pull. `JCC BROOKLYN` (309 Grand Ave) looked like it might duplicate the already-
+verified `JCC BROOKLYN WINDSOR TERRACE` (1224 Prospect Ave) — same brand, two DOHMH line items. Checked
+before assuming either way: the Windsor Terrace site's own page names all three of the network's
+physical locations (Windsor Terrace, North Williamsburg, Clinton Hill) with per-site phone and email.
+309 Grand Ave is Clinton Hill — a third, genuinely distinct site, not a duplicate. The Williamsburg site
+already has a program card (Williamsburg Soccer Club, 14 Hope St), so only the two venues with no card
+were created: JCC Brooklyn Windsor Terrace and JCC Brooklyn Clinton Hill.
+
+Dodge YMCA at PS 261 hit the address guard on first try — 314 Pacific Street already holds `Kids in the
+Game PS 261`, a DIFFERENT operator's program card at the same public-school building. Both are real:
+Dodge YMCA's own branch page and independent camp directories confirm a genuine satellite camp at this
+address, separate from its main branch 8 blocks away at 225 Atlantic Ave. Added a distinguishing suffix
+("PS 261 Summer Camp Site") per the guard's own suggested pattern and created it — a second shared-venue
+building found this session, after Major Owens.
+
+Coverage: **447 sport listings, 439 served.**
