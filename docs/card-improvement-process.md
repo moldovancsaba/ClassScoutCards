@@ -7904,3 +7904,17 @@ exist rather than given a picture of somewhere else.
   boundary at Empire Boulevard, so the stored Crown Heights was left alone and escalated.
 - **A search summary put "Red Hook Martial Arts" in Red Hook — Dutchess County, ZIP 12571**, 90 miles from
   Brooklyn. Token collision on a neighbourhood name, and the same shape as `camp.com` and `zing.cz`.
+
+### Round 1c — the first reveals through the ported gate
+
+The four Tennis Innovators courts created by the provider split arrived hidden, which is that path's
+forced default and correct: a raw insert bypasses the main app's publish gate, so a split child can never
+be born public. With the gate now implemented rather than avoided, each was given an image and revealed
+**by passing it** — image on imgbb, name, category, borough, source URL, no scraped chrome. Seven
+listings are now publicly visible that were not this morning: three new Brooklyn businesses in
+zero-coverage neighbourhoods, and four Manhattan/Suffolk tennis courts belonging to an operator that had
+**no live listing at all** despite five confirmed venues.
+
+On their photographs: Tennis Innovators publishes four images of its own courts and serves the same four
+on every location page, so each court was given a *different* one of the four and the fact that it is the
+operator's programme generally rather than that specific court is recorded on the record, not glossed.
