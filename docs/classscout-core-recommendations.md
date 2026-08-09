@@ -581,3 +581,39 @@ record was reviewed in *August*. Please render `lastReviewedAt` (and consider `p
 Related and worth doing at the same time: §0b's `fieldVerifications[]`. One freshly-checked phone number
 currently refreshes the whole record's timestamp, so a record can look uniformly current when only one
 field was actually re-verified.
+
+### (f) The LA tenant's place vocabulary has no South Los Angeles, and `laLocations.ts` is missing real neighbourhoods
+
+Found 2026-08-09 by working all 19 live LA-tenant providers as one cohort. Two separate asks.
+
+**1. There is no area for South Los Angeles.** `LA_AREAS` has ten entries — Central LA, Westside, San
+Fernando Valley, San Gabriel Valley, South Bay, Gateway Cities, Eastside, Harbor, Santa Clarita Valley,
+Antelope Valley — and none of them covers South LA. Lula Washington Dance Theatre, a decades-old modern
+dance company and youth school at 3773 Crenshaw Blvd, therefore has nowhere correct to sit; it is filed
+under Central LA because that is the least wrong option, and its neighbourhood is empty because Crenshaw
+appears in no area's list. This is not an edge case in a low-traffic corner of the map: South LA is a large
+part of the city with real children's programmes in it, and the taxonomy currently cannot express any of
+them.
+
+**2. Three real neighbourhoods are missing from areas that do exist.**
+
+| Missing | Belongs to | Real listing blocked by it |
+| --- | --- | --- |
+| La Cañada Flintridge | San Gabriel Valley | Descanso Gardens, 1418 Descanso Drive |
+| Del Rey | Westside | Broadway Gymnastics School, 5433 Beethoven Street |
+| (Crenshaw) | *no area exists* | Lula Washington Dance Theatre, 3773 Crenshaw Blvd |
+
+In each case this bridge left the field EMPTY rather than rounding to the nearest listed neighbourhood,
+because a precise wrong answer sends a family to the wrong place. Two further records (Griffith Observatory
+and Travel Town Museum) are also empty, but deliberately and permanently: both are inside Griffith Park,
+which straddles several neighbourhoods, and the same reasoning already keeps Central Park and Floyd Bennett
+Field out of the NYC vocabulary. Those two do not need a vocabulary entry — the other three do.
+
+**Why this surfaced now, and the more useful finding underneath it.** Before this pass, **15 of the 19 live
+LA providers were filed under `Central LA` and 13 of the 19 had no neighbourhood at all.** A five-area city
+rendered as one area plus blanks is not a distribution, it is a default — the same shape as the 18-record
+`Manhattanville` address default and the repeated `East New York` neighbourhood already documented for the
+NYC tenant, in the one field nobody had checked because the LA tenant is small. Resolving each record
+against its own street address moved them to seven different areas. **If the discovery pipeline has an
+area-of-last-resort for the LA tenant, that is worth finding and removing**; a blank is honest and a
+confident wrong area is not.
