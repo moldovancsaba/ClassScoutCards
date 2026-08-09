@@ -1257,6 +1257,30 @@ in a comment when you add one, the way the existing ports do.
   nothing forbidden, just no separate place), each only after confirming the parent exists. A pool-wide
   re-scan afterwards returned **zero**, which is a real negative result: this cohort is now closed.
 
+- **Fixing ONE field on a record whose reality has not been established makes a fabricated record look
+  MORE credible — I did this and had to reverse it within the hour.** "Brooklyn Basketball League" had a
+  real-looking address (789 Eastern Pkwy, 11213), so I corrected its empty neighbourhood to Crown Heights
+  and wrote that the other fields were "checked and left". They were not read. Its website is
+  `nhl.com/rangers/community/youth-hockey` — the Rangers' youth HOCKEY page, on a basketball card — and
+  both descriptions are NHL.com chrome ("The official National Hockey League website including news,
+  rosters, stats, schedules…"). No league of that name at that address is findable. Quarantined, and the
+  neighbourhood write reversed. **A precise neighbourhood on invented content is the
+  precision-in-a-wrong-claim failure applied to my own work.** The reality check comes first, before any
+  field is touched — it is the first rule in this file, and a plausible address is exactly what makes it
+  feel skippable.
+- **A cheap scan catches that whole shape: is the stored `website` host a major media, platform or
+  directory domain?** Three live providers tripped it. One was the NHL case above. The other two were
+  duplicates whose better-sourced twin already existed — Brooklyn Nets Youth Basketball on
+  `nba.com/nets/community/youth` (the sibling carries the academy's own domain, phone and address) and
+  Bed-Stuy Sports Flag Football on a `brooklynbridgeparents.com` round-up article (the sibling carries the
+  league's own domain and the right neighbourhood; the directory-sourced one said DUMBO). Worth running
+  on `providers`, not just `contentCards`, because a provider carries descriptions and the host's chrome
+  becomes the business's own copy.
+- **The batch queue was serving records that had already been retired.** `signals.py` filtered out
+  `qualityStatus: quarantined` but not `visibility: hidden`, so **209 of 1,029** non-quarantined records in
+  the queue were ones this loop had already hidden. Fixed. When a queue and a retirement mechanism use
+  different fields, the queue has to know about both.
+
 ## Work in BATCHES of 4-10, covering EVERY component, and improve the process after each one (owner directive, 2026-08-09)
 
 **"Do you understand your task to do the listing fixes in batches maximum 4-10 at the time and deliver
