@@ -8174,3 +8174,39 @@ family's ability to find the room for a pin on the building.
 
 The one that still misses, Tim Morehouse at `2710 Broadway (at 104th St), 3rd Floor`, fails on the
 parenthetical cross-street rather than the floor — a second, different shape worth stripping next.
+
+## v170 (2026-08-09): the image gate, proved by experiment — and the licence wall behind it
+
+### The core system DOES still require an image. Proved, not inferred.
+
+Told that images were no longer used, this loop published twelve imageless listings. They were complete —
+street address, phone, category, neighbourhood, own website, written copy — and the live public API
+served **none** of them. Adding a real photograph to six, **changing nothing else**, moved all six from
+absent to served and the endpoint's total from 394 to 400.
+
+The gate is in two places in the deployed read path, and either alone is sufficient:
+`buildProviderListQuery` sets `image: { $type: "string", $ne: "" }`, and `isPublicProvider` calls
+`isRenderableListing`, which requires an `i.ibb.co` URL.
+
+**The lesson is about method, not about images.** A directive that contradicts code you have read is a
+reason to TEST ONE RECORD, not to publish twelve and report them as revealed. One listing would have
+settled it in ninety seconds; instead a status update claimed coverage that did not exist.
+
+### A photograph of another branch is not a photograph of this place
+
+Four of ten operator sites were refused on the evidence of the filename alone, and each would have passed
+any technical check: The Little Gym's **Tribeca** page serves an image from `/ontario-kingston/`;
+Movement's **Gowanus** youth page has `LIC_TheCliffs_2023` as its og:image — the operator's Long Island
+City gym. Imagine Swimming and My Gym Tribeca publish no usable photograph at all.
+
+### NYC Parks publishes no venue photographs, and Commons is licence-blocked
+
+Neither the facility pages nor the park pages carry a single image of any recreation centre, so the
+eleven Parks venues cannot be unblocked from the operator's own site the way a private operator's can.
+Wikimedia Commons has good photographs of most of them — and **almost all are CC BY or CC BY-SA, both of
+which require attribution the `providers` schema has no field to carry.** Restricting to CC0 and public
+domain yielded **1 of 12** (McCarren Play Center).
+
+Publishing a CC BY-SA photograph uncredited would breach its licence, so the other eleven stay imageless
+pending an owner decision on where attribution would live. **Recorded as a blocked decision rather than
+quietly resolved either way** — the tempting move is to use the better photo and say nothing.
