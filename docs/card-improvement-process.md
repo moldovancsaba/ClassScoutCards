@@ -6595,6 +6595,14 @@ only place it can go.
   gyms (7). Two of the latter proved Manhattan-only. Also quarantined a real Tribeca balloon SHOP (retail
   is not an activity), a magician with an office address, and a Zoom-only subscription.
 
+- v150 (2026-08-09): **a fabricated cluster of nine, found by the ABSENCE of a website.** Generic
+  `<Place> <Sport> <Club>` names with plausible street addresses and no source; none of the businesses
+  exists. Such a record passes every field-level check and looks better than the honest ones around it,
+  which is why it survived — and why two of my own writes had improved a field on one before anyone
+  asked whether the business was real. Both reversed. `website_missing` reclassified from a minor
+  completeness gap to the strongest fabrication signal in the set. Also: a media-host scan, the
+  satellite cohort closed at zero, and a queue that was serving 209 already-retired records.
+
 ## v144 (2026-08-08): the location-evidence audit — 64 live provider records, and a check that was measuring itself
 
 This round started as a routine continuation of the cross-collection neighbourhood fill and turned into
@@ -7052,3 +7060,67 @@ listings.
 - **Governors Island is not in the neighbourhood vocabulary**, so play:groundNYC's borough was set and its
   neighbourhood deliberately left empty. Third vocabulary gap recorded this run, after Crenshaw (no South
   LA area) and the standing Borough-taxonomy gap.
+
+## v150 (2026-08-09): a fabricated cluster, and two of my own writes that made it worse
+
+### Nine invented businesses, found by the absence of a website
+
+Working the signal queue turned up a run of records with a shared signature: **no website at all, no
+phone, no email, a generic `<Place> <Sport> <Club/Academy>` name, and a plausible street address.** Ten
+live providers matched. Independent searches were run for each business AT its stored address and **nine
+of them do not exist**:
+
+Upper West Side Gymnastics (415 Amsterdam Ave) · West Village Youth Soccer (75 Jane St) · Brooklyn
+Baseball Academy (8503 3rd Ave) · Red Hook Youth Soccer (1 Clinton St) · Upper East Side Tennis Club (321
+E 72nd St) · East Village Soccer Academy (138 St Marks Pl) · Riverside Youth Lacrosse · Brooklyn Running
+Club Youth (78 Atlantic Ave) · Brooklyn Dance & Sports Club (148 Court St).
+
+Real organisations of adjacent names exist for several — Brooklyn Kids Run, Sweat FC's Red Hook classes,
+78 Youth Sports — which is exactly what makes the invented ones read as plausible.
+
+The tenth, **Brooklyn Lacrosse Club Youth**, was retired rather than quarantined: that club is real, has
+three properly-sourced records including 334 Furman Street, and this fourth record simply carried the
+same fabricated-address shape attached to a genuine operator.
+
+### Why this cluster survived every previous sweep
+
+**A fabricated record with a real-looking street address passes every field-level check.** No placeholder,
+no compound, no missing location, no scraped chrome, no non-English copy. On the signal queue it looked
+*better* than the honest records around it. The only tell is the absence of a source — and `website_missing`
+had been sitting in the signal list as a minor completeness gap. It is now documented as the strongest
+fabrication signal in the set.
+
+### Two writes of my own that made fabricated records look more credible
+
+Both reversed the same day, and both worth recording because the failure is identical:
+
+- **West Village Youth Soccer**: earlier in this run I "corrected" its neighbourhood from Greenwich
+  Village to West Village, reasoning that 75 Jane St (10014) is in the West Village. The address is
+  invented.
+- **Brooklyn Basketball League**: I set its empty neighbourhood to Crown Heights from its stored 789
+  Eastern Pkwy, and wrote that the other fields were "checked and left". They were not read — its website
+  is `nhl.com/rangers/community/youth-hockey`, the Rangers' youth HOCKEY page on a basketball card, and
+  both descriptions are NHL.com chrome.
+
+**Improving one field on a record whose reality has not been established makes a fabricated record look
+more credible, not less.** A precise neighbourhood on invented content is the precision-in-a-wrong-claim
+rule turned on my own work. The reality check is the first rule in `CLAUDE.md` for a reason, and a
+plausible address is precisely what makes it feel skippable.
+
+### Two more scans this produced
+
+- **Website host is a major media/platform/directory domain.** Three live providers. One was the NHL case;
+  the other two were duplicates whose better-sourced twin already existed (Brooklyn Nets Youth Basketball
+  on `nba.com`, Bed-Stuy Sports Flag Football on a `brooklynbridgeparents.com` round-up that also had it in
+  DUMBO). Worth running on `providers` and not only on cards, because a provider carries descriptions and
+  the host's chrome becomes the business's own copy.
+- **A record whose own description points at another listing.** Eight found and retired to hidden, each
+  after confirming the parent exists. Re-scan returns zero; cohort closed.
+
+### A queue defect
+
+`signals.py` excluded `qualityStatus: quarantined` but not `visibility: hidden`, so **209 of 1,029**
+records it was serving had already been retired by this loop. When a queue and a retirement mechanism key
+on different fields, the queue has to know about both.
+
+Live providers with no website: **10 → 0.** Live provider pool: 806.

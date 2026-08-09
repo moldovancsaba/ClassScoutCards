@@ -99,6 +99,13 @@ export function providerSignals(p: ProviderLike): SignalName[] {
 
   if (blank(p.phone)) s.push("phone_missing");
   if (blank(p.email)) s.push("email_missing");
+  // 2026-08-09: this is the strongest fabrication signal in the set, not a minor completeness gap. Ten
+  // live providers had no website, and NINE of them were invented — generic "<Place> <Sport> <Club>"
+  // names with plausible street addresses and nothing else: Upper West Side Gymnastics at 415 Amsterdam
+  // Ave, West Village Youth Soccer at 75 Jane St, Red Hook Youth Soccer at 1 Clinton St. None exists.
+  // A fabricated record with a real-looking address passes every field-level check and looks BETTER than
+  // the honest records around it, which is why the cluster survived so long — and why two of them had
+  // their neighbourhoods "improved" by this loop before anyone asked whether the business was real.
   if (blank(p.website)) s.push("website_missing");
   if (blank(p.neighborhood)) s.push("nb_missing");
   if (blank(p.image)) s.push("image_missing");
