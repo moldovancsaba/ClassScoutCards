@@ -6582,6 +6582,13 @@ only place it can go.
   CompleteBody Kids quarantined, Peter Stuyvesant Little League's description was an encyclopaedia
   passage about a 1940s housing complex, and an LA-vocabulary gap recorded for Crenshaw.
 
+- v148 (2026-08-09): **batches 11-12, and the hole the cohort sweep left open.** The compound-place
+  guard never listed `or`, so v147's claim that `"Manhattan or Brooklyn"` was rejected on write was
+  false and the owner caught it; `or`/`;`/`|` added with tests and all 341 canonical names re-checked.
+  Re-running the widened guard found 130 content-card values it would now reject, 17 mechanically
+  resolvable. Tinkergarten quarantined (no venue anywhere); a record literally named "West" whose own
+  description said it was a directory page was retired.
+
 ## v144 (2026-08-08): the location-evidence audit — 64 live provider records, and a check that was measuring itself
 
 This round started as a routine continuation of the cross-collection neighbourhood fill and turned into
@@ -6947,3 +6954,51 @@ Compound boroughs remaining in the live pool: **zero**.
   deliberately NOT changed: 75 Smith Street is arguably Boerum Hill while the studio's own name and every
   directory say Brooklyn Heights. That is precisely the address-versus-brand tie `judgeLocation` refuses to
   break automatically.
+
+## v148 (2026-08-09): batches 11–12, and the hole the cohort sweep left open
+
+**The compound-place guard did not list `or`.** SOP v147 said `"Manhattan or Brooklyn"` was "now rejected
+on write" and it was not — `validateWriteRequest`'s separator list covered `/`, `and`, `&` and `+` only, so
+the string thirteen providers had just been cleaned of would have been accepted straight back in. The owner
+caught the false claim. `or`, `;` and `|` added, all 341 canonical place names re-checked against the
+widened guard (zero wrongly rejected), regression tests for every separator plus the empty value that must
+stay allowed. **Cleaning the rows is not the same as closing the hole**, and a sentence asserting a value is
+now impossible needs a test behind it before it is written.
+
+Re-running the widened guard over both collections then found what it would now reject: **providers zero,
+content cards 130.** Seventeen were mechanically resolvable and were fixed — six `boroughGuess` values like
+`"Manhattan / NYC"` where stripping the non-place noun leaves one real borough, and eleven
+`neighborhoodGuess` values like `"NYC / Manhattan"` where stripping it leaves a BOROUGH, which is not a
+neighbourhood and was therefore **cleared** rather than written one column to the right.
+
+The remaining 113 are dominated by `"Manhattan/Brooklyn"` ×51. Two things worth recording about that
+cohort so the next pass does not re-derive them: **none is published** (44 DISCOVERED, 6
+BLOCKED_REPAIRABLE, 1 PARKED), so there is no live harm; and **50 of the 51 titles name no location at
+all**, so it cannot be resolved mechanically and needs per-card sourceHost research.
+
+### Batch 12
+
+- **Tinkergarten Manhattan** quarantined under the physical-only rule in its clearest form: independent
+  leaders running classes in whatever public park is near them, coordinated by a company in Columbus,
+  Ohio. Distinct from the hybrid case (a real venue that also runs outdoor sessions) and from a league on
+  public fields (which plays at identified grounds) — here the park changes with whoever is leading.
+- **"West"** — a record whose name is one word and whose own description already read *"A multi-provider
+  summer camp round-up page, not a single business."* A previous pass diagnosed it and left it live. Its
+  activityTypes and all five age buckets are the union of everything the round-up listed, which is what a
+  directory page looks like when mistaken for a provider.
+- **Tribeca Performing Arts Center**'s address said Chelsea while its neighbourhood said Tribeca — the
+  neighbourhood was the right half — and its description was a sales banner with no subject: *"2026-27
+  Family Events and Memberships On Sale Now!"*
+- **The Painted Cloud**: sources disagree between 156 S 2nd St and 168 Marcy Ave. The more recent was taken
+  and **the disagreement recorded on the record** rather than silently resolved; they are a block apart and
+  the older is most likely a previous door.
+- **Tiny Scientist** and **Premier Martial Arts** show a small discipline worth naming: where the
+  `shortDescription` was already good and only `longDescription` duplicated it, the short one was KEPT and
+  only the long one written. Rewriting both because a signal fired would have thrown away good copy.
+
+### Where the pool stands after 12 batches
+
+75 listings worked — 41 corrected, 24 should-not-exist, 7 needs_human, 3 confirmed — with
+**33 long and 31 short descriptions rewritten**, 23 addresses, 20 phones, 16 re-sourced websites, 24 age
+ranges, 6 renames. Live visible providers: 820. Records tripping none of the five core copy/contact
+signals: 272.
