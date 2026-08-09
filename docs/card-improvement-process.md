@@ -7507,3 +7507,49 @@ Two other findings:
 
 Shared descriptions after these two batches: **12 texts / 51 records, from 24 / 88.** What is left is
 dominated by the 33-record NYC Parks Summer Sports Experience and Kids in Motion cluster.
+
+## v157 (2026-08-09): batches 39–41 — the 33-record NYC Parks cluster, resolved by VENUE not swept
+
+33 live records named NYC Parks programmes: `Summer Sports Experience: <sport> at <park>`, `Kids in Motion
+at <park>`, and one Basketball Clinic. Grouping them by the venue in their own titles gave **26 distinct
+parks, of which 21 had exactly one record and were already correct.** That is the one-card-per-location
+rule working at scale on a municipal operator — the same conclusion an earlier pass reached about
+laparks.org's 30 cards, and the reason cluster size alone is never evidence. **Retiring on size would have
+deleted 21 real, distinct, correctly-carded public parks.**
+
+### Batch 39 — five parks with more than one record (12 → 5)
+
+Highbridge Recreation Center (3), John J. Carty Park (3), Holcombe Rucker Park (2), St. John's (2),
+Brownsville (2). Two of those five were not obviously duplicates at all: **St. John's Recreation Center
+stands at 1251 Prospect Place inside St. John's Park**, and **Brownsville Recreation Center shares 1555
+Linden Boulevard with Brownsville Playground** — each read as two venues only because one card used the
+park's name and the other the building's. In every case the survivor was chosen by which record had a real
+street address; where neither did (Rucker Park), the tie-break was which card describes what the place
+actually is.
+
+### Batch 40 — the twelve Kids in Motion playgrounds, given their own copy
+
+Two defects were uniform and needed no research: **`primaryActivityType: "Fitness"` on a free drop-in
+supervised PLAY programme**, and `category: "Classes"` on a programme whose entire model is turning up
+without booking. Both fixed to Drop-In Activities across all twelve, and each park given copy of its own.
+One empty address filled (Lawrence Virgilio Playground, Woodside).
+
+### Batch 41 — the nine Summer Sports Experience records, and a miss worth recording
+
+**Batch 39's venue grouping missed a sixth duplicate, and both scans were structurally blind to it.**
+"Summer Sports Experience: Various Sports at Fort Hamilton Senior Recreation Center" is at 9941 Fort
+Hamilton Parkway — the same address as John J. Carty Park, because the senior centre stands inside that
+park. Grouping by the NAME in the title puts them in different buckets; grouping by ADDRESS cannot help
+because these records store the venue's own name in the address field. Only reading the nine found it.
+Worth stating as a limit rather than a one-off: **when a cluster's addresses are placeholders, the address
+scan is blind by construction and the name scan is all that is left — and a name scan cannot know that one
+building sits inside another.**
+
+Three defects across the nine: the venue's own NAME stored as the address (and on two records, the CARD'S
+OWN TITLE stored as the address, the same shape found on a Steve & Kate's record); `Fitness` or the bare
+parent `Sports` with no discipline; and three empty neighbourhoods. Four addresses were filled from the
+parks themselves, two neighbourhoods refined from the Harlem display group to Central Harlem, and **two
+were deliberately left empty** — Ben Abrams Playground, whose location could not be confirmed, and
+Scarangella Park, which sits between two adjacent vocabulary entries with nothing on the record to settle it.
+
+**Shared descriptions across the live pool: 9 texts / 18 records, from 24 / 88 when the scan was written.**
