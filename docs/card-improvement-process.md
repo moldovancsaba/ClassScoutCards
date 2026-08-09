@@ -8159,3 +8159,18 @@ obvious move was to promote all nine. Checking each ADDRESS first showed **seven
 record under a different id**. Only Chelsea Piers' Chelsea field house (six hidden programme cards, none
 live) and Prospect Park YMCA (seven) were genuinely stranded — the retire-first mistake in the data. Both
 promoted; the claim of nine would have produced seven duplicates.
+
+### The unit in the address defeats the geocoder — strip it for the lookup, never for the record
+
+Every address the first two geocoding passes dropped carried a floor, suite or apartment: `4B`,
+`Suite 1506`, `#200`, `2nd Floor`, `Level 2`, `SC1`, `Lower Level`. Nominatim reads those as part of the
+street line and fails to match the building. Retrying against the building alone recovered **11 of 13** —
+Beyond Boxing, Brooklyn Bridge Fencing, My Gym Park Slope, Church Street Boxing ×2, Starrett City Boxing,
+Apex for Youth, Mo'Motion, Fencers Club, Court 16 FiDi and Shinkai Dojo.
+
+**The stored address is deliberately left alone.** A family needs "Suite 545" to find the door; only the
+geocoder needed it removed. Stripping the unit from the record to make a lookup succeed would trade a
+family's ability to find the room for a pin on the building.
+
+The one that still misses, Tim Morehouse at `2710 Broadway (at 104th St), 3rd Floor`, fails on the
+parenthetical cross-street rather than the floor — a second, different shape worth stripping next.
