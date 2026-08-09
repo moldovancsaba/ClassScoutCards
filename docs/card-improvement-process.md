@@ -6589,6 +6589,12 @@ only place it can go.
   resolvable. Tinkergarten quarantined (no venue anywhere); a record literally named "West" whose own
   description said it was a directory page was retired.
 
+- v149 (2026-08-09): **the 51-card `Manhattan/Brooklyn` cohort, researched and closed.** 45 resolved, 6
+  `needs_human`. The compound was not a coincidence alongside the defect but its cause: the cohort is
+  dominated by party entertainers (19, no premises at all) and clubs training in several rented school
+  gyms (7). Two of the latter proved Manhattan-only. Also quarantined a real Tribeca balloon SHOP (retail
+  is not an activity), a magician with an office address, and a Zoom-only subscription.
+
 ## v144 (2026-08-08): the location-evidence audit — 64 live provider records, and a check that was measuring itself
 
 This round started as a routine continuation of the cross-collection neighbourhood fill and turned into
@@ -7002,3 +7008,47 @@ all**, so it cannot be resolved mechanically and needs per-card sourceHost resea
 **33 long and 31 short descriptions rewritten**, 23 addresses, 20 phones, 16 re-sourced websites, 24 age
 ranges, 6 renames. Live visible providers: 820. Records tripping none of the five core copy/contact
 signals: 272.
+
+## v149 (2026-08-09): the 51-card `Manhattan/Brooklyn` cohort, researched and closed
+
+Owner: *"Research that 50 and fix them as well."* All 51 worked; **45 resolved, 6 left `needs_human`.**
+
+### Why one discovery run produced 51 identical compound boroughs
+
+Not a coincidence alongside the field defect — the *cause* of it. The cohort turned out to be dominated by
+two business models that have no single address for an extractor to read, so it fell back to a compound:
+
+**1. Party entertainers (19 cards).** Magicians, clowns, character performers, bubble acts, a puppet
+company, a party fairy. A performer travels to whatever venue the family books, so there is no location to
+assign a borough to. All quarantined under the physical-only rule — except three whose sites return
+nothing readable, which were left `needs_human` rather than swept in on the cohort's dominant shape,
+because *"this cohort is mostly X"* is not evidence about any individual record.
+
+**2. Clubs that train in rented school gyms (7 cards).** Big City Volleyball (75 Morton St, Sacred Heart at
+406 E 91st, Dalton at 200 E 87th), High Octane (Marymount, 215 E 94th, 980 Park Ave), NYC Juniors (six
+Manhattan venues plus 100 Dobbin St in Greenpoint), Dribbl, Swim Easy (109 E 50th plus the Léman pool at 25
+Greenwich St), British Swim School. These are **in scope** — a continuing programme at a fixed address is
+the Physique Swimming shape — but they run at several borrowed gyms at once. Two of them turned out to be
+**Manhattan-only**, so the Brooklyn half was simply wrong; the genuinely two-borough ones had the borough
+**cleared with every confirmed venue named**, per the directive that premises in two boroughs are two
+listings.
+
+### The rest
+
+| verdict | cards | examples |
+| --- | --- | --- |
+| Borough corrected to a single real one | 8 | Amaze Light Festival and NY Hall of Science → **Queens** (both ZIP 11368, Corona); New Heights → Crown Heights (1561 Bedford Ave, the Bedford-Union Armory); Barcelona SC → Bushwick (238 Wyckoff Ave); play:groundNYC → Manhattan (The Yard, 40 Barry Road, **Governors Island**) |
+| Quarantined — out of scope | 5 | **Balloon Saloon**, a real Tribeca business but a party-SUPPLIES SHOP, not an activity; **NY Party Works**, inflatable hire in Deer Park, Long Island; **Volo Kids**, public parks with HQ in Baltimore; **Story Pirates Creator Club**, explicitly a Zoom subscription |
+| Terminal — no entity to maintain | 7 | root-domain duplicates (SwimJim, and the root twins of NYC Impact and Lil' Kickers), programme cards (Taste Buds birthday parties, Super Soccer Stars birthday parties), the NYC Parks youth-sports INDEX, and a single dated **event** listing (Jesse Owens Track, `/events/2026/05/09/`) |
+| `needs_human` | 6 | three entertainers whose sites return nothing; Eleven United, which may not exist (searches surface two *different* United clubs); Spanish Workshop, which collides with three similarly-named orgs; NYC Youth Football League |
+
+### Three judgements worth keeping
+
+- **Balloon Saloon had to be decided on what the business DOES, not on whether it is real.** It is real,
+  local, well-known and beloved — and it sells balloons. Retail is not an activity a child attends.
+- **Silly Billy has a street address and was still quarantined.** 10 West 15th Street is a magician's
+  office. An administrative office is not a location, and writing "Chelsea" would send a family to a door
+  they cannot use. The address is what made this one look resolvable.
+- **Governors Island is not in the neighbourhood vocabulary**, so play:groundNYC's borough was set and its
+  neighbourhood deliberately left empty. Third vocabulary gap recorded this run, after Crenshaw (no South
+  LA area) and the standing Borough-taxonomy gap.
