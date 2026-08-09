@@ -9013,3 +9013,65 @@ assumed.
 
 Coverage after this stretch: **461 sport listings, 453 served** (started the stretch at 444/436).
 Manhattan zeros 14 → 12.
+
+### Chelsea/Hudson Yards + East Village — 7 of 19 sport-qualifying rows created (2026-08-09)
+
+Owner uploaded three spreadsheets in one message: Chelsea/Hudson Yards (7 rows), East Village (12 rows),
+and a second copy of the already-processed Lower East Side sheet (identical content, no new work). Per
+the owner's explicit "Stop the loop now" instruction given earlier the same session, this was worked as a
+**bounded task** — read, cross-check, verify, create — with no resumption of open-ended autonomous
+discovery (no new SerpAPI/Yelp/DOHMH sweeps) once it closed out.
+
+Excluded per the sport-listings mandate (dance/arts, not sports): Tutu School Chelsea, Genius Gems Chelsea
+(a magnetic-tile play attraction — a real, fun, physical activity, but not a sport), Peridance Center,
+Loco-Motion Dance Theatre, New York Theatre Ballet School.
+
+Excluded on the standing "citywide operator, no venue of its own" caution: **both** Kids in the Game
+camps (Chelsea and East Village) run inside Avenues The World School, 259 10th Ave — a private school
+building the operator does not own, the same shape already flagged for Kids in the Game at PS 261.
+Creating more such cards compounds an unresolved question rather than resolving it.
+
+Deferred, not excluded: Greenwich House Youth Services' two after-school sites are program cards inside
+PS buildings the organisation does not own — held pending the broader Greenwich House / program-not-a-
+location review already underway elsewhere in this catalog, rather than ruled on in isolation here.
+
+**Distinguished two similar-looking "operator rents a school building" shapes side by side, deliberately
+opposite outcomes**: LNF Kids Summer Camp (215 E 6th St, St. George Academy) is a dedicated, single-
+purpose seasonal camp business whose rented building IS its real and only location — created, matching
+the already-established Steve & Kate's Camp precedent. Kids in the Game (above) is a multi-site citywide
+operator with no venue of its own anywhere — not created, matching the PS 261 precedent. Same building
+shape, opposite verdict, because the question is whether the operator has ANY venue of its own, not
+whether this particular venue is rented.
+
+**A second live template-placeholder finding on championstkd.com** (first found earlier this session on
+the Chinatown location): the Chelsea location page also serves `555-555-5555` / `mymail@mailservice.com`
+beside its real, location-specific contact details. Confirms this is a site-wide template default, not a
+one-off — worth checking any further Champions TKD location before trusting its contact block wholesale.
+
+**Mu Geuk Martial Arts — spreadsheet URL was a dead franchise-directory template.** The sheet's given
+`mugeukmartialarts.com` resolved to an inactive template page with no real content. Independent search
+found the operator's real, active site at `mugeuknyc.com` (271 W 23rd St, 2nd Floor) — created sourced to
+the real site, not the spreadsheet's dead one. Same entity-before-domain discipline already applied to the
+lax.com case, run in the opposite direction: here the entity is real and the given domain was simply wrong.
+
+**Cornerstone at Campos Plaza University Settlement** (611 E 13th St) — the operator's own program page
+described the drop-in basketball activity but did not print a street address for this specific site;
+address confirmed via independent search rather than assumed from the organisation's other locations.
+
+**The Rainbow Play Space — address corrected from the spreadsheet.** The sheet claimed 14 E 7th St; the
+operator's own site (homepage and a separate contact page) consistently gives 343 East 10th Street.
+Unlike the West Village sheet's Aikido of Manhattan candidate earlier this session (where independent
+search produced a *different, ambiguous* address with no clear resolution and the candidate was withheld
+entirely), here the operator's own site gave one clear, repeated answer — so the record was created at the
+operator-confirmed address, with the spreadsheet's discrepant address noted in `fieldVerifications` rather
+than either trusted blindly or used as a reason to withhold.
+
+Created (7): Champions Martial Arts Chelsea (241 9th Ave), Mu Geuk Martial Arts (271 W 23rd St, 2nd Fl),
+Ahn's Taekwondo NYC (20 Avenue A), Champions Martial Arts Avenue C (177 Loisaida Ave), LNF Kids Summer
+Camp (215 E 6th St), Cornerstone at Campos Plaza University Settlement (611 E 13th St), The Rainbow Play
+Space (343 East 10th St). All 7 applied cleanly, gate PASSES, zero collisions.
+
+Coverage after this batch: **461 sport listings in Brooklyn+Manhattan, 461 served** (469 in the database,
+8 built-but-not-yet-served elsewhere in the pool). Per the owner's stop instruction, autonomous discovery
+is paused here pending further direction — this entry closes out the bounded spreadsheet-processing task,
+not a loop iteration.
