@@ -24,11 +24,8 @@ import { expansionMarketKeys } from "@/lib/delivery/expansionMarkets";
  * listing: a family clicks it, finds nothing, and stops trusting the catalogue.
  *
  *   name, category, borough, address, website   — identity, format, place, and the source that proves it
- *   image                                        — owner directive: "the image is always required and
- *                                                  always has to be checked and added to the database".
- *                                                  Also the main app's own hard gate — a listing without
- *                                                  an imgbb-hosted image is invisible, so creating one
- *                                                  without an image manufactures an invisible record.
+ *   (image is OPTIONAL — see the note on it in validateCreateRequest. It is the main app's own hard
+ *    gate, so a listing without one is created hidden rather than pretending to be live.)
  *   shortDescription, longDescription            — the enrichment mandate. A new listing with placeholder
  *                                                  copy is precisely the defect this loop spends its time
  *                                                  removing; it should not be creating more.
@@ -41,7 +38,8 @@ import { expansionMarketKeys } from "@/lib/delivery/expansionMarkets";
  *              The address-fill pipeline's refusals "were all real findings"; this is the same test
  *              applied before insert rather than after.
  *   image    — 63 live records share 16 image files, one banner on 14 of them. A shared image is not a
- *              photograph of the place a family is deciding to walk to. A new listing must bring its own.
+ *              photograph of the place a family is deciding to walk to. Refused only ACROSS operators:
+ *              two branches of one business may share that business's own photograph.
  *
  * VISIBILITY IS DERIVED, NEVER PASSED. The caller does not get to say whether the listing is public: the
  * record is run through `providerPublishGate` — the faithful port of the main app's own `isPublicProvider`
@@ -107,11 +105,24 @@ export function validateCreateRequest(body: unknown): CreateValidationResult {
   if (!/^https:\/\/\S{6,}$/i.test(text("website"))) {
     return { ok: false, status: 400, error: "provider.website must be a real https:// URL — the source that evidences this business exists" };
   }
-  if (!isImgBbHttpsImageUrl(p.image)) {
+  // (2026-08-09, owner directive: "image is optional not requirement. The better the existing")
+  // Image is OPTIONAL to create, and still validated when supplied.
+  //
+  // The consequence is real and is not hidden: EVERY read path in the main app requires an imgbb-hosted
+  // image. `deriveServingDoc` computes its `renderable` flag from `isRenderableListing`, and
+  // `publicListReads` and `publicBrowse` both filter on it — all three verified by reading that repo. So
+  // a listing created without an image is complete in every other respect and INVISIBLE to families
+  // until a photograph lands. The publish gate derives `visibility` from exactly that, so such a listing
+  // is created hidden rather than pretending to be live, and shows up in the image work-list.
+  //
+  // Making it optional is still the right call: a fully-researched listing with a real address and phone
+  // waiting on a photo is strictly better than no record of the business at all, and the research is the
+  // expensive half.
+  if (p.image !== undefined && p.image !== null && String(p.image).trim() !== "" && !isImgBbHttpsImageUrl(p.image)) {
     return {
       ok: false,
       status: 400,
-      error: "provider.image is required and must be an https imgbb URL (https://i.ibb.co/...). The main app shows no listing without its own image, so a listing created without one is invisible by construction. Upload the venue's own photograph rather than reusing another listing's.",
+      error: `provider.image must be an https imgbb URL (https://i.ibb.co/...) when supplied — the main app renders no other host, so any other URL is an image that will never appear. Omit the field to create the listing without one. Got: ${String(p.image).slice(0, 96)}`,
     };
   }
 
@@ -225,10 +236,10 @@ export async function applyCardBridgeCreate(request: NormalizedCreateRequest): P
   const host = (value: string): string => {
     try { return new URL(value).hostname.toLowerCase().replace(/^www\./, ""); } catch { return ""; }
   };
-  const imageClash = await db.collection("providers").findOne(
+  const imageClash = text("image") ? await db.collection("providers").findOne(
     { image: text("image"), visibility: { $ne: "hidden" } },
     { projection: { id: 1, name: 1, website: 1 } },
-  );
+  ) : null;
   if (imageClash && host(String(imageClash.website ?? "")) !== host(text("website"))) {
     return {
       created: false,
@@ -263,7 +274,6 @@ export async function applyCardBridgeCreate(request: NormalizedCreateRequest): P
     address: text("address"),
     website: text("website"),
     sourceUrls: [text("website")],
-    image: text("image"),
     activityTypes: aligned.activityTypes,
     primaryActivityType: aligned.primaryActivityType,
     shortDescription: text("shortDescription"),
@@ -277,6 +287,7 @@ export async function applyCardBridgeCreate(request: NormalizedCreateRequest): P
     bridgeCreatedAt: nowIso,
     bridgeCreateReason: request.reason,
   };
+  if (text("image")) doc.image = text("image");
   if (text("phone")) doc.phone = text("phone");
   if (text("email")) doc.email = text("email");
   if (Array.isArray(p.ageRanges)) doc.ageRanges = p.ageRanges;
