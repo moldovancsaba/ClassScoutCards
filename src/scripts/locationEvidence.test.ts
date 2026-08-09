@@ -7,6 +7,7 @@ import {
   judgeLocation,
   sharedDefaults,
   zipBorough,
+  addressIsInServiceArea,
 } from "./locationEvidence";
 
 describe("zipBorough — the one location fact that outranks every field on the record", () => {
@@ -138,5 +139,39 @@ describe("manhattanCrossStreet — house number as a cross-street proxy", () => 
     // Carnegie Hill vs Yorkville within ZIP 10128.
     expect(manhattanCrossStreet("24 East 95th Street")!.house).toBeLessThan(300);   // Carnegie Hill
     expect(manhattanCrossStreet("421 East 91st Street")!.house).toBeGreaterThanOrEqual(300); // Yorkville
+  });
+});
+
+describe("addressIsInServiceArea — the positive form of a check that failed as a denylist", () => {
+  it("catches the address that the reference-host denylist missed", () => {
+    // prov-mail-online: a live BROOKLYN provider addressed to the Daily Mail's London office.
+    expect(addressIsInServiceArea("9 Derry Street, London W", "nyc")).toBe(false);
+    // The denylist built for this defect did not contain dailymail.co.uk, so it found nothing.
+  });
+
+  it("passes ordinary NYC addresses in every form the catalogue actually stores", () => {
+    for (const a of [
+      "555 E 90th St, New York, NY 10128",
+      "9941 Fort Hamilton Pkwy, Brooklyn, NY 11209",
+      "Upper West Side, Manhattan, NYC",
+      "Pier 59, Chelsea Piers, New York, NY 10011",
+      "43-44 12th Street, Long Island City, NY 11101",
+    ]) {
+      expect(addressIsInServiceArea(a, "nyc")).toBe(true);
+    }
+  });
+
+  it("applies the LA tenant's own service area rather than New York's", () => {
+    expect(addressIsInServiceArea("1600 Ocean Front Walk, Santa Monica, CA 90401", "la")).toBe(true);
+    // The YMCA of Metropolitan Los Angeles stored a camp property 300 miles away, and it fails.
+    expect(addressIsInServiceArea("200 Sherwin Creek Rd, Mammoth Lakes, CA 93546", "la")).toBe(true);
+    // ^ Mammoth Lakes IS in California, so this check correctly does NOT catch it — that record was found
+    // by reading it, and the limit is worth asserting rather than pretending the check is stronger.
+    expect(addressIsInServiceArea("555 E 90th St, New York, NY 10128", "la")).toBe(false);
+  });
+
+  it("treats an ABSENT address as passing — that is a different signal", () => {
+    expect(addressIsInServiceArea("", "nyc")).toBe(true);
+    expect(addressIsInServiceArea(null, "nyc")).toBe(true);
   });
 });

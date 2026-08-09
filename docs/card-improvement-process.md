@@ -7709,3 +7709,39 @@ with real enrollable programmes — the difference is who the operator is talkin
 
 Broadway Dance Center's children's card carried **an adults-only course listing as its description**
 ("Ages 18+ • Oct 5, 2026-May 14, 2027"), on the record for the Children & Teens division.
+
+## v161 (2026-08-09): batch 50 — "Mail Online", and why the denylist built for it missed it
+
+`prov-mail-online` was a **live Brooklyn provider** named Mail Online, sourced to `dailymail.co.uk`,
+addressed to *"9 Derry Street, London W"* — the Daily Mail's London office, cut off mid-postcode — with
+2,389 characters of British tabloid front page as its long description, opening on a Michael Gove column
+and running into Zendaya and Tom Holland having lunch. Filed under Birthday Parties and Sports, ages 0-2
+and Teens. Quarantined. Second such record found today, after "Manhattan - Wikitravel".
+
+**How it was found is the finding.** Not by the reference-host scan built for exactly this defect — that
+returned six hits with five false positives and did not include this one, because `dailymail.co.uk` was not
+on its list. **A denylist finds what is on the list.** It was found by the defect-signal queue, because a
+fabricated record is also an incomplete one: no phone, no email, no neighbourhood, a 74-character
+description.
+
+### The positive form of the same check, which needs no list
+
+Rather than enumerating bad hosts, ask whether the stored address contains ANY marker placing it in the
+record's own tenant service area. `addressIsInServiceArea()` in `locationEvidence.ts`. Across **690 live
+providers with an address: 26 fail, and none is out of area** — three are citywide-programme records
+already recorded as split candidates ("94 NYCHA community centres citywide"), and the other 23 are bare
+street lines with no city or ZIP suffix ("253 36th Street", "50 Bedford Ave."), incomplete rather than
+wrong. A clean census-scale negative result, and one that can now be re-run in a second.
+
+**Its limit is asserted in a test rather than glossed**: the YMCA of Metropolitan Los Angeles's Mammoth
+Lakes camp address, 300 miles from the city, PASSES — Mammoth Lakes is in California. That record was found
+by reading it, and the check is not stronger than it is.
+
+### Two clubs a name scan would have merged
+
+Lil' Kickers Manhattan (`lilkickers.com`, a national franchise) and Manhattan Kickers Soccer Club
+(`manhattankickers.org`, a local club) differ only by word order. Both kept. An earlier pass had already
+recorded "Lil' Kickers Manhattan on manhattankickers.org" as a cross-wiring risk, so this is the same pair
+seen from the other side — and it is the fourth confirmed instance of two real organisations with
+confusingly similar names, after United Soccer Academy / Brooklyn United, the two fencing clubs, and the
+two Williamsburg soccer clubs.

@@ -183,3 +183,34 @@ export function judgeLocation(claim: LocationClaim): LocationVerdict {
   if (stored) return { action: "confirmed", value: stored, because: "nothing on the record contradicts the stored value" };
   return { action: "needs_human", because: "the record carries no address, no place name and no stored value" };
 }
+
+/**
+ * Does a stored address contain ANY marker placing it in its tenant's own service area?
+ *
+ * **This is the positive form of a check that kept failing as a denylist.** The catalogue has twice found
+ * a live provider whose entire content came from a foreign or off-topic site — "Manhattan - Wikitravel",
+ * and "Mail Online", a Brooklyn provider addressed to *"9 Derry Street, London W"* with two thousand
+ * characters of British tabloid front page as its description. A reference-host denylist was built for
+ * exactly that defect and **missed the second one**, because `dailymail.co.uk` was not on the list. A
+ * denylist finds what is on the list; asking whether the address is IN the service area needs no list of
+ * places that are not.
+ *
+ * Measured 2026-08-09 across 690 live providers with an address: **26 fail, and none of them is out of
+ * area.** Three are citywide-programme records already recorded as split candidates ("94 NYCHA community
+ * centres citywide"); the other 23 are bare street lines with no city, state or ZIP suffix — "253 36th
+ * Street", "50 Bedford Ave." — which are incomplete rather than wrong. So the current answer is a clean
+ * negative result, which is the useful thing to be able to state.
+ *
+ * Deliberately permissive: a ZIP alone passes, and so does a bare "NY". The point is to catch an address
+ * that is somewhere else entirely, not to grade formatting.
+ */
+const SERVICE_AREA: Record<string, RegExp> = {
+  nyc: /\b(?:ny|n\.y\.|new york|nyc|brooklyn|bronx|queens|manhattan|staten island)\b|\b1[01]\d{3}\b/i,
+  la: /\b(?:ca|calif|california|los angeles|santa monica|pasadena|long beach|burbank|glendale)\b|\b9\d{4}\b/i,
+};
+
+export function addressIsInServiceArea(address: string | null | undefined, city?: string | null): boolean {
+  const a = String(address ?? "").trim();
+  if (!a) return true; // an absent address is a separate signal, not an out-of-area one
+  return (SERVICE_AREA[String(city ?? "nyc").toLowerCase()] ?? SERVICE_AREA.nyc).test(a);
+}
