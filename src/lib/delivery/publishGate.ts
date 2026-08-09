@@ -95,10 +95,22 @@ export function providerPublishGate(record: PublishGateInput): PublishGateResult
   const source = str(record.website) || (Array.isArray(record.sourceUrls) ? str(record.sourceUrls[0]) : "");
   if (!/^https?:\/\/\S+$/i.test(source)) missing.push("website is not a usable source URL");
 
-  // `hasValidOwnImage` — the requirement that actually blocks most listings.
-  if (!isImgBbHttpsImageUrl(record.image)) {
-    missing.push("image is not an https imgbb URL (i.ibb.co/...); the main app shows no listing without its own image");
-  }
+  // (2026-08-09, owner directive: "Publish listings even the image missing!!! The core system does not
+  // use the images now.") The image is NO LONGER a publish requirement.
+  //
+  // Recorded plainly because the two sources disagree and a future reader deserves to know which was
+  // followed and why. The `classscout` checkout read on this date still gates on it in three places —
+  // `isRenderableListing` = `hasValidOwnImage && isRenderableExceptImage`, with `deriveServingDoc`
+  // computing its `renderable` flag from it and `publicListReads`/`publicBrowse` both filtering on it.
+  // The owner states the DEPLOYED core no longer does. The owner owns that system and knows its current
+  // behaviour; a clone is a snapshot of one commit. So the gate follows the directive.
+  //
+  // Note what this does NOT change: `imgbbImageFieldError` is still enforced on WRITE, so an image that
+  // is supplied must still be an imgbb URL. Dropping the requirement to HAVE one is not the same as
+  // accepting a URL that will never render. And `isRenderableExceptImage`'s other conditions — title,
+  // category, location, source — remain, because those were never about the photograph.
+  //
+  // If listings created under this rule turn out not to appear, this is the first thing to re-check.
 
   // The moderation flags this bridge could always set defensively.
   if (str(record.qualityStatus).toLowerCase() === "quarantined") missing.push("qualityStatus is quarantined");

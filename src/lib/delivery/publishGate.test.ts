@@ -41,15 +41,19 @@ describe("providerPublishGate — would a family see this listing?", () => {
   it("reports EVERY unmet requirement, not just the first", () => {
     // A caller fixing a listing wants the whole list; one at a time turns one research pass into five
     // round-trips.
-    const r = providerPublishGate({ ...VISIBLE, image: "", category: "", website: "" });
+    const r = providerPublishGate({ ...VISIBLE, name: "", category: "", website: "" });
     expect(r.ok).toBe(false);
     expect(r.missing).toHaveLength(3);
   });
 
-  it("fails on a non-imgbb image, which is what blocks most real listings", () => {
-    const r = providerPublishGate({ ...VISIBLE, image: "https://gowanusfencing.example/photo.jpg" });
-    expect(r.ok).toBe(false);
-    expect(r.missing.join(" ")).toMatch(/imgbb/);
+  // (2026-08-09, owner directive: "Publish listings even the image missing!!! The core system does not
+  // use the images now.") The image was a hard requirement here for exactly one day. Pinned as a test
+  // rather than just deleted, because the checked-out classscout code still gates on it and a future
+  // reader hitting invisible listings needs to find this decision rather than re-derive it.
+  it("no longer requires an image at all", () => {
+    const { image, ...noImage } = VISIBLE;
+    expect(providerPublishGate(noImage).ok).toBe(true);
+    expect(providerPublishGate({ ...VISIBLE, image: "" }).ok).toBe(true);
   });
 
   it("fails when hidden or quarantined, which are the flags this bridge could always set", () => {
@@ -71,7 +75,7 @@ describe("providerPublishGate — would a family see this listing?", () => {
     expect(providerPublishGate({ ...VISIBLE, neighborhood: "" }).ok).toBe(true);
   });
 
-  it("does NOT require phone, email, address, ageRanges, schedule or price", () => {
+  it("does NOT require phone, email, address, ageRanges, schedule, price — or an image", () => {
     // Each of those is a quality obligation under the enrichment mandate, not a visibility condition.
     // Conflating the two would make this gate refuse listings the main app would happily show.
     expect(providerPublishGate(VISIBLE).ok).toBe(true);
