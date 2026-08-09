@@ -302,16 +302,48 @@ export function validateWriteRequest(body: unknown): WriteValidationResult {
     };
   }
 
-  // This bridge has no real geocoder — it can only ever honestly claim "approximate" placement, never
-  // pretend to be google/nominatim/places/civic-quality geocoding it never actually performed.
+  // (2026-08-09) This used to accept ONLY `source: "approximate"`, on the stated grounds that "this
+  // bridge has no real geocoder". That premise is now false: the loop geocodes street addresses against
+  // Nominatim, which is the same service the existing live pins were produced by (`source: "nominatim"`
+  // appears on real records today). Widening the rule because its reason stopped being true is the same
+  // discipline this repo applies to clearing a blocker — the premise has to be false, not merely
+  // inconvenient.
+  //
+  // WHY THIS MATTERED. Listings created by this bridge carried no `geo` at all, and the map viewport is a
+  // real FILTER rather than a display hint. So a listing with a perfect street address was absent from
+  // the map and from any map-bounded browse, while 232 of 394 live listings had pins. That is what
+  // "I don't see the results online" looked like from the outside.
+  //
+  // Two things are still refused, and both are load-bearing:
+  //   - a source this bridge cannot actually perform (anything but `approximate` or `nominatim`);
+  //   - a CENTROID-GRADE pin. `precision` must be `exact` or `interpolated` for a nominatim pin, because
+  //     a neighbourhood centroid dressed as a geocode puts a confident marker on a street the business
+  //     is not on — already recorded here as worse than no pin at all, with seven live listings sharing
+  //     one Upper East Side point. A nominatim result that only resolves to a neighbourhood must be
+  //     dropped, not written.
   if (collection === "providers" && "geo" in updates) {
     const geo = updates.geo as Record<string, unknown> | undefined;
-    if (typeof geo !== "object" || geo === null || geo.source !== "approximate") {
+    if (typeof geo !== "object" || geo === null) {
+      return { ok: false, status: 400, error: "geo must be an object with lat, lng, precision and source" };
+    }
+    const allowedSources = ["approximate", "nominatim"];
+    if (typeof geo.source !== "string" || !allowedSources.includes(geo.source)) {
       return {
         ok: false,
         status: 400,
-        error: 'geo.source must be "approximate" when writing geo through this bridge — this bridge has no real geocoder, so any other source value would misrepresent how the pin was placed.',
+        error: `geo.source must be one of: ${allowedSources.join(", ")} — anything else would misrepresent how the pin was placed, because those are the only two this bridge can actually perform.`,
       };
+    }
+    if (geo.source === "nominatim" && geo.precision !== "exact" && geo.precision !== "interpolated") {
+      return {
+        ok: false,
+        status: 400,
+        error: 'a geo with source "nominatim" must have precision "exact" or "interpolated". A coarser match is a neighbourhood centroid, and a centroid dressed as a geocode puts a confident marker on a street the business is not on — drop the pin instead.',
+      };
+    }
+    if (typeof geo.lat !== "number" || typeof geo.lng !== "number"
+        || geo.lat < -90 || geo.lat > 90 || geo.lng < -180 || geo.lng > 180) {
+      return { ok: false, status: 400, error: "geo.lat and geo.lng must be numbers in range" };
     }
   }
 

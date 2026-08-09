@@ -208,13 +208,40 @@ describe("validateWriteRequest", () => {
       expect(result.ok).toBe(true);
     });
 
-    it("rejects geo claiming a real geocoder source it never performed", () => {
+    it("rejects geo claiming a geocoder this bridge cannot actually perform", () => {
       const result = validateWriteRequest({
         ...validProviderBody,
         updates: { geo: { lat: 40.68, lng: -73.96, precision: "exact", source: "google" } },
       });
       expect(result.ok).toBe(false);
-      expect(!result.ok && result.error).toMatch(/geo\.source must be "approximate"/);
+      expect(!result.ok && result.error).toMatch(/geo\.source must be one of/);
+    });
+
+    // (2026-08-09) Nominatim was added because the old rule's stated reason — "this bridge has no real
+    // geocoder" — stopped being true, and listings created here were absent from the map for want of a
+    // pin while 232 of 394 live listings had one.
+    it("accepts a nominatim pin at street precision", () => {
+      for (const precision of ["exact", "interpolated"]) {
+        expect(validateWriteRequest({
+          ...validProviderBody,
+          updates: { geo: { lat: 40.6325, lng: -73.8907, precision, source: "nominatim" } },
+        }).ok).toBe(true);
+      }
+    });
+
+    it("REFUSES a centroid-grade nominatim pin, which is worse than no pin", () => {
+      // Seven live listings already share a single Upper East Side point derived this way.
+      const result = validateWriteRequest({
+        ...validProviderBody,
+        updates: { geo: { lat: 40.68, lng: -73.96, precision: "approximate", source: "nominatim" } },
+      });
+      expect(result.ok).toBe(false);
+      expect(!result.ok && result.error).toMatch(/centroid/);
+    });
+
+    it("rejects coordinates out of range or non-numeric", () => {
+      expect(validateWriteRequest({ ...validProviderBody, updates: { geo: { lat: 999, lng: -73.96, precision: "exact", source: "nominatim" } } }).ok).toBe(false);
+      expect(validateWriteRequest({ ...validProviderBody, updates: { geo: { lat: "40.68", lng: -73.96, precision: "exact", source: "nominatim" } } }).ok).toBe(false);
     });
 
     it("rejects geo with no source at all", () => {
