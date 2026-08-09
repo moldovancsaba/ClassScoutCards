@@ -36,3 +36,47 @@ describe("validateCopyQuality", () => {
     expect(validateCopyQuality("Classes here.", "d")).toMatch(/too short/);
   });
 });
+
+// (2026-08-09, owner directive) US English in family-facing copy. The word list is the easy half; the
+// protection against renaming a real business is the half worth testing.
+describe("British spelling in public copy", () => {
+  it("rejects the spellings the sweep actually found in live records", () => {
+    for (const [text, word] of [
+      ["Our after-school programme runs weekly for ages five and up in the gym.", "programme"],
+      ["A community centre with a pool, open to families across the area.", "centre"],
+      ["A neighbourhood club that has run here for over thirty years now.", "neighbourhood"],
+      ["The organisation runs camps and classes throughout the school year.", "organisation"],
+      ["Coaches travelling between sites teach the same graded curriculum.", "travelling"],
+      ["Self-defence classes for children from about six years upwards.", "defence"],
+    ] as const) {
+      const err = validateCopyQuality(text, "longDescription");
+      expect(err, text).toBeTruthy();
+      expect(err).toContain(word);
+    }
+  });
+
+  it("NEVER flags a capitalised Theatre — that is a real business's name", () => {
+    // Treasure Trunk Theatre, American Ballet Theatre, Dance Theatre of Harlem, Jalopy Theatre and
+    // New York Theatre Ballet are all spelled this way. Renaming one is worse than the spelling.
+    for (const text of [
+      "Treasure Trunk Theatre runs drama classes and school-holiday camps for children.",
+      "It is an affiliate of American Ballet Theatre's National Training Curriculum programs.",
+      "Dance Theatre of Harlem School teaches classical ballet to students of all levels.",
+    ]) {
+      expect(validateCopyQuality(text, "longDescription"), text).toBeNull();
+    }
+  });
+
+  it("does not flag a capitalised word in proper-noun position", () => {
+    expect(validateCopyQuality("Classes run at the Kaufman Music Centre building on West 67th Street.", "longDescription")).toBeNull();
+  });
+
+  it("DOES flag a sentence-initial capital, which is not evidence of a name", () => {
+    const err = validateCopyQuality("Programmes run every weekday afternoon for children aged six and over.", "longDescription");
+    expect(err).toContain("Programme");
+  });
+
+  it("leaves correct US copy alone", () => {
+    expect(validateCopyQuality("A neighborhood center running youth programs, swim lessons and summer camps.", "longDescription")).toBeNull();
+  });
+});

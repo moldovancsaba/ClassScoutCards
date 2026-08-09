@@ -63,6 +63,8 @@ export function validateCopyQuality(value: string, label: string): string | null
   if (value.trim().length < 20) {
     return `${label} is too short to be real source-backed prose (< 20 chars)`;
   }
+  const british = britishSpellingError(value, label);
+  if (british) return british;
   return null;
 }
 
@@ -76,4 +78,65 @@ export function validateCopyQuality(value: string, label: string): string | null
  */
 export function containsScrapedChrome(value: string): boolean {
   return SCRAPED_CHROME_PATTERNS.some((p) => p.test(value)) || CAROUSEL_ARTIFACT_PATTERN.test(value);
+}
+
+/**
+ * British spelling in family-facing copy (owner directive, 2026-08-09: "We use and have to use US English
+ * on the site so every content, listing should be rephrased to US English if required").
+ *
+ * A sweep found 297 live records carrying "programme" (389 times), "centre" (129), "neighbourhood",
+ * "organisation", "travelling", "defence" and "enrolment" in their descriptions — much of it written by
+ * this loop. A guard is what stops it coming back one description at a time.
+ *
+ * THE PROPER-NOUN PROBLEM is what makes this more than a word list. Treasure Trunk Theatre, Dance Theatre
+ * of Harlem, American Ballet Theatre, Lula Washington Dance Theatre, Jalopy Theatre and New York Theatre
+ * Ballet are all spelled that way because that is their NAME. Renaming a real business is a worse defect
+ * than the spelling, so:
+ *
+ *   - a CAPITALISED "Theatre" is never flagged;
+ *   - nothing capitalised and directly preceded by another capitalised word is flagged, because that is
+ *     proper-noun position ("Music Centre", "Youth Programme").
+ *
+ * A capital after a full stop IS flagged — sentence-initial position is not evidence of a name.
+ */
+const BRITISH_SPELLINGS: ReadonlyArray<readonly [RegExp, string]> = [
+  [/\bprogrammes?\b/g, "program(s)"],
+  [/\bcentres?\b/g, "center(s)"],
+  [/\borganisations?\b/g, "organization(s)"],
+  [/\borganis(e|es|ed|ing)\b/g, "organize"],
+  [/\bspecialis(e|es|ed|ing)\b/g, "specialize"],
+  [/\bemphasis(e|es|ed|ing)\b/g, "emphasize"],
+  [/\brecognis(e|es|ed|ing)\b/g, "recognize"],
+  [/\bneighbourhoods?\b/g, "neighborhood(s)"],
+  [/\btravelling\b/g, "traveling"],
+  [/\btravelled\b/g, "traveled"],
+  [/\bdefence\b/g, "defense"],
+  [/\blicence\b/g, "license"],
+  [/\benrolment\b/g, "enrollment"],
+  [/\bcolours?\b/g, "color(s)"],
+  [/\bfavourites?\b/g, "favorite(s)"],
+  [/\bmetres?\b/g, "meter(s)"],
+  [/\btheatres?\b/g, "theater(s)"],
+];
+
+/** The word sits in proper-noun position: capitalised, directly after another capitalised word. */
+function inProperNoun(text: string, index: number, word: string): boolean {
+  if (!/^[A-Z]/.test(word)) return false;
+  return /[A-Z][\w'-]*\s+$/.test(text.slice(Math.max(0, index - 40), index));
+}
+
+/** Returns a caller-facing message naming the first British spelling found, or null. */
+export function britishSpellingError(value: string, label: string): string | null {
+  for (const [pattern, us] of BRITISH_SPELLINGS) {
+    const re = new RegExp(pattern.source, "gi");
+    let m: RegExpExecArray | null;
+    while ((m = re.exec(value)) !== null) {
+      const word = m[0];
+      // A capitalised Theatre is somebody's name, always.
+      if (/^T/.test(word) && word.toLowerCase().startsWith("theatre")) continue;
+      if (inProperNoun(value, m.index, word)) continue;
+      return `${label} uses British spelling ("${word}") — this site serves US families and its copy must be US English. Write "${us}". Proper nouns are exempt: a business genuinely named "... Theatre" keeps its own spelling.`;
+    }
+  }
+  return null;
 }
