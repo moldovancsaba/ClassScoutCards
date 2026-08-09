@@ -7798,3 +7798,30 @@ wrote an activity value not in the vocabulary and the derivation silently discar
 shape: **the batch driver's read-back verifies only the fields that were SENT**, so it cannot see a field
 that was described and omitted, nor one whose absence is the defect. When correcting a place, write every
 level of it.
+
+### Batch 53 — the vocabulary-coverage sweep, and the one record it found
+
+The directive's verification is not "the code compiles" but "does every live listing's stored place now
+resolve against some vocabulary?" A temporary in-repo vitest file (written inside `src/` so the `@/` alias
+resolved — `npx tsx` cannot load this repo's tsconfig from the scratchpad) walked all **712 live
+providers** and resolved each stored `borough`/`neighborhood` against NYC, LA and the four expansion
+markets:
+
+```
+live providers: 712
+BOROUGH unresolvable: 0
+NEIGHBOURHOOD unresolvable: 1
+    prov-brooklyn-elite-volleyball   Brooklyn -> "Columbia Street Waterfront District"
+```
+
+That single record was a **spelling variant, not a missing place** — the canonical name is "Columbia
+Street Waterfront", and adding the long form as a synonym would require a fold target for a name that is
+already its own display group. Corrected to the canonical spelling, with `neighborhood: corrected` recorded
+in `fieldVerifications`. Coverage is now complete.
+
+**Why the sweep was worth running separately from the batches that motivated it.** Every place fix this
+session was found by working a record; this asked the inverse question — *is there anything left the
+vocabulary cannot express?* — and could only be answered by enumerating the pool. A vocabulary change that
+is verified only by the records that prompted it is verified against its own training set. Recording a
+census result (712, not a sample) is the other half of the already-catalogued rule about saying sample-vs-
+census out loud.
