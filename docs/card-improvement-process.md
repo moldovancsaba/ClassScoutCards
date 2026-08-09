@@ -7197,3 +7197,74 @@ siblings were hidden.
   apart.
 
 Remaining after batch 28: **39 shared-address clusters, 82 live records.**
+
+## v152 (2026-08-09): batches 29–30 — 41 records, 21 venues, and where the cluster scan stops being mechanical
+
+Batches 29 and 30 both came from `addressClusters()`. Together with batch 28 they took the pool from **46
+clusters / 100 live records to 21 clusters / 43 records.**
+
+### Batch 29 — ten one-operator clusters, 20 records
+
+Straightforward program-card retirements at ten addresses, all build-then-retire. Five of them turned on a
+judgement worth recording rather than on the duplicate itself:
+
+- **`5 W 63rd St` — a CHAIN-LEVEL record parked on a branch's address.** The sibling of West Side YMCA was
+  literally named "New York City's Ymca" — the YMCA of Greater New York, 24 branches — sitting on this one
+  branch's street address, with `theschulberts@gmail.com`, a **personal Gmail account**, as the YMCA's
+  contact. Same shape as a franchisor's root domain standing in for a branch.
+- **`140 Flatbush Ave` — right name beats richer fields, again.** The operator's own site is titled
+  *Brooklyn Basketball* and calls itself "the official youth basketball program of the Brooklyn Nets and
+  New York Liberty", so the sibling's name — *Brooklyn Nets Basketball Academy* — is a description of the
+  backing, not a business a family could ask for at the door. The sibling was the better-populated record;
+  its copy was folded into the canonical one before retirement.
+- **`630 Sackett St` — the field/copy split, reversed.** Stored neighbourhood said Park Slope; the record's
+  own researched description said "a Brooklyn dojo in Gowanus". 630 Sackett is between Third and Fourth
+  Avenues, so the copy was right and the field was wrong — the opposite of Gymstars in batch 28, and both
+  invisible to `judgeLocation()`, which only reads fields.
+- **`2280 Frederick Douglass Blvd` — two live records with the BYTE-IDENTICAL name and address.** Nothing
+  but a name or address scan surfaces that.
+- **`250 W 86th St` — a reality check that came out the other way.** Crossbar's descriptions were full of
+  "Order Now Menu Trivia Karaoke", which reads exactly like the Equinox "Kids Club" case — a bar with an
+  amenity mislabelled as children's provision. It is not: Crossbar publishes toddler open-play soccer
+  sessions every weekday 9am–12pm, $10 a child, on its own indoor field. Real programme, real fixed
+  address. Its sibling was named **"Crossbar (new)"**, which is the suffix on every page title of the
+  site's template — the same defect family as the "New" and "And" titles.
+
+### Batch 30 — the `mixed` clusters, 21 records
+
+Deliberately took the clusters the classifier could not resolve. They split three ways, and the third is
+why `mixed` can never be swept:
+
+1. **Genuinely shared buildings.** Pier 40 (353 West St) holds four records and only ONE is a duplicate —
+   Downtown United Soccer Club has two cards, while the Village Community Boathouse and Greenwich Village
+   Little League are separate real organisations at the same pier. Confirmed and left. Likewise Big City
+   Volleyball renting Congregation Beth Elohim's gym at 274 Garfield Place: two real operators, both kept.
+2. **One operator behind two names** — FunFit Kids / "Kids Multi", SwimJim twice, Prospect Gymnastics /
+   "Coney Island Gymnastics Prospect".
+3. **A real second operator sharing an address with a duplicate PAIR.** 752 West End Avenue holds both of
+   FunFit's cards *and* Imagine Swimming, which rents the pool in the same building. You cannot act on the
+   cluster, only on records inside it.
+
+Three findings from it:
+
+- **"Kids Multi" is not a business.** The operator's own page title is "Kids Multi-Sport Program | New York
+  | FunFit Kids" — the card's name is the first two words of a title tag. Fifth instance of the
+  title-fragment-as-business-name defect.
+- **"Coney Island Gymnastics Prospect" was sitting on the real gym's own address.** 1023 Church Avenue is
+  Prospect Gymnastics in Ditmas Park; the sibling claimed the neighbourhood Coney Island, five miles away.
+  An earlier pass quarantined a Coney Island Gymnastics card elsewhere for the same fabrication; this one
+  was hiding inside a real business's address cluster.
+- **A ticket type is not a place, and neither is a park.** The New York Botanical Garden's venue record was
+  named "New York Botanical Garden — NYC Resident Grounds Access" with `primaryActivityType: "Botanical
+  garden"`. Renamed and re-typed — but its neighbourhood was deliberately **left empty and marked
+  needs_human**, as were the Bronx Zoo's and Bronx House's: NYBG and the zoo occupy their own acreage in
+  Bronx Park bordering three neighbourhoods without sitting in any, and 990 Pelham Parkway South sits on a
+  boundary this platform's Bronx vocabulary has no entry for. The Staten Island Children's Museum could be
+  answered (Snug Harbor is in Livingston, which IS in the vocabulary), which is the contrast that makes the
+  other three genuine escalations rather than laziness.
+
+### Three dated titles, retired
+
+`Bronx House — Summer Fun 2026`, `New York Botanical Garden Science Camp (2026)`, `Staten Island Children's
+Museum — Summer Camp 2026`. Each retired as a program card anyway, but a year in a title is its own defect:
+the card will still be live next summer.
