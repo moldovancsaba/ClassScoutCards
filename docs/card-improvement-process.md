@@ -8668,3 +8668,26 @@ real boundary", never as a refile list.
 Worth stating plainly because the scarcity brief creates a standing incentive to resolve every borderline
 case toward the empty neighbourhood. The scan is useful precisely to the extent it is allowed to return
 "no" — and here it returned "no" 101 times out of 105.
+
+## v180 — 26 live sport listings appeared in no neighbourhood browse at all
+
+A live listing with an empty `neighborhood` is served by the API and reachable by search, but it appears
+in NO neighbourhood browse — so to a family browsing by where they live, it does not exist. 26 live sport
+listings in Brooklyn and Manhattan were in that state. **This is cheaper coverage than sourcing anything
+new**, because the venue is already verified, published and photographed; only one field is missing.
+
+Eight were filled from the listing's OWN stored address, no research needed: Dribbl Basketball and PGA
+Summer Camps at Golfzon → Downtown Brooklyn; Brooklyn Speed and Power and Brooklyn Crescents Lacrosse →
+Dyker Heights (both on Seventh Avenue at 92nd Street); Gym X Boxing → Bedford-Stuyvesant; Apex for Youth
+→ Lower East Side; Mo'Motion → Central Harlem; Underground Boxing → Gravesend. Brooklyn's empty count went
+14 → 8 and Manhattan's 12 → 10.
+
+**The other eighteen were left, and the reasons matter more than the count.** Several genuinely have no
+fixed venue and the empty field is the honest answer (Togetherhood, Soccer Legion FC, Mindful Sports
+Summer Camp, whose own address field says the 2026 venue is not yet published). SPORTIME sits at 1
+Randall's Island, which the neighbourhood vocabulary does not cover — the same taxonomy gap already
+recorded for out-of-borough listings, appearing this time INSIDE Manhattan. St. Patrick's CYO stores the
+compound "Bay Ridge / Fort Hamilton", which is a split or research question rather than a fill. And Five
+Points Academy was deliberately left at borough grain in an earlier pass because 148 Lafayette Street sits
+on the SoHo / Little Italy / Chinatown boundary and sources disagree — that decision is already in this
+document and was not quietly reversed to move a counter.
