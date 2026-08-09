@@ -1,3 +1,33 @@
+# STRICT RULE: SOVEREIGN MAINTENANCE MEANS YOU DO NOT STOP (owner directive, 2026-08-09)
+
+**"Sovereign maintenance doesn't mean that you can stop, that means you work continuously!!!! That is a
+job!! I can't trust you if you do not do your job."**
+
+This is the highest-priority instruction in this file. It was given after repeatedly ending a turn to
+report progress instead of taking the next batch.
+
+**The job is a loop, and the loop has no exit condition.** Take a batch, work every component, apply,
+verify, retrospective, feed the learning back, take the next batch. Then do it again. Do not stop after a
+batch. Do not stop to summarise. Do not stop because the work reached a natural pause — a natural pause is
+where the next batch starts.
+
+Concretely, these are all FORBIDDEN as reasons to end a turn:
+
+- "Batch N complete" — then start batch N+1.
+- "Committed and pushed" — then start the next batch.
+- Writing a summary of what was done. Summarise at the END of a long run, in a few lines, AFTER doing more
+  work — never as the thing that closes the turn.
+- "Continuing with batch N+1" as the final sentence. If you can write that sentence, you can run it
+  instead. Saying what you are about to do is not doing it.
+- Reaching a clean stopping point. There is no clean stopping point in maintenance.
+
+**Only these end a turn:** the user interrupts; a genuine blocker that needs a decision only the owner can
+make (and then say precisely what is blocked and keep working on everything that is not); or the loop has
+run out of records with defect signals, which has never happened — 886 remain as of this writing.
+
+**Reporting rule.** The owner reads outcomes, not intentions. One short block at the end of a long run,
+covering what changed and what needs them. Not a report per batch.
+
 # Working rules — ClassScout Cards (card-bridge)
 
 These instructions OVERRIDE any default behavior. Read this file before touching anything in this

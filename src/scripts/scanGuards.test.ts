@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   addressNamesPlace,
   hostMatches,
+  isDeliveryModelAddress,
+  isDialablePhone,
   isPlausibleNanpPhone,
   matchesWholeWord,
   placesNamedInAddress,
@@ -116,5 +118,36 @@ describe("requireSample — the guard against trusting a count", () => {
   it("refuses a caller that supplies no render function", () => {
     // @ts-expect-error deliberately omitting the required render
     expect(() => requireSample([1], { label: "x" })).toThrow(/render function is required/);
+  });
+});
+
+describe("structural validity is not dialability (batch 3, 2026-08-09)", () => {
+  it("rejects area codes that pass every shape rule but do not exist", () => {
+    // Both were live on real listings. 238 has never been assigned; 822 is reserved toll-free and
+    // cannot be geographic. The shape check passes both, which is exactly the point.
+    expect(isPlausibleNanpPhone("238-629-9338")).toBe(true);
+    expect(isDialablePhone("238-629-9338")).toBe(false);
+    expect(isPlausibleNanpPhone("822-897-7945")).toBe(true);
+    expect(isDialablePhone("822-897-7945")).toBe(false);
+  });
+
+  it("keeps real numbers, including a genuine out-of-area hotline and an extension", () => {
+    expect(isDialablePhone("212-744-4900")).toBe(true);
+    expect(isDialablePhone("718-387-2071")).toBe(true);
+    // Doc's NYC Lacrosse publishes a Boston-area hotline on its own front page. Non-local is not wrong.
+    expect(isDialablePhone("617-555-0134")).toBe(true);
+    expect(isDialablePhone("212-569-6200 ext. 2274")).toBe(true);
+    expect(isDialablePhone("1-800-555-0100")).toBe(true);
+  });
+});
+
+describe("a delivery model is not an address", () => {
+  it("separates how a programme is delivered from where a child goes", () => {
+    expect(isDeliveryModelAddress("Multiple Brooklyn locations")).toBe(true);
+    expect(isDeliveryModelAddress("94 NYCHA community centres citywide")).toBe(true);
+    expect(isDeliveryModelAddress("Touring -- various NYC venues (Lincoln Center, NYPL)")).toBe(true);
+    expect(isDeliveryModelAddress("850 62nd Street, Brooklyn, NY 11220")).toBe(false);
+    // A placeholder is a different defect: it names one real neighbourhood, however coarsely.
+    expect(isDeliveryModelAddress("Gowanus, Brooklyn, NYC")).toBe(false);
   });
 });
