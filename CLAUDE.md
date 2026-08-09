@@ -1185,6 +1185,22 @@ in a comment when you add one, the way the existing ports do.
   coarse value. `manhattanCrossStreet` returns null rather than guessing, and a boundary street is left to
   the coarser side (W 72nd stays Upper West Side rather than being claimed for Lincoln Square).
 
+- **A quarantined provider does NOT quarantine its content card, and nothing in the schema links the two.**
+  Found when `apple seeds` turned up `PUBLISHED` as a card while its own provider record had been
+  quarantined for permanent closure in an earlier pass. Querying the shape pool-wide: **34 hosts where
+  every provider is quarantined and none is live; 18 maintainable cards on them, 12 of them `PUBLISHED`.**
+  Four were confirmed-closed or fabricated businesses still live (apple seeds, The Play Lab ×2, The Paint
+  Place UWS, Big Apple Swim School).
+- **That check is a LEAD GENERATOR, not a bulk action — and its own output proves it.** Four of the 18 are
+  Tennis Innovators cards that are the *correct result* of an earlier split: the parent was quarantined
+  precisely because its children now exist. Two more (The Coding Space UES and Park Slope) name genuinely
+  real centres, while the quarantined twin claimed an Upper West Side location the operator does not have.
+  Acting on the signal in bulk would have deleted real businesses and undone real work. Check each one.
+- **Inheriting a twin's verdict is wrong even when the verdict is right.** The quarantined provider on
+  `thepaintplaceny.com` was *The Paint Place Brooklyn*; the live card was *The Paint Place UWS* — a
+  different location, which needed its own check. It happened to also be closed, but that had to be
+  established, not assumed.
+
 ## Store the REAL neighbourhood; the page's grouping rule handles display (owner directive, 2026-08-08)
 
 **"I want the real neighbourhoods and boroughs for every single listing, there is a grouping rule how the

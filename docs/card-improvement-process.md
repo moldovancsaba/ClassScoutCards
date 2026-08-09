@@ -6558,6 +6558,15 @@ only place it can go.
   parks are not in the borough claimed), and the record contradicting its own name (20). Cleared an
   18-record shared-default location. New: `src/scripts/locationEvidence.ts` + 12 tests.
 
+- v145 (2026-08-09): **the quarantined-twin cross-collection check, and 92 real neighbourhoods.**
+  Extended the real-neighbourhood sweep from 29 to 92 of 345, resolving straddling ZIPs from
+  Manhattan's house-numbering convention rather than the ZIP — and rebuilt, by hand, the exact
+  substring false positive `scanGuards.ts` was written to prevent two commits earlier (`\byork\b`
+  matching the "York" in "New York", on every Manhattan address at once). New check: 18 maintainable
+  cards, 12 `PUBLISHED`, whose only provider twin is quarantined — a lead generator, not a bulk
+  action, since four of them are the correct output of an earlier split. Four confirmed-closed
+  businesses were live.
+
 ## v144 (2026-08-08): the location-evidence audit — 64 live provider records, and a check that was measuring itself
 
 This round started as a routine continuation of the cross-collection neighbourhood fill and turned into
@@ -6689,3 +6698,80 @@ ZIP→neighbourhood map: NYC ZIP boundaries and neighbourhood boundaries genuine
 21-entry hand-built map found in the scratchpad had 11225 as "Prospect Heights" and 11206 as
 "Williamsburg", both wrong. A map that is 80% right is worse than no map, because it writes with
 confidence.
+
+## v145 (2026-08-09): the quarantined-twin cross-collection check, and 92 real neighbourhoods
+
+Continues v144 under the owner directive to store real neighbourhoods. Two distinct pieces of work.
+
+### Real neighbourhoods: 29 → 92 of the 345 group-valued providers
+
+Tier 2 extended the blanket ZIP rules (10026/10030/10037 → Central Harlem, 10065 → Lenox Hill, 10017 →
+Midtown East, 10028 → Yorkville). Tier 3 stopped using the ZIP at all where it straddles, and resolved
+from the address using **Manhattan's house-numbering convention**: on an East Side numbered street 200+ is
+east of Lexington and 300+ east of Third, which is exactly the Carnegie Hill / Yorkville line inside
+10128; W 72nd St is the Lincoln Square / Upper West Side line inside 10023.
+
+**Two ZIPs were in the tier-2 draft and removed on inspection**, which is the reason to read a plan rather
+than run it: 10022 straddles Midtown East and Sutton Place (488 E 60th St, under the Queensboro Bridge, is
+Sutton Place) and 10019 straddles Midtown West and Hell's Kitchen (810 7th Ave at 53rd is not Hell's
+Kitchen; 445 W 54th is). Their four records were resolved per address instead.
+
+**The bug worth the whole section.** The tier-3 avenue matcher listed `york` as an alternative, for York
+Avenue. `\byork\b` matches the **"York" in "New York"** — so every address in Manhattan looked like it
+named York Avenue, and all of Carnegie Hill was about to be filed as Yorkville. This is the same substring
+false positive `src/scripts/scanGuards.ts` was written to prevent **two commits earlier, in this same
+sweep**. A guard only helps where it is called; writing a fresh regex by hand reintroduced the class it
+exists to stop.
+
+Two details make it worse than an ordinary slip. It produced a **correct answer for one record by
+accident** — 431 E. 91st really is Yorkville — so the output read plausibly. And it was caught only by
+spot-reading two rows (17 E 89th, 24 E 95th) whose house numbers were obviously west of Third. Now
+`stripCityStateTail` and `manhattanCrossStreet` in `locationEvidence.ts`, with the naive regex asserted
+*failing* in a test. **When an address is the haystack, strip the ", New York, NY 10128" tail first.**
+
+Deliberate non-actions, all recorded rather than silently dropped: 13 records whose address is a bare
+avenue ("334 Amsterdam Ave") keep their coarse value, because an avenue address carries no cross-street
+evidence at all; W 72nd addresses stay Upper West Side rather than being claimed for Lincoln Square, since
+a boundary street belongs to the coarser side; and Music to Your Home is skipped entirely because it
+teaches in families' own homes, so 235 E 95th is an office and **an administrative office is not a
+location**.
+
+### A new cross-collection check: cards whose only provider twin is quarantined
+
+Found by accident and then run deliberately. `apple seeds` was **`PUBLISHED` as a content card while its
+own provider record had already been quarantined for permanent closure** — quarantining a provider does
+not quarantine its card, and nothing in the schema links the two.
+
+Querying that shape pool-wide: **34 hosts where every provider is quarantined and no live provider
+remains; 12 of them still carry a maintainable content card; 18 cards, 12 of them `PUBLISHED`.**
+
+**It is a lead generator, not a bulk action, and the list proves it.** Four of the 18 are Tennis
+Innovators cards that are the *correct output* of an earlier split — the parent was quarantined precisely
+because its children now exist. Bulk-acting on this signal would have undone real work. Two more (The
+Coding Space) name genuinely real centres while the quarantined twin claimed an Upper West Side location
+the operator does not have. So each was checked individually:
+
+| card | verdict |
+| --- | --- |
+| apple seeds (`PUBLISHED`) | **QUARANTINED** — closed; own domain no longer resolves, Yelp marks both sites CLOSED, Time Out confirms |
+| The Play Lab Williamsburg (`PUBLISHED`) + Brooklyn | **QUARANTINED** — closed 24 Oct 2025, reported by Greenpointers |
+| The Paint Place UWS (`PUBLISHED`) | **QUARANTINED** — Time Out lists it CLOSED. Needed its own check: the quarantined twin was *The Paint Place Brooklyn*, a different location |
+| Big Apple Swim School Brooklyn (`PUBLISHED`) | **QUARANTINED** — no such business; token match on "Big Apple" to a K-8 private school |
+| Cocoon NYC (`PUBLISHED`, `categoryHint: Indoor Play`) | **QUARANTINED** — prenatal/postpartum wellness for women, and livestream/on-demand. Adults-only *and* no physical venue |
+| New York Loves Kids (`PUBLISHED`) | **BLOCKED_TERMINAL** — a directory's own brand name; the article's real subject, Kidville UWS, already has a card |
+| 2026 Bronx Summer Camps (`PUBLISHED`) | **BLOCKED_TERMINAL** — a camp guide, not a camp |
+| South Brooklyn United (`PUBLISHED`) | **BLOCKED_REPAIRABLE** — real club, sourced to a HOSPITAL (`nychealthandhospitals.org/locations/south-brooklyn-health/`) on the token "South Brooklyn" |
+| The Coding Space UES + Park Slope | **re-sourced** off the root domain to their real per-location pages |
+| Tennis Innovators ×4 | **no action** — correct output of an earlier split |
+
+Also fixed on the way through: "Edgies Teen Center / Shorefront Y kids programs" mashed **two unrelated
+organisations** and took its location from the wrong one — it was filed in Brooklyn / Brighton Beach (the
+Shorefront Y) while its source is `mannycantor.org/teen-center/`, the Manny Cantor Center at 197 East
+Broadway on the Lower East Side. Retitled and relocated to the one organisation the source describes, with
+the Shorefront Y recorded as a separate card candidate. Its `categoryHint` was also null despite being
+writable — set, per the content-quality mandate.
+
+### Totals
+
+104 records: 92 real-neighbourhood refinements, 4 closure quarantines, 3 further quarantines, 2 terminals,
+1 repairable, 2 re-sourced, 1 mashup repaired. Every one dry-run first and verified by re-reading.
