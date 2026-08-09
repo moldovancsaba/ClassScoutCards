@@ -84,6 +84,10 @@ def norm_addr(a):
 
 if __name__ == "__main__":
     targets = json.load(open(sys.argv[1]))
+    # Output path is an ARGUMENT, not a constant. The second run of this script overwrote the first
+    # run's results because both wrote to sweep.json -- a silent data loss that only did not cost
+    # anything because the ranked queue had already been extracted.
+    outpath = sys.argv[2] if len(sys.argv) > 2 else "sweep.json"
     pool = json.load(open("all_prov.json"))
     have_addr = {norm_addr(r.get("address"))[:34] for r in pool if r.get("address")}
     have_name = {re.sub(r"[^a-z0-9]", "", str(r.get("name") or "").lower()) for r in pool}
@@ -128,6 +132,6 @@ if __name__ == "__main__":
         for r in fresh[:14]:
             print(f"     {r['name'][:36]:38} {r['addr'][:24]:26} {r['kind'][:12]:13} "
                   f"{r['sport'][:16]:17} {r['phone'][:14]:15} {r['web'][:34]}")
-        json.dump(out, open("sweep.json", "w"), indent=1)
+        json.dump(out, open(outpath, "w"), indent=1)
         time.sleep(2)
-    print(f"\nwrote sweep.json — {sum(len(v or []) for v in out.values())} venues across {len(out)} neighbourhoods")
+    print(f"\nwrote {outpath} — {sum(len(v or []) for v in out.values())} venues across {len(out)} neighbourhoods")

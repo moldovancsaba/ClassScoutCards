@@ -8624,3 +8624,47 @@ Four of the nine pages list a Fax immediately after the Phone, and a naive "firs
 page" grab takes the wrong one on at least Highbridge (fax 212-927-2063) and Red Hook (fax 718-722-7341).
 The parser reads the labelled field. Worth remembering wherever a government or institutional page is the
 source — a fax number passes every shape check a phone validator applies.
+
+## v179 — "Which listings already sit in a neighbourhood showing zero?" — 105 leads, 4 corrections
+
+`src/scripts/inZeroNeighborhood.py`. The Prospect Lefferts Gardens round's best find was not a new
+business but a listing the catalogue already had, storing a PLG address under `neighborhood:
+"Williamsburg"` — the operator's other site. PLG showed zero sport listings while already having one.
+That is the cheapest coverage there is: the venue is already verified, published and photographed. So
+this scan asks the question generally — for every neighbourhood still at zero, which live sport listings
+are PINNED inside its bounding box while filed under a different name?
+
+**It only became possible today.** Running it before the 70 pins were re-derived would have chased
+coordinates rather than listings.
+
+### The four that survived, and the honest ratio
+
+- **North Brooklyn YMCA → Cypress Hills.** 570 Jamaica Avenue is on Cypress Hills' main spine; East New
+  York is south of Atlantic Avenue. The branch's NAME describes the Y's service area, not the building's
+  neighbourhood — the same brand-name-in-a-place-field shape as Williamsburg Soccer Club, whose clubhouse
+  is in Greenpoint.
+- **Vanderbilt YMCA (224 E 47th) and Tim Morehouse East Side (235 E 49th) → Turtle Bay**, both filed
+  under the broader Midtown East. Store the real neighbourhood; the page's grouping folds it.
+- **Bredwinner Youth Boxing (1 E 28th at Fifth) → NoMad**, filed under Midtown.
+- Plus **Joy Gymnastics → Sunset Park**, filling an EMPTY field (not a zero-coverage win, still a gap).
+
+**105 leads, 4 corrections.** The ratio is the finding. Nominatim's bounding boxes for Manhattan's
+micro-neighbourhoods overlap so completely that Gramercy, Gramercy Park, Rose Hill, NoMad, Koreatown and
+Murray Hill are effectively the same rectangle — the same twelve records were returned under each. **A
+bounding box is not a polygon**, and a scan built on one has to be read as "worth checking against the
+real boundary", never as a refile list.
+
+### Two deliberate non-actions, and the pressure worth naming
+
+- **John J. Carty Park** is on Fort Hamilton Parkway *between 94th and 101st Streets* — it straddles the
+  Bay Ridge / Fort Hamilton line, and its stored address (9941) is the southern end. Fort Hamilton shows
+  zero sport listings and refiling it would have closed that. **That is exactly why it was not done.**
+  The exactly-one-real-answer rule does not stop applying because the wrong answer would improve a
+  counter, and "a precise wrong answer is worse than a coarse right one" is the rule this loop is most
+  likely to break under a coverage target.
+- **The four South Slope candidates** (450–555 Fourth and Fifth Avenues, filed as Park Slope) sit where
+  Park Slope and South Slope have no crisp line. Left as filed.
+
+Worth stating plainly because the scarcity brief creates a standing incentive to resolve every borderline
+case toward the empty neighbourhood. The scan is useful precisely to the extent it is allowed to return
+"no" — and here it returned "no" 101 times out of 105.
