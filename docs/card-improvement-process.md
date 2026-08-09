@@ -7124,3 +7124,76 @@ records it was serving had already been retired by this loop. When a queue and a
 on different fields, the queue has to know about both.
 
 Live providers with no website: **10 → 0.** Live provider pool: 806.
+
+## v151 (2026-08-09): batches 27–28 — the shared-address scan, and 31 records for 11 real venues
+
+Batch 27 was drawn from the signal queue as usual. Batch 28 was drawn from a scan that batch 27's
+retrospective produced, which is the first time in this loop that a hand-worked batch has fed the *choice*
+of the next batch rather than only its ordering.
+
+### Batch 27: two clusters and a park, 13 records
+
+| Record | Verdict | What was found |
+| --- | --- | --- |
+| `prov-chelsea-piers-field-house` | corrected | Surviving venue. `category`/`programType` both read **Birthday Parties** for an 80,000 sq ft sports centre; long description extended to name the five camps that were separate cards |
+| `prov-chelsea-piers-golf-camp-31001228` | corrected | **Retitled** to *The Golf Club at Chelsea Piers*, Pier 59, 212-336-6400 — a real venue in the complex with no card |
+| ×6 Chelsea Piers camp/academy records | should_not_exist | Program cards at `62 Chelsea Piers`, the Field House's address |
+| `prov-brooklyn-youth-sports-club` | corrected | East New York + `653 Schenck Ave, Brooklyn, NY 11207` + `information@bkysc.org`, both descriptions rewritten |
+| `prov-brooklyn-youth-sports-club-volleyball-…` | should_not_exist | Program card, same address; its email was harvested first |
+| `prov-brooklyn-youth-sports-club-da7d8e29` | should_not_exist | Third copy, address `Brooklyn, NY`, description opening on "The Garden quickly became one of our most engaging classrooms" |
+| `prov-bryant-park-kids-events` | corrected | Real park, real free kids programming; `Birthday Parties` → `Drop-In Activities`, placeholder address replaced, 212-768-4242 + info@bryantpark.org added, copy replaced (it was adult yoga sponsorship chrome) |
+| `prov-camp-kids-club-ny-preschool-kids-club` | should_not_exist | Program card; the real Tribeca venue is carded at 88 Leonard St |
+
+Nine of thirteen were surplus. Chelsea Piers alone had **seven records for one building**, and two of them
+carried `/fieldhouse-chelsea/summer-camps/…` in their own `website` field — the records saying, in their
+own data, that they are programmes of a venue that already has a card.
+
+### The scan the retrospective produced
+
+Group live providers by street address, normalised for suffix spelling, punctuation and the city/state/ZIP
+tail, and drop placeholders. **589 of 1,087 live providers carry a real street address, and 100 of them sit
+on an address another live record also claims — 46 clusters.** `src/scripts/addressClusters.ts`.
+
+The uncomfortable part is that this repo had already observed the signal and could not act on it. SOP and
+`CLAUDE.md` both record that the address-fill pipeline *refused* to write a street address another listing
+held, and that all 41 refusals were real findings. A refusal fires only when something tries to write. The
+clusters already sitting in the catalogue were invisible to it. **When a guard's refusals turn out to be
+findings, run the guard's own test as a standing scan.**
+
+Two limits are deliberate and both are asserted in tests. A cluster is a lead, not a verdict — Pier 40 (353
+West St) genuinely houses Downtown United Soccer Club, the Village Community Boathouse and Pier 40 Baseball.
+And the `one-operator` / `mixed` classifier under-counts: it compares leading name tokens, so the three
+Marlene Meyerson JCC records read `mixed`. **`mixed` means unresolved, not cleared.**
+
+### Batch 28: the seven largest clusters, 18 records, 7 survivors
+
+| Cluster | Records | Outcome |
+| --- | --- | --- |
+| `579 Vanderbilt Ave` — Gymstars Brooklyn | 3 → 1 | Two program cards sharing one byte-identical scrape and a stale phone/email pair |
+| `334 Amsterdam Ave` — Marlene Meyerson JCC | 3 → 1 | Day Camp and Sports retired; `Camps` → `Classes`; JCC Harlem noted as an uncarded second location |
+| `212 North End Ave` — Asphalt Green BPC | 3 → 1 | Survivor's long description was **6,710 characters of navigation chrome**, the largest such block found in this pool |
+| `1395 Lexington Ave` — 92NY | 3 → 1 | Harkness Dance Center retired as a division; **Camp Yomi retired as out of taxonomy** |
+| `100 Jay St` — Tutu School DUMBO | 2 → 1 | Camp retired, `twirl@tutuschooldumbo.com` harvested first |
+| `43-44 12th St` — Tutu School LIC | 2 → 1 | Both records accurate; a plain duplicate |
+| `299 South St` — Basketball City | 2 → 1 | League program card retired |
+
+Every cluster was **build-then-retire**: three emails and one ZIP moved onto survivors before their
+siblings were hidden.
+
+### Four things worth carrying
+
+- **Two records in one cluster can have their descriptions SWAPPED.** The JCC venue record described the
+  day camp; the day camp record described the centre. Both read well, both pass every length, language and
+  chrome check. Only reading a description against its own record's *name* catches it.
+- **The field can be right and the copy wrong.** Gymstars' `neighborhood` said Prospect Heights and its own
+  short description said "in Fort Greene". 579 Vanderbilt Ave is Prospect Heights. Every previously
+  catalogued disagreement of this shape had the field wrong, and `judgeLocation()` only reads fields.
+- **An HQ address can sit on a programme with no in-taxonomy site to correct to.** Camp Yomi stored 92NY's
+  Manhattan building; the camp is 50 acres in Rockland County. Fifth instance of the HQ-address pattern,
+  first one that could only be retired.
+- **A sub-address token can be the whole difference between a venue and a duplicate.** `62 Chelsea Piers`,
+  `61 Chelsea Piers` and `Pier 59` are the Field House, Sky Rink and Golf Club. A normaliser aggressive
+  enough to fold "Chelsea Piers" together would have retired two real venues; the test asserts they stay
+  apart.
+
+Remaining after batch 28: **39 shared-address clusters, 82 live records.**

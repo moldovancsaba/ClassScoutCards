@@ -1298,6 +1298,31 @@ in a comment when you add one, the way the existing ports do.
   a different entity from the Williamsburg Soccer Club at the WSC Clubhouse, 33 Nassau Avenue, whose
   "Williamsburg" is a brand and which is actually in Greenpoint. Third confirmed instance of this shape
   after United Soccer Academy/Brooklyn United and the two fencing clubs. Confirm both before merging either.
+- **Two records in one cluster can have their descriptions SWAPPED, so each is accurate about the other.**
+  Found 2026-08-28 in the batch-28 clusters: `prov-marlene-meyerson-jcc-manhattan` described the day camp
+  ("Day Camp @ the JCC offers joyful experiences for children ages 3+…") while `prov-day-camp-the-jcc`
+  described the centre ("Discover programs, fitness, arts, and cultural events…"). Neither field is
+  garbage, neither is empty, and every length, language and chrome check passes on both — a scan can only
+  catch this by reading a description against its own record's NAME. Worth knowing before trusting copy
+  that merely reads well.
+- **The FIELD can be right and the COPY wrong, which is the opposite of the usual direction.** Every
+  catalogued disagreement so far had the stored field wrong and the address or name right. Gymstars
+  Brooklyn's `neighborhood` said Prospect Heights and its own short description said "in Fort Greene";
+  579 Vanderbilt Ave, ZIP 11238, between Dean and Bergen, is Prospect Heights, so the field was correct
+  and the prose was the defect. `judgeLocation()` cannot see this — it reads fields. Read the copy against
+  the address too, not only the fields against each other.
+- **A parent's HQ address can sit on a programme that is not merely in another neighbourhood but out of
+  the taxonomy altogether — and then there is nothing to re-address it to.** 92NY Camp Yomi stored 1395
+  Lexington Avenue, which is 92NY's own building; the camp is 50 acres in ROCKLAND COUNTY with bus service
+  from the city, as its own description said. The earlier HQ-address instances (WCS, NYC Parks, Kids in
+  the Game) all had a real in-borough site to correct TO. This one has none, so it is a retirement rather
+  than a correction — fifth instance of the HQ pattern, first with no fix available.
+- **When normalising an address for clustering, a sub-address token can be the entire difference between a
+  venue and a duplicate.** Chelsea Piers is `62 Chelsea Piers` (Field House), `61 Chelsea Piers` (Sky Rink)
+  and `Pier 59` (the Golf Club) — three real, separately-ticketed children's venues in one complex. A
+  normaliser aggressive enough to fold "Chelsea Piers" together would have merged them and retired two real
+  places. `normalizeStreetAddress` keeps the leading number for exactly this reason, and the test asserts
+  the three stay apart.
 
 ## Work in BATCHES of 4-10, covering EVERY component, and improve the process after each one (owner directive, 2026-08-09)
 
@@ -1329,6 +1354,30 @@ resolve, and **an `image` shared byte-for-byte with an unrelated provider** (63 
 **`updatedAt` is no longer a usable queue and must not be used as one.** This session's own bulk sweeps
 touched most of the pool, so "oldest updated" now surfaces records written minutes ago. Order by defect
 signal; keep a `batch_done` set so worked records do not reappear.
+
+**The retrospective compounded a second time in batch 27, and this one changed what the queue IS.** That
+batch found by hand that **seven live provider records shared the address `62 Chelsea Piers`** — the Field
+House, carded once as a venue and six more times as its camps — and three shared `653 Schenck Ave` for one
+East New York community centre. Grouping the whole pool by normalised street address then found **46 such
+addresses covering 100 live records**, 27 of them one operator's programme menu carded several times over.
+`src/scripts/addressClusters.ts`. Batch 28 was chosen from that scan rather than from signal count and
+resolved 18 records in seven clusters, so **a scan can now feed the queue as well as order it.** Three
+things about it are worth carrying:
+
+- **This repo had already SEEN the signal and could not act on it.** The address-fill pipeline refused to
+  write a street address another listing held, and "all 41 refusals were real findings" is already written
+  down below. A refusal only fires when something tries to write, so it was structurally blind to the
+  clusters already sitting in the catalogue. **When a guard's refusals turn out to be findings, run the
+  guard's own test as a scan.**
+- **A cluster is a LEAD, never a verdict.** Pier 40 (353 West St) genuinely houses Downtown United Soccer
+  Club, the Village Community Boathouse and Pier 40 Baseball — three unrelated operators that each deserve
+  a listing. The classifier only separates "every name starts with the same token" from everything else,
+  and it deliberately UNDER-counts: `Marlene Meyerson JCC Manhattan` + `…JCC Manhattan Sports` + `Day Camp
+  @ the JCC` read as `mixed` while being one operator. Read `mixed` as unresolved, never as cleared.
+- **Retire the surplus, but not before the survivor carries what they knew.** Every cluster in batch 28 was
+  build-then-retire: `campsagbpc@asphaltgreen.org` came off the Asphalt Green camp card, `twirl@
+  tutuschooldumbo.com` off the Tutu School camp card, and Brooklyn Youth Sports Club's `information@bkysc.org`
+  and ZIP off its volleyball programme card, each before the sibling was hidden.
 
 ## A place field names ONE place, and two places means TWO LISTINGS (owner directive, 2026-08-09)
 
