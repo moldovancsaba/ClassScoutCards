@@ -284,3 +284,24 @@ describe("the bridge write path rejects a malformed program", () => {
     expect(validateWriteRequest(body([{ title: "Flatbush Ymca", cadence: "Weekends", timeText: "Weekend schedule" }])).ok).toBe(true);
   });
 });
+
+describe("cadence non-answers (owner report from a live card, 2026-08-09)", () => {
+  it('rejects cadence "Custom", which rendered on the public card as a CUSTOM chip', () => {
+    const r = validateRecurringPrograms([{ title: "Age-group teams, clinics and camps", cadence: "Custom" }]);
+    expect(r.ok).toBe(false);
+    expect(r.ok === false && r.error).toMatch(/could not classify/);
+  });
+
+  it("rejects its siblings, and is case-insensitive", () => {
+    for (const c of ["custom", "CUSTOM", "Varies", "other"]) {
+      expect(validateRecurringPrograms([{ cadence: c }]).ok).toBe(false);
+    }
+  });
+
+  it("accepts a real cadence, and accepts the field being absent", () => {
+    expect(validateRecurringPrograms([{ cadence: "Weekly" }]).ok).toBe(true);
+    expect(validateRecurringPrograms([{ cadence: "Weekends" }]).ok).toBe(true);
+    expect(validateRecurringPrograms([{ title: "Saturday clinic" }]).ok).toBe(true);
+    expect(validateRecurringPrograms([{ cadence: null }]).ok).toBe(true);
+  });
+});

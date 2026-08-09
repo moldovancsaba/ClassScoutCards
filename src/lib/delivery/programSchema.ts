@@ -259,6 +259,21 @@ export function validateRecurringPrograms(value: unknown): ProgramValidationResu
     if (!entry || typeof entry !== "object" || Array.isArray(entry)) return fail(path, "must be an object");
     const p = entry as Record<string, unknown>;
 
+    // (2026-08-09, owner report from a live card) `cadence: "Custom"` renders on the public card as a
+    // chip reading CUSTOM, sitting in the row beside AGES 6-8 / AGES 9-12. It is the pipeline recording
+    // that it could not classify the schedule -- the same non-answer class as `no category` and
+    // `Multi-category`, both already banned -- and 317 of 830 live programmes carried it. A parent reading
+    // "CUSTOM" learns nothing and is shown a machine's shrug. Absence is the correct representation.
+    if ("cadence" in p && p.cadence !== null && p.cadence !== undefined) {
+      const cadence = String(p.cadence).trim().toLowerCase();
+      if (cadence === "custom" || cadence === "varies" || cadence === "other") {
+        return fail(
+          `${path}.cadence`,
+          `is "${String(p.cadence)}", which is the pipeline recording that it could not classify the schedule, not a fact about the programme — it renders to a parent as a chip. Omit the field instead; an absent cadence is an honest absence.`,
+        );
+      }
+    }
+
     if ("daysOfWeek" in p && p.daysOfWeek !== null) {
       if (!Array.isArray(p.daysOfWeek)) return fail(`${path}.daysOfWeek`, "must be an array of day names");
       for (const day of p.daysOfWeek) {

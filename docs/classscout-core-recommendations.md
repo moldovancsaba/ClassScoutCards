@@ -522,3 +522,62 @@ one of them is about children's safety.
 **Correction to an earlier note in this file's sibling doc:** a 25-card sample once found zero cards carrying
 this code and it was written up as "does not generalise". The census shows 21% of quarantined cards carry it.
 The sample was unrepresentative; the conclusion was wrong.
+
+## 0e. The card renders section BOILERPLATE and a machine's shrug to parents — three display defects, all owner-reported from live cards (2026-08-09)
+
+All three came from the owner opening real cards on classscout.ai. None of them is a data problem this
+bridge can reach; all three are in this repo's rendering.
+
+### (a) A section subtitle that is developer copy, shown to families
+
+The Recurring Programs block renders, verbatim:
+
+> **Recurring programs**
+> *Structured schedule details for ongoing classes, series, and repeating activities.*
+
+That second line is a description of the FEATURE, written for whoever built it. A parent looking for
+Saturday swimming does not need a definition of what a recurring programme is. Confirmed not to be in the
+data: a scan of all 1,039 live providers found **zero** records containing the string, so it is hardcoded
+UI copy. Either delete it or replace it with the programme content itself — and **hide the whole section
+when there are no programmes**, which is now common (313 live providers have none, and after the cleanup
+described below some legitimately dropped to zero rather than show invented schedules).
+
+### (b) `cadence: "Custom"` renders as a chip reading **CUSTOM**
+
+On the 5 Points Lacrosse card, the chip row read:
+
+> **CUSTOM** · AGES 6–8 · AGES 9–12 · AGES TEENS
+
+"Custom" is the pipeline recording that it could not classify the schedule. It sat on **317 of 830 live
+programmes (38%)**. It is the same non-answer class as `no category` (§1) and `Multi-category`, both
+already banned, and it appears in the same visual row as the age chips, so it reads as though it were a
+fact about the programme.
+
+**The bridge has cleared all 317 and now rejects the value on write** (`validateRecurringPrograms` in the
+sibling repo, plus `varies` and `other`). Two asks here: (i) stop the extractor emitting it — an absent
+cadence is the correct representation of "not found"; and (ii) **retire `cadence` altogether** once
+`schedule{}` is populated, per §0b — the surviving values (`Weekends`, `Weekdays`, `Weekly`) only restate
+`daysOfWeek` less precisely.
+
+While clearing it, two further defects were found in the same field and also fixed in data:
+**148 programmes had the building's opening hours as their class time** (a bare `5:30am`, or a span of 8+
+hours), and **436 of 830 were titled with the provider's own name** — a "programme" called *Asphalt Green*
+at *Asphalt Green*. 68 entries were pure scraper noise on all three counts at once (venue name + door
+hours + all five age buckets) and were removed. The extractor is emitting one row per schedule fragment it
+sees on the page, not one row per programme.
+
+### (c) Most cards show no "last reviewed" date, and that is a trust problem
+
+Of two cards opened side by side, one showed `SOURCE REVIEWED · JUN 2026` and the other showed nothing at
+all. The owner's words: *"A lot of cards does not show when created or last updated!! That is important for
+building trust!"*
+
+**The data is there.** `lastReviewedAt` and `lastReviewedBy` are populated on **all 1,039 live providers**,
+and every write through this bridge stamps them — so the freshness signal exists and is current. Whatever
+drives the `SOURCE REVIEWED` badge today is a different, sparser field, and it is showing *June* while the
+record was reviewed in *August*. Please render `lastReviewedAt` (and consider `publishedAt`, present on
+449). A card with no date reads as abandoned even when it was checked this week.
+
+Related and worth doing at the same time: §0b's `fieldVerifications[]`. One freshly-checked phone number
+currently refreshes the whole record's timestamp, so a record can look uniformly current when only one
+field was actually re-verified.

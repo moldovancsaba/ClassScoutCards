@@ -1201,6 +1201,37 @@ in a comment when you add one, the way the existing ports do.
   different location, which needed its own check. It happened to also be closed, but that had to be
   established, not assumed.
 
+## Work in BATCHES of 4-10, covering EVERY component, and improve the process after each one (owner directive, 2026-08-09)
+
+**"Do you understand your task to do the listing fixes in batches maximum 4-10 at the time and deliver
+highly curated great quality well maintained updated cards? After each batch where you went through all of
+the components you have to learn what can improve your process. Build it into the maintenance flow."**
+
+This was given after a stretch of single-field cohort sweeps — hundreds of `neighborhood`-only writes and
+**zero descriptions**. Cohort sweeps are the right tool for a mechanical defect with a known shape; they
+are NOT the job. The job is a curated card. The loop is:
+
+1. **Take 4–10 listings.** `providers`, not `contentCards` — `address`, `phone`, `email`,
+   `shortDescription`, `longDescription`, `recurringPrograms`, `ageRanges` and `image` exist only there.
+2. **Work every component on each one**: reality check → name → category/programType → activityTypes +
+   primaryActivityType → borough + real neighbourhood → address → phone → email → website → ageRanges →
+   both descriptions → recurringPrograms → image → blockers. Record the verdict (`confirmed` / `corrected`
+   / `needs_human` / `should_not_exist`) and, for a confirmation, **name the fields checked**.
+3. **Retrospective, every batch**: what did I find by hand that a scan could have found? Turn it into a
+   measurement.
+4. **Feed it back into the queue** and take the next batch.
+
+**Step 3 is the part that compounds, and the first batch proved it.** Six hand-worked records produced five
+signals that were then measured across all 1,040: `shortDescription == longDescription` (125 records),
+descriptions under 120 chars (343), non-English scraped copy (9), a stored `website` that 404s or does not
+resolve, and **an `image` shared byte-for-byte with an unrelated provider** (63 records across 16 files —
+`csny-banner-sports.png` alone on 14). Only **145 of 1,040 live providers have zero signals.**
+`src/scripts/providerSignals.ts` encodes them, and the queue is now ordered worst-first by signal count.
+
+**`updatedAt` is no longer a usable queue and must not be used as one.** This session's own bulk sweeps
+touched most of the pool, so "oldest updated" now surfaces records written minutes ago. Order by defect
+signal; keep a `batch_done` set so worked records do not reappear.
+
 ## Store the REAL neighbourhood; the page's grouping rule handles display (owner directive, 2026-08-08)
 
 **"I want the real neighbourhoods and boroughs for every single listing, there is a grouping rule how the
