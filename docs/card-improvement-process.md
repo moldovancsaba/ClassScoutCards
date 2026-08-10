@@ -9802,3 +9802,41 @@ Good Shepherd Services both had thin/fragment descriptions replaced with real pr
 6 touched: 1 chain-wide activityTypes bug (3rd confirmed instance), 1 naming question flagged for a
 future pass, 1 venue independently cross-checked against a national organization's own site, 3 description
 corrections. `batch_done.json` now at 784 IDs.
+
+### General maintenance batch #16 — a card describing an unrelated adult pop-up event, and a shared-venue-tenant pair confirmed rather than merged (2026-08-10)
+
+**Brooklyn Bridge Park Soccer Shots' website and description described an entirely different, unrelated
+event — not a reality-check failure of the entity, but of the SOURCE PAGE picked for it.** The record is
+named for Soccer Shots, a real national youth soccer instruction program that Brooklyn Bridge Park does
+host — but its stored website pointed to `brooklynbridgepark.org/adidas-home-of-soccer/`, a page for a
+2026 adult-oriented World Cup fan-zone pop-up (live match screenings, a beer garden, cultural
+programming, June-July dates). A family reading this card would have learned about a beer garden, not a
+kids' soccer class. Corrected to the same real soccer program page its sibling record
+(`...-soccer-shots-prospect`) already correctly used. Distinct from every off-topic-contamination case
+already catalogued: the ENTITY (Soccer Shots at Brooklyn Bridge Park) is completely real, only the
+specific page picked to source it from was wrong — one host, two totally different pages, and the wrong
+one got attached.
+
+**Eastside Westside Music Together's stored website was a third-party discovery-platform link
+(sideways.nyc), not a scam or dead end, but not the operator's own site either** — that listing itself
+named the real operator ("Center for Family Music: East Side West Side Music Together") and its real
+domain (eswsmusictogether.com), corrected accordingly. This confirms, rather than merges with, Muse Arts'
+presence at the same building (102 West 75th Street) — the sideways.nyc listing independently names East
+Side West Side Music Together as a DIFFERENT licensed Music Together operator sharing that address, the
+same shared-venue-tenant shape as Chelsea Piers and the Yorkshire Towers SwimJim/Gotham City Swim pair,
+not a duplicate to retire.
+
+**Brooklyn Brazilian Jiu-Jitsu had a wrong neighborhood AND an incomplete address in the same field** —
+"412 Myrtle Avenue" with no city, state or ZIP, and a stored neighborhood (Cobble Hill) that a geocode of
+the address itself contradicts (Fort Greene). Both fixed together.
+
+Three more leaked-chrome descriptions cleaned: a Brooklyn Bridge Park Conservancy Soccer Shots record
+whose description was a bare pricing table, Trail Blazers' repeated "DONATE enroll" button chrome
+truncated mid-list with a literal "[…]", and — a near-miss worth naming — a citation ("a 2016 Wall Street
+Journal survey of 900+ executives") that a naive address-shaped regex briefly mistook for a street address
+before the surrounding text was actually read. Chuck E. Cheese's empty neighborhood (Bronx Terminal
+Market) was filled in as Mott Haven.
+
+6 touched: 1 wrong-source-page fix on an otherwise-real entity, 1 website correction confirming (not
+merging) a shared-venue-tenant pair, 1 combined neighborhood+address fix, 3 description cleanups.
+`batch_done.json` now at 794 IDs.
