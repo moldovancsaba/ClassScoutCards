@@ -9441,3 +9441,36 @@ was generic filler; these two are not.
 
 6 touched (4 description rewrites, 1 leaked-name fix, 1 website correction), 2 checked and confirmed clean.
 `batch_done.json` now at 671 IDs.
+
+### General maintenance batch #4 — a fifth split candidate found, five leaked-navigation descriptions cleaned (2026-08-10)
+
+Seven records, all arts/music/STEM providers rather than sport (this loop is not sport-restricted —
+that filter only applied to the neighborhood-spreadsheet stream). Five of the seven had a description
+that was literally the operator's own site NAVIGATION MENU, scraped verbatim, rather than copy —
+Children's Arts & Science Workshops (repeated 3x: "Home - Children's Arts & Science Workshops, Inc.
+Children's Arts & Science Workshops, Inc."), New York Transit Museum Education ("Calendar Old City Hall
+Tours... LEARN and tour LEARN and tour"), Lavender Blues ("Home Classes Videos About Me Gift Cards
+Contact Me Music", repeated 3x), Artshack Brooklyn, and Brooklyn Game Lab (a single generic marketing
+line rather than nav chrome, but the same underlying "no real copy" defect). All five replaced with real
+facts pulled from elsewhere on each operator's own site — a confirmed founding year for Artshack (2016),
+a real program list for Brooklyn Game Lab (D&D leagues, Teen Counselors in Training), CASW's actual DOE
+program types (Beacon, Cornerstone, SONYC).
+
+**Muse Arts — a fifth confirmed split candidate, found by checking why a record's neighborhood (Melrose,
+Bronx) didn't match its own description (serves "Upper West Side, Upper East Side, Harlem, and the South
+Bronx").** The operator's own Locations page names **five real, distinct venues**: Center for Family Music
+(102 W 75th St, UWS), Pilgrim Cathedral of Harlem (15 W 126th St), Workplayce (154 W 70th St, UWS), Speech
+Matters (1751 2nd Ave, UES), The Brick Church School (62 E 92nd St, UES), and — matching the stored
+Bronx/Melrose location — "The Studio at 811 Walton Ave (South Bronx), 810 Gerard Avenue, The Bronx, NY
+10451." Fixed this record's address to the specific confirmed Bronx site rather than leaving the bare
+neighborhood placeholder, and recorded the other four confirmed addresses in the write's `reason` field as
+a split candidate for a future pass — the same discipline already used for Little Scholars, Modern Martial
+Arts, and SwimJim: **when a multi-venue operator's addresses are already confirmed, record them before
+they're forgotten, even if the split itself waits.**
+
+**Brooklyn Bridge Park Conservancy Environmental Education** had a genuine, well-written description
+already — just a DUMBO-borough placeholder address, filled in with the Environmental Education Center's
+real building (99 Plymouth St) from the operator's own site navigation.
+
+7 touched — 5 descriptions rewritten from leaked navigation/generic filler, 1 address specified from a
+split-candidate operator, 1 address filled from a placeholder. `batch_done.json` now at 678 IDs.
