@@ -9840,3 +9840,36 @@ Market) was filled in as Mott Haven.
 6 touched: 1 wrong-source-page fix on an otherwise-real entity, 1 website correction confirming (not
 merging) a shared-venue-tenant pair, 1 combined neighborhood+address fix, 3 description cleanups.
 `batch_done.json` now at 794 IDs.
+
+### General maintenance batch #17 — an image filename living in an email field, and a "Brooklyn" record that was Manhattan the whole time (2026-08-10)
+
+**Code Ninjas Brooklyn's `email` field held "jumping@2x.webp"** — a retina-resolution image asset
+filename, not an email address, presumably captured by an extraction pass that matches on the `@`
+character without checking what surrounds it. Cleared. Its address remains the already-documented
+template-placeholder case ("1234 Street Place," baked into the franchise page itself) — nothing new to
+fix there, left at neighborhood grade as already decided.
+
+**Kano Martial Arts Kids Brooklyn is a Manhattan business — its own address was sitting inside its own
+description the whole time.** The record's NAME says "Brooklyn," but its `borough` field already
+correctly said Manhattan, and its own scraped description contained the real address in plain text:
+"149 West 27th Street, 1st Floor, New York, New York 10001" — Midtown, not Brooklyn at all. A wrong-
+borough NAME on an otherwise-correctly-bordered record is a new shape: every prior wrong-borough-name case
+this session (Karate City, Tiger Schulmann's, PLAYDAY) had the WRONG FIELDS following the wrong name; here
+the fields were already right and only the name lagged behind. The same description also contained a
+large block of leaked HTML FORM-FIELD ATTRIBUTES (`data-val-required`, `pattern="^[^%$\(\)<>&@;*]+$"`,
+`maxlength`) — a scrape that captured an entire `<input>` tag's attributes as visible text, a new and
+more severe shape of the leaked-page-furniture pattern than any navigation-menu or donation-widget case
+found so far this session.
+
+**Axiom Learning NYC quarantined — a clean out-of-market fabrication, no ambiguity.** The operator's own
+Locations page names exactly three real sites: Concord, MA; Wellesley, MA; and Kuala Lumpur, Malaysia.
+Zero in New York City. Matches the already-catalogued out-of-market pattern (the Georgia camp company
+case) exactly — a real company, confidently real-looking record, zero real presence in the market this
+platform serves.
+
+Three more leaked-navigation/promotional-flyer descriptions cleaned (Private Picassos — a customer-
+testimonial fragment; Brooklyn Titans Youth Football & Cheer — all-caps flyer copy plus site nav chrome;
+City Kids Williamsburg — a repeated headline and logo-alt-text fragment).
+
+6 touched: 1 broken-field bug (image filename in an email field), 1 wrong-borough NAME on an otherwise-
+correct record, 1 out-of-market quarantine, 3 description cleanups. `batch_done.json` now at 804 IDs.
