@@ -1,11 +1,12 @@
 import { describe, it, expect } from "vitest";
 import { generateCard } from "./cardGenerator";
+import type { GenerateCardInput } from "@/lib/types/provider";
 
-const baseInput = {
+const baseInput: GenerateCardInput = {
   name: "Brooklyn Dance Academy",
-  source: "manual" as const,
-  category: "Classes" as const,
-  borough: "Brooklyn" as const,
+  source: "manual",
+  category: "Classes",
+  borough: "Brooklyn",
   neighborhood: "Park Slope",
   address: "145 7th Ave, Brooklyn, NY 11215",
   activityTypes: ["Dance"],
@@ -31,14 +32,17 @@ describe("generateCard", () => {
   });
 
   it("normalizes borough casing", () => {
-    const result = generateCard({ ...baseInput, borough: "brooklyn" });
+    // Deliberately out-of-contract input (lowercase borough) to exercise the function's defensive
+    // runtime normalization, which is looser than the GenerateCardInput type it declares.
+    const result = generateCard({ ...baseInput, borough: "brooklyn" } as unknown as GenerateCardInput);
 
     expect(result.success).toBe(true);
     expect(result.card?.borough).toBe("Brooklyn");
   });
 
   it("normalizes age range encodings", () => {
-    const result = generateCard({ ...baseInput, ageRanges: ["3-5", "6-8"] });
+    // Deliberately out-of-contract input (hyphens instead of en-dashes) for the same reason.
+    const result = generateCard({ ...baseInput, ageRanges: ["3-5", "6-8"] } as unknown as GenerateCardInput);
 
     expect(result.success).toBe(true);
     expect(result.card?.ageRanges).toEqual(["3–5", "6–8"]);

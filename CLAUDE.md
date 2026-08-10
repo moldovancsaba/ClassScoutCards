@@ -189,7 +189,10 @@ Three things live in this one repo:
    network policy allows outbound HTTPS but not a native MongoDB (TCP 27017) connection can still work
    with real card data, and so this experimentation can never put the main app's Vercel project at
    risk. **`docs/card-improvement-process.md` is the canonical, binding operating procedure for this
-   part of the repo — read it before running any loop iteration or write.**
+   part of the repo — read it before running any loop iteration or write.** (Its batch-by-batch
+   changelog was split out to `docs/card-improvement-process-changelog.md` on 2026-08-10, purely for
+   file size — the combined file had grown past 800KB. The SOP itself — purpose, the loop, decision
+   matrices, every standing rule — is unchanged and still lives in the main file.)
 2. **The card generator** (`src/pages/api/generate.ts`, `src/pages/api/status.ts`,
    `src/pages/api/history.ts`, `src/pages/api/cards/[id].ts`, `src/lib/generator/`,
    `src/lib/delivery/{ingestApi,mongoDirect}.ts`) — an older, separate feature: generates new activity
@@ -214,6 +217,18 @@ Three things live in this one repo:
    from the main app) are load-bearing, not decoration.
 
 ## Current status (2026-08-07)
+
+**Update, 2026-08-10: this section is a point-in-time snapshot from the 100/200-card passes and is now
+three days stale relative to real, ongoing work — treat it as history, not current state.** Since it was
+written: the sport-listings coverage project (10 new per neighborhood) has run through dozens of
+owner-verified neighborhood spreadsheets plus a general defect-signal maintenance loop, taking Brooklyn+
+Manhattan sport listings from roughly 400 to 478 served, with a live-updated coverage report available via
+`status.py` in the maintenance session's scratchpad (not checked into this repo). The single biggest
+structural change: `docs/card-improvement-process.md`'s batch-by-batch changelog — which had grown past
+800KB — was split out to **`docs/card-improvement-process-changelog.md`** on 2026-08-10; this file (the
+SOP itself) is unchanged in substance. **Read the changelog file's tail end, not this section, for the
+actual current state of any specific finding, pattern, or open item** — this section is kept for the
+history of the 100/200-card passes specifically, not updated further.
 
 A 100-card mass-enrichment pass (`docs/card-improvement-process.md`, now at v33+) has been completed —
 a new agent picking this up is not starting from zero. Read that doc's Changelog before assuming a
