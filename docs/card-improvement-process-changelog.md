@@ -5942,3 +5942,28 @@ The remaining ~40 cards in this window (a wide mix of pipeline states — `PUBLI
 `DISCOVERED`, `PARKED_COOLDOWN`, `REPAIRING`) were all specific, well-formed, plausible real NYC youth
 programs (My Gym, Chelsea Piers' several programs, Little League branches, Prospect Park facilities,
 Hola BK, Cobble Hill BJJ, etc.) — confirmed and touched, no defects found.
+
+### Sovereign loop, continued — a systematic keyword-collision pattern, and confirming an already-safe adult-content quarantine (2026-08-10)
+
+**Safety note, not a new finding**: four cards sourced from adult-content sites (pornhub.com x3,
+xvideos.com x1) were already correctly `QUARANTINED`/`operationalVisibility: quarantined` — the
+pipeline's own discovery-safety net had already caught and hidden them; this pass only filled in the
+missing `terminalReason` for the audit trail. Nothing was ever visible to a family.
+
+**A systematic keyword-collision pattern, not a one-off**: THREE separate "Asphalt Green" cards
+(Basketball Foundations, Baseball Academy, Youth Sports Classes, plus a bare "Asphalt Green" card) had
+all been matched to `manassasasphalt.com` — an unrelated Virginia paving contractor, hit only on the
+word "asphalt." Quarantined all four with the pattern named explicitly, since a single fix wouldn't have
+surfaced that it kept recurring. Also quarantined: "Marlene Meyerson JCC Manhattan" matched to a baby-name-
+meaning page for "Marlene"; a Harry Truman Presidential Library biography card; an FC Barcelona match
+schedule page matched on football/schedule keywords against an NYC card; and a Chelsea Piers Brooklyn
+gymnastics card sourced from a third-party listicle rather than the operator's own site (already covered
+by sibling cards sourced correctly).
+
+Remaining ~15 cards in this window were real, well-formed, correctly-sourced leads (British Swim School,
+Chelsea Piers' several camps, 92nd Street Y, Modern Martial Arts NYC, Uptown Soccer Academy, Brooklyn
+Boulders) — confirmed and touched.
+
+Running total this session: 4 real provider creates, 2 live-duplicate fixes, 1 code fix (directional
+address normalization, shipped with a regression test), and well over 300 content cards reviewed across
+the backlog-compaction cohort and several windows of real leads.
