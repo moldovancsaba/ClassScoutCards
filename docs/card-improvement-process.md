@@ -9769,3 +9769,36 @@ from mid-description and empty `ageRanges` filled from the operator's own "newbo
 
 8 touched: 1 deliberate non-write (out-of-city mailing address), 1 neighborhood/address contradiction
 fixed, 6 description/field corrections. `batch_done.json` now at 774 IDs.
+
+### General maintenance batch #15 — a third Art/Music activityTypes bug on the same franchise, and a possible stale business name flagged rather than guessed (2026-08-10)
+
+**Tiger Schulmann's Upper West Side carried the identical `activityTypes: ["Art","Music"]` substring-match
+bug already found and fixed on the Chelsea branch** — a third confirmed instance of this exact chain-wide
+defect (the Tribeca duplicate-merge fix earlier this session also touched a stale phone on a Tiger
+Schulmann's record, though not this specific bug). Worth a franchise-wide check: at this rate, any
+un-reviewed Tiger Schulmann's branch is a reasonable bet to carry the same wrong tags.
+
+**Kids N Motion Dance & Gymnastics — a naming question flagged, not guessed.** The stored NAME is "Kids N
+Motion Dance & Gymnastics," but the operator's own site introduces itself repeatedly and consistently as
+"Brooklyn Gymnastics and Dance (BGD)" — never once as "Kids N Motion" anywhere in the fetched content.
+This could be a stale/former business name, or "Kids N Motion" could be a specific sub-program the site
+just doesn't surface on its main pages — genuinely ambiguous from what a static fetch can confirm. Filled
+in the real neighborhood (Midwood, from a Nominatim POI match on the East Midwood Jewish Center, the
+building this program runs inside) and cleaned the description, but left the NAME question as a recorded
+`needs_human` flag rather than renaming on a guess.
+
+**Junior Rangers Learn to Play Hockey's Marine Park address was verified against the NHL's own locations
+page rather than assumed from the record alone** — confirmed Aviator Sports Complex is a real Rangers
+Learn to Play rink there, which matters because most of the other addresses on that same NHL page are
+outside NYC (Connecticut, Westchester) and the record could easily have been describing the wrong rink
+entirely. Its description was a jumbled FAQ-list fragment ("B) Your child is too advanced for the
+program...") — cleaned to a real description once the venue was confirmed.
+
+Queens County Farm Museum's description was a literal scraped CALENDAR WIDGET (day-of-week abbreviations
+and "0 events" counts) rather than any description at all — the plainest instance yet of the
+scraped-page-furniture pattern, replaced with real facts about the farm. The Barrow Group Kids & Teens and
+Good Shepherd Services both had thin/fragment descriptions replaced with real program facts.
+
+6 touched: 1 chain-wide activityTypes bug (3rd confirmed instance), 1 naming question flagged for a
+future pass, 1 venue independently cross-checked against a national organization's own site, 3 description
+corrections. `batch_done.json` now at 784 IDs.
