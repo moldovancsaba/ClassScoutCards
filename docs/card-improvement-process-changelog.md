@@ -5863,3 +5863,24 @@ of re-serving the same null-reason cards indefinitely.
   since a media property is not the entity a "parent group" card is meant to describe.
 
 Not yet reached the end of this cohort — still paging through it at the same `updatedAt` timestamp.
+
+### Sovereign loop, continued — another real create (The Canopy, Williamsburg), backlog cohort now at ~217 cleared (2026-08-10)
+
+Continued paging through the 2026-07-05 backlog-compaction cohort. Sixty-eight more cards cleared
+(same pattern: internal seed placeholders, plus off-topic external domains — a French Huawei-unlock
+tech-support forum, a German football livestream page, more Bing/zhihu/dunyanews repeats).
+
+**`prov-the-canopy` created** — a real 5,000 sq ft playspace and parent-support studio in Williamsburg,
+Brooklyn (118 N 11th St Floor 3), for babies/toddlers up to age 4, running Baby & Me Yoga, postnatal
+yoga, and a free weekly postpartum support group. A direct fetch of the operator's own Squarespace-hosted
+domain hit a TLS/SNI certificate mismatch (`*.squarespace.com` cert not covering the custom domain) —
+corroborated instead via three independent secondary sources (a PRWeb press release, a Macaroni Kid
+Brooklyn NW event listing, a Sawyer marketplace listing) that agreed on name, address, phone and program
+list before creating. `alignActivityTypes` re-derived `["Yoga", "Sports"]` from the description text
+rather than the `["Indoor Play", "Yoga"]` first supplied — accepted the system's own classification since
+yoga is specifically and repeatedly evidenced in the copy, more so than generic "Indoor Play."
+
+Running total this session: 4 real provider creates (Katmint, PlayGroup NYC Park Slope, IPS NYC, The
+Canopy), 1 placeholder-listing fix+reveal (NYC Elite Gymnastics UWS), 1 live-duplicate fix (Imagine
+Swimming Crown Heights), ~217 backlog cards cleared, several quarantines and stale-lead corrections.
+Backlog cohort not yet exhausted.
