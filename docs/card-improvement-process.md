@@ -9637,3 +9637,19 @@ Opus 118 Harlem School of Music (real, historic East Harlem violin program) had 
 from its own contact page and empty `ageRanges` set to a reasonable elementary-school-age range.
 
 2 touched (1 quarantine, 1 enrichment), 6 confirmed already clean. `batch_done.json` now at 721 IDs.
+
+### General maintenance batch #10 — a fully clean batch, a real negative result (2026-08-10)
+
+All 8 records this batch (My Gym City Point, Ken-Zen Institute, Globall Sports Centers Brooklyn, New
+Generation School of Martial Arts, Bergen Beach Sports and Recreation Camp, Dodge YMCA at PS 261, and both
+Gymboree Play & Music locations) were flagged by the defect-signal scan purely for missing email/image —
+and every one already carries a real, specific street address, a real phone number, and an accurate,
+non-generic description. Attempted image pickup via each operator's own og:image tag (`ogpick.py`) found
+nothing usable on any of the four checked (all JS-rendered sites with no static og:image) — a real,
+recorded negative result rather than a silent skip.
+
+This is the second consecutive batch where most flagged records needed no action (6 of 8 last time, 8 of
+8 this time) — worth stating plainly: **the defect-signal queue is now surfacing genuinely well-populated
+records more often than genuinely broken ones**, which is itself useful information about where this
+pass of the pool stands, distinct from earlier batches in this same session that found a defect in nearly
+every record touched. `batch_done.json` now at 729 IDs.
