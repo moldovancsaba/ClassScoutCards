@@ -5926,3 +5926,19 @@ remaining 23 cards (The Little Gym Brooklyn Heights, Sokol NY Youth Gymnastics, 
 Brooklyn/Manhattan locations, Fastbreak Kids' several UWS/Downtown cards, Broadway Gymnastics School,
 Asphalt Green Battery Park City, MetroRock Brooklyn Kids, etc.) were all specific, well-formed, and
 geographically sensible — confirmed and touched, no defects found.
+
+### Sovereign loop, continued — a mis-geocoded LA card and a keyword-collision quarantine (2026-08-10)
+
+Two more real defects found and fixed in this window:
+- **`cc-437dbccb006e7a33ce17cbcc` ("Playgroup Los Angeles") was guessed Manhattan/Upper West Side** for a
+  real Los Angeles nature-based parent-child program (its own site names a class at the LA Arboretum,
+  Arcadia). Not a wrong NYC neighbourhood — a wrong market entirely. Corrected to San Gabriel Valley/Arcadia.
+- **`cc-eebcebf208d5cf5b40353124` ("Asphalt Green Basketball Foundations") quarantined** — its source,
+  manassasasphalt.com, is an unrelated Virginia paving contractor matched only on the word "asphalt," not
+  the real Asphalt Green sports nonprofit. Was stuck in `PARKED_COOLDOWN` past its own re-run date with
+  nothing behind it.
+
+The remaining ~40 cards in this window (a wide mix of pipeline states — `PUBLISHED`, `PREPARING`,
+`DISCOVERED`, `PARKED_COOLDOWN`, `REPAIRING`) were all specific, well-formed, plausible real NYC youth
+programs (My Gym, Chelsea Piers' several programs, Little League branches, Prospect Park facilities,
+Hola BK, Cobble Hill BJJ, etc.) — confirmed and touched, no defects found.
