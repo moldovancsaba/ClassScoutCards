@@ -9509,3 +9509,47 @@ venues or partner sites rather than one fixed studio — an honest gap, not a pl
 9 touched: 3 quarantined, 1 corrected after a second look reversed an initial fabrication read, 2
 description cleanups, 3 checked and left as-is (Camp Orot, Metropolitan Oval Academy Manhattan Outreach,
 Russian School of Mathematics UES — all already reasonably complete). `batch_done.json` now at 687 IDs.
+
+### General maintenance batch #6 — a quarantine that had been decided but never applied, plus a second leaked page-title NAME bug and two new creates found along the way (2026-08-10)
+
+**Tutu School Williamsburg — the reality check this catalogue's own notes had already run, apparently
+without the write landing.** This exact case (Tutu School's Williamsburg card, a real brand claiming a
+location its own site doesn't have) is already described in this file's "Hard-won lessons" section as
+QUARANTINED — but the live record's `qualityStatus` was still `null`. Re-ran the check from scratch rather
+than trusting the note: fetched tutuschool.com/locations directly, and its full current NY roster (Long
+Island City, Commack, DUMBO, Tribeca, Sayville, Chelsea, Park Slope, East Amherst, Boerum Hill, Lenox
+Hill, Upper East Side) confirms **no Williamsburg branch exists**. Quarantined for real this time. **A
+documented decision is not the same as an applied write — worth spot-checking closed items occasionally,
+not just trusting the log.**
+
+**That same fetch surfaced two real, uncarded branches: Park Slope (235 5th Ave) and Chelsea (175 10th
+Ave)** — both already visible on the operator's own locations page but absent from this catalogue (DUMBO,
+Boerum Hill, UES and LIC were already correctly carded). Chelsea had actually been EXCLUDED once already
+this session, from the Chelsea/Hudson Yards sport-only spreadsheet batch, correctly, since it's dance —
+but this loop isn't sport-restricted, so both were created now.
+
+**"Programs Kids Programs in Kingsbridge Bronx" — a second confirmed instance of a page-`<title>`-tag
+leaking into the public NAME field**, the same class of bug as BronxWorks's "Missing_official_image"
+earlier this session, but with different content: this one is the page's literal HTML `<title>`, not an
+internal pipeline note. The real business, confirmed from its own page text, is **Warriors Sports Club**
+— "loved by Bronx families for over 25 years" — operating inside Church of the Mediator at 260 West 231st
+Street. Renamed, and address/phone/email/activityTypes (Taekwondo) filled in from the same page. **Two
+confirmed instances of this exact bug class in one session is enough to call it a pattern worth a
+dedicated scan** (any NAME field containing "Programs" as its first word, or matching a URL-slug shape,
+is a plausible signal) rather than waiting to stumble on a third.
+
+**The Whitney Museum Family Programs had an internal contradiction free to catch**: `neighborhood` said
+Chelsea while `address` already correctly said Meatpacking District — the same check-a-record-against-
+itself discipline already named for Ballet Tech. Corrected the neighborhood to match, and filled in the
+real street address (99 Gansevoort St). **Pier 2 Roller Rink's address was truncated mid-word** ("150
+Furman St, Pier") — completed to the real, specific address rather than left as a data-entry cutoff.
+
+Two more descriptions cleaned of leaked navigation (Chelsea Greyhounds Track Club, BronxWorks Cornerstone
+Community Centers — the latter's `activityTypes` was also empty and filled in), and two records
+(Physique Swimming UES, Berkeley Carroll Summer Programs) were reviewed and left largely as-is — Physique
+Swimming got a real description but its address stays at neighborhood grade (already an established,
+legitimate multi-venue swim-school model), and Berkeley Carroll's four confirmed campus buildings mean no
+single-building guess was made for which one hosts summer camp specifically.
+
+10 records touched (1 quarantine finally applied, 1 rename + enrichment, 4 description/field cleanups, 2
+reviewed-and-confirmed, 2 address/neighborhood fixes) plus 2 new creates. `batch_done.json` now at 697 IDs.
