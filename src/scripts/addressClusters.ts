@@ -52,6 +52,13 @@ const SUFFIX: Record<string, string> = {
   turnpike: "tpke",
 };
 
+/** Directional prefixes ("East 4th St" vs "E 4th St" — the same building either way). Added 2026-08-10
+ *  after cardBridgeCreate.ts's own duplicate-address check missed exactly this pair for a real business
+ *  (Evolutionary Martial Arts, 64 E 4th St / 64 East 4th Street) — caught before the create ran, by the
+ *  generated id carrying a "-2" suffix for a name that was already live. Mirrored here since this
+ *  function is the one cardBridgeCreate.ts's own copy is kept in sync with. */
+const DIRECTION: Record<string, string> = { east: "e", west: "w", north: "n", south: "s" };
+
 /**
  * A comparable key for a street address, or null when the value is not a street address at all.
  *
@@ -69,7 +76,7 @@ export function normalizeStreetAddress(address: string | null | undefined): stri
   a = a
     .split(/\s+/)
     .filter(Boolean)
-    .map((w) => SUFFIX[w] ?? w)
+    .map((w) => SUFFIX[w] ?? DIRECTION[w] ?? w)
     .join(" ");
   return a || null;
 }

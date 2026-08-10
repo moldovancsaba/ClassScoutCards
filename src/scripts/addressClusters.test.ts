@@ -26,6 +26,15 @@ describe("normalizeStreetAddress — one address must not split into two cluster
     expect(normalizeStreetAddress("62 Chelsea Piers, New York, NY 10011")).toBe("62 chelsea piers");
     expect(normalizeStreetAddress("Pier 59, Chelsea Piers, New York, NY 10011")).toBe("pier 59 chelsea piers");
   });
+
+  it("folds a directional prefix's abbreviation and spelled-out form together (2026-08-10 finding)", () => {
+    // cardBridgeCreate.ts's duplicate-address check missed "64 E 4th St" against an existing "64 East
+    // 4th Street" -- the same building -- because only street-TYPE suffixes were normalised, not
+    // directional prefixes. Caught before a create ran, by the generated id carrying a "-2" for a name
+    // that was already live.
+    const forms = ["64 E 4th St, New York, NY 10003", "64 East 4th Street, New York, NY 10003"];
+    expect(new Set(forms.map(normalizeStreetAddress)).size).toBe(1);
+  });
 });
 
 describe("addressClusters — the batch-27 finding, turned into a measurement", () => {

@@ -192,11 +192,16 @@ function normalizeStreetAddress(address: string): string | null {
     street: "st", str: "st", avenue: "ave", av: "ave", road: "rd", boulevard: "blvd",
     place: "pl", drive: "dr", court: "ct", lane: "ln", parkway: "pkwy", terrace: "ter",
   };
+  // (2026-08-10 finding) Directional prefixes were not normalised, so "64 E 4th St" and "64 East 4th
+  // Street" -- the exact same building, one abbreviated -- hashed to different keys and the duplicate
+  // check missed them. Caught before a create actually ran, by the generated id itself carrying a "-2"
+  // suffix for a name that was already live.
+  const DIRECTION: Record<string, string> = { east: "e", west: "w", north: "n", south: "s" };
   let a = address.toLowerCase().trim();
   if (!a || !/\d/.test(a)) return null; // no house number: a placeholder, shared by design
   a = a.replace(/,?\s*(?:new york|ny|brooklyn|bronx|queens|staten island|nyc)\b/g, " ");
   a = a.replace(/\b1[01]\d{3}\b/g, " ").replace(/[^a-z0-9 ]/g, " ");
-  return a.split(/\s+/).filter(Boolean).map((w) => SUFFIX[w] ?? w).join(" ") || null;
+  return a.split(/\s+/).filter(Boolean).map((w) => SUFFIX[w] ?? DIRECTION[w] ?? w).join(" ") || null;
 }
 
 export async function applyCardBridgeCreate(request: NormalizedCreateRequest): Promise<CreateOutcome> {
