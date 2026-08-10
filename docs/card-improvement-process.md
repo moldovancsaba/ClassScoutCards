@@ -9674,3 +9674,32 @@ was purely a missing-field gap, not a content-quality problem.
 
 5 touched (1 description cleanup, 4 neighborhood fills), 7 confirmed already excellent. `batch_done.json`
 now at 741 IDs.
+
+### General maintenance batch #12 — a second Riverside Hawks duplicate, two cultural institutions' addresses independently verified by search (2026-08-10)
+
+**Riverside Hawks Youth Basketball is a second, later duplicate of the same real program** already fixed
+once this session — `prov-riverside-hawks` already carries the correct address (490 Riverside Drive,
+Morningside Heights) and a full, real description; this record still had the bare Upper West Side
+placeholder. Retired as the duplicate. The earlier "token-match bug manufactures cross-host duplicates"
+finding was about a `riverside.com` mismatch; this pair is different — both records are correctly sourced
+to riversidehawks.org, just two separate discovery hits for the identical real program.
+
+**Anderson's Martial Arts Academy had an internal contradiction** (neighborhood said Greenwich Village,
+address already said NoHo) — the same check-a-record-against-itself class of fix as Ballet Tech and the
+Whitney Museum. Corrected the neighborhood to match the already-correct address.
+
+**Two real cultural institutions' addresses were independently confirmed via web search rather than a
+site fetch**, since both operators' sites are JS-rendered and yielded nothing to a static fetch: Instituto
+Cervantes New York (211 E 49th St, Turtle Bay — phone matched exactly what was already on file, a good
+cross-check) and the Lycée Français de New York's Cultural Center (505 E 75th St, Lenox Hill). Both had
+leaked-navigation or off-topic scraped-fragment descriptions replaced with real copy — the Lycée's in
+particular had been describing an unrelated student genealogy/voting-rights project, not the cultural
+center itself.
+
+Wave Hill Family Art Project's empty neighborhood was filled in as Riverdale. Six other records in this
+batch (Prospect Park YMCA, Bridge for Dance, both Treasure Trunk Theatre locations, Arts in Action VAP,
+Children's Museum of Manhattan, Beat the Bomb Brooklyn) were checked and already carried real, specific,
+non-generic content — left untouched.
+
+5 touched (2 address fills verified via search, 1 internal-contradiction fix, 1 duplicate retired, 1
+neighborhood fill), 7 confirmed already good. `batch_done.json` now at 753 IDs.
