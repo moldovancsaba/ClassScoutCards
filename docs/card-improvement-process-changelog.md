@@ -5914,3 +5914,15 @@ The remaining ~17 cards in this run were all already `PUBLISHED`, specifically n
 sensible for well-known real NYC youth programs (Karate City UWS/UES as two genuine branches, Tiger
 Schulmann's Bay Ridge, Randall's Island Park Alliance, Greenpoint YMCA, etc.) — reviewed and touched, no
 further defects found this pass.
+
+### Sovereign loop, continued — a further run of real published cards, ~280 cards processed this session (2026-08-10)
+
+Reviewed the next window: two already-adequately-quarantined real leads (Wollman Rink Skate School,
+mismatched to a Microsoft source but already carrying a substantive terminalReason; Imagine Swimming
+Manhattan, correctly flagged as a vague multi-location catch-all rather than merged into the operator's
+existing per-branch records) needed no further action. Verified `aviatorsportclub.com` is a second real
+domain for the same Aviator Sports & Events Center (Floyd Bennett Field) rather than a mismatch. The
+remaining 23 cards (The Little Gym Brooklyn Heights, Sokol NY Youth Gymnastics, NY Kids Club's several
+Brooklyn/Manhattan locations, Fastbreak Kids' several UWS/Downtown cards, Broadway Gymnastics School,
+Asphalt Green Battery Park City, MetroRock Brooklyn Kids, etc.) were all specific, well-formed, and
+geographically sensible — confirmed and touched, no defects found.
