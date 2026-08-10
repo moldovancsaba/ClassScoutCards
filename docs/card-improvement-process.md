@@ -9873,3 +9873,23 @@ City Kids Williamsburg — a repeated headline and logo-alt-text fragment).
 
 6 touched: 1 broken-field bug (image filename in an email field), 1 wrong-borough NAME on an otherwise-
 correct record, 1 out-of-market quarantine, 3 description cleanups. `batch_done.json` now at 804 IDs.
+
+### General maintenance batch #18 — nine of ten records already excellent (2026-08-10)
+
+A striking batch: KoKo NYC, Ferox Ninja Playground DUMBO, VITAL Climbing Gym LES, Herbert Von King Cultural
+Arts Center, Brooklyn Aikikai, Hinds Combat Sports Midtown West, My Gym Cobble Hill, Elite Swimming NYC and
+Combat Club by KMI were ALL already real, specific, well-sourced records — several carrying details this
+session has specifically trained on catching right (Hinds Combat Sports' own record already correctly
+notes its 201-area-code phone is a "mobile line that kept its number... not an error," and Elite Swimming
+NYC's own record already explains why it's listed despite Midwood having "thin swim coverage"). Only PGA
+Summer Camps at Golfzon Social Brooklyn needed a real fix — a street-only address completed with city/
+state/ZIP (geocode-confirmed Downtown Brooklyn) and a generic description replaced with the camp's real
+curriculum.
+
+This is now the third batch out of the last five where 8+ of 10 records needed no correction — consistent
+with the queue increasingly surfacing well-populated records as the higher-defect-density records get
+worked through. `email_missing` alone, now the dominant remaining signal (66 of 243 flagged records),
+is frequently not a real defect: many legitimate small operators simply don't publish one.
+
+1 touched (address completion + description polish), 9 confirmed already excellent. `batch_done.json`
+now at 814 IDs.
