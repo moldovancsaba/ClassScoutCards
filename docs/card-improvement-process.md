@@ -9580,3 +9580,37 @@ description named but the stored value had dropped.
 
 7 touched: 1 quarantine (closure statement the data already contained), 1 duplicate retired, 5
 description/field corrections. `batch_done.json` now at 705 IDs.
+
+### General maintenance batch #8 — a leaked "Source title: / Fact:" prompt artifact, and CodeAdvantage joins the no-fixed-venue list (2026-08-10)
+
+**Ronin Athletics Kids BJJ's description contained a new shape of leaked internal text**: "Source title:
+Ronin Athletics Kids BJJ Fact: Ronin Athletics gym has been a pioneer..." — a prompt/extraction TEMPLATE
+format ("Source title: ... Fact: ...") leaked verbatim into the public description, distinct from the
+navigation-menu and instruction-text leaks already catalogued. Cleaned up; real address found (265 Madison
+Ave, Murray Hill).
+
+**CodeAdvantage Manhattan quarantined under the no-fixed-venue prohibition — a coding-education instance
+of the same shape as Togetherhood.** Its own site offers "Online Classes" and "In School Programs"
+delivered inside PARTNER schools' after-school programs; its own "Locations" nav link 404s, and no
+CodeAdvantage-owned venue was found anywhere. Same underlying harm as every prior instance: no door a
+family can walk through that belongs to this business.
+
+**Kids in the Game Riverdale — a case where filling in a real address was right, even though the
+standing caution excludes NEW creates for this operator.** The standing caution (already applied twice
+this session, to Chelsea and East Village Kids in the Game camps) is about not creating MORE cards for an
+operator with no venue of its own anywhere — but this record already existed, and its own camp page names
+a specific, real, confirmable site: "Amber Charter Kingsbridge Elementary School, 3120 Corlear Ave" — the
+same treatment already given to the existing Kids in the Game Inwood record, which also names a specific
+Amber Charter building. **The caution is about not creating unverified cards for a no-fixed-venue
+operator, not about refusing to enrich an existing card once its specific site becomes confirmable** —
+worth stating explicitly since the two could be conflated.
+
+Three more leaked-navigation/promotional-copy descriptions cleaned (Fit4Dance Brooklyn, Dance with Miss
+Rachel — a repeated location list, not the unrelated "Ms. Rachel" YouTube personality, worth double-
+checking before conflating similarly-named entities — and Color Factory NYC, whose description mixed a
+dated ticket-bundle promo and a customer-review quote into what should have been factual copy).
+
+6 touched: 1 quarantine, 1 specific-address fill for an existing citywide-operator record, 4 description
+cleanups. Engineering for Kids Manhattan and Broadway Workshop were checked but left with their existing
+gaps (no confirmable specific address found for either via static fetch) rather than guessed.
+`batch_done.json` now at 713 IDs.
