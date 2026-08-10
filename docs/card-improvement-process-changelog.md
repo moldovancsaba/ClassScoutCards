@@ -5884,3 +5884,33 @@ Running total this session: 4 real provider creates (Katmint, PlayGroup NYC Park
 Canopy), 1 placeholder-listing fix+reveal (NYC Elite Gymnastics UWS), 1 live-duplicate fix (Imagine
 Swimming Crown Heights), ~217 backlog cards cleared, several quarantines and stale-lead corrections.
 Backlog cohort not yet exhausted.
+
+### Sovereign loop, continued — past the backlog cohort into real leads; a live duplicate and a mislocated card found, a real code fix shipped (2026-08-10)
+
+Cleared the last 3 stragglers of the 2026-07-05 junk-source backlog (220 total cleared), then moved into
+a run of genuinely real, already-`PUBLISHED` `contentCards` (YMCA branches, Neighborhood Music School,
+Aviator Sports, martial arts/gymnastics/skating schools, JCC camps, Randall's Island, etc.).
+
+**Two real defects found and fixed:**
+1. **A second live duplicate provider pair**, same shape as the earlier Imagine Swimming one:
+   `prov-new-york-city-s-ymca` (badly-named, generic, low category confidence) and `prov-west-side-ymca`
+   (well-sourced, specifically named, real staff contact) are the same West Side YMCA branch at 5 West
+   63rd Street. Quarantined the weaker duplicate.
+2. **`cc-c358db37f2f8163b3c6d627a` (Evolutionary Martial Arts) was mis-located** — guessed Upper West
+   Side, but the real school (confirmed via Yelp and its own Facebook page) is at 64 E 4th St in the East
+   Village. Corrected the neighbourhood.
+
+**A real code fix shipped, found while double-checking #2 before creating a providers record for it**:
+attempted to create `prov-evolutionary-martial-arts`, and the generated id came back
+`prov-evolutionary-martial-arts-2` — meaning a record by that name already existed. It did: address
+"64 East 4th Street" (spelled out) against my "64 E 4th St" (abbreviated) — the SAME building, but
+`normalizeStreetAddress`'s duplicate-address check only folded street-TYPE suffixes (street→st,
+avenue→ave, …), never directional prefixes, so the two forms hashed to different keys and the collision
+check would have missed a real duplicate had the id not happened to reveal it. Added east/west/north/south
+folding to both copies of the function (`cardBridgeCreate.ts` and its `addressClusters.ts` twin) with a
+regression test; 392 tests pass. Shipped in `526e0e9`.
+
+The remaining ~17 cards in this run were all already `PUBLISHED`, specifically named, and geographically
+sensible for well-known real NYC youth programs (Karate City UWS/UES as two genuine branches, Tiger
+Schulmann's Bay Ridge, Randall's Island Park Alliance, Greenpoint YMCA, etc.) — reviewed and touched, no
+further defects found this pass.
