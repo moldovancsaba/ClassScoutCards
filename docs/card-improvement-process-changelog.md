@@ -5810,3 +5810,33 @@ Eight items across the three collections, oldest-first, no cards skipped:
 No taxonomy match exists for "full-day early-childhood program" among the four `CATEGORY_VALUES` or the
 eighteen canonical `activityTypes` — used `Classes` / `Indoor Play` as the closest evidenced fit and said
 so plainly rather than picking something more specific-sounding but unevidenced.
+
+### Sovereign loop, continued — stale Imagine Swimming lead, a live duplicate listing found and fixed, one junk source confirmed (2026-08-10)
+
+Continuing the hand-run oldest-first loop:
+
+1. **`cc-6b82ac1d5c36869c669da50c` ("Imagine Swimming Brooklyn Heights") quarantined as a stale
+   lead.** Independently checked the operator's current `/locations` page: Imagine Swimming's five real
+   locations today are TriBeCa Flagship, TriBeCa BMCC, Upper West Side, Crown Heights Armory, and Montauk
+   Playhouse — there is no Brooklyn Heights location. The business is already extensively catalogued
+   under its correct locations; this specific lead does not correspond to anything real.
+2. **A live duplicate listing found and fixed while researching #1.** `prov-imagine-swimming-crown-heights-12ce264e`
+   and `prov-imagine-swimming-crown-heights-armory` are two separate provider records for the identical
+   physical pool (1561 Bedford Ave, Brooklyn) — same address, phone, email. The first was the one
+   actually LIVE (no visibility flag set), sourced from the bare homepage with a generic shared stock
+   banner (`csny-banner-sports_507.png`, one of this catalogue's already-known 16 reused image files) and
+   a repeated "OUR STAFF" blurb. The second — better-evidenced, with a dedicated source page, a real
+   per-listing photo, and a proper weekly-lessons schedule — was sitting hidden. Quarantined the weaker
+   duplicate and revealed the correct one, so exactly one Crown Heights listing is now live instead of two.
+3. **`cc-d6539e1f40b36e2604ffca63` ("Imagine Swimming Tribeca") quarantined as already covered** — its
+   own source page is genuinely correct, but `prov-imagine-swimming-tribeca` already exists, published,
+   at the same address; re-enriching this card would only recreate what already exists.
+4. **`cc-0056dedbeafeb506a9442a88` ("Parent group research, Bedford-Stuyvesant")**: already `QUARANTINED`
+   with `blockerCodes: [placeholder_or_junk_source]` but a null `terminalReason`. Verified the source
+   (dunyanews.tv) is a Pakistani news portal's generic homepage with no connection to any Brooklyn parent
+   group, and filled in the missing reason rather than leaving it blank.
+
+Pattern worth naming: researching one card in a multi-location operator's cluster is now reliably
+surfacing OTHER defects in that same operator's other records (the address-guess correction two batches
+ago, and now a live duplicate) — worth deliberately re-checking a whole operator's cluster once one of
+its cards is touched, not just the single card the queue happened to serve up.
