@@ -9653,3 +9653,24 @@ This is the second consecutive batch where most flagged records needed no action
 records more often than genuinely broken ones**, which is itself useful information about where this
 pass of the pool stands, distinct from earlier batches in this same session that found a defect in nearly
 every record touched. `batch_done.json` now at 729 IDs.
+
+### General maintenance batch #11 — Staten Island's Snug Harbor cluster all shared one empty-neighborhood gap (2026-08-10)
+
+Seven of twelve records checked were already excellent (Chinatown YMCA Beacon Center, Workshop NYC,
+New York Rockits, City Climb NYC at The Edge, Champions Martial Arts Avenue C, Nicol NYC Hell's Kitchen,
+Sail Academy Inwood) — real, specific, well-sourced content, several with published pricing and hours
+lifted directly from the operator's own page. Left untouched.
+
+**Tutu School Upper East Side's description was leaked make-up-class scheduling boilerplate** ("Please do
+not hesitate to contact your Tutu School to schedule a make-up class...", repeated) — the same franchise's
+description-quality problem already seen at other branches this session, cleaned up the same way.
+
+**Three of four Staten Island records flagged for an empty neighborhood shared the same underlying gap**:
+Staten Island Museum and its Earth Camp 2026 program are both on the Snug Harbor Cultural Center campus
+(1000 Richmond Terrace) — filled in as Livingston, the North Shore neighborhood Snug Harbor sits in.
+Broadway YMCA (651 Broadway) is nearby, filled in as West Brighton. Five Points Academy, in Manhattan (148
+Lafayette St), was filled in as Little Italy. All four otherwise had excellent, detailed content — this
+was purely a missing-field gap, not a content-quality problem.
+
+5 touched (1 description cleanup, 4 neighborhood fills), 7 confirmed already excellent. `batch_done.json`
+now at 741 IDs.
