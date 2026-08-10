@@ -9553,3 +9553,30 @@ single-building guess was made for which one hosts summer camp specifically.
 
 10 records touched (1 quarantine finally applied, 1 rename + enrichment, 4 description/field cleanups, 2
 reviewed-and-confirmed, 2 address/neighborhood fixes) plus 2 new creates. `batch_done.json` now at 697 IDs.
+
+### General maintenance batch #7 — a closure statement sitting unread inside a record's own description (2026-08-10)
+
+**Cynthia King Dance Studio's own stored description already said, verbatim, "Cynthia King Dance Studio
+is no longer accepting students."** No outside research was needed to find this — the closure statement
+was sitting in the data the whole time, just never acted on. Confirmed permanently closed; quarantined.
+Distinguishes cleanly from the instructor's separate, still-open ADULT drop-in classes at a different
+address, which are a different offering this card was never about. A sharper version of the
+already-catalogued "farewell message" signal (apple seeds) — that one required inferring closure from
+past-tense marketing language; this one states it outright and just wasn't read carefully.
+
+**Brooklyn Bridge Park Conservancy Programs retired as a duplicate of the Environmental Education record
+fixed two batches ago** — its entire description was Form 990 tax-filing links and a general donor
+appeal, zero actual program content, while the sibling record already carries the real Environmental
+Education Center program and address.
+
+Five more routine fixes: NY Preschool & Kids Club's 94th Street branch got its real address (345 E 94th
+St, Yorkville — a borough-level UES placeholder corrected to the actual branch) and phone from the
+operator's own find-a-location page; SFX Youth Sports (the general org record, distinct from its Flag
+Football sibling fixed earlier) had its placeholder address corrected to Prospect Park, matching both its
+own description and its sibling; West Side Soccer League and Harlem RBI/DREAM had leaked-navigation and
+mid-sentence-cutoff descriptions replaced with real program facts; Bronx House Community Center had an
+empty neighborhood filled in (Morris Park) and `Sports` added to `activityTypes`, which its own
+description named but the stored value had dropped.
+
+7 touched: 1 quarantine (closure statement the data already contained), 1 duplicate retired, 5
+description/field corrections. `batch_done.json` now at 705 IDs.
