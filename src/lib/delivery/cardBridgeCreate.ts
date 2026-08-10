@@ -24,8 +24,9 @@ import { expansionMarketKeys } from "@/lib/delivery/expansionMarkets";
  * listing: a family clicks it, finds nothing, and stops trusting the catalogue.
  *
  *   name, category, borough, address, website   — identity, format, place, and the source that proves it
- *   (image is OPTIONAL — see the note on it in validateCreateRequest. It is the main app's own hard
- *    gate, so a listing without one is created hidden rather than pretending to be live.)
+ *   (image is OPTIONAL — see the note on it in validateCreateRequest. `providerPublishGate` no longer
+ *    requires one at all as of c204ba6, so an imageless create is NOT automatically hidden; visibility
+ *    still follows the gate, which now judges it on everything else.)
  *   shortDescription, longDescription            — the enrichment mandate. A new listing with placeholder
  *                                                  copy is precisely the defect this loop spends its time
  *                                                  removing; it should not be creating more.
@@ -108,16 +109,19 @@ export function validateCreateRequest(body: unknown): CreateValidationResult {
   // (2026-08-09, owner directive: "image is optional not requirement. The better the existing")
   // Image is OPTIONAL to create, and still validated when supplied.
   //
-  // The consequence is real and is not hidden: EVERY read path in the main app requires an imgbb-hosted
-  // image. `deriveServingDoc` computes its `renderable` flag from `isRenderableListing`, and
-  // `publicListReads` and `publicBrowse` both filter on it — all three verified by reading that repo. So
-  // a listing created without an image is complete in every other respect and INVISIBLE to families
-  // until a photograph lands. The publish gate derives `visibility` from exactly that, so such a listing
-  // is created hidden rather than pretending to be live, and shows up in the image work-list.
+  // UPDATED same day, ~1h43m later (c204ba6): the classscout checkout on disk still gates every read
+  // path on `hasValidOwnImage` (`deriveServingDoc`, `isRenderableListing`, `publicListReads`,
+  // `publicBrowse` all verified by reading that repo) — but the owner stated the DEPLOYED core no longer
+  // does, and `providerPublishGate` in publishGate.ts now follows that directive and does not check
+  // `image` at all. So the claim that USED to live here — "a listing created without an image is
+  // INVISIBLE until a photograph lands" — is no longer true: an imageless create is judged on
+  // everything else the gate checks (name, category, borough, source, moderation flags, copy quality)
+  // and is created visible if those pass. See publishGate.ts for the full reasoning; this note exists so
+  // a future reader here does not re-derive a claim the gate itself already corrected.
   //
-  // Making it optional is still the right call: a fully-researched listing with a real address and phone
-  // waiting on a photo is strictly better than no record of the business at all, and the research is the
-  // expensive half.
+  // Making the field optional is still the right call regardless of which gate rule is in force: a
+  // fully-researched listing with a real address and phone is strictly better than no record of the
+  // business at all, and the research is the expensive half.
   if (p.image !== undefined && p.image !== null && String(p.image).trim() !== "" && !isImgBbHttpsImageUrl(p.image)) {
     return {
       ok: false,
