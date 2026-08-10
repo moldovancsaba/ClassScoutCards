@@ -9397,3 +9397,47 @@ as West Brighton, the zoo's well-established Staten Island neighborhood.
 
 6 touched: 1 quarantined, 1 duplicate merged-and-retired, 1 admin-office address cleared, 2 descriptions
 rewritten from fragments, 1 empty field filled. `batch_done.json` now at 663 IDs.
+
+### General maintenance batch #3 — a leaked pipeline note in a NAME field, and an expired marketing site that isn't a closure (2026-08-09/10)
+
+**BronxWorks's own NAME field read "Bronxworks: Missing_official_image"** — an internal pipeline note
+about a missing image had leaked into the public-facing name itself, not a description field like every
+prior instance of this class of bug. Corrected to "BronxWorks Adolescent Programs." Worth widening any
+future leaked-text sweep to check `name`, not just the copy fields.
+
+**NYC Skyline Flag Football's stored website now shows "Squarespace - Website Expired"** — a lapsed
+hosting subscription, not obvious evidence of closure. Before treating it as the confirmed-permanently-
+closed pattern (City Treehouse), checked independently: the operator still runs an ACTIVE LeagueApps
+registration portal (a live member-login page, not a dead one), and a web search still surfaces the
+program's own flag-football and basketball pages describing current-looking offerings. Corrected the
+stored `website` to the still-live LeagueApps URL rather than the expired one, and flagged the situation
+itself (expired marketing site, active registration platform) for a future re-check rather than either
+quarantining a possibly-still-real business or leaving a dead link standing. A new, narrower case between
+"confirmed closed" and "confirmed open": the business's OWN marketing presence lapsed while its
+transactional one didn't.
+
+Three more descriptions were scraped PAGE CHROME rather than real copy, each a slightly different shape
+of the pattern already named: Prospect Park Baseball Association League's was a season-farewell banner
+plus a live field-status widget's text ("Closed Field is closed for the day n/a No field status
+available"); Children's Aid Athletics and Team Sports' was the ORGANIZATION's homepage chrome (donor
+testimonials, a fundraising benefit announcement, and an anecdote about a DIFFERENT, Bronx-specific soccer
+program) rather than copy about this specific athletics program — the anecdote was real and well-written,
+which made it tempting to keep, but it described a different program page and was deliberately left out
+rather than imported as if it were about this one. Brooklyn Crescents Lacrosse's description was simply
+cut off mid-sentence ("Programming for Every Age From Age 3") — completed from the operator's own site,
+which also filled a previously-empty `ageRanges` field (PreK through high school).
+
+**Socceroof Sunset Park's description tail was literally the site's own navigation menu**, scraped
+verbatim ("Careers Contact Blog... Our clubs Crown-heights New Rochelle Long Island City Hochelaga Le
+Plateau Sunset Park...") — cleaned up, with the specific street address left as a `needs_human` gap since
+the operator's site is a JS-rendered Astro app that yields nothing to a static fetch.
+
+Two records in the batch (Oasis Day Camp – Park Slope, Kids in the Game Inwood Summer Camp) were flagged
+by the defect-signal scan (`desc_identical` — short and long description are byte-for-byte the same) but
+turned out on inspection to already carry real, specific, well-written copy that simply works at both
+lengths — not a defect. Left untouched. Worth restating: `desc_identical` is a SIGNAL to check, not proof
+of a problem on its own — the earlier "American Youth Dance Theater" case that named this signal really
+was generic filler; these two are not.
+
+6 touched (4 description rewrites, 1 leaked-name fix, 1 website correction), 2 checked and confirmed clean.
+`batch_done.json` now at 671 IDs.
