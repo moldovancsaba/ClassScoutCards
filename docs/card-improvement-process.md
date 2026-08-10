@@ -9614,3 +9614,26 @@ dated ticket-bundle promo and a customer-review quote into what should have been
 cleanups. Engineering for Kids Manhattan and Broadway Workshop were checked but left with their existing
 gaps (no confirmable specific address found for either via static fetch) rather than guessed.
 `batch_done.json` now at 713 IDs.
+
+### General maintenance batch #9 — a museum that closed its building entirely, and a batch that was mostly already fine (2026-08-10)
+
+**The Rubin Museum Family Programs quarantined — the museum itself confirms it closed its NYC building.**
+Fetching rubinmuseum.org directly returns: "Since transitioning from our physical space in New York City,
+the Rubin presents Himalayan art and its insights through traveling exhibitions, participatory experiences,
+partnerships, and a dynamic digital platform" — the museum describes itself as "a museum without walls."
+140 West 17th Street, the address this record carried, no longer hosts any family program a family could
+visit. A sharper version of the confirmed-permanently-closed pattern (City Treehouse) — there the business
+had simply shut down; here a whole INSTITUTION restructured away from having a physical location at all,
+while continuing to exist and operate in a form this catalogue has no way to represent.
+
+**Six of eight records in this batch (Red Hook Recreation Center, Shirley Chisholm Recreation Center, The
+Cliffs at Harlem, both New York Ninja Academy locations, Supreme Martial Arts Upper West Side) were flagged
+by the defect-signal scan for missing email/image, and all six turned out to already carry real, specific,
+well-written descriptions** — genuine facts (a pool's reduced hours, a subway stop's proximity, a franchise's
+sibling locations), not filler. Left untouched. A concrete data point for the standing "signals are a thing
+to check, not proof of a problem" rule: in this batch, 6 of 8 flagged records needed nothing.
+
+Opus 118 Harlem School of Music (real, historic East Harlem violin program) had its phone/email filled in
+from its own contact page and empty `ageRanges` set to a reasonable elementary-school-age range.
+
+2 touched (1 quarantine, 1 enrichment), 6 confirmed already clean. `batch_done.json` now at 721 IDs.
