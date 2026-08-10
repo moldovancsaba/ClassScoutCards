@@ -9908,3 +9908,41 @@ identical short and long, replaced with a factual description using facts alread
 
 Fourth consecutive batch where 8+ of 10 records needed no correction. 1 touched, 9 confirmed clean.
 `batch_done.json` now at 824 IDs.
+
+### Zero-sport-coverage neighborhood sweep — a targeted pivot away from the diminishing-returns signal queue (2026-08-10)
+
+After four consecutive general-maintenance batches trending toward "mostly already clean," pivoted to a
+more directional exercise: which browsable neighborhoods have ZERO sport listings at all, and can any be
+resolved with genuine, verified businesses rather than left as a gap. `zero_nb.py` (new) lists them
+directly from the same coverage report the owner-requested status check already runs. Before this sweep:
+11 of 54 Brooklyn neighborhoods and 9 of 38 Manhattan neighborhoods had zero.
+
+**Two resolved, both found by cross-checking rather than blind discovery.** Champions Martial Arts Avenue
+C (177 Loisaida Ave) was already correctly created earlier this session, but filed under East Village —
+a geocode of its own exact address returns Alphabet City specifically, a distinct, already-vocabulary
+neighborhood showing zero coverage. Corrected the neighborhood; East Village didn't need the record and
+Alphabet City did. **Training Zone NYC's Manhattan location resolves Stuyvesant Town's zero-coverage gap,
+and does so in a way that specifically avoids the still-open StuyTown/PCV access question from earlier
+this session**: the operator's own page brands the location "Gramercy Park" for search reach, but an
+independent Nominatim POI match for "Training Zone" at its exact address (329 1st Ave) returns the real
+neighbourhood, "Stuy Town" — and unlike the property-management-hosted StuyTown vendor cards flagged
+earlier, this is a genuinely independent, publicly-bookable commercial martial arts school, not a resident
+amenity. **Never trust a business's own SEO neighborhood branding over an independent geocode of its
+actual address** — the second time this session that discipline caught something (after NY Empire
+Baseball's "Harlem" claim for an address literally behind Lincoln Center).
+
+**One near-miss correctly avoided**: Equinox Gramercy surfaced as a lead for the Gramercy gap, but this
+catalogue already has a standing finding that Equinox's "Kids Club" is drop-off childcare for adult gym
+members, not a children's activity — the same business, found again from a different angle, correctly
+excluded again rather than re-litigated.
+
+**Real negative results, stated plainly rather than silently dropped**: targeted searches for Fort
+Hamilton, Marble Hill, Navy Yard, Vinegar Hill, Lincoln Center, and Tudor City found nothing genuinely
+located IN those specific areas — every lead was either a nearby neighborhood's business (a "Brooklyn
+Gymnastics" address that geocoded to Bath Beach, not Fort Hamilton) or a general NYC-wide result with no
+neighborhood-specific confirmation. These are small, low-density, or non-residential areas (a military
+base, an industrial complex, a tiny historic pocket, a cultural campus, a gated enclave), so a genuine zero
+is plausible rather than a research failure — but recorded as unresolved, not silently treated as done.
+
+Coverage: Manhattan zero-sport neighborhoods 9 → 7; Brooklyn unchanged at 11 (no Brooklyn gap resolved this
+pass). Total served sport listings 476 → 478. `batch_done.json` now at 825 IDs.
