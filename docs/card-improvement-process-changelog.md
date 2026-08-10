@@ -5840,3 +5840,26 @@ Pattern worth naming: researching one card in a multi-location operator's cluste
 surfacing OTHER defects in that same operator's other records (the address-guess correction two batches
 ago, and now a live duplicate) — worth deliberately re-checking a whole operator's cluster once one of
 its cards is touched, not just the single card the queue happened to serve up.
+
+### Sovereign loop, continued — cleared a large backlog-compaction cohort missing terminalReason, two more real creates (2026-08-10)
+
+Discovered the globally-oldest queue position was dominated by a large cohort from the 2026-07-05
+backlog-compaction event: hundreds of `contentCards`, all `QUARANTINED` with a `placeholder_or_junk_source`
+(or similar) blocker code already correctly set, but `terminalReason` left `null`. Verified the pattern on
+several representative samples first (internal `internal://classscout/source-seed/...` placeholders with
+no real page at all; external domains — `zhihu.com`, `who.int`, `dunyanews.tv`, `apps.microsoft.com`,
+`id.wikipedia.org` — with zero connection to any NYC children's activity), then cleared 121 of them by
+filling in the missing `terminalReason` and touching each, so the queue can move past this cohort instead
+of re-serving the same null-reason cards indefinitely.
+
+**Two more real, previously-uncatalogued entities found while triaging this cohort, both created:**
+- **`prov-the-international-preschools-ips`** — a real 60+-year Upper East Side preschool
+  (345 East 86th Street). Its content card had been mismatched to a "parent group research" search;
+  the source (ipsnyc.org) is real, but the entity is a preschool provider, not a meetup group. Corrected
+  the source card's `categoryHint` and `terminalReason` to record the entity-type mismatch and the new
+  provider id, rather than force-fitting it into `meetupGroups` enrichment.
+- One card ("Upper West Side Parents") turned out to be a personal parenting blog/media property
+  (~1M monthly pageviews per its own about page), not a specific group — confirmed terminal, not created,
+  since a media property is not the entity a "parent group" card is meant to describe.
+
+Not yet reached the end of this cohort — still paging through it at the same `updatedAt` timestamp.
