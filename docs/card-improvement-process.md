@@ -9703,3 +9703,34 @@ non-generic content — left untouched.
 
 5 touched (2 address fills verified via search, 1 internal-contradiction fix, 1 duplicate retired, 1
 neighborhood fill), 7 confirmed already good. `batch_done.json` now at 753 IDs.
+
+### General maintenance batch #13 — a wrong-neighborhood catch found by fetching the operator's own site, and a near-miss deliberately not taken (2026-08-10)
+
+**New York Empire Baseball was filed under Harlem; its own site names its Manhattan location plainly**:
+"The Arena is located behind Lincoln Center at 251 West 60 Street" — Nominatim independently returns a
+POI match for "New York Empire Baseball" at that exact address, confirming it. Corrected neighborhood
+(Harlem → Lincoln Square) and address together, the same discipline as the Yang Taekwondo/Tiger Schulmann's
+Chelsea fixes earlier — never correct one field of a location without checking the others.
+
+**Creative Art Works Brooklyn — a near-miss caught before it became a new mistake.** Its contact page
+gives a specific, verifiable address (520 8th Ave, Suite 201A, matching the org's own phone and email
+exactly) — every other fix this session would have written that straight into the placeholder address.
+But that address is in Manhattan (Garment District), and this record is specifically titled and bordered
+"Creative Art Works Brooklyn," representing the organization's Brooklyn programming. Writing the confirmed
+Manhattan office address into a Brooklyn-bordered record would have created the exact defect this session
+keeps finding and fixing elsewhere (a parent organization's HQ address overwriting a program's real
+location) — deliberately left at borough grade instead, with the finding recorded so a future pass knows
+the office address was seen and rejected, not missed.
+
+Four more leaked-navigation descriptions cleaned (Silver Music, Snapology Long Island City, Twin Parks
+Montessori "Summer Program" — three separate real campuses named on the operator's site, none
+distinguished as the specific one hosting this record, left as an honest gap — and The Door NYC, whose
+description was a donation-page scrape of gift-amount buttons and impact statistics rather than a
+description of its actual services; also got its real address, 555 Broome St, refined from SoHo to the
+more precise Hudson Square). Little Sharks Playground's empty neighborhood was filled from its own record
+ID (Tottenville), and its `longDescription` — a generic "top indoor playground near me" SEO blurb — was
+replaced with the real facts already sitting correctly in its own `shortDescription`.
+
+7 touched: 1 wrong-neighborhood correction verified two ways (operator site + independent geocode POI
+match), 1 deliberate non-write to avoid a parent-HQ-address mistake, 5 description/field cleanups.
+`batch_done.json` now at 764 IDs.
