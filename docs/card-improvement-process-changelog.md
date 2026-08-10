@@ -5768,3 +5768,45 @@ is plausible rather than a research failure — but recorded as unresolved, not 
 
 Coverage: Manhattan zero-sport neighborhoods 9 → 7; Brooklyn unchanged at 11 (no Brooklyn gap resolved this
 pass). Total served sport listings 476 → 478. `batch_done.json` now at 825 IDs.
+
+### Sovereign loop, resumed manually — two directory-scrape quarantines, one placeholder listing revealed, one new create, three confirmed-terminal touches (2026-08-10)
+
+Resumed the global oldest-first loop by hand after the concurrent-agent handoff earlier this session.
+Eight items across the three collections, oldest-first, no cards skipped:
+
+1. **`meetup-mommy-and-me-club`** and **`meetup-psychology-today`** quarantined. Both `meetupGroups`
+   records were named after, and sourced from, a nationwide directory-aggregator's own SEO search page
+   (mommyandme.club's per-city template; Psychology Today's Brooklyn support-group search results) —
+   the stored `name` was literally the aggregator's own brand, not a specific group. Psychology Today's
+   page is additionally about adult prenatal/postpartum therapy, not a children's activity at all.
+2. **`prov-untitled-listing` fixed and revealed.** Name was the literal placeholder `"Untitled Listing"`
+   and address a bare `"Upper West Side, Manhattan, NYC"`. The website (nycelite.com) named the real
+   business — NYC Elite Gymnastics — and its Upper West Side branch page gave a real street address,
+   phone and email; the stored borough/neighbourhood already narrowed to that one branch (of three), so
+   no split was needed. The existing shortDescription/longDescription turned out to be the operator's own
+   genuine About Us copy verbatim, not scraped chrome — confirmed rather than rewritten. Passed the full
+   public gate on every field; revealed.
+3. **Two `contentCards` confirmed already-correctly-terminal**: `cc-c2837e9031d1e98779f53e5b` (Project
+   Kid, a crafts blog, not an activity provider — corroborated by the linked providers record) and
+   `cc-1392344004f6f1f296bb043c` / `cc-90c974b4246109a25d6cb2b9` (two cards from one bad discovery run
+   against a "28 Iconic Things to Do in Manhattan" listicle, one of them extracted the fragment "To" as
+   its title). All three: existing terminal diagnosis re-verified against the live source, `touch: true`,
+   no change needed.
+4. **`cc-32bed8b9acd447feca41f2fc` (NY1 news article) confirmed terminal, with a lead recorded.** The
+   article covers Kaufman Music Center's small instrument-donation pilot — real, but a news article about
+   a program is not itself a bookable listing. Recorded the lead (Kaufman Music Center, kaufmanmusiccenter.org,
+   Upper West Side) for a future pass rather than chasing it inside this card's own scope.
+5. **`cc-186c3a638cad2658ae824b04` → `prov-the-katmint-learning-initiative` created.** The scraped
+   source was thekatmint.com's `/who-we-are/` chrome page, correctly flagged as not-a-listing — but the
+   real entity (The Katmint Learning Initiative, a full-day early-childhood program) was genuinely
+   uncatalogued. Geocoded its address independently rather than trusting the stored guess: the card said
+   "Downtown Brooklyn," the real address resolves to Bushwick. Created a real record from the operator's
+   own homepage (name, address, phone, email, hours, program list); corrected the source contentCard's
+   `boroughGuess`/`neighborhoodGuess`/`sourceUrl` and recorded the new provider's id in `terminalReason`
+   rather than trying to promote the old card. **A second Katmint site (637 Lexington Ave, ~half a mile
+   away, independently geocoded as a distinct building) exists and does not yet have its own record** —
+   recorded as unresolved rather than merged into one listing or silently dropped.
+
+No taxonomy match exists for "full-day early-childhood program" among the four `CATEGORY_VALUES` or the
+eighteen canonical `activityTypes` — used `Classes` / `Indoor Play` as the closest evidenced fit and said
+so plainly rather than picking something more specific-sounding but unevidenced.
