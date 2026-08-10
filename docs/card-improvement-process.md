@@ -9734,3 +9734,38 @@ replaced with the real facts already sitting correctly in its own `shortDescript
 7 touched: 1 wrong-neighborhood correction verified two ways (operator site + independent geocode POI
 match), 1 deliberate non-write to avoid a parent-HQ-address mistake, 5 description/field cleanups.
 `batch_done.json` now at 764 IDs.
+
+### General maintenance batch #14 — a mailing address in Rhinebeck, and West Side Taekwondo's own address contradicting its own neighborhood (2026-08-10)
+
+**Camp Broadway's confirmed contact address is 103 East Market Street, Rhinebeck, NY 12572** — upstate,
+Dutchess County, nowhere near NYC. This is the organization's (Broadway Education Alliance's) registered
+mailing address, not a camp venue. A second instance of the parent-HQ-address trap this session already
+named for Creative Art Works, but sharper: that one was at least in the right CITY (Manhattan, wrong
+borough for a Brooklyn record); this one isn't in New York City at all. Deliberately left the Midtown
+placeholder in place rather than write an out-of-city mailing address into a Manhattan camp's location
+field, and enriched the description with real program names (Mainstage NYC, Shining Stars, Ensemble)
+instead.
+
+**West Side Taekwondo's own stored address already contradicted its own neighborhood** — 243 W 124th
+Street is deep in Central Harlem, not the Upper West Side the record claimed. The same
+check-a-record-against-itself class of fix as Ballet Tech, the Whitney Museum, and Anderson's Martial
+Arts Academy, now confirmed four times in one session — worth treating as a standing, cheap check on
+every record touched, not just something to notice occasionally.
+
+**Wiz Kids Basketball's description had the same leaked-site-chrome shape as several other records this
+session** ("Coming Soon always working... Tweets by wizkidsaau... Copyright © 202") sitting next to real
+program facts (a Books B4 Ball academic-eligibility requirement) further down — cleaned, keeping the real
+facts. **Dance Theatre of Harlem's Saturday Youth Drop-In Classes record described the COMPANY overall**
+("Dance Theatre of Harlem is an American professional ballet company...", the kind of generic sentence a
+Wikipedia infobox would produce) rather than the specific drop-in program the card represents — rewritten
+to describe the actual Saturday program.
+
+Four more routine fixes: three Staten Island/Bronx records had empty neighborhoods filled in from
+geocodes or, in Wiz Kids' case, the street's own name (Baychester Avenue → Baychester); St. Patrick's CYO's
+neighborhood was filled from a genuinely compound real description ("Bay Ridge/Ft. Hamilton") by picking
+the parish's primary identity, flagged `needs_human` since it's a judgment call between two adjacent real
+answers, not a single confirmed fact; Jalopy Theatre School of Music had a customer-quote fragment removed
+from mid-description and empty `ageRanges` filled from the operator's own "newborns to seniors" language.
+
+8 touched: 1 deliberate non-write (out-of-city mailing address), 1 neighborhood/address contradiction
+fixed, 6 description/field corrections. `batch_done.json` now at 774 IDs.
