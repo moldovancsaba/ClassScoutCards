@@ -9355,3 +9355,45 @@ businesses already resolved in this catalogue by a DIFFERENT route earlier in th
 City, Fencers Club, Yang Taekwondo, Tiger Strong NYC) — useful confirmation that this owner-curated list
 and this bridge's own review loop are converging on the same real businesses independently, not working
 at cross purposes.
+
+### General maintenance batch #2 — a B2B staffing vendor quarantined, a duplicate merged, an admin-office address cleared (2026-08-09)
+
+Next defect-signal batch, worked while no spreadsheet was pending. Six records touched.
+
+**Togetherhood Manhattan — a new shape of the no-fixed-venue prohibition.** Every prior instance of this
+rule (Prep Academy Tutors, Kids in the Game, Big Apple Youth Sports) was a vendor whose people travel to
+OTHER buildings — a family's home, a rented school. Togetherhood is one more step removed: it's a **B2B
+staffing platform** whose own homepage says outright, "Togetherhood connects schools with passionate,
+vetted independent instructors" — the schools are Togetherhood's customers, not the families, and the
+stored address (530 5th Ave) is its own corporate office. A family can't sign up with Togetherhood
+directly at all; whatever school licenses its instructors is the actual point of contact. Quarantined on
+the same reasoning as the others, one layer more abstracted from the venue.
+
+**Henry Street Athletics — a duplicate pair, each with what the other lacked.** One record
+(`prov-henry-street-settlement-athletics`, created in an earlier LES batch) had the real address (301
+Henry St, confirmed off the operator's own "Our Buildings" list) but no email and only `Basketball` in
+`activityTypes`. The other (`prov-henry-street-athletics-a739082a`) had a placeholder address but a
+specific staff phone and email (`sjeambon@henrystreet.org`) and a description naming BOTH basketball and
+baseball training. Merged the good fields into the canonical (address-correct) record — added the
+phone/email, added `Baseball` to `activityTypes` — then retired the duplicate. A reminder that a duplicate
+pair is sometimes worth reading in full before picking a winner: neither record alone had everything.
+
+**Rangers Youth Hockey — an administrative-office address cleared, not corrected.** The stored address (11
+Penn Plaza) is Madison Square Garden's own corporate headquarters; the Rangers' community page names no
+specific rink where youth camps/clinics actually run. Rather than guess a rink, the address was cleared —
+consistent with the standing rule that a wrong address is worse than an honest gap, applied here to a
+professional sports team's community program rather than a tutoring company or NYC Parks facility.
+
+**Bed-Stuy Sluggers Baseball League's description was a coach-bio fragment** ("In addition to his team
+coaching, he has extensive experience...") starting mid-sentence with no antecedent — rewritten with the
+organization's own real facts (a volunteer-led 501(c)(3), founded 2014, serving Bedford-Stuyvesant and
+central Brooklyn). No specific street address was found on the operator's own site (the league plays at
+various Brooklyn fields), so the neighborhood-grade address was left as the honest answer rather than
+invented — the same park-league discipline as SFX/AYSO/Gjøa.
+
+**Staten Island Zoo Birthday Parties** had an empty neighborhood field on an otherwise well-populated
+record (real address, real pricing, real party details already present from an earlier pass) — filled in
+as West Brighton, the zoo's well-established Staten Island neighborhood.
+
+6 touched: 1 quarantined, 1 duplicate merged-and-retired, 1 admin-office address cleared, 2 descriptions
+rewritten from fragments, 1 empty field filled. `batch_done.json` now at 663 IDs.
