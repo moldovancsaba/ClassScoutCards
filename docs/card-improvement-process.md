@@ -9474,3 +9474,38 @@ real building (99 Plymouth St) from the operator's own site navigation.
 
 7 touched — 5 descriptions rewritten from leaked navigation/generic filler, 1 address specified from a
 split-candidate operator, 1 address filled from a placeholder. `batch_done.json` now at 678 IDs.
+
+### General maintenance batch #5 — three quarantines, and a fabricated-location read that turned out wrong on a second check (2026-08-10)
+
+**NY Martial Arts Academy looked exactly like the real-brand-fabricated-location pattern, and wasn't.**
+This record's own stored description named the chain's locations as "Astoria, Little Neck, Greenpoint,
+and Glen Cove" — four real places, none of them Manhattan — while the record itself claimed "Midtown,
+Manhattan." Zero of four matching is exactly the shape that has meant quarantine every other time it's
+been seen this session. But the description is a stale/incomplete scrape, not the operator's current
+truth: fetching nymaa.com's own current Locations page directly shows FIVE branches, not four — Astoria,
+Greenpoint, Glen Cove, Little Neck/Bayside, **and Midtown, Manhattan, 787 7th Ave**. The record was real
+all along; its own copy just hadn't been updated for a location the business added since. Corrected the
+address to the confirmed 787 7th Ave and rewrote the description to reflect all five branches. **The
+lesson: when a record's own description contradicts its own location claim, check the operator's CURRENT
+site before concluding fabrication — a stale description is a real possibility distinct from a fabricated
+address, and this is the first time this session it was the description that was wrong, not the field.**
+
+**Three reality-check failures, each a different flavor already named in this catalog.** *F45 Training* is
+a pure adult HIIT franchise — its own homepage text contains zero mentions of children, kids, or youth
+anywhere, despite the record carrying `ageRanges` from 0-2 through Teens; more clear-cut than any prior
+"unevidenced children's claim" case, since those at least had the word "kids" somewhere on the page. *Yombu
+New York* is a real, legitimate booking marketplace for kids' party entertainers — but the entertainers
+travel to the CUSTOMER's own party venue, and Yombu itself has no physical location a family ever visits,
+the Togetherhood shape applied to entertainers instead of instructors. *Broadway Bound Kids* is off-topic
+contamination: its stored description is entirely unrelated scraped Broadway.com content (an actor's bio,
+a Disney casting note, a preview schedule for an unrelated play), and searching broadway.com's own
+homepage for "Broadway Bound Kids" turns up nothing — the name appears nowhere on the site it was
+supposedly sourced from.
+
+Two more descriptions cleaned from leaked navigation/generic filler (Nory Brooklyn Heights, Allergic to
+Salad Brooklyn), both left at neighborhood-grade addresses since both operators run at rotating rented
+venues or partner sites rather than one fixed studio — an honest gap, not a placeholder to force closed.
+
+9 touched: 3 quarantined, 1 corrected after a second look reversed an initial fabrication read, 2
+description cleanups, 3 checked and left as-is (Camp Orot, Metropolitan Oval Academy Manhattan Outreach,
+Russian School of Mathematics UES — all already reasonably complete). `batch_done.json` now at 687 IDs.
