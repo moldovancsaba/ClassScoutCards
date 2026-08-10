@@ -9893,3 +9893,18 @@ is frequently not a real defect: many legitimate small operators simply don't pu
 
 1 touched (address completion + description polish), 9 confirmed already excellent. `batch_done.json`
 now at 814 IDs.
+
+### General maintenance batch #19 — another mostly-clean batch, one generic slogan replaced (2026-08-10)
+
+Nine of ten records (Children's Tumbling, Asphalt Green Sports at MOCC, Mushin MMA Greenwich Village, Bay
+Ridge Summer Sports and Theatre Camp, Martial Arts Family Studio, Champions Martial Arts Chinatown, Bo Law
+Kung Fu, Manhattan Shaolin KungFu and QiGong, Two Bridges Neighborhood Council Basketball) were already
+real, specific and well-sourced — several with the kind of detail this session's own hard-won lessons
+would have flagged as missing if it weren't already there (Bay Ridge's DOHMH permit citation, Two Bridges'
+"this is not a paid class" callout, Asphalt Green's explicit note that it runs the field component of a
+shared building rather than a campus of its own). Only International Martial Arts Center needed a fix —
+its description was a generic marketing slogan ("Experience the best Martial Arts in NYC. Join...")
+identical short and long, replaced with a factual description using facts already on the record.
+
+Fourth consecutive batch where 8+ of 10 records needed no correction. 1 touched, 9 confirmed clean.
+`batch_done.json` now at 824 IDs.
