@@ -6040,3 +6040,23 @@ Yorkville, Fort Washington, Hamilton Grange, Spring Creek, East Flatbush, Browns
 Lots, Cypress Hills, Macomb's Bridge, Kips Bay, New Amsterdam, Marcy, Gravesend, Hudson Park, Greenpoint)
 plus four more internal-seed placeholders filled in. Session running total now approaching 450
 `contentCards` reviewed.
+
+### Sovereign loop, continued — two more LA region errors, one keyword collision worth flagging explicitly (2026-08-11)
+
+Two real region MISTAKES (not just gaps) found and fixed:
+- **Long Beach Public Library** was guessed `Central LA` — Long Beach is its own city, canonically
+  `Gateway Cities` in this catalogue's own tables.
+- **Descanso Gardens** was guessed `Central LA` — its real location, La Cañada Flintridge, is canonically
+  `San Gabriel Valley`.
+
+**Worth flagging explicitly, even though containment was already correct**: a card titled "Complete" was
+matched to `ar15discounts.com/collections/complete-uppers/` — a firearms parts retailer, hit only on the
+word "Complete" (likely against "Complete Playground" or similar). Already `QUARANTINED`; documented the
+specific subject matter in the terminal reason rather than filing it under the generic
+`placeholder_or_junk_source` label the way other collisions were, since a future reader should not have
+to re-discover what kind of mismatch this was.
+
+Confirmed clean: five real Central LA landmarks already correctly located (Griffith Observatory, The
+Broad, Travel Town Museum, La Brea Tar Pits, Brooklyn Bridge Parents' own camps listing), plus two
+already-well-diagnosed incomplete cards (a raw Google-search-results source, Fit4Dance NYC) needing only
+a touch. Thirteen more internal-seed placeholders cleared.
