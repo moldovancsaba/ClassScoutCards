@@ -6178,4 +6178,51 @@ worth checking every time.** Of the 68 remaining records the agent flagged towar
 **Net for this batch: 53 writes, 53 successes, 0 quarantines applied to a record that turned out to have a
 real, resolvable entity behind it.** Left deliberately out of scope: the 22 `MAPS_LINK` records (real,
 resolvable businesses via a Google Maps place-link, not junk — belongs in a `considerate` pass) and the one
-unresolved Physique Swimming record. The 157-record providers "easy" bucket has not yet been started.
+unresolved Physique Swimming record.
+
+### Executing the "easy" providers bucket: all 157 resolved, and the agent's own summaries were wrong often enough to require re-reading every record (2026-08-11)
+
+Unlike the contentCards bucket, the local dump backing the workflow's provider classifications was stale
+(121 of 157 ids weren't in it) — every one of these 157 was re-fetched live by id before any decision, not
+worked from the workflow's cached snapshot.
+
+**That re-fetch caught something the classification pass itself had missed.** Scanning each record's own
+`shortDescription`/`longDescription` for self-declared-duplicate language ("Duplicate record; see X", "A
+class at X; see the X listing", "Part of X; see the Y listing") turned up **28 records the agent had
+summarized as "Real specific site, complete location, no gaps"** — Private Picassos, Karate City Upper
+East Side (wrong borough entirely — it's in Hell's Kitchen), Brooklyn Bridge Fencing Club, Lucy Moses
+School, The Art Farm NYC, three Aviator Sports program cards, Asphalt Green Upper East Side, Sky Rink at
+Chelsea Piers, Brooklyn Sports Club Youth Program, Inwood Little League, and more — every one of them
+self-admitting in its own stored description that it duplicates a better-sourced sibling record. Two
+(Inwood Little League, Asphalt Green Upper East Side) named a sibling with the *same* display name, so
+before quarantining either a name-filtered lookup confirmed a real second record with a full street
+address existed under a suffixed id — not a self-reference bug. Combined with the one the agent's own
+reason text did flag (`prov-west`, a multi-provider roundup page self-admitting it isn't a single
+business) and the ones the reason text caught correctly (Dodge/Flushing/Greenpoint/North Brooklyn/
+Bedford-Stuyvesant YMCA program cards, Kings Bay Y, DiamondHeart, Church Street School, Brooklearn
+Carroll Gardens, Kidville UES, Mo'Motion, 78 Youth Sports): **29 records total quarantined**
+(`qualityStatus: "quarantined"`, `visibility: "hidden"` — providers' one-directional Decision Matrix C,
+no `state`/`terminalReason` field equivalent to contentCards, so the full reasoning lives only in the
+write's own `reason` and the audit log).
+
+**Four more were real, evidenced field-level fixes, not confirms:** `prov-esf-camps-missing-official-image`
+carried a leaked internal placeholder string as its literal `name` ("Esf Camps: Missing_official_image") —
+corrected to "ESF Camps Riverdale" from its own description. `prov-kids-multi` had the generic non-brand
+name "Kids Multi" for a real, fully-described business (FunFit NYC) — same defect class as the "Camp" →
+"Camp Orot" precedent earlier in this document. `prov-kings-bay-y-volleyball` was geotagged
+Williamsburg while its own description says the class meets "at Kings Bay Y in Sheepshead Bay" — corrected
+to match the record's own evidence. `prov-metropolitan-oval-academy-manhattan-outreach` carried an
+unevidenced `neighborhood: "Harlem"` for a program whose own longDescription says it serves "Manhattan,
+Brooklyn, and Long Island" — a multi-borough outreach programme has no single neighbourhood, so the
+guessed value was cleared rather than left standing on no evidence (companion fix to the same business's
+contentCards stub, corrected earlier in this document).
+
+**The remaining 124 were touch-confirmed** after the same live re-read (own domain, real address, no
+self-declared-duplicate language) found nothing to change — two hit a transient TLS handshake timeout on
+the first pass and succeeded on retry.
+
+**Net for this batch: 157/157 resolved, 0 failures.** This closes out the full 820-record "easy" bucket
+from the classification workflow (663 contentCards + 157 providers). The lesson worth carrying into the
+`considerate` pass: an "easy, no gaps" classification is only as good as whether the classifier actually
+read the record's own stored description text end to end — a live re-check against source, not the cached
+classification, is what caught 28 of these 29 quarantines.
