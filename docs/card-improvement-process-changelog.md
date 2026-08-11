@@ -6060,3 +6060,20 @@ Confirmed clean: five real Central LA landmarks already correctly located (Griff
 Broad, Travel Town Museum, La Brea Tar Pits, Brooklyn Bridge Parents' own camps listing), plus two
 already-well-diagnosed incomplete cards (a raw Google-search-results source, Fit4Dance NYC) needing only
 a touch. Thirteen more internal-seed placeholders cleared.
+
+### Sovereign loop, continued — 5th real create: a business blocked by a missing source, not a fake lead (2026-08-11)
+
+**`prov-new-amsterdam-fencing-academy` created.** `cc-82b87d4d72356975493f2c9a` carried the real business
+name (New Amsterdam Fencing Academy, a genuine Upper West Side fencing club) but its seed had literally
+no source URL at all (`enrichmentSummary.sourceStatus: "missing_source"`) — a discovery-pipeline gap, not
+evidence the business is fake. Found the operator's real domain (nyfencing.com) and corroborated the
+address (302 W 91st St) via Yelp and Waze, since the domain did not render statically. Also corrected the
+source card's neighbourhood (was Harlem; the real address is Upper West Side).
+
+A run of ~22 real, well-sourced Brooklyn youth-activity leads (Gallery Players Youth Theater, Brooklyn
+Waldorf School, Powerhouse Arts, Theatre for a New Audience, My Gym's two Brooklyn branches, Soccer
+Shots Brooklyn South, BASIS Independent Brooklyn, Tiger Schulmann's Bay Ridge, Brooklyn Ninja Academy,
+Brooklyn Bridge Park Boathouse, etc.) confirmed clean and touched.
+
+Session totals: **5 real provider creates**, 2 live-duplicate fixes, 1 code fix, ~30 real location
+corrections, and roughly 500 `contentCards` reviewed oldest-first.
