@@ -6032,3 +6032,11 @@ this same run). Then a real cluster of thirteen NYPL/BPL public library branch c
 Hamilton Fish Park, Epiphany, 115th St, 96th St, Muhlenberg, Heiskell, 125th St, Countee Cullen,
 Morningside Heights, Grand Central, 53rd St, Park Slope) — all correctly sourced from the library
 systems' own `/locations` pages with correct borough guesses already. Confirmed and touched.
+
+### Sovereign loop, continued — the NYPL/BPL library run continues, ~450 cards reviewed (2026-08-11)
+
+Nineteen more real NYPL/BPL branch cards confirmed clean (Schomburg Center, 58th Street, Clarendon,
+Yorkville, Fort Washington, Hamilton Grange, Spring Creek, East Flatbush, Brownsville, Seward Park, New
+Lots, Cypress Hills, Macomb's Bridge, Kips Bay, New Amsterdam, Marcy, Gravesend, Hudson Park, Greenpoint)
+plus four more internal-seed placeholders filled in. Session running total now approaching 450
+`contentCards` reviewed.
