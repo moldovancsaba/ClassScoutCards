@@ -6004,3 +6004,20 @@ on "bridge"); a farm-equipment retailer selling cattle crushes (previously carry
 auto-generated blocker-code string as its terminalReason, not an actual explanation — replaced with one);
 one more already-safely-quarantined adult-content card. The remaining real leads (Dance with Miss Rachel,
 three Marlene Meyerson JCC Manhattan pages, Complete Playground, Crossbar) confirmed clean.
+
+### Sovereign loop, continued — a whole cluster of 21 real LA institutions had no region at all (2026-08-11)
+
+A large, single discovery run (2026-08-07, ~10:31:49–55, sequential) surfaced 23 real, well-known LA-area
+family institutions — zoos, museums, nature centers, city parks-and-rec departments, libraries — every
+one of them with `boroughGuess: null`. Not a wrong guess this time: no guess at all. Filled in the real
+region and neighbourhood for 21 of them from their own well-known addresses, checked against this
+repo's own canonical `LA_AREAS`/`NEIGHBORHOODS` tables rather than assumed (Los Angeles Zoo and the Autry
+→ Central LA/Los Feliz via Griffith Park; Skirball Cultural Center → Westside/Bel Air via Sepulveda Pass;
+Cabrillo Marine Aquarium → Harbor/San Pedro; Placerita Canyon Nature Center → Santa Clarita Valley/Newhall;
+and sixteen more). Left two genuinely citywide/countywide systems (LA Public Library, LA County Library)
+with no region at all, rather than picking one branch's location for an institution that has dozens —
+the same "citywide programme, no single home" judgement applied to Boys & Girls Clubs of Greater LA
+earlier this session.
+
+Session totals: 4 real provider creates, 2 live-duplicate fixes, 1 code fix, 26 real region/location
+corrections (5 NYC neighbourhood/market fixes + 21 LA region fills), and over 400 `contentCards` reviewed.
