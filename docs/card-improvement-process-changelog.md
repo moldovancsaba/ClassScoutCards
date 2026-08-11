@@ -6021,3 +6021,14 @@ earlier this session.
 
 Session totals: 4 real provider creates, 2 live-duplicate fixes, 1 code fix, 26 real region/location
 corrections (5 NYC neighbourhood/market fixes + 21 LA region fills), and over 400 `contentCards` reviewed.
+
+### Sovereign loop, continued — the LA region-gap cluster continues, a real NYPL/BPL library run confirmed (2026-08-11)
+
+Ten more LA institutions from the same no-region discovery run fixed (STAR Eco Station, California
+Science Center, Madrona Marsh Nature Center, LACMA, Pasadena Public Library, Glendale Library, City of
+Santa Clarita Recreation, TreePeople, plus two near-duplicate discovery cards for Bob Baker Marionette
+Theater and Discovery Cube LA that already had a correctly-fixed sibling card from an earlier pass in
+this same run). Then a real cluster of thirteen NYPL/BPL public library branch cards (Bloomingdale,
+Hamilton Fish Park, Epiphany, 115th St, 96th St, Muhlenberg, Heiskell, 125th St, Countee Cullen,
+Morningside Heights, Grand Central, 53rd St, Park Slope) — all correctly sourced from the library
+systems' own `/locations` pages with correct borough guesses already. Confirmed and touched.
