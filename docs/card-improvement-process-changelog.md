@@ -6125,3 +6125,57 @@ the MongoDB credential earlier this session. The lesson for next time: fetch dat
 turn and hand agents only the already-fetched, credential-free records to classify — the approach the
 very first attempt at this workflow used, before an unrelated args-passing bug forced a rewrite that
 introduced this exposure.
+
+### Executing the "easy" contentCards bucket: 640 of 663 resolved, real judgment applied per record (2026-08-11)
+
+Acted on the classification workflow's 663-record "easy" contentCards bucket rather than treating the
+bucket label as a single mechanical action. Splitting by the workflow agent's own `reason` text first,
+then re-checking each record against the live database before writing, turned up two things worth
+recording so the pattern is recognized faster next time.
+
+**573 records were genuinely clean** — the agent's own reason said "confirmed clean" or equivalent — and
+were touch-confirmed (empty update, `lastReviewedAt`/`lastReviewedBy` stamped) in three resumable batches
+to work around the shell tool's 2-minute execution limit. All 573 succeeded.
+
+**"Easy = quarantine" was the agent's default framing for the rest, and it was wrong often enough to be
+worth checking every time.** Of the 68 remaining records the agent flagged toward quarantine:
+
+- 14 known franchise/chain cards (Tiger Schulmann's, NY Kids Club, The Little Gym, Soccer Shots, Kids in
+  Sports, West Side YMCA, Chelsea Piers Field House, McCarren Tennis Center) already had a confirmed real
+  domain from earlier in this same session — applying the real `sourceUrl` fixed them outright instead of
+  discarding a resolvable lead. 2 more were false positives from a keyword-substring check ("not squatted"
+  matched on "squat") and needed only a touch-confirm.
+- Of the remaining 54, live re-fetch showed **16 already sitting correctly at `BLOCKED_REPAIRABLE`** with
+  a keyword-collision source and a real underlying entity (Wikipedia/Merriam-Webster/nytimes.com/amazon.com
+  matches on a common word in the business's own name) — quarantining these would have discarded real,
+  repairable businesses on the strength of a bad source pick alone. 11 were touch-confirmed as already
+  correct; **10 more were still sitting in `DISCOVERED` carrying the same collision pattern (several with
+  a wrongly-applied `policy_or_safety_review`)** and were moved to `BLOCKED_REPAIRABLE` with
+  `policy_or_safety_review` dropped and `terminalReason` rewritten to name the actual keyword collision —
+  same fix pattern as the `constitution.congress.gov` / 14th Street Y and `en.wikipedia.org` / Downtown
+  United Soccer Club cases earlier in this document, just not yet applied to these ten.
+- **18 were the "seed card" duplicate class** (`internal://classscout/source-seed/…` or a bare
+  `google.com` maps-link placeholder, `sourceHost: "classscout"`) — checked one at a time by title/name
+  against the live database rather than assumed resolved. All 18 had a real, already-resolved sibling
+  elsewhere: Brooklyn Italians Soccer Club, Tiger Strong NYC (×2 stub cards), Brooklyn Martial Arts, and
+  Park Slope United Soccer Club each had a `PUBLISHED` sibling; several more (Central Park Tennis Center
+  Youth, Downtown Soccer League NYC, Playgarden Prep ×2, Hoop Heaven, Mind Over Matter Fitness) had a
+  `BLOCKED_TERMINAL` sibling on the real domain; a few (Imagine Swimming Brooklyn Heights, Fun Clubs
+  Brooklyn Camps, Brains & Motion Education Brooklyn, Advantage QuickStart Tennis) had a `QUARANTINED`
+  sibling; New Amsterdam Fencing Academy's real domain (nyfencing.com) had already been captured as a new
+  `providers` record (`prov-new-amsterdam-fencing-academy`, published) in an earlier batch, just never
+  closed out on this stub. All 18 were moved to `BLOCKED_TERMINAL` citing the sibling id, rather than
+  `QUARANTINED` — quarantine implies the record itself is wrong; these are dead stubs superseded elsewhere.
+  **One (Physique Swimming Battery Park City) had no confirmed real sibling** and was left untouched —
+  genuinely not an easy win, needs its own research pass.
+- The true remaining junk — 14 records whose own *title* was the scraped garbage page itself (Aliexpress,
+  an Ipswich Town fan-news page, a mail-order-bride site, xnxx.es, a Chinese Q&A dictionary page, etc.),
+  every one of them also carrying **fabricated Bronx borough/neighborhood metadata** with no connection to
+  the actual (nonexistent) entity — were quarantined with `categoryHint`/`boroughGuess`/`neighborhoodGuess`
+  cleared, matching the "worst-case off-topic-contamination" fix pattern already established in this
+  document.
+
+**Net for this batch: 53 writes, 53 successes, 0 quarantines applied to a record that turned out to have a
+real, resolvable entity behind it.** Left deliberately out of scope: the 22 `MAPS_LINK` records (real,
+resolvable businesses via a Google Maps place-link, not junk — belongs in a `considerate` pass) and the one
+unresolved Physique Swimming record. The 157-record providers "easy" bucket has not yet been started.
