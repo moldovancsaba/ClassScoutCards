@@ -5967,3 +5967,21 @@ Boulders) — confirmed and touched.
 Running total this session: 4 real provider creates, 2 live-duplicate fixes, 1 code fix (directional
 address normalization, shipped with a regression test), and well over 300 content cards reviewed across
 the backlog-compaction cohort and several windows of real leads.
+
+### Sovereign loop, continued — a second adult-content wave confirmed safe, a real business held back from a bad address guess (2026-08-11)
+
+Another wave of already-`QUARANTINED` junk (three more adult-content sites — epornz.com, xhamster.com,
+fuq.com — all correctly hidden already; a PC-game-download site; ten more internal-seed placeholders)
+filled in with terminalReason and touched.
+
+**A real business found, but NOT created** — the disciplined outcome, not a shortcut: `cc-3a2cf8370ddda9a39e414af7`'s
+title was the generic location fragment "New York, Ny" for what is actually Children's Art Classes, a
+25-year-old NYC art-class franchise. Its own site gives "752 West End Avenue NY, NY 10025" — the exact
+same bare address already held by two other real, unrelated tenants in this catalogue (Imagine Swimming,
+FunFit Kids), with no suite number anywhere on the operator's site. Rather than invent a distinguishing
+suite to get past the create endpoint's own duplicate-address guard (the guard this session added
+directional-prefix folding to, two batches ago), fixed the card's title only and left the create for a
+future pass once a real suite number turns up — recorded as an open gap, not silently dropped.
+
+Session totals now: 4 real provider creates, 2 live-duplicate fixes, 1 code fix, and roughly 350
+`contentCards` reviewed.
