@@ -6226,3 +6226,34 @@ from the classification workflow (663 contentCards + 157 providers). The lesson 
 `considerate` pass: an "easy, no gaps" classification is only as good as whether the classifier actually
 read the record's own stored description text end to end — a live re-check against source, not the cached
 classification, is what caught 28 of these 29 quarantines.
+
+### Closing out the 22 `MAPS_LINK` contentCards deliberately set aside from the easy-wins pass (2026-08-11)
+
+These were held back from the batch above on purpose — a raw Google Maps `place_id` deep link as
+`sourceUrl` is a pipeline working-artifact, not a verdict on the entity, so quarantining them the way the
+54-record junk batch did would have discarded real, resolvable businesses. 2 of the 22 (Brooklyn Italians
+Soccer Club, Central Park Tennis Center Youth) turned out to already be resolved by the seed-card
+duplicate pass above — no separate action needed. Live re-fetch on the remaining 20 found:
+
+- **1 more fingerprint-duplicate the dry-run itself caught**: `cc-090cfbb5ff065d287b619929`, a second "NY
+  Kids Club UES" stub, would have collided with `cc-40c83372e90b122db05ab42e`'s fingerprint the moment its
+  `sourceUrl` was corrected to the same real domain — the write API's own collision guard flagged this
+  before anything was written, confirming they are the same card. Marked `BLOCKED_TERMINAL` citing the
+  sibling, same pattern as the seed-card class above.
+- **1 direct fix from an already-confirmed domain**: `cc-099087db9ce2e2606b7598dc` ("West Side YMCA")
+  re-sourced to `ymcanyc.org/locations/west-side-ymca/programs-and-classes`, the same real branch page
+  confirmed for a different West Side YMCA duplicate earlier this session.
+- **8 moved `DISCOVERED` → `BLOCKED_REPAIRABLE`** (Mill Basin Day Camp, Physique Swimming, i9 Sports
+  Brooklyn, Goldfish Swim School Manhattan, Park Slope Academy Jiu Jitsu Kids, Prospect Park Soccer
+  League, Chelsea Piers Field House Brooklyn Flag Football, Mathnasium Park Slope) — real, on-topic
+  businesses with no confirmed replacement domain in hand this pass; a Maps link is not evidence of an
+  off-topic entity, so `BLOCKED_REPAIRABLE` (not quarantine) is the honest state.
+- **10 touch-confirmed** — already sitting correctly at `BLOCKED_REPAIRABLE` for the identical reason.
+
+**Net: 21 writes (1 collision-caught duplicate resolved on the second attempt, 20 on the first), 0
+failures.** No domain was guessed from memory for any record where this session had not already
+independently verified it elsewhere — several strong candidates (NYRR, Mathnasium, Goldfish Swim School,
+i9 Sports are all well-known national brands) were still left at `BLOCKED_REPAIRABLE` rather than assigned
+a specific location-page URL pulled from memory, consistent with this loop's standing rule against writing
+an unverified source. This closes every record from the classification workflow's easy bucket except the
+one unresolved Physique Swimming Battery Park City stub noted earlier, which stays open for a future pass.
