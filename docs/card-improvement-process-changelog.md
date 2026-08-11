@@ -6096,3 +6096,32 @@ Park/Coney Island, Brooklyn Italians Soccer Club, etc.) confirmed clean and touc
 (contentCards + providers + meetupGroups not yet published or retired, ~1,750 records) into easy/
 considerate/hard buckets with deep statistics, per an explicit request to scale the audit with multiple
 agents. Results to follow once it completes.
+
+### Full-sweep classification workflow completed (partial): 1,267/1,752 records, 131 flagged findings (2026-08-11)
+
+The 20-agent classification workflow (launched to fulfil an explicit request for a multi-agent full sweep
+of the pending backlog) finished with 13/20 agents succeeding — 1 blocked by an automated safety check,
+6 stopped by a session usage limit. Real results, not extrapolated: of 1,267 records actually classified,
+**820 easy (65%), 335 considerate (26%), 112 hard (9%)**.
+
+**131 records (10%) carry a flagged finding**, clustering into five real patterns: 85 likely-duplicate
+flags (~40 distinct pairs — e.g. Amerikick Brooklyn, Shihan Martial Arts Brooklyn, and Premier Martial
+Arts Brooklyn each have a real-domain card and a wrong-domain/directory-listing twin), 27 wrong-source/
+keyword-collision matches (Physique Swimming's enrichment pulled a dictionary definition of "physique";
+Premier Martial Arts Brooklyn resolved to a gambling site; Seahorse Swim School Brooklyn resolved to an
+unrelated Santa Cruz business), 21 location errors (Martial Arts Family Studio guessed Brooklyn against
+its own Manhattan address), 7 multi-location split candidates (British Swim School spans a 4-card
+cluster), and 7 rename/rebrand cases (German School Brooklyn now brands as Global School Brooklyn).
+Full detail published as an artifact; report and reasoning preserved in this repo's commit history via
+this entry.
+
+**A security disclosure, not a finding about the catalogue**: the workflow's design embedded the live
+`CARD_BRIDGE_API_KEY` directly in each classification agent's prompt so agents could fetch their own data
+slice. That key is now persisted in plaintext in the workflow's script file (redacted after the fact) and
+in at least 38 subagent transcript files under this session's local project directory — not public, but
+written to more places than intended. One agent run was itself blocked by an automated safety check for
+exactly this reason. **Recommended: rotate `CARD_BRIDGE_API_KEY`**, the same caution already applied to
+the MongoDB credential earlier this session. The lesson for next time: fetch data in the orchestrating
+turn and hand agents only the already-fetched, credential-free records to classify — the approach the
+very first attempt at this workflow used, before an unrelated args-passing bug forced a rewrite that
+introduced this exposure.
