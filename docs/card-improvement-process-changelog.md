@@ -5985,3 +5985,22 @@ future pass once a real suite number turns up — recorded as an open gap, not s
 
 Session totals now: 4 real provider creates, 2 live-duplicate fixes, 1 code fix, and roughly 350
 `contentCards` reviewed.
+
+### Sovereign loop, continued — five real LA institutions had no region at all; more keyword collisions (2026-08-11)
+
+**A genuine gap, not a wrong guess**: five real, well-known LA family institutions (City of Pasadena
+Recreation, The Getty Center, Boys & Girls Clubs of Greater LA, Discovery Cube LA, Aquarium of the
+Pacific) reached `DISCOVERED` with `boroughGuess` entirely missing (`null`), not just wrong. Filled in
+the real region/neighbourhood for four of them from their own known addresses (Pasadena→San Gabriel
+Valley, Getty Center→Westside/Brentwood, Discovery Cube→San Fernando Valley/Sylmar, Aquarium of the
+Pacific→Gateway Cities/Long Beach — confirmed against the canonical `LA_AREAS`/`NEIGHBORHOODS` tables
+rather than guessed). Left Boys & Girls Clubs of Greater LA's region blank rather than picking one: it is
+a genuinely citywide umbrella with many branches, the same "citywide programme, not one location" pattern
+already established for split candidates this session.
+
+More keyword collisions and guide pages quarantined: a Wikitravel article about all of Manhattan; an
+"Untitled listing" sourced from a multi-venue party-space listicle; Tower Bridge in **London** (matched
+on "bridge"); a farm-equipment retailer selling cattle crushes (previously carrying only an
+auto-generated blocker-code string as its terminalReason, not an actual explanation — replaced with one);
+one more already-safely-quarantined adult-content card. The remaining real leads (Dance with Miss Rachel,
+three Marlene Meyerson JCC Manhattan pages, Complete Playground, Crossbar) confirmed clean.
