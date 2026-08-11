@@ -6077,3 +6077,22 @@ Brooklyn Bridge Park Boathouse, etc.) confirmed clean and touched.
 
 Session totals: **5 real provider creates**, 2 live-duplicate fixes, 1 code fix, ~30 real location
 corrections, and roughly 500 `contentCards` reviewed oldest-first.
+
+### Sovereign loop, continued — a domain-hijack case resolved to a real quarantine, not a false enrichment (2026-08-11)
+
+**`cc-5fe8f394ea334dae35949b9d` ("Trestle Art Space Kids") — a double defect, resolved without fabricating
+a "kids" program.** Its original source, trestlegallery.org, is now a domain-squatted VPN-affiliate spam
+site (confirmed via its own scraped `sourceTextSample`: "Best VPN Services... Flixtor UnBlocking"). Found
+the real, currently-live operator at trestleartspace.org — but it turned out to be a private ARTIST STUDIO
+RENTAL space ($445/month studios for adults), with no kids/youth programming anywhere on its own site. The
+card's own title was likely a fabricated/mis-derived extraction. Quarantined as off-topic rather than
+inventing a "kids classes" claim the real business doesn't make.
+
+A run of 22 real, well-sourced Brooklyn/Manhattan leads (Mathnasium's four branches, Kumon's three branches,
+The Little Gym Dumbo, Soccer Shots Brooklyn North, Jewish Children's Museum, Bend + Bloom Kids Yoga, Luna
+Park/Coney Island, Brooklyn Italians Soccer Club, etc.) confirmed clean and touched.
+
+**In parallel**: launched a 20-agent workflow to fetch and classify the ENTIRE remaining pending backlog
+(contentCards + providers + meetupGroups not yet published or retired, ~1,750 records) into easy/
+considerate/hard buckets with deep statistics, per an explicit request to scale the audit with multiple
+agents. Results to follow once it completes.
