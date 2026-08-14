@@ -12,7 +12,7 @@ const token = tokenMatch[1];
 
 // The actual password
 const password = 'apicard11-11';
-const uri = `mongodb+srv://apicard:${password}@cardsapi.xeksqkr.mongodb.net/?appName=CARDSAPI`;
+const uri = `REDACTED_ROTATE_ME_2026-08-14`;
 
 console.log('Updating MONGODB_URI with actual password...');
 execSync(`echo '${uri}' | vercel env add MONGODB_URI production --token ${token}`, { cwd: '/root/.openclaw/workspace/ClassScoutCards', encoding: 'utf8' });
