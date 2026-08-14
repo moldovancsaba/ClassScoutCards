@@ -12,7 +12,7 @@ if (!tokenMatch) {
 }
 const token = tokenMatch[1];
 const password = process.argv[2] || "apicard11-11";
-const uri = `mongodb+srv://apicard:***}@cardsapi.xeksqkr.mongodb.net/?appName=CARDSAPI`;
+const uri = `REDACTED_ROTATE_ME_2026-08-14`;
 
 console.log("Updating Vercel env var with token prefix:", token.slice(0, 6) + "...");
 try {
